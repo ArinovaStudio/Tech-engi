@@ -7,8 +7,9 @@ datasource db {
 }
 
 enum Role {
-  USER
   ADMIN
+  CLIENT
+  ENGINEER
 }
 
 model User {
@@ -17,9 +18,60 @@ model User {
   email String @unique
   emailVerified DateTime?
   password String?
-  role Role @default(USER)
+  role Role  
   image String?
+
   accounts Account[]
+  clientProfile ClientProfile?
+  engineerProfile EngineerProfile?
+}
+
+model ClientProfile {
+  id String @id @default(uuid())
+  userId String @unique
+  totalProjects Int @default(0)
+  totalBudget Float @default(0)
+  expertise String[]
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projects Project[]
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum Qualification {
+  UG
+  EMPLOYED
+  UNEMPLOYED
+}
+
+enum IdType {
+  STUDENT_ID
+  AADHAAR
+  PAN
+  PAY_SLIP
+}
+
+model EngineerProfile {
+  id String @id @default(uuid())
+  userId String @unique
+  
+  status ApprovalStatus @default(PENDING)
+  rejectionReason String? @db.Text
+  qualification Qualification
+  idType IdType
+  idNumber String
+  idImage String
+  
+  certifications String[]
+  skills String[]
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignedWork Project[]
 }
 
 model Account {
@@ -41,6 +93,16 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
+
+enum ProjectStatus {
+  DRAFT
+  AWAITING_ADVANCE
+  SEARCHING
+  IN_PROGRESS
+  COMPLETED
+  CANCELED
+}
+
 enum Otptype {
   VERIFY_EMAIL
   RESET_PASSWORD
@@ -48,11 +110,31 @@ enum Otptype {
 
 model Otp {
   id String @id @default(uuid())
-  email String @unique
+  email String
   code String
   type Otptype
   expiresAt DateTime
   createdAt DateTime @default(now())
 
   @@unique([email, type])
+}
+
+model Project {
+  id String @id @default(uuid())
+  clientId String
+  EngineerId String?
+
+  title String
+  description String @db.Text
+  budget Float
+  instruments String[]
+  roadmapFiles String[]
+  
+  advancePaid Boolean @default(false)
+  status ProjectStatus @default(DRAFT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  client ClientProfile @relation(fields: [clientId], references: [id])
+  engineer EngineerProfile? @relation(fields: [EngineerId], references: [id])
 }

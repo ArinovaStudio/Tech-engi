@@ -33,6 +33,13 @@ export async function POST(req: NextRequest) {
     }
 
     if (type === "VERIFY_EMAIL") {
+      const existingUser = await prisma.user.findUnique({ where: { email } });
+      
+      if (!existingUser) {
+        await prisma.otp.delete({ where: { email_type: { email, type } } });
+        return NextResponse.json({ success: false, message: "Account not found. Please register first" }, { status: 404 });
+      }
+
       await prisma.user.update({
         where: { email },
         data: { emailVerified: new Date() }

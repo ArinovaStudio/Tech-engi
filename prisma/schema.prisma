@@ -93,7 +93,6 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
-
 enum ProjectStatus {
   DRAFT
   AWAITING_ADVANCE
@@ -101,22 +100,6 @@ enum ProjectStatus {
   IN_PROGRESS
   COMPLETED
   CANCELED
-}
-
-enum Otptype {
-  VERIFY_EMAIL
-  RESET_PASSWORD
-}
-
-model Otp {
-  id String @id @default(uuid())
-  email String
-  code String
-  type Otptype
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-
-  @@unique([email, type])
 }
 
 model Project {
@@ -137,4 +120,20 @@ model Project {
 
   client ClientProfile @relation(fields: [clientId], references: [id])
   engineer EngineerProfile? @relation(fields: [engineerId], references: [id])
+}
+
+enum Otptype {
+  VERIFY_EMAIL
+  RESET_PASSWORD
+}
+
+model Otp {
+  id String @id @default(uuid())
+  email String
+  code String
+  type Otptype
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@unique([email, type])
 }

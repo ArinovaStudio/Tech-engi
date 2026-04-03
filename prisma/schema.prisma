@@ -72,6 +72,7 @@ model EngineerProfile {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   assignedWork Project[]
+  invitations ProjectInvitation[]
 }
 
 model Account {
@@ -120,6 +121,28 @@ model Project {
 
   client ClientProfile @relation(fields: [clientId], references: [id])
   engineer EngineerProfile? @relation(fields: [engineerId], references: [id])
+
+  invitations ProjectInvitation[]
+}
+
+enum InvitationStatus {
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+model ProjectInvitation {
+  id String @id @default(uuid())
+  projectId String
+  engineerId String
+  status InvitationStatus @default(SENT)
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  engineer EngineerProfile @relation(fields: [engineerId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, engineerId])
 }
 
 enum Otptype {

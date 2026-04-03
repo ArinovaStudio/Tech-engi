@@ -4,6 +4,40 @@ import { getClient } from "@/lib/auth";
 import { uploadFile, deleteFile } from "@/lib/uploads";
 import { z } from "zod";
 
+export async function GET( req: NextRequest, { params }: { params: Promise<{ projectId: string }> } ) {
+  try {
+    const { user, error } = await getClient();
+    if (error || !user || !user.clientProfile) {
+      return NextResponse.json({ success: false, message: error || "Unauthorized" }, { status: 401 });
+    }
+
+    const { projectId } = await params;
+
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      include: {
+          engineer: {
+            include: { user: { select: { name: true, image: true, email: true }}
+          }
+        }
+      }
+    });
+
+    if (!project) {
+      return NextResponse.json({ success: false, message: "Project not found" }, { status: 404 });
+    }
+
+    if (project.clientId !== user.clientProfile.id) {
+      return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
+    }
+
+    return NextResponse.json({ success: true, project }, { status: 200 });
+
+  } catch {
+    return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
+  }
+}
+
 const updateProjectSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters"),
   description: z.string().min(20, "Please provide a more detailed description"),

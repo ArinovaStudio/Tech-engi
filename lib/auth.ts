@@ -2,13 +2,16 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 
-export async function getAdmin() {
+export async function getUser() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email){
     return { user: null, error: "Unauthorized" };
   }
 
-  const user = await prisma.user.findUnique({ where: { email: session.user.email } });
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    include: { clientProfile: true, engineerProfile: true }
+  });
   
   if (!user){
     return { user: null, error: "User not found" };
@@ -16,6 +19,25 @@ export async function getAdmin() {
 
   if (!user.emailVerified){
     return { user: null, error: "Please verify your email first" };
+  }
+
+  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+  if (user.lastActiveAt < twentyFourHoursAgo) {
+    prisma.user.update({
+      where: { id: user.id },
+      data: { lastActiveAt: new Date() }
+    });
+  }
+
+  return { user, error: null };
+}
+
+export async function getAdmin() {
+  const { user, error } = await getUser();
+
+  if (!user || error){
+    return { user: null, error };
   }
 
   if (user.role !== "ADMIN"){
@@ -27,22 +49,10 @@ export async function getAdmin() {
 
 
 export async function getClient() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email){
-    return { user: null, error: "Unauthorized" };
-  }
+  const { user, error } = await getUser();
 
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    include: { clientProfile: true }
-  });
-
-  if (!user){
-    return { user: null, error: "User not found" };
-  }
-
-  if (!user.emailVerified){
-    return { user: null, error: "Please verify your email first" };
+  if (!user || error){
+    return { user: null, error };
   }
 
   if (user.role !== "CLIENT"){
@@ -53,22 +63,10 @@ export async function getClient() {
 }
 
 export async function getEngineer(requireApproval = true) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email){
-    return { user: null, error: "Unauthorized" };
-  }
+  const { user, error } = await getUser();
 
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    include: { engineerProfile: true }
-  });
-
-  if (!user){
-    return { user: null, error: "User not found" };
-  }
-
-  if (!user.emailVerified){
-    return { user: null, error: "Please verify your email first" };
+  if (!user || error){
+    return { user: null, error };
   }
 
   if (user.role !== "ENGINEER"){
@@ -85,15 +83,6 @@ export async function getEngineer(requireApproval = true) {
     if (user.engineerProfile.status === "REJECTED") {
       return { user: null, error: `Account rejected: ${user.engineerProfile.rejectionReason}` };
     }
-  }
-
-  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-
-  if (user.lastActiveAt < twentyFourHoursAgo) {
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { lastActiveAt: new Date() }
-    });
   }
 
   return { user, error: null };

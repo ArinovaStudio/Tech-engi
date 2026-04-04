@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getEngineer } from "@/lib/auth";
 import { deleteFile, uploadImage } from "@/lib/uploads";
 import { z } from "zod";
+import { generateEmbedding } from "@/lib/embeddings";
 
 export async function GET() {
   try {
@@ -59,7 +60,11 @@ export async function POST(req: NextRequest) {
 
     const idImageUrl = await uploadImage(idImageFile, "kyc");
 
-    await prisma.engineerProfile.create({
+    const embeddingText = `Skills: ${validation.data.skills.join(", ")}`;
+    const embeddingVector = await generateEmbedding(embeddingText);
+    const vectorString = JSON.stringify(embeddingVector);
+
+    const newProfile = await prisma.engineerProfile.create({
       data: {
         userId: user.id,
         status: "PENDING",
@@ -71,6 +76,12 @@ export async function POST(req: NextRequest) {
         certifications: validation.data.certifications || [],
       }
     });
+
+    await prisma.$executeRaw`
+      UPDATE "EngineerProfile"
+      SET embedding = ${vectorString}::vector
+      WHERE id = ${newProfile.id}
+    `;
 
     return NextResponse.json({ success: true, message: "Profile created successfully" }, { status: 201 });
 
@@ -112,6 +123,10 @@ export async function PUT(req: NextRequest) {
       idImageUrl = await uploadImage(idImageFile, "kyc");
     }
 
+    const embeddingText = `Skills: ${validation.data.skills.join(", ")}`;
+    const embeddingVector = await generateEmbedding(embeddingText);
+    const vectorString = JSON.stringify(embeddingVector);
+
     await prisma.engineerProfile.update({
       where: { userId: user.id },
       data: {
@@ -123,6 +138,12 @@ export async function PUT(req: NextRequest) {
         certifications: validation.data.certifications || []
       }
     });
+
+    await prisma.$executeRaw`
+      UPDATE "EngineerProfile"
+      SET embedding = ${vectorString}::vector
+      WHERE "userId" = ${user.id}
+    `;
 
     return NextResponse.json({ success: true, message: "Profile updated successfully" }, { status: 200 });
 

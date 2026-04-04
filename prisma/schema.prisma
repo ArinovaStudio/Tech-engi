@@ -1,9 +1,11 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
   provider = "postgresql"
+  extensions = [vector]
 }
 
 enum Role {
@@ -69,6 +71,7 @@ model EngineerProfile {
   
   certifications String[]
   skills String[]
+  embedding Unsupported("vector(768)")?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   assignedWork Project[]

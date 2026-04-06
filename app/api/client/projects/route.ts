@@ -34,6 +34,8 @@ const projectSchema = z.object({
   description: z.string().min(20, "Please provide a more detailed description"),
   budget: z.number().min(500, "Minimum budget must be ₹500"), 
   instruments: z.array(z.string()).default([]),
+  startDate: z.coerce.date().optional(),
+  endDate: z.coerce.date().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -50,13 +52,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: validation.error.issues[0].message }, { status: 400 });
     }
 
+    const { title, description, budget, instruments, startDate, endDate } = validation.data;
+
+    if (startDate && endDate && startDate > endDate) {
+      return NextResponse.json({ success: false, message: "Start date must be before end date" }, { status: 400 });
+    } 
+
     const newProject = await prisma.project.create({
       data: {
         clientId: user.clientProfile.id,
-        title: validation.data.title,
-        description: validation.data.description,
-        budget: validation.data.budget,
-        instruments: validation.data.instruments,
+        title, description, budget, instruments, startDate, endDate,
         status: "AWAITING_ADVANCE"
       }
     });

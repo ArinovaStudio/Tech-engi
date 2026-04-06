@@ -113,3 +113,29 @@ export const deletionRequestRejectedTemplate = (clientName: string, projectTitle
     <p>Regards,<br/>The Platform Team</p>
   </div>
 `;
+
+export const extensionRequestedTemplate = (clientName: string, projectTitle: string, reason: string, newDate: string) => `
+  <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+    <h2 style="color: #0275d8;">Deadline Extension Requested</h2>
+    <p>Hello ${clientName},</p>
+    <p>The engineer working on your project <b>${projectTitle}</b> has requested a deadline extension.</p>
+    <p><b>Requested End Date:</b> ${newDate}</p>
+    <p><b>Reason:</b> <i>"${reason}"</i></p>
+    <p>Please log in to your dashboard to Approve or Reject this request.</p>
+    <br/>
+    <p>Regards,<br/>The Platform Team</p>
+  </div>
+`;
+
+export const extensionReviewedTemplate = (engineerName: string, projectTitle: string, isApproved: boolean) => `
+  <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+    <h2 style="color: ${isApproved ? '#5cb85c' : '#d9534f'};">Deadline Extension ${isApproved ? 'Approved' : 'Rejected'}</h2>
+    <p>Hello ${engineerName},</p>
+    <p>Your request to extend the deadline for <b>${projectTitle}</b> has been <b>${isApproved ? 'Approved' : 'Rejected'}</b> by the client.</p>
+    ${isApproved 
+      ? '<p>The project timeline has been officially updated.</p>' 
+      : '<p>The original deadline still stands. If this causes a major issue, please raise a Ticket from your dashboard.</p>'}
+    <br/>
+    <p>Regards,<br/>The Platform Team</p>
+  </div>
+`;

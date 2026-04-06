@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
     }
 
     const activeProjects = await prisma.project.findMany({
-      where: { status: "SEARCHING" },
+      where: { status: "SEARCHING", advancePaid: true },
       include: {
         invitations: { orderBy: { createdAt: "desc" } }
       }

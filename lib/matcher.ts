@@ -78,7 +78,12 @@ export async function getTopMatches(projectId: string) {
       format: 'json'
     });
 
-    const result = JSON.parse(response.message.content);
+    const rawText = response.message.content;
+    
+    const jsonMatch = rawText.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+    if (!jsonMatch) throw new Error("No JSON found in response");
+
+    const result = JSON.parse(jsonMatch[0]);
     
     let matchedIds: string[] = [];
     

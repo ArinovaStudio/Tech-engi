@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getClient } from "@/lib/auth";
-import { uploadFile } from "@/lib/uploads";
 import { z } from "zod";
 
 export async function GET() {
@@ -18,9 +17,7 @@ export async function GET() {
     const projects = await prisma.project.findMany({
       where: { clientId: user.clientProfile.id },
       include: {
-        engineer: {
-          include: { user: { select: { name: true, image: true } } }
-        }
+        engineer: { include: { user: { select: { name: true, image: true } } } }
       },
       orderBy: { createdAt: 'desc' }
     });
@@ -42,55 +39,29 @@ const projectSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const { user, error } = await getClient();
-    if (error || !user) {
+    if (error || !user?.clientProfile) {
       return NextResponse.json({ success: false, message: error || "Unauthorized" }, { status: 401 });
     }
 
-    if (!user.clientProfile) {
-      return NextResponse.json({ success: false, message: "Please complete your profile first" }, { status: 403 });
-    }
+    const body = await req.json(); 
 
-    const formData = await req.formData();
-    
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
-    const budget = Number(formData.get("budget"));
-    const instrumentsRaw = formData.get("instruments") as string;
-    const instruments = instrumentsRaw ? JSON.parse(instrumentsRaw) : [];
-
-    const validation = projectSchema.safeParse({ title, description, budget, instruments });
+    const validation = projectSchema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json({ success: false, message: validation.error.issues[0].message }, { status: 400 });
     }
 
-    const files = formData.getAll("files") as File[];
-    
-    if (files.length > 5) {
-      return NextResponse.json({ success: false, message: "Maximum 5 files allowed" }, { status: 400 });
-    }
-
-    const roadmapFileUrls: string[] = [];
-    
-    for (const file of files) {
-      if (file.size > 0) { 
-        const fileUrl = await uploadFile(file, "projects");
-        roadmapFileUrls.push(fileUrl);
-      }
-    }
-
-    await prisma.project.create({
+    const newProject = await prisma.project.create({
       data: {
         clientId: user.clientProfile.id,
         title: validation.data.title,
         description: validation.data.description,
         budget: validation.data.budget,
         instruments: validation.data.instruments,
-        roadmapFiles: roadmapFileUrls,
         status: "AWAITING_ADVANCE"
       }
     });
 
-    return NextResponse.json({ success: true, message: "Project created successfully" }, { status: 201 });
+    return NextResponse.json({ success: true, message: "Project created successfully", projectId: newProject.id }, { status: 201 });
 
   } catch {
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });

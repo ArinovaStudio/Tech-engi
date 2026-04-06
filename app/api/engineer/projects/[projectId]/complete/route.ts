@@ -13,8 +13,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pro
 
     const project = await prisma.project.findUnique({ where: { id: projectId } });
 
-    if (!project || project.engineerId !== user.engineerProfile.id) {
-      return NextResponse.json({ success: false, message: "Project not found or forbidden" }, { status: 404 });
+    if (!project) {
+      return NextResponse.json({ success: false, message: "Project not found" }, { status: 404 });
+    }
+
+    if (project.engineerId !== user.engineerProfile.id) {
+      return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
     }
 
     if (project.status !== "IN_PROGRESS") {

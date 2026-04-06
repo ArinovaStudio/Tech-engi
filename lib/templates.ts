@@ -88,3 +88,28 @@ export const projectInvitationTemplate = (name: string, projectTitle: string) =>
     </div>
   `;
 };
+
+export const deletionRequestApprovedTemplate = (userName: string, projectTitle: string, isEngineer: boolean) => `
+  <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+    <h2 style="color: #d9534f;">Project Cancellation Update</h2>
+    <p>Hello ${userName},</p>
+    <p>The project <b>${projectTitle}</b> has been officially cancelled and deleted by the platform administrator.</p>
+    ${isEngineer 
+      ? '<p><b>Action Required:</b> You no longer need to work on this project. Any pending settlements for work already completed will be processed according to our platform guidelines.</p>' 
+      : '<p>Your request to delete this project has been approved. The project, its resources, and all associated data have been permanently removed from our systems.</p>'
+    }
+    <br/>
+    <p>Regards,<br/>The Platform Team</p>
+  </div>
+`;
+
+export const deletionRequestRejectedTemplate = (clientName: string, projectTitle: string) => `
+  <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+    <h2 style="color: #f0ad4e;">Project Deletion Request Update</h2>
+    <p>Hello ${clientName},</p>
+    <p>Your request to delete the project <b>${projectTitle}</b> has been <b>rejected</b> by the administrator.</p>
+    <p>The project remains active. If you have ongoing concerns with the engineer or the project scope, please raise a Support Ticket from your dashboard so we can mediate the issue.</p>
+    <br/>
+    <p>Regards,<br/>The Platform Team</p>
+  </div>
+`;

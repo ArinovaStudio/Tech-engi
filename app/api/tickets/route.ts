@@ -36,6 +36,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    
+    const ticketsRaisedToday = await prisma.ticket.count({
+      where: { raisedById: user.id, createdAt: { gte: twentyFourHoursAgo } }
+    });
+
+    if (ticketsRaisedToday >= 3) {
+      return NextResponse.json({ success: false, message: "You have reached the daily limit of 3 tickets" }, { status: 429 });
+    }
+
     const formData = await req.formData();
     const data = {
       projectId: formData.get("projectId") as string,
@@ -76,7 +86,7 @@ export async function POST(req: NextRequest) {
       uploadedImageUrls = await Promise.all(uploadPromises);
     }
 
-    const newTicket = await prisma.ticket.create({
+    await prisma.ticket.create({
       data: {
         projectId: validation.data.projectId,
         raisedById: user.id,
@@ -86,7 +96,7 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    return NextResponse.json({ success: true, message: "Ticket raised successfully", ticket: newTicket }, { status: 201 });
+    return NextResponse.json({ success: true, message: "Ticket raised successfully" }, { status: 201 });
 
   } catch {
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });

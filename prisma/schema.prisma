@@ -28,6 +28,7 @@ model User {
   clientProfile ClientProfile?
   engineerProfile EngineerProfile?
   raisedTickets Ticket[]
+  addedResources ProjectResource[]
 }
 
 model ClientProfile {
@@ -120,7 +121,6 @@ model Project {
   description String @db.Text
   budget Float
   instruments String[]
-  roadmapFiles String[]
   
   advancePaid Boolean @default(false)
   status ProjectStatus @default(DRAFT)
@@ -132,6 +132,32 @@ model Project {
 
   invitations ProjectInvitation[]
   tickets Ticket[]
+  resources ProjectResource[]
+  deletionRequest ProjectDeletionRequest?
+}
+
+enum ResourceType {
+  FILE
+  CREDENTIALS
+  IMAGE
+  LINK
+  TEXT
+}
+
+model ProjectResource {
+  id String @id @default(uuid())
+  projectId String
+  addedById String
+
+  title String
+  type ResourceType
+  content String @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  addedBy User  @relation(fields: [addedById], references: [id], onDelete: Cascade)
 }
 
 enum InvitationStatus {
@@ -152,6 +178,23 @@ model ProjectInvitation {
   engineer EngineerProfile @relation(fields: [engineerId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, engineerId])
+}
+
+enum DeletionRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model ProjectDeletionRequest {
+  id String @id @default(uuid())
+  projectId String @unique 
+  reason String @db.Text
+  status DeletionRequestStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 enum TicketType {

@@ -66,8 +66,7 @@ export async function POST( req: NextRequest ) {
 
     return NextResponse.json({ success: true, message: "Matching completed" }, { status: 200 });
 
-  } catch (e){
-    console.error(e);
+  } catch {
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }

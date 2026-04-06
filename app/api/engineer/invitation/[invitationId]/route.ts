@@ -22,7 +22,7 @@ export async function GET( req: NextRequest, { params }: { params: Promise<{ inv
             description: true,
             budget: true, 
             instruments: true,
-            roadmapFiles: true, 
+            resources: true, 
             createdAt: true,
           }
         }
@@ -36,7 +36,7 @@ export async function GET( req: NextRequest, { params }: { params: Promise<{ inv
     if (invitation.engineerId !== user.engineerProfile.id) {
       return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
     }
-
+    
     const { budget, ...safeProject } = invitation.project;
     
     const updatedInvitation = {

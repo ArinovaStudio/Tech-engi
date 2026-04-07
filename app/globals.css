@@ -10,6 +10,11 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-benz: var(--font-benz);
+  --font-montserrat: var(--font-montserrat);
+  --font-id: var(--font-id);
+  --font-inter: var(--font-inter);
+  --font-spacegrotesk: var(--font-spacegrotesk);
 }
 
 @media (prefers-color-scheme: dark) {

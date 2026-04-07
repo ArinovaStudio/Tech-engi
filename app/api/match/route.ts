@@ -32,6 +32,10 @@ export async function POST( req: NextRequest ) {
       return NextResponse.json({ success: false, message: "Advance payment required" }, { status: 400 });
     }
 
+    if (project.engineerId){
+      return NextResponse.json({ success: false, message: "Project already assigned" }, { status: 400 });
+    }
+
     await prisma.project.update({
       where: { id: projectId },
       data: { status: "SEARCHING" }

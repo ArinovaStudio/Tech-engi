@@ -19,13 +19,40 @@ export default function PayoutFormPage() {
     e.preventDefault();
     setError("");
 
-    if (method === "UPI" && !upiId.trim()) {
-      setError("Please enter your UPI ID");
-      return;
+    if (method === "UPI") {
+      const upiTrimmed = upiId.trim();
+      if (!upiTrimmed) {
+        setError("Please enter your UPI ID");
+        return;
+      }
+      
+      const upiRegex = /^[a-zA-Z0-9.\-_]{2,256}@[a-zA-Z]{2,64}$/;
+      if (!upiRegex.test(upiTrimmed)) {
+        setError("Invalid UPI ID format. Example: yourname@okicici");
+        return;
+      }
     }
-    if (method === "BANK" && (!accountNumber.trim() || !ifscCode.trim())) {
-      setError("Account number and IFSC code are required");
-      return;
+
+    if (method === "BANK") {
+      const accTrimmed = accountNumber.trim();
+      const ifscTrimmed = ifscCode.trim().toUpperCase();
+
+      if (!accTrimmed || !ifscTrimmed) {
+        setError("Account number and IFSC code are required");
+        return;
+      }
+
+      const accountRegex = /^\d{9,18}$/;
+      if (!accountRegex.test(accTrimmed)) {
+        setError("Invalid Account Number. It should be between 9 and 18 digits.");
+        return;
+      }
+
+      const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+      if (!ifscRegex.test(ifscTrimmed)) {
+        setError("Invalid IFSC Code format. Example: SBIN0001234");
+        return;
+      }
     }
 
     setIsLoading(true);
@@ -36,7 +63,7 @@ export default function PayoutFormPage() {
         body: JSON.stringify({
           upiId: method === "UPI" ? upiId.trim() : null,
           accountNumber: method === "BANK" ? accountNumber.trim() : null,
-          ifscCode: method === "BANK" ? ifscCode.trim() : null,
+          ifscCode: method === "BANK" ? ifscCode.trim().toUpperCase() : null,
           bankName: method === "BANK" ? bankName.trim() || null : null,
           accountHolder: method === "BANK" ? accountHolder.trim() || null : null,
         }),
@@ -68,7 +95,7 @@ export default function PayoutFormPage() {
         <div className="flex p-1 mb-6 bg-gray-50 rounded-xl border border-gray-100">
           <button
             type="button"
-            onClick={() => setMethod("UPI")}
+            onClick={() => { setMethod("UPI"); setError(""); }}
             className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
               method === "UPI"
                 ? "bg-white text-[#f0b31e] shadow-sm border border-gray-100"
@@ -79,7 +106,7 @@ export default function PayoutFormPage() {
           </button>
           <button
             type="button"
-            onClick={() => setMethod("BANK")}
+            onClick={() => { setMethod("BANK"); setError(""); }}
             className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
               method === "BANK"
                 ? "bg-white text-[#f0b31e] shadow-sm border border-gray-100"
@@ -104,8 +131,8 @@ export default function PayoutFormPage() {
                 type="text"
                 required
                 value={upiId}
-                onChange={(e) => setUpiId(e.target.value)}
-                placeholder="yourname@upi"
+                onChange={(e) => setUpiId(e.target.value.toLowerCase())}
+                placeholder="yourname@bank"
                 className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
               />
             </div>
@@ -127,7 +154,7 @@ export default function PayoutFormPage() {
                   type="text"
                   required
                   value={accountNumber}
-                  onChange={(e) => setAccountNumber(e.target.value)}
+                  onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ''))}
                   placeholder="Enter account number"
                   className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
                 />
@@ -140,7 +167,7 @@ export default function PayoutFormPage() {
                   value={ifscCode}
                   onChange={(e) => setIfscCode(e.target.value.toUpperCase())}
                   placeholder="e.g. SBIN0001234"
-                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
+                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black uppercase"
                 />
               </div>
               <div className="space-y-1.5">

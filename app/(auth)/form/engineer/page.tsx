@@ -11,7 +11,7 @@ const QUALIFICATIONS = [
 ];
 
 const ID_TYPES: Record<string, string[]> = {
-  UG: ["STUDENT_ID"],
+  UG: ["STUDENT_ID","AADHAAR", "PAN"],
   EMPLOYED: ["AADHAAR", "PAN", "PAY_SLIP"],
   UNEMPLOYED: ["AADHAAR", "PAN"],
 };
@@ -45,6 +45,7 @@ export default function EngineerFormPage() {
   const handleQualificationChange = (val: string) => {
     setQualification(val);
     setIdType("");
+    setIdNumber("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,12 +55,30 @@ export default function EngineerFormPage() {
     if (!idFile) { setError("Please upload your ID document"); return; }
     if (skills.length === 0) { setError("Please add at least one skill"); return; }
 
+    const cleanedId = idNumber.replace(/\s+/g, '').toUpperCase();
+
+    if (idType === "PAN") {
+      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+      if (!panRegex.test(cleanedId)) {
+        setError("Invalid PAN format. It should be 5 letters, 4 numbers, and 1 letter (e.g., ABCDE1234F)");
+        return;
+      }
+    }
+
+    if (idType === "AADHAAR") {
+      const aadhaarRegex = /^[2-9]{1}[0-9]{11}$/;
+      if (!aadhaarRegex.test(cleanedId)) {
+        setError("Invalid Aadhaar format. It must be exactly 12 digits and cannot start with 0 or 1.");
+        return;
+      }
+    }
+
     setIsLoading(true);
     try {
       const formData = new FormData();
       formData.append("qualification", qualification);
       formData.append("idType", idType);
-      formData.append("idNumber", idNumber);
+      formData.append("idNumber", cleanedId);
       formData.append("file", idFile);
       formData.append("skills", JSON.stringify(skills));
       formData.append("certifications", JSON.stringify(certifications));
@@ -127,7 +146,7 @@ export default function EngineerFormPage() {
                   <button
                     key={type}
                     type="button"
-                    onClick={() => setIdType(type)}
+                    onClick={() => { setIdType(type); setIdNumber(""); setError(""); }}
                     className={`py-2 px-4 text-xs font-semibold rounded-xl border transition-all ${
                       idType === type
                         ? "bg-[#f0b31e] text-white border-[#f0b31e] shadow-sm"
@@ -148,9 +167,9 @@ export default function EngineerFormPage() {
               type="text"
               required
               value={idNumber}
-              onChange={(e) => setIdNumber(e.target.value)}
-              placeholder="Enter your ID number"
-              className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
+              onChange={(e) => setIdNumber(e.target.value.toUpperCase())}
+              placeholder={idType === "PAN" ? "ABCDE1234F" : idType === "AADHAAR" ? "12 Digit Number" : "Enter your ID number"}
+              className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black uppercase"
             />
           </div>
 

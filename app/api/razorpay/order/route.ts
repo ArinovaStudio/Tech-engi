@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     const order = await razorpay.orders.create({
       amount: Math.round(amountToPay * 100),
       currency: "INR",
-      receipt: `receipt_${projectId}_${Date.now()}`
+      receipt: `rep_${projectId}`
     });
 
     await prisma.transaction.create({

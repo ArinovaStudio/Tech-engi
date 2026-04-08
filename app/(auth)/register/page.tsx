@@ -23,11 +23,13 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState(""); // NEW: Confirm Password State
   const [role, setRole] = useState<"CLIENT" | "ENGINEER">("CLIENT");
   
   const [otpCode, setOtpCode] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // NEW: Show/Hide Confirm Password
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -39,6 +41,13 @@ export default function RegisterPage() {
 
     if (password.length < 6) {
       setError("Password must be at least 6 characters");
+      setIsLoading(false);
+      return;
+    }
+
+    // NEW: Confirm Password Validation
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
       setIsLoading(false);
       return;
     }
@@ -115,6 +124,7 @@ export default function RegisterPage() {
         throw new Error("Verified, but failed to log in automatically.");
       }
 
+      // Redirect based on role
       if (role === "ENGINEER") {
         router.push("/dashboard");
       } else {
@@ -132,16 +142,40 @@ export default function RegisterPage() {
     try {
       setIsLoading(true);
       document.cookie = `oauth_role=${role}; path=/; max-age=120`;
-      await signIn("google", { callbackUrl: "/" });
+      
+      // NEW: Redirect to the correct form dynamically based on the selected role tab!
+      const callbackUrl = role === "ENGINEER" ? "/form/engineer" : "/form/client";
+      await signIn("google", { callbackUrl });
+      
     } catch (err: any) {
       setError("Google sign in failed");
       setIsLoading(false);
     }
   };
 
+  const handleResendOtp = async () => {
+    try {
+      const otpRes = await fetch("/api/auth/otp/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, type: "VERIFY_EMAIL" }),
+      });
+
+      const otpData = await otpRes.json();
+
+      if (!otpRes.ok || !otpData.success) {
+        throw new Error("Failed to send OTP email.");
+      }
+
+      setSuccessMsg("We've sent a new 6-digit code to your email.");
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#f8fafd] flex flex-col justify-center items-center p-4 font-sans">
-      <div className="w-full max-w-[420px] bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8 sm:p-10">
+    <div className="min-h-screen bg-[#f8fafd] flex flex-col justify-center items-center p-4 font-sans relative">
+      <div className="w-full max-w-[420px] bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8 sm:p-10 relative overflow-hidden">
         
         {/* Step 1: Registration Form */}
         {step === 1 && (
@@ -253,6 +287,31 @@ export default function RegisterPage() {
                 </div>
               </div>
 
+              {/* Confirm Password */}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700 ml-1">Confirm Password</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full pl-11 pr-11 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-[#f0b31e] transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
+
               <button
                 type="submit"
                 disabled={isLoading}
@@ -302,23 +361,25 @@ export default function RegisterPage() {
 
         {/* Step 2: OTP Verification Form */}
         {step === 2 && (
-          <div className="animate-in fade-in slide-in-from-right-8 duration-500">
+          <div className="animate-in fade-in slide-in-from-right-8 duration-500 pt-4">
             <button 
               onClick={() => setStep(1)}
-              className="absolute top-6 left-6 text-gray-400 hover:text-gray-700 transition-colors"
+              className="absolute top-6 left-6 p-2 bg-gray-50 rounded-full text-gray-400 hover:text-[#f0b31e] hover:bg-yellow-50 transition-colors"
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
 
-            <div className="text-center mb-8">
-              <div className="flex h-14 w-14 items-center justify-center rounded-[1rem] bg-blue-50 shadow-lg shadow-blue-500/10 mx-auto mb-4">
-                <KeyRound className="h-7 w-7 text-blue-500" />
+            <div className="text-center mb-8 mt-4">
+              {/* UPDATED UI: Aligned with primary brand colors */}
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#f0b31e]/10 mx-auto mb-6">
+                <KeyRound className="h-8 w-8 text-[#f0b31e]" />
               </div>
               <h1 className="text-2xl font-bold text-[#0f172a] tracking-tight">
-                Check Your Email
+                Verify your email
               </h1>
               <p className="text-gray-500 mt-2 text-sm px-4">
-                {successMsg}
+                We've sent a 6-digit verification code to<br/>
+                <span className="font-semibold text-gray-700">{email}</span>
               </p>
             </div>
 
@@ -330,7 +391,6 @@ export default function RegisterPage() {
 
             <form onSubmit={handleVerifyOtp} className="space-y-6">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700 ml-1">6-Digit OTP Code</label>
                 <div className="relative">
                   <input
                     type="text"
@@ -338,20 +398,32 @@ export default function RegisterPage() {
                     maxLength={6}
                     value={otpCode}
                     onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                    placeholder="000000"
-                    className="w-full text-center tracking-[0.5em] text-lg font-bold h-14 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
+                    placeholder="••••••"
+                    className="w-full text-center tracking-[1em] text-2xl font-bold h-16 rounded-xl border-2 border-gray-100 bg-gray-50 focus:bg-white focus:border-[#f0b31e] focus:ring-4 focus:ring-[#f0b31e]/10 outline-none transition-all text-gray-800"
                   />
                 </div>
               </div>
 
               <button
                 type="submit"
-                disabled={isLoading}
-                className="w-full h-12 bg-[#0f172a] hover:bg-[#1e293b] text-white rounded-xl text-base font-semibold shadow-md transition-all flex justify-center items-center disabled:opacity-70 disabled:cursor-not-allowed"
+                disabled={isLoading || otpCode.length !== 6}
+                className="w-full h-12 bg-[#f0b31e] hover:bg-[#e0a61a] text-white rounded-xl text-base font-semibold shadow-md shadow-yellow-500/20 transition-all flex justify-center items-center disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Verify & Continue"}
+                {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Verify Account"}
               </button>
             </form>
+
+            <div className="mt-8 text-center">
+              <p className="text-sm text-gray-500">
+                Didn't receive the code?{" "}
+                <button 
+                  onClick={handleResendOtp} 
+                  className="text-[#f0b31e] font-semibold hover:underline"
+                >
+                  Click to resend
+                </button>
+              </p>
+            </div>
           </div>
         )}
 

@@ -6,7 +6,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pro
   try {
     const { user, error } = await getClient();
     if (error || !user?.clientProfile) {
-      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ success: false, message: error || "Unauthorized" }, { status: 401 });
     }
 
     const { projectId } = await params;

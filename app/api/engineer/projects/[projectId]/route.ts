@@ -42,7 +42,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ proj
   try {
     const { user, error } = await getEngineer();
     if (error || !user?.engineerProfile) {
-      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ success: false, message: error || "Unauthorized" }, { status: 401 });
     }
 
     const { projectId } = await params;

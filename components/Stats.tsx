@@ -2,6 +2,7 @@
 import React from 'react'
 import { CalendarCheck, Users, Award, Shield, Zap, Globe } from 'lucide-react'
 import { useScrollAnimation } from '@/lib/useScrollAnimation'
+import Image from 'next/image';
 
 const stats = [
   { value: '10K+', label: 'Project Delivered on Time' },
@@ -13,11 +14,12 @@ const stats = [
 ]
 
 const companyIcons = [
-  { icon: Shield, label: 'Secure' },
-  { icon: Globe, label: 'Global' },
-  { icon: Award, label: 'Premium' },
-  { icon: Zap, label: 'Fast' },
-  { icon: CalendarCheck, label: 'Reliable' },
+  { src: '/sugar.png', label: 'sugar' },
+  { src: '/abc.png', label: 'abc' },
+  { src: '/bbc.png', label: 'bbc' },
+  { src: '/gateway.png', label: 'gateway' },
+  { src: '/moto.png', label: 'moto' },
+  { src: '/flash.png', label: 'flash' },
 ]
 
 const Stats = () => {
@@ -45,21 +47,13 @@ const Stats = () => {
           ))}
         </div>
 
-        <div ref={iconsRef} className="mt-26 border border-slate-200 py-8 w-full">
-          <div className="flex flex-wrap items-center justify-between gap-28 px-6">
-            {companyIcons.map((company, index) => {
-              const Icon = company.icon
-              return (
-                <div key={index} className="flex flex-col items-center gap-3 text-slate-600">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-sm">
-                    <Icon size={28} className="text-slate-900" />
-                  </div>
-                  <span className="text-xs uppercase tracking-[0.2em] text-slate-500">
-                    {company.label}
-                  </span>
-                </div>
-              )
-            })}
+        <div ref={iconsRef} className="mt-26 w-full h-full border border-slate-200 py-8 w-full overflow-hidden">
+          <div className="flex animate-marquee items-center">
+            {[...companyIcons, ...companyIcons].map((company, index) => (
+              <div key={index} className="flex-shrink-0 h-16 w-[290px] h-[100px] relative">
+                <Image src={company.src} alt={company.label} fill className="object-contain" />
+              </div>
+            ))}
           </div>
         </div>
       </div>

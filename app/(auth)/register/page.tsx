@@ -116,9 +116,9 @@ export default function RegisterPage() {
       }
 
       if (role === "ENGINEER") {
-        router.push("/form/engineer");
+        router.push("/dashboard");
       } else {
-        router.push("/form/client");
+        router.push("/dashboard");
       }
       router.refresh();
 

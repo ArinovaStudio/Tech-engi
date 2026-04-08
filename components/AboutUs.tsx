@@ -39,19 +39,15 @@ const AboutUs = () => {
       {/* ── Section 1: Testimonial ── */}
       <section ref={testimonialRef} className="relative bg-white overflow-hidden border-b border-gray-200 h-full">
         {/* Orange circle top-left */}
-        {/* <div
-          className="absolute -top-16 -left-16 w-[30%] h-[280px] rounded-full"
-          style={{ backgroundColor: "#F5A623", opacity: 0.85 }}
-        /> */}
-        <div className="w-[1275px] h-[1275px] p-[200px] rounded-full bg-[#FFAE58] absolute -top-60 -left-230">
+        <div className="w-[1275px] h-[1275px] p-[200px] rounded-full bg-[#FFAE58] absolute -top-60 -left-200">
           <div className="w-full h-full rounded-full bg-white"></div>
         </div>
 
-        <div className="max-w-full mx-auto px-18 py-16 relative z-10">
+        <div className="max-w-full mx-auto px-25 py-16 relative z-10">
           <div className="flex items-start gap-10">
 
             {/* Left: person image */}
-            <div className="relative flex-shrink-0 w-[434px]">
+            <div className="relative mx-20 flex-shrink-0 w-[434px]">
 
               <Image
                 src="/white-guy.jpg"
@@ -66,7 +62,7 @@ const AboutUs = () => {
 
 
             {/* Middle: testimonial card */}
-            <div className="flex-1 max-w-[569px] border border-gray-200 font-inter bg-white shadow-lg p-6 absolute left-100 top-60 mt-8">
+            <div className="flex-1 max-w-[569px] border border-gray-300 font-inter bg-white shadow-lg p-6 absolute left-130 top-60 mt-8">
               <h3 className="text-[40px] font-bold text-black">Cecilia Pouros</h3>
               <p className="text-[14px] text-gray-400 mb-4">Regional Markets Executive</p>
               <p className="text-[20px] text-black leading-relaxed">
@@ -76,14 +72,14 @@ const AboutUs = () => {
               </p>
             </div>
             {/* Stars */}
-            <div className="mt-6 absolute left-160 bottom-20 flex items-center border border-gray-200 gap-4 bg-white px-6 py-4 shadow-lg">
+            <div className="mt-6 absolute left-180 bottom-20 flex items-center border border-gray-200 gap-4 bg-white px-6 py-4 shadow-lg">
               {[...Array(5)].map((_, i) => (
                 <span key={i} className="text-[#F7871B] text-[28px]">★</span>
               ))}
             </div>
 
             {/* Right: heading */}
-            <div className="flex-1 text-[55px] text-right pt-4 font-id font-bold">
+            <div className="flex-1 text-[72px] text-right font-id font-[700]">
               <h2 className="leading-tight text-black">
                 What others{" "}
                 <span className="text-orange-400">think</span>
@@ -100,7 +96,7 @@ const AboutUs = () => {
 
               {/* Nav arrows */}
               <div className="flex items-end justify-end mt-64 ">
-                <button className="w-20 h-20 border-2 border-gray-300 flex items-center justify-center hover:bg-gray-50">
+                <button className="w-20 h-20 border-2 text-gray-500 border-gray-300 flex items-center justify-center hover:bg-gray-50">
                   <ChevronLeft size={20} />
                 </button>
                 <button className="w-20 h-20 text-black  border-2 border-gray-300 flex items-center justify-center hover:bg-gray-50">

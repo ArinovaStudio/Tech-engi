@@ -1,6 +1,6 @@
 import AboutUs from "@/components/AboutUs";
 import BrowserCategory from "@/components/BrowserCategory";
-import Fotter from "@/components/Fotter";
+import Footer from "@/components/Footer";
 import Start from "@/components/Start";
 import Stats from "@/components/Stats";
 import HowItWorks from "@/components/HowItWorks";
@@ -15,7 +15,7 @@ export default function Home() {
       <BrowserCategory />
       <Stats />
       <AboutUs />
-      <Fotter />
+      <Footer />
     </div>
   );
 }

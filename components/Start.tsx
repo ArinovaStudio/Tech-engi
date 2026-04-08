@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
+import Link from "next/link";
 
 const Start = () => {
   const navRef = useRef<HTMLElement>(null);
@@ -97,12 +98,12 @@ const Start = () => {
               Tech-ENGI connects students with skilled builders who turns your ideas, assignments and projects into ready-to-submit work fast!
             </p>
             <div className="flex items-center font-inter gap-3">
-              <button className="px-6 py-4 text-[16px] font-bold text-gray-900 bg-[#F4F4F4] whitespace-nowrap">
+              <Link href={'form/engineer'} className="px-6 py-4 text-[16px] font-bold text-gray-900 bg-[#F4F4F4] whitespace-nowrap">
                 BECOME BUILDER
-              </button>
-              <button className="px-6 py-4 text-[16px] font-bold bg-black text-white flex items-center gap-2 hover:bg-gray-800 whitespace-nowrap">
+              </Link>
+              <Link href={'form/client'} className="px-6 py-4 text-[16px] font-bold bg-black text-white flex items-center gap-2 hover:bg-gray-800 whitespace-nowrap">
                 START MY PROJECT <span>↗</span>
-              </button>
+              </Link>
             </div>
           </div>
         </div>

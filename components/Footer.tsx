@@ -1,11 +1,11 @@
-const Fotter = () => {
+const Footer = () => {
   return (
     <footer className="w-full bg-white font-inter">
 
       <div className="max-w-full mx-auto px-16 pt-12 grid grid-cols-4 gap-8">
 
         <div>
-          <h2 className="text-[30px] font-bold leading-tight text-black font-id">
+          <h2 className="text-[30px] font-bold font-[700] leading-tight text-black font-id">
             Connecting Engineers<br />with Massive<br />Projects
           </h2>
         </div>
@@ -44,14 +44,14 @@ const Fotter = () => {
         </div>
 
         <div>
-          <p className="text-[22px] font-bold tracking-[0.2em] text-black uppercase mb-4 font-id">
+          <p className="text-[22px] font-bold tracking-[0.2em] text-black uppercase mb-4 text-right font-id">
             Release Letter
           </p>
           <div className="flex flex-col items-end gap-2 mb-4">
             <input
               type="email"
               placeholder="Enter your email"
-              className="w-full px-3 py-4 text-[13px] outline-none font-id placeholder-gray-400 bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-4 text-[13px] outline-none font-id placeholder-gray-400 bg-[#F0F0F0] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
             <button className="bg-black text-white text-[12px] font-bold px-4 py-2 font-id hover:bg-gray-800 whitespace-nowrap">
               SUBSCRIBE
@@ -127,4 +127,4 @@ const Fotter = () => {
   );
 };
 
-export default Fotter;
+export default Footer;

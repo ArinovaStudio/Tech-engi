@@ -63,7 +63,7 @@ type NewTaskShape = {
   dueDate: string;
   tags: string[];
   status: 'assigned' | 'in-progress' | 'completed' | 'on-hold';
-  attachments: File[];
+  attachments: File[] | null;
   projectId: string;
 };
 
@@ -76,7 +76,7 @@ const NewTaskModal: React.FC<{
   isLoading: boolean;
   onClose: () => void;
   newTask: NewTaskShape;
-  setNewTask: (t: NewTaskShape) => void;
+  setNewTask: React.Dispatch<React.SetStateAction<NewTaskShape>>;
   handleCreateTask: () => void;
   handleAddTag: (tag: string) => void;
   handleRemoveTag: (tag: string) => void;
@@ -85,7 +85,7 @@ const NewTaskModal: React.FC<{
 }> = ({ isOpen, onClose, newTask, isLoading, setNewTask, handleCreateTask, handleAddTag, handleRemoveTag, currentUser, mode }) => {
   if (!isOpen) return null;
 const removeAttachment = (index: number) => {
-  setNewTask((prev) => {
+  setNewTask((prev: NewTaskShape) => {
     if (!prev.attachments) return prev;
 
     const updated = prev.attachments.filter((_, i) => i !== index);
@@ -258,9 +258,9 @@ onChange={(e) => {
 </div>
 
 
-  {newTask.attachments?.length > 0 && (
+  {(newTask.attachments?.length ?? 0) > 0 && (
     <div className="mt-3 space-y-2">
-      {newTask.attachments.map((file, index) => (
+      {newTask.attachments?.map((file, index) => (
         <div
           key={`${file.name}-${index}`}
           className="flex items-center justify-between text-sm px-4 pr-3 py-3.5 rounded-lg bg-white border border-[var(--border)] font-inter" style={{color:'var(--text-primary)'}}>
@@ -414,7 +414,7 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
       priority: draggedTask.priority,
       dueDate: draggedTask.dueDate,
       tags: draggedTask.tags,
-      userId: currentUser.id,
+      userId: currentUser?.id,
         }),
       })
       }
@@ -584,7 +584,7 @@ if (newTask.attachments?.length) {
       const data = await res.json();
 
       if (data.success) {
-        const updatedComments = selectedTask.comments.map(c =>
+        const updatedComments = selectedTask.comments.map((c: Comment) =>
           c.id === commentId ? { ...c, content: newContent } : c
         );
 
@@ -617,7 +617,7 @@ if (newTask.attachments?.length) {
       const data = await res.json();
 
       if (data.success) {
-        const updatedComments = selectedTask.comments.filter(c => c.id !== commentId);
+        const updatedComments = selectedTask.comments.filter((c: Comment) => c.id !== commentId);
 
         setTasks(tasks.map(task =>
           task.id === selectedTask.id
@@ -719,7 +719,7 @@ if (newTask.attachments?.length) {
       formData.append("status", newTask.status);
       formData.append("tags", newTask.tags.join(","));
       formData.append("projectId", projectId);
-      formData.append("employeeId", currentUser.employeeId);
+      formData.append("employeeId", currentUser?.employeeId ?? "");
 
 if (newTask.attachments?.length) {
   newTask.attachments.forEach((file) => {

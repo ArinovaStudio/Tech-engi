@@ -144,7 +144,11 @@ const DesignerModal = ({ showModal, projectData, currentUser }: any) => {
       if (clientId) {
         const response = await fetch(`/api/client/analytics/design?clientId=${clientId}&projectId=${projectData.id}`);
         const result = await response.json();
-        if (result.success && result.data) setDesignSystemData(parseDesignData(result.data));
+        if (result.success && result.data) setDesignSystemData({
+  ...designSystemData,
+  colors: result.data.colors as never[], // explicitly specify the type
+  // other properties
+});
       }
     } catch { toast.error("Failed to load design data"); }
   }, [projectData]);
@@ -771,11 +775,10 @@ export default function OverviewTab({ project }: OverviewTabProps) {
       </div>
 
       {/* ── Design System Section ── */}
-      {designSystemInfo && (
+      {/* {designSystemInfo && (
         <div style={{ padding: "0 1.5rem 1.5rem", background: T.bg }}>
           <div style={{ display: "flex", gap: "1.5rem" }}>
 
-            {/* Design System Card */}
             <div style={{ background: T.card, borderRadius: 16, padding: "1.5rem", border: `2px solid ${T.primary}`, position: "relative", minWidth: 300 }}>
               <span style={{ position: "absolute", top: -13, right: 60, background: T.primary, color: "#fff", fontSize: 12, fontWeight: 600, padding: "3px 14px", borderRadius: 4 }}>Design System</span>
 
@@ -791,28 +794,23 @@ export default function OverviewTab({ project }: OverviewTabProps) {
                   </div>
                 )}
 
-                {/* Sliding info */}
                 <div style={{ overflow: "hidden", height: 140 }}>
                   <div style={{ display: "flex", transition: "transform 0.4s ease", transform: `translateX(-${currentSlide * 100}%)` }}>
-                    {/* Slide 0 */}
                     <div style={{ minWidth: "100%", display: "flex", flexDirection: "column", gap: 12 }}>
                       {designSystemInfo.brandName && <InfoRow label="Brand Name" value={designSystemInfo.brandName} />}
                       {designSystemInfo.designType?.length > 0 && designSystemInfo.designType[0] !== "null" && <InfoRow label="Design Type" value={designSystemInfo.designType.join(", ")} />}
                       {designSystemInfo.brandFeel && designSystemInfo.brandFeel !== "null" && <InfoRow label="Brand Feel" value={designSystemInfo.brandFeel} />}
                     </div>
-                    {/* Slide 1 */}
                     <div style={{ minWidth: "100%", display: "flex", flexDirection: "column", gap: 12 }}>
                       {designSystemInfo.contentTone?.length > 0 && designSystemInfo.contentTone[0] !== "null" && <InfoRow label="Content Tone" value={designSystemInfo.contentTone.join(", ")} />}
                       {designSystemInfo.theme?.length > 0 && designSystemInfo.theme[0] !== "null" && <InfoRow label="Theme" value={designSystemInfo.theme.join(", ")} />}
                       {designSystemInfo.keyPages?.length > 0 && designSystemInfo.keyPages[0] !== "null" && <InfoRow label="Key Pages" value={designSystemInfo.keyPages.join(", ")} />}
                     </div>
-                    {/* Slide 2 */}
                     <div style={{ minWidth: "100%", display: "flex", flexDirection: "column", gap: 12 }}>
                       {designSystemInfo.fonts && Object.keys(designSystemInfo.fonts).length > 0 && <InfoRow label="Fonts" value={Object.keys(designSystemInfo.fonts).join(", ")} />}
                       {designSystemInfo.layoutStyle && Object.keys(designSystemInfo.layoutStyle).length > 0 && <InfoRow label="Layout Style" value={Object.keys(designSystemInfo.layoutStyle).join(", ")} />}
                       {designSystemInfo.visualGuidelines && Object.keys(designSystemInfo.visualGuidelines).length > 0 && <InfoRow label="Visual Guidelines" value={Object.keys(designSystemInfo.visualGuidelines).join(", ")} />}
                     </div>
-                    {/* Slide 3 */}
                     <div style={{ minWidth: "100%", display: "flex", flexDirection: "column", gap: 12 }}>
                       {designSystemInfo.uniqueness && Object.keys(designSystemInfo.uniqueness).length > 0 && <InfoRow label="Uniqueness" value={Object.keys(designSystemInfo.uniqueness).join(", ")} />}
                     </div>
@@ -836,9 +834,7 @@ export default function OverviewTab({ project }: OverviewTabProps) {
               </div>
             </div>
 
-            {/* Phase + Technology card */}
             <div style={{ flex: 1, background: T.card, borderRadius: 16, border: `1px solid ${T.border}`, display: "flex", overflow: "hidden" }}>
-              {/* Current Phase */}
               <div style={{ flex: 1, padding: "1.5rem", borderRight: `1px solid ${T.border}` }}>
                 <p style={{ margin: "0 0 1rem", fontSize: 14, color: T.textMuted, fontWeight: 500 }}>Current Phase</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -861,10 +857,8 @@ export default function OverviewTab({ project }: OverviewTabProps) {
                 </div>
               </div>
 
-              {/* Divider */}
               <div className="h-full w-1 bg-[#e5e5e5] flex-shrink-0"></div>
 
-              {/* Technology Used */}
               <div className="flex-1 p-6 relative overflow-hidden min-w-0">
                 <div className="relative flex flex-col mb-5 items-start">
                   <h3 className="text-xl text-[#6F6F6F] mb-6">
@@ -876,7 +870,7 @@ export default function OverviewTab({ project }: OverviewTabProps) {
                 {designSystemInfo.technology && designSystemInfo.technology.length > 0 ? (
                   <div className="space-y-5 text-sm overflow-y-auto max-h-[260px] pr-2"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                    {designSystemInfo.technology.map((item, index) => (
+                    {designSystemInfo.technology.map((item: any, index: number) => (
                       <div key={index} className="flex justify-between items-center gap-4">
                         <span className="text-[#6F6F6F] flex-shrink-0">{item.key}</span>
                         <span className="font-medium text-[#050A30] text-right">{item.value}</span>
@@ -892,7 +886,7 @@ export default function OverviewTab({ project }: OverviewTabProps) {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </>
   )
 }

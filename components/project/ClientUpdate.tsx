@@ -25,7 +25,7 @@ export function MinimalCard({ id, description, createdBy, date, onDelete }: Card
 function ClientUpdate({ projectId }: { projectId: string }) {
   const [showAddUpdate, setShowAddUpdate] = useState(false);
   const [update, setUpdate] = useState("");
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState(false);
 

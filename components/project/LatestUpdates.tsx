@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Clock, CheckCircle, Hourglass, Timer, LucideLoader } from "lucide-react";
 
 export default function LatestUpdates({ projectId }: { projectId: string }) {
-  const [updates, setUpdates] = useState([]);
+  const [updates, setUpdates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function LatestUpdates({ projectId }: { projectId: string }) {
       const data = await res.json();
 
       if (data.tasks && Array.isArray(data.tasks)) {
-        const recentTasks = data.tasks
+        const recentTasks = (data.tasks as any[])
           .filter(task => task.updatedAt)
           .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
           .slice(0, 10);

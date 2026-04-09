@@ -5,12 +5,12 @@ import { AlertTriangle, Plus, Trash2, User, Clock, LucideLoader } from "lucide-r
 import toast from "react-hot-toast";
 
 export default function TicketsTab({ projectId }: { projectId: string }) {
-  const [tickets, setTickets] = useState([]);
+  const [tickets, setTickets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [creating, setCreating] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [teammates, setTeammates] = useState([]);
+  const [teammates, setTeammates] = useState<any[]>([]);
   const [newTicket, setNewTicket] = useState({ reason: "", blockedTeammates: [] as string[] });
 
   useEffect(() => {

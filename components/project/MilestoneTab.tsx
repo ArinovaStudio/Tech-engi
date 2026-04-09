@@ -5,7 +5,7 @@ import { Calendar, Flag, Plus, Loader2, Edit, Trash2, LucideLoader } from "lucid
 import toast from "react-hot-toast";
 
 export default function MilestoneTab({ projectId }: any) {
-  const [milestones, setMilestones] = useState([]);
+  const [milestones, setMilestones] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [open, setOpen] = useState(false);

@@ -5,7 +5,7 @@ import { AlertTriangle, Plus, Clock, CheckCircle, XCircle, User, LucideLoader } 
 import toast from "react-hot-toast";
 
 export default function BlockageTab({ projectId }: { projectId: string }) {
-  const [tickets, setTickets] = useState([]);
+  const [tickets, setTickets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [creating, setCreating] = useState(false);

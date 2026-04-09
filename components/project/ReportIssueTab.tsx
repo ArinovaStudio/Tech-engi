@@ -5,8 +5,8 @@ import { AlertCircle, Plus, Calendar, User, Shield, LucideLoader } from "lucide-
 import toast from "react-hot-toast";
 
 export default function ReportIssueTab({ projectId }: { projectId: string }) {
-  const [tasks, setTasks] = useState([]);
-  const [reports, setReports] = useState([]);
+  const [tasks, setTasks] = useState<any[]>([]);
+  const [reports, setReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showClientIssueModal, setShowClientIssueModal] = useState(false);

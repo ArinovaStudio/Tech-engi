@@ -55,7 +55,7 @@ export default function SalesDistribution() {
               ))}
             </Pie>
             <Tooltip
-              formatter={(val: number) => [`$${val.toFixed(2)}`, ""]}
+              formatter={(val) => [`$${Number(val).toFixed(2)}`, ""]}
               contentStyle={{ borderRadius: 0, border: "1px solid #e5e5e5", fontSize: 12 }}
             />
           </PieChart>

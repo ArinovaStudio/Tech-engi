@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { Prisma } from "@/lib/prisma";
 import { getUser } from "@/lib/auth";
 import { uploadFile } from "@/lib/uploads";
 import { z } from "zod";
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ success: false, message: "Project ID is required" }, { status: 400 });
     }
 
-    const project = await prisma.project.findUnique({
+    const project = await Prisma.project.findUnique({
       where: { id: projectId },
       include: { client: true, engineer: true }
     });
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
       include: { addedBy: { select: { name: true, role: true, image: true } } }
     });
 
-    const sanitizedResources = resources.map(res => {
+    const sanitizedResources = resources.map((res: typeof resources[number]) => {
 
       if (user.role === "CLIENT" && res.isLocked && !project.isFinalPaymentMade) {
         return { 

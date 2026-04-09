@@ -2,7 +2,17 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #ffffff;
+
+  /* Dashboard design tokens */
+  --bg: #f4f4f4;
+  --bg-card: #ffffff;
+  --border: #e5e5e5;
+  --primary: #FFAE58;
+  --primary-light: #fff4e6;
+  --text-primary: #050A30;
+  --text-secondary: #4B4B4B;
+  --text-muted: #6F6F6F;
 }
 
 @keyframes marquee {

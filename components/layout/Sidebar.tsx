@@ -2,11 +2,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import {
   LayoutDashboard, CreditCard, Users, MessageSquare, LogOut, ChevronLeft, ChevronRight,
-  ProportionsIcon,
-  User,
-  UserKeyIcon
+  ProportionsIcon, User, UserKeyIcon, FolderKanban, Wallet
 } from "lucide-react";
 
 interface NavItem {
@@ -16,19 +15,33 @@ interface NavItem {
   href: string;
 }
 
-const generalNav: NavItem[] = [
+const ADMIN_NAV: NavItem[] = [
+  { label: "Dashboard",           icon: <LayoutDashboard size={18} />, href: "/dashboard" },
+  { label: "Projects",            icon: <FolderKanban size={18} />,    href: "/dashboard/project" },
+  { label: "Client Management",   icon: <User size={18} />,            href: "/dashboard/client-management" },
+  { label: "Engineer Management", icon: <UserKeyIcon size={18} />,     href: "/dashboard/engineer-management" },
+  { label: "Payment",             icon: <CreditCard size={18} />,      href: "/dashboard/payment" },
+  { label: "Customers",           icon: <Users size={18} />,           href: "/dashboard/customers" },
+  { label: "Message",             icon: <MessageSquare size={18} />,   href: "/dashboard/message"},];
+
+const CLIENT_NAV: NavItem[] = [
   { label: "Dashboard", icon: <LayoutDashboard size={18} />, href: "/dashboard" },
-  { label: "Payment", icon: <CreditCard size={18} />, href: "/dashboard/payment" },
-  { label: "Customers", icon: <Users size={18} />, href: "/dashboard/customers" },
-  { label: "Message", icon: <MessageSquare size={18} />, href: "/dashboard/message"},
-  { label: "Project", icon: <ProportionsIcon size={18} />, href: "/dashboard/project" },
-  { label: "Client Management", icon: <User size={18} />, href: "/dashboard/client-management" },
-  { label: "Engineer Management", icon: <UserKeyIcon size={18} />, href: "/dashboard/engineer-management" },
+  { label: "Projects",  icon: <FolderKanban size={18} />,   href: "/dashboard/project" },
+];
+
+const ENGINEER_NAV: NavItem[] = [
+  { label: "Dashboard", icon: <LayoutDashboard size={18} />, href: "/dashboard" },
+  { label: "Projects",  icon: <FolderKanban size={18} />,   href: "/dashboard/project" },
+  { label: "Payout",    icon: <Wallet size={18} />,         href: "/dashboard/payout" },
 ];
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const role = session?.user?.role;
+
+  const nav = role === "CLIENT" ? CLIENT_NAV : role === "ENGINEER" ? ENGINEER_NAV : ADMIN_NAV;
 
   const NavLink = ({ item }: { item: NavItem }) => {
     const isActive = pathname === item.href;
@@ -88,12 +101,11 @@ export default function Sidebar() {
       </button>
 
       <nav className="flex-1 overflow-y-auto px-3 py-2">
-        <SectionLabel label="General" />
-        {generalNav.map((item) => <NavLink key={item.label} item={item} />)}
+        {nav.map((item) => <NavLink key={item.label} item={item} />)}
       </nav>
 
       <div className="border-t border-[var(--border)] p-3 space-y-2">
-        <button className={`w-full flex items-center font-bold gap-2.5 px-3 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 transition-all ${collapsed ? "justify-center" : ""}`}>
+        <button onClick={() => signOut({ callbackUrl: "/login" })} className={`w-full flex items-center font-bold gap-2.5 px-3 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 transition-all ${collapsed ? "justify-center" : ""}`}>
           <LogOut size={18} className="shrink-0" />
           {!collapsed && <span>Logout</span>}
         </button>

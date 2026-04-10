@@ -1,660 +1,200 @@
 "use client";
 
 import DashboardShell from "@/components/layout/DashboardShell";
-import { Plus, Search, Filter, Users, Calendar, X, AlertCircle } from "lucide-react";
+import { Plus, Search, Filter, Users, Calendar, AlertCircle, Clock, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
-import React, { useState, useMemo } from "react";
-
-// ─── Types ───────────────────────────────────────────────────────────────────
+import { useSession } from "next-auth/react";
+import React, { useState, useMemo, useEffect } from "react";
 
 interface Project {
   id: string;
-  name: string;
-  summary: string;
-  basicDetails: string;
-  priority: "HIGH" | "MEDIUM" | "LOW";
-  membersCount: number;
+  title: string;
+  description: string;
+  budget?: number;
+  earnings?: number;
+  status: string;
   progress: number;
+  instruments: string[];
+  startDate?: string;
+  endDate?: string;
   createdAt: string;
+  advancePaid?: boolean;
+  isFinalPaymentMade?: boolean;
 }
 
-interface TechEntry {
-  key: string;
-  value: string;
-}
-
-interface User {
-  id: string;
-  name: string;
-  role: string;
-  department: string;
-}
-
-// ─── Static Data ──────────────────────────────────────────────────────────────
-
-const STATIC_PROJECTS: Project[] = [
-  {
-    id: "p1",
-    name: "E-commerce Revamp",
-    summary:
-      "Full redesign and rebuild of the client shopping portal with improved UX and performance optimizations.",
-    basicDetails: "Includes cart, checkout, and payment gateway integration.",
-    priority: "HIGH",
-    membersCount: 5,
-    progress: 68,
-    createdAt: "2024-11-12",
-  },
-  {
-    id: "p2",
-    name: "AI Analytics Dashboard",
-    summary:
-      "Internal analytics dashboard powered by ML models for real-time business insights and forecasting.",
-    basicDetails: "Python backend with React frontend.",
-    priority: "MEDIUM",
-    membersCount: 3,
-    progress: 35,
-    createdAt: "2025-01-05",
-  },
-  {
-    id: "p3",
-    name: "Mobile Banking App",
-    summary:
-      "Cross-platform mobile app for retail banking with biometric authentication and instant transfers.",
-    basicDetails: "React Native, Node.js, PostgreSQL stack.",
-    priority: "HIGH",
-    membersCount: 7,
-    progress: 82,
-    createdAt: "2024-09-22",
-  },
-  {
-    id: "p4",
-    name: "CMS Static Site",
-    summary:
-      "Lightweight static site built on Next.js with headless CMS integration for the marketing team.",
-    basicDetails: "Deployed on Vercel with Contentful.",
-    priority: "LOW",
-    membersCount: 2,
-    progress: 95,
-    createdAt: "2025-02-14",
-  },
-  {
-    id: "p5",
-    name: "Cyber Security Audit Tool",
-    summary:
-      "Automated vulnerability scanning and reporting tool for internal infrastructure assessments.",
-    basicDetails: "Python-based scanner with exportable PDF reports.",
-    priority: "MEDIUM",
-    membersCount: 4,
-    progress: 20,
-    createdAt: "2025-03-01",
-  },
-  {
-    id: "p6",
-    name: "SaaS HR Platform",
-    summary:
-      "Multi-tenant HR management SaaS with payroll, attendance, and leave management modules.",
-    basicDetails: "Node.js, MongoDB, React. Hosted on AWS.",
-    priority: "HIGH",
-    membersCount: 6,
-    progress: 55,
-    createdAt: "2024-12-18",
-  },
-];
-
-const STATIC_USERS: User[] = [
-  { id: "u1", name: "Priya Sharma", role: "Developer", department: "Engineering" },
-  { id: "u2", name: "Rahul Mehta", role: "Designer", department: "Design" },
-  { id: "u3", name: "Anjali Singh", role: "QA Engineer", department: "Testing" },
-  { id: "u4", name: "Vikram Nair", role: "Backend Dev", department: "Engineering" },
-  { id: "u5", name: "Neha Kapoor", role: "PM", department: "Management" },
-];
-
-const STATIC_ADMINS = [
-  { id: "a1", name: "Alex Johnson", workingAs: "CTO" },
-  { id: "a2", name: "Sarah Chen", workingAs: "VP Engineering" },
-  { id: "a3", name: "Mark Davis", workingAs: "Director" },
-];
-
-const PREDEFINED_TECH: { key: string; options: string[] }[] = [
-  { key: "Design", options: ["Figma", "Adobe XD", "Sketch", "Canva"] },
-  { key: "Frontend", options: ["React", "Next.js", "Vue.js", "Angular"] },
-  { key: "Backend", options: ["Node.js", "Python", "Java", "PHP"] },
-  { key: "Database", options: ["PostgreSQL", "MongoDB", "MySQL", "Redis"] },
-  { key: "Hosting", options: ["Vercel", "AWS", "Netlify", "Heroku"] },
-];
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-const formatDate = (dateString: string): string => {
-  if (!dateString) return "N/A";
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) return "N/A";
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
+const STATUS_META: Record<string, { label: string; color: string }> = {
+  DRAFT: { label: "Draft", color: "bg-gray-100 text-gray-600" },
+  AWAITING_ADVANCE: { label: "Awaiting Advance", color: "bg-yellow-100 text-yellow-700" },
+  SEARCHING: { label: "Searching Engineer", color: "bg-blue-100 text-blue-700" },
+  IN_PROGRESS: { label: "In Progress", color: "bg-green-100 text-green-700" },
+  IN_REVIEW: { label: "In Review", color: "bg-purple-100 text-purple-700" },
+  AWAITING_FINAL_PAYMENT: { label: "Awaiting Final Payment", color: "bg-orange-100 text-orange-700" },
+  COMPLETED: { label: "Completed", color: "bg-emerald-100 text-emerald-700" },
+  CANCELED: { label: "Canceled", color: "bg-red-100 text-red-600" },
 };
 
-const getPriorityClasses = (priority: string): string => {
-  switch (priority) {
-    case "HIGH":
-      return "bg-red-100 text-red-800 border-red-200";
-    case "MEDIUM":
-      return "bg-yellow-100 text-yellow-800 border-yellow-200";
-    case "LOW":
-      return "bg-green-100 text-green-800 border-green-200";
-    default:
-      return "bg-gray-100 text-gray-700 border-gray-200";
-  }
-};
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-interface ProjectCardProps {
-  project: Project;
-}
-
-function ProjectCard({ project }: ProjectCardProps) {
+function StatusBadge({ status }: { status: string }) {
+  const meta = STATUS_META[status] ?? { label: status, color: "bg-gray-100 text-gray-600" };
   return (
-    <div className="group relative bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition-all duration-200 cursor-pointer">
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <h3 className="text-[15px] font-semibold text-gray-900 leading-snug group-hover:text-blue-600 transition-colors line-clamp-2">
-          {project.name}
-        </h3>
-        <span
-          className={`shrink-0 px-2.5 py-0.5 text-[11px] font-semibold rounded-full border ${getPriorityClasses(project.priority)}`}
-        >
-          {project.priority}
-        </span>
-      </div>
-
-      <p className="text-sm text-gray-500 mb-4 line-clamp-3 leading-relaxed">
-        {project.summary || "No summary available"}
-      </p>
-
-      <div className="flex items-center justify-between text-xs text-gray-400 mb-4">
-        <span className="flex items-center gap-1.5">
-          <Users size={13} />
-          {project.membersCount} members
-        </span>
-        <span className="flex items-center gap-1.5">
-          <Calendar size={13} />
-          {formatDate(project.createdAt)}
-        </span>
-      </div>
-
-      <div className="mb-3">
-        <div className="flex justify-between text-xs text-gray-400 mb-1.5">
-          <span>Progress</span>
-          <span className="font-medium text-gray-600">{project.progress}%</span>
-        </div>
-        <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-blue-500 rounded-full transition-all duration-500"
-            style={{ width: `${project.progress}%` }}
-          />
-        </div>
-      </div>
-
-      {project.basicDetails && (
-        <p className="text-xs text-gray-400 line-clamp-2 mt-3 pt-3 border-t border-gray-100">
-          {project.basicDetails}
-        </p>
-      )}
-    </div>
+    <span className={`text-[10px] font-semibold font-inter px-2 py-0.5 rounded-full ${meta.color}`}>
+      {meta.label}
+    </span>
   );
 }
 
-// ─── Create Modal ─────────────────────────────────────────────────────────────
+function ProjectCard({ project, role }: { project: Project; role: string }) {
+  const amount = role === "ENGINEER" ? project.earnings : project.budget;
+  const amountLabel = role === "ENGINEER" ? "Earnings" : "Budget";
 
-interface FormData {
-  name: string;
-  summary: string;
-  priority: "LOW" | "MEDIUM" | "HIGH";
-  basicDetails: string;
-  budget: string;
-  projectType: string;
-  startDate: string;
-  deadline: string;
-  supervisorAdmin: string;
-  repository: string;
+  return (
+    <Link href={`/dashboard/project/${project.id}`}>
+      <div className="bg-white border border-[var(--border)] rounded-xl p-5 hover:shadow-md hover:border-[var(--primary)] transition-all cursor-pointer group">
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <h3 className="text-sm font-bold font-inter text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--primary)] transition-colors">
+            {project.title}
+          </h3>
+          <StatusBadge status={project.status} />
+        </div>
+
+        <p className="text-xs font-inter text-[var(--text-muted)] line-clamp-2 mb-4 leading-relaxed">
+          {project.description}
+        </p>
+
+        {project.instruments?.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-3">
+            {project.instruments.slice(0, 3).map((inst) => (
+              <span key={inst} className="text-[10px] font-inter px-2 py-0.5 bg-[var(--primary-light)] text-[var(--primary)] border border-[#ffd9a8] rounded-full">
+                {inst}
+              </span>
+            ))}
+            {project.instruments.length > 3 && (
+              <span className="text-[10px] font-inter text-[var(--text-muted)]">+{project.instruments.length - 3}</span>
+            )}
+          </div>
+        )}
+
+        <div className="mb-3">
+          <div className="flex justify-between text-[10px] font-inter text-[var(--text-muted)] mb-1">
+            <span>Progress</span>
+            <span className="font-semibold text-[var(--text-primary)]">{project.progress}%</span>
+          </div>
+          <div className="w-full h-1.5 bg-[var(--bg)] rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all"
+              style={{ width: `${project.progress}%`, background: "var(--primary)" }}
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between pt-3 border-t border-[var(--border)]">
+          <div className="flex items-center gap-1 text-[10px] font-inter text-[var(--text-muted)]">
+            <Calendar size={11} />
+            {new Date(project.createdAt).toLocaleDateString()}
+          </div>
+          {amount !== undefined && (
+            <span className="text-xs font-bold font-inter text-[var(--text-primary)]">
+              {amountLabel}: ₹{amount.toLocaleString()}
+            </span>
+          )}
+        </div>
+      </div>
+    </Link>
+  );
 }
 
-const INITIAL_FORM: FormData = {
-  name: "",
-  summary: "",
-  priority: "MEDIUM",
-  basicDetails: "",
-  budget: "",
-  projectType: "",
-  startDate: "",
-  deadline: "",
-  supervisorAdmin: "",
-  repository: "",
-};
-
-interface CreateModalProps {
-  onClose: () => void;
-  onSubmit: (project: Project) => void;
-}
-
-function CreateModal({ onClose, onSubmit }: CreateModalProps) {
-  const [formData, setFormData] = useState<FormData>(INITIAL_FORM);
-  const [techStack, setTechStack] = useState<TechEntry[]>([]);
-  const [newTechKey, setNewTechKey] = useState("");
-  const [newTechValue, setNewTechValue] = useState("");
-  const [customCategory, setCustomCategory] = useState("");
-  const [currentPhase, setCurrentPhase] = useState("");
-  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
-  const [memberSearchTerm, setMemberSearchTerm] = useState("");
-  const [isMemberDropdownOpen, setIsMemberDropdownOpen] = useState(false);
+// ── Client: Create Project Modal ──────────────────────────────────────────────
+function CreateProjectModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  const [form, setForm] = useState({ title: "", description: "", budget: "", startDate: "", endDate: "" });
+  const [instruments, setInstruments] = useState<string[]>([]);
+  const [instrInput, setInstrInput] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const selectedCategory = PREDEFINED_TECH.find((c) => c.key === newTechKey);
-  const filteredUsers = STATIC_USERS.filter((u) =>
-    u.name.toLowerCase().includes(memberSearchTerm.toLowerCase())
-  );
-
-  const handleField = (
-    key: keyof FormData,
-    value: string
-  ) => setFormData((prev) => ({ ...prev, [key]: value }));
-
-  const addTech = () => {
-    const key = newTechKey === "custom" ? customCategory : newTechKey;
-    const value = newTechValue.trim();
-    if (!key || !value) return;
-    setTechStack((prev) => [...prev, { key, value }]);
-    setNewTechKey("");
-    setNewTechValue("");
-    setCustomCategory("");
+  const addInstrument = () => {
+    const v = instrInput.trim();
+    if (v && !instruments.includes(v)) setInstruments((p) => [...p, v]);
+    setInstrInput("");
   };
 
-  const removeTech = (idx: number) =>
-    setTechStack((prev) => prev.filter((_, i) => i !== idx));
-
-  const toggleMember = (id: string) =>
-    setSelectedMembers((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { name, projectType, budget, startDate, deadline, supervisorAdmin } = formData;
-    if (!name.trim() || !projectType || !budget || !startDate || !deadline || !supervisorAdmin) {
-      setError("Please fill all required fields.");
-      return;
-    }
-    const newProject: Project = {
-      id: `p_${Date.now()}`,
-      name: formData.name,
-      summary: formData.summary || "No summary provided.",
-      basicDetails: formData.basicDetails,
-      priority: formData.priority,
-      membersCount: selectedMembers.length,
-      progress: 0,
-      createdAt: new Date().toISOString(),
-    };
-    onSubmit(newProject);
-    onClose();
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/client/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: form.title,
+          description: form.description,
+          budget: Number(form.budget),
+          instruments,
+          startDate: form.startDate || undefined,
+          endDate: form.endDate || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!data.success) { setError(data.message); return; }
+      onCreated();
+      onClose();
+    } catch { setError("Something went wrong"); }
+    finally { setLoading(false); }
   };
+
+  const inputCls = "w-full px-3 py-2 border border-[var(--border)] rounded-lg text-sm font-inter outline-none focus:ring-2 focus:ring-[var(--primary)] bg-white text-[var(--text-primary)]";
 
   return (
-    <div
-      className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white rounded-2xl w-full max-w-3xl max-h-[88vh] overflow-y-auto shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-        style={{ scrollbarWidth: "none" }}
-      >
-        <div className="p-7">
-          {/* Modal Header */}
-          <div className="flex items-center justify-between mb-7">
-            <h2 className="text-xl font-bold text-gray-900">Create new project</h2>
-            <button
-              type="button"
-              onClick={onClose}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              <X size={18} className="text-gray-500" />
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
-                <AlertCircle size={15} />
-                {error}
-              </div>
-            )}
-
-            {/* Grid fields */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-white rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="p-6">
+          <h2 className="text-lg font-bold font-id text-[var(--text-primary)] mb-5">Create New Project</h2>
+          {error && (
+            <div className="flex items-center gap-2 text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-4">
+              <AlertCircle size={13} /> {error}
+            </div>
+          )}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-medium font-inter text-[var(--text-secondary)] mb-1">Title *</label>
+              <input className={inputCls} placeholder="Project title (min 5 chars)" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+            </div>
+            <div>
+              <label className="block text-xs font-medium font-inter text-[var(--text-secondary)] mb-1">Description *</label>
+              <textarea className={`${inputCls} resize-none`} rows={3} placeholder="Describe your project (min 20 chars)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
+            </div>
+            <div>
+              <label className="block text-xs font-medium font-inter text-[var(--text-secondary)] mb-1">Budget (₹) *</label>
+              <input type="number" className={inputCls} placeholder="Min ₹500" value={form.budget} onChange={(e) => setForm({ ...form, budget: e.target.value })} required />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Project name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => handleField("name", e.target.value)}
-                  placeholder="Enter project name"
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+                <label className="block text-xs font-medium font-inter text-[var(--text-secondary)] mb-1">Start Date</label>
+                <input type="date" className={inputCls} value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Project type <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={formData.projectType}
-                  onChange={(e) => handleField("projectType", e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                >
-                  <option value="">Select type</option>
-                  {["AI", "Cyber Security", "SaaS", "Static Website", "E-commerce", "Web Application", "Mobile App", "Other"].map((t) => (
-                    <option key={t}>{t}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Priority</label>
-                <select
-                  value={formData.priority}
-                  onChange={(e) => handleField("priority", e.target.value as FormData["priority"])}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                >
-                  <option value="LOW">Low</option>
-                  <option value="MEDIUM">Medium</option>
-                  <option value="HIGH">High</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Budget <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="number"
-                  value={formData.budget}
-                  onChange={(e) => handleField("budget", e.target.value)}
-                  placeholder="Enter amount"
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Start date <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  value={formData.startDate}
-                  onChange={(e) => handleField("startDate", e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Deadline <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  value={formData.deadline}
-                  min={formData.startDate}
-                  onChange={(e) => handleField("deadline", e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Supervisor admin <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={formData.supervisorAdmin}
-                  onChange={(e) => handleField("supervisorAdmin", e.target.value)}
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                >
-                  <option value="">Select supervisor</option>
-                  {STATIC_ADMINS.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.name} – {a.workingAs}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Repository</label>
-                <input
-                  type="text"
-                  value={formData.repository}
-                  onChange={(e) => handleField("repository", e.target.value)}
-                  placeholder="URL ending in .git"
-                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <label className="block text-xs font-medium font-inter text-[var(--text-secondary)] mb-1">End Date</label>
+                <input type="date" className={inputCls} value={form.endDate} min={form.startDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} />
               </div>
             </div>
-
-            {/* Tech stack */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Technology stack</label>
-              {techStack.length > 0 && (
-                <div className="space-y-2 mb-3">
-                  {techStack.map((t, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm"
-                    >
-                      <span>
-                        <strong className="text-gray-800">{t.key}:</strong>{" "}
-                        <span className="text-gray-600">{t.value}</span>
-                      </span>
-                      <button type="button" onClick={() => removeTech(i)} className="text-red-400 hover:text-red-600">
-                        <X size={14} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <div className="grid grid-cols-3 gap-2">
-                <select
-                  value={newTechKey}
-                  onChange={(e) => { setNewTechKey(e.target.value); setNewTechValue(""); }}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                >
-                  <option value="">Category</option>
-                  {PREDEFINED_TECH.map((c) => (
-                    <option key={c.key} value={c.key}>{c.key}</option>
-                  ))}
-                  <option value="custom">Custom</option>
-                </select>
-
-                {newTechKey === "custom" ? (
-                  <input
-                    type="text"
-                    placeholder="Category name"
-                    value={customCategory}
-                    onChange={(e) => setCustomCategory(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                ) : selectedCategory ? (
-                  <select
-                    value={newTechValue}
-                    onChange={(e) => setNewTechValue(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                  >
-                    <option value="">Technology</option>
-                    {selectedCategory.options.map((o) => (
-                      <option key={o}>{o}</option>
-                    ))}
-                    <option value="other">Other</option>
-                  </select>
-                ) : (
-                  <input
-                    type="text"
-                    placeholder="Technology"
-                    value={newTechValue}
-                    onChange={(e) => setNewTechValue(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                )}
-
-                {newTechKey === "custom" && (
-                  <input
-                    type="text"
-                    placeholder="Technology"
-                    value={newTechValue}
-                    onChange={(e) => setNewTechValue(e.target.value)}
-                    className="col-start-3 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                )}
-
-                <button
-                  type="button"
-                  onClick={addTech}
-                  disabled={
-                    newTechKey === "custom"
-                      ? !customCategory || !newTechValue
-                      : !newTechKey || !newTechValue
-                  }
-                  className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-40 transition-colors"
-                >
-                  Add
-                </button>
+              <label className="block text-xs font-medium font-inter text-[var(--text-secondary)] mb-1">Instruments / Skills Needed</label>
+              <div className="flex gap-2 mb-2">
+                <input className={inputCls} placeholder="e.g. React, Node.js" value={instrInput} onChange={(e) => setInstrInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addInstrument())} />
+                <button type="button" onClick={addInstrument} className="px-3 py-2 bg-[var(--primary-light)] text-[var(--primary)] border border-[#ffd9a8] rounded-lg text-xs font-inter font-semibold">Add</button>
               </div>
-            </div>
-
-            {/* Current phase */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Current project phase
-              </label>
-              <select
-                value={currentPhase}
-                onChange={(e) => setCurrentPhase(e.target.value)}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-              >
-                <option value="">Select phase</option>
-                {["Design", "Code", "Testing", "Deployment"].map((p) => (
-                  <option key={p}>{p}</option>
+              <div className="flex flex-wrap gap-1">
+                {instruments.map((i) => (
+                  <span key={i} className="text-[10px] font-inter px-2 py-0.5 bg-[var(--primary-light)] text-[var(--primary)] border border-[#ffd9a8] rounded-full flex items-center gap-1">
+                    {i}
+                    <button type="button" onClick={() => setInstruments((p) => p.filter((x) => x !== i))} className="hover:text-red-500">×</button>
+                  </span>
                 ))}
-              </select>
+              </div>
             </div>
-
-            {/* Summary */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Summary</label>
-              <textarea
-                value={formData.summary}
-                onChange={(e) => handleField("summary", e.target.value)}
-                placeholder="Brief project summary"
-                rows={3}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              />
-            </div>
-
-            {/* Basic details */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Basic details</label>
-              <textarea
-                value={formData.basicDetails}
-                onChange={(e) => handleField("basicDetails", e.target.value)}
-                placeholder="Detailed project description"
-                rows={4}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              />
-            </div>
-
-            {/* Team members */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Team members{" "}
-                <span className="text-gray-400 font-normal">({selectedMembers.length} selected)</span>
-              </label>
-              <button
-                type="button"
-                onClick={() => setIsMemberDropdownOpen((o) => !o)}
-                className="w-full text-left px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                {selectedMembers.length > 0
-                  ? `${selectedMembers.length} user(s) selected`
-                  : "Select members"}{" "}
-                ↓
-              </button>
-
-              {isMemberDropdownOpen && (
-                <div className="mt-2 border border-gray-200 rounded-xl bg-white overflow-hidden shadow-sm">
-                  <div className="p-2 border-b border-gray-100">
-                    <input
-                      type="text"
-                      placeholder="Search users..."
-                      value={memberSearchTerm}
-                      onChange={(e) => setMemberSearchTerm(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div className="max-h-52 overflow-y-auto">
-                    {filteredUsers.length === 0 ? (
-                      <p className="text-sm text-gray-400 px-4 py-3">No users found</p>
-                    ) : (
-                      filteredUsers.map((user) => (
-                        <div
-                          key={user.id}
-                          onClick={() => toggleMember(user.id)}
-                          className={`flex items-center justify-between px-4 py-2.5 cursor-pointer transition-colors ${selectedMembers.includes(user.id)
-                            ? "bg-blue-50"
-                            : "hover:bg-gray-50"
-                            }`}
-                        >
-                          <div>
-                            <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                            <p className="text-xs text-gray-400">
-                              {user.role} · {user.department}
-                            </p>
-                          </div>
-                          {selectedMembers.includes(user.id) && (
-                            <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shrink-0">
-                              <svg
-                                className="w-3 h-3 text-white"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                strokeWidth={3}
-                              >
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                              </svg>
-                            </div>
-                          )}
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Actions */}
             <div className="flex gap-3 pt-2">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-              >
-                <Plus size={15} />
-                Create project
+              <button type="button" onClick={onClose} className="flex-1 px-4 py-2 border border-[var(--border)] rounded-lg text-sm font-inter text-[var(--text-secondary)] hover:bg-[var(--bg)]">Cancel</button>
+              <button type="submit" disabled={loading} className="flex-1 px-4 py-2 text-white rounded-lg text-sm font-inter font-semibold disabled:opacity-50 flex items-center justify-center gap-2" style={{ background: "var(--primary)" }}>
+                {loading && <Loader2 size={14} className="animate-spin" />} Create Project
               </button>
             </div>
           </form>
@@ -664,130 +204,133 @@ function CreateModal({ onClose, onSubmit }: CreateModalProps) {
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
-
+// ── Main Page ─────────────────────────────────────────────────────────────────
 export default function ProjectsPage() {
-  const [projects, setProjects] = useState<Project[]>(STATIC_PROJECTS);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [priorityFilter, setPriorityFilter] = useState("ALL");
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const { data: session } = useSession();
+  const role = session?.user?.role;
 
-  const filteredProjects = useMemo(() => {
-    return projects.filter((p) => {
-      const matchSearch =
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.summary.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchPriority = priorityFilter === "ALL" || p.priority === priorityFilter;
-      return matchSearch && matchPriority;
-    });
-  }, [projects, searchTerm, priorityFilter]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [showCreate, setShowCreate] = useState(false);
 
-  const handleProjectCreated = (newProject: Project) => {
-    setProjects((prev) => [newProject, ...prev]);
+  const fetchProjects = async () => {
+    if (!role) return;
+    setLoading(true);
+    try {
+      const endpoint =
+        role === "CLIENT" ? "/api/client/projects" :
+          role === "ADMIN" ? "/api/admin/project" :
+            "/api/engineer/projects";
+      const res = await fetch(endpoint);
+      const data = await res.json();
+      if (data.success) setProjects(data.projects);
+    } catch { /* silent */ }
+    finally { setLoading(false); }
   };
+
+  useEffect(() => { fetchProjects(); }, [role]);
+
+  const filtered = useMemo(() => projects.filter((p) => {
+    const matchSearch = p.title.toLowerCase().includes(search.toLowerCase()) || p.description.toLowerCase().includes(search.toLowerCase());
+    const matchStatus = statusFilter === "ALL" || p.status === statusFilter;
+    return matchSearch && matchStatus;
+  }), [projects, search, statusFilter]);
+
+  const stats = useMemo(() => ({
+    total: projects.length,
+    active: projects.filter((p) => ["IN_PROGRESS", "IN_REVIEW", "SEARCHING"].includes(p.status)).length,
+    completed: projects.filter((p) => p.status === "COMPLETED").length,
+  }), [projects]);
 
   return (
     <DashboardShell>
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6 py-8 space-y-7">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">My Projects</h1>
-              <p className="text-gray-500 mt-1 text-[15px]">Manage and track your assigned projects</p>
-            </div>
-
-            <div className="flex items-center gap-3 flex-wrap">
-              {/* Search */}
-              <div className="relative">
-                <Search
-                  size={16}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                />
-                <input
-                  type="text"
-                  placeholder="Search projects..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm bg-white text-black focus:border-transparent w-52"
-                />
-              </div>
-
-              {/* Priority filter */}
-              <div className="relative">
-                <Filter
-                  size={15}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-                />
-                <select
-                  value={priorityFilter}
-                  onChange={(e) => setPriorityFilter(e.target.value)}
-                  className="pl-8 pr-3 py-2.5 border border-gray-300 rounded-xl text-sm bg-white text-black cursor-pointer appearance-none"
-                >
-                  <option value="ALL">All</option>
-                  <option value="HIGH">High</option>
-                  <option value="MEDIUM">Medium</option>
-                  <option value="LOW">Low</option>
-                </select>
-              </div>
-
-              {/* New project button */}
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#FFAE58] text-white rounded-xl text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm"
-              >
-                <Plus size={16} />
-                New project
-              </button>
-            </div>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold font-id text-[var(--text-primary)]">
+              {role === "CLIENT" ? "My Projects" : role === "ADMIN" ? "All Projects" : "Assigned Projects"}
+            </h1>
+            <p className="text-xs font-inter text-[var(--text-muted)] mt-0.5">
+              {role === "CLIENT" ? "Manage your projects and track progress"
+                : role === "ADMIN" ? "Overview of all client projects"
+                  : "Projects you are working on"}
+            </p>
           </div>
-
-          {/* Stats bar */}
-          <div className="flex items-center gap-6 text-sm text-gray-500">
-            <span>
-              <strong className="text-gray-900 font-semibold">{projects.length}</strong> total
-            </span>
-            <span>
-              <strong className="text-red-600 font-semibold">
-                {projects.filter((p) => p.priority === "HIGH").length}
-              </strong>{" "}
-              high priority
-            </span>
-            <span>
-              <strong className="text-gray-900 font-semibold">{filteredProjects.length}</strong> shown
-            </span>
-          </div>
-
-          {/* Projects grid */}
-          {filteredProjects.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-24 text-center">
-              <AlertCircle size={48} className="text-gray-300 mb-4" />
-              <h3 className="text-lg font-semibold text-gray-700 mb-1">No projects found</h3>
-              <p className="text-sm text-gray-400">
-                {projects.length === 0
-                  ? "You haven't been assigned to any projects yet."
-                  : "Try adjusting your search or filter."}
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filteredProjects.map((project) => (
-                <Link href={`/dashboard/project/${project.id}`} key={project.id}>
-                  <ProjectCard key={project.id} project={project} />
-                </Link>
-              ))}
-            </div>
+          {role === "CLIENT" && (
+            <button onClick={() => setShowCreate(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm font-semibold" style={{ background: "var(--primary)" }}>
+              <Plus size={15} /> New Project
+            </button>
           )}
         </div>
 
-        {/* Create modal */}
-        {showCreateModal && (
-          <CreateModal
-            onClose={() => setShowCreateModal(false)}
-            onSubmit={handleProjectCreated}
-          />
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-4">
+          {[
+            { label: "Total", value: stats.total, icon: <Users size={16} />, color: "text-[var(--text-primary)]" },
+            { label: "Active", value: stats.active, icon: <Clock size={16} />, color: "text-green-600" },
+            { label: "Completed", value: stats.completed, icon: <CheckCircle size={16} />, color: "text-blue-600" },
+          ].map((s) => (
+            <div key={s.label} className="bg-white border border-[var(--border)] rounded-xl p-4 flex items-center gap-3">
+              <div className={`${s.color}`}>{s.icon}</div>
+              <div>
+                <p className={`text-xl font-bold font-id ${s.color}`}>{s.value}</p>
+                <p className="text-[10px] font-inter text-[var(--text-muted)]">{s.label}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Filters */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="relative">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+            <input
+              placeholder="Search projects..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9 pr-4 py-2 border border-[var(--border)] rounded-lg text-sm font-inter bg-white text-[var(--text-primary)] outline-none focus:ring-2 focus:ring-[var(--primary)] w-52"
+            />
+          </div>
+          <div className="relative">
+            <Filter size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="pl-8 pr-3 py-2 border border-[var(--border)] rounded-lg text-sm font-inter bg-white text-[var(--text-primary)] outline-none appearance-none cursor-pointer"
+            >
+              <option value="ALL">All Status</option>
+              {Object.entries(STATUS_META).map(([k, v]) => (
+                <option key={k} value={k}>{v.label}</option>
+              ))}
+            </select>
+          </div>
+          <span className="text-xs font-inter text-[var(--text-muted)]">{filtered.length} shown</span>
+        </div>
+
+        {/* Content */}
+        {loading ? (
+          <div className="flex items-center justify-center py-24">
+            <Loader2 className="animate-spin text-[var(--primary)]" size={36} />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <XCircle size={40} className="text-[var(--border)] mb-3" />
+            <p className="text-sm font-inter font-semibold text-[var(--text-primary)]">No projects found</p>
+            <p className="text-xs font-inter text-[var(--text-muted)] mt-1">
+              {projects.length === 0 ? (role === "CLIENT" ? "Create your first project to get started." : "You haven't been assigned to any projects yet.") : "Try adjusting your search or filter."}
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filtered.map((p) => <ProjectCard key={p.id} project={p} role={role ?? ""} />)}
+          </div>
         )}
       </div>
+
+      {showCreate && <CreateProjectModal onClose={() => setShowCreate(false)} onCreated={fetchProjects} />}
     </DashboardShell>
   );
 }

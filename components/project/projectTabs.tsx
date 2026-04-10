@@ -3,8 +3,8 @@ import Link from "next/link";
 import React, { useState } from "react";
 
 const TABS = [
-  "Overview", "Work Done", "Kanban", "Team",
-  "Milestones", "Assets", "Tickets", "Report Issue", "Tips", "Client Update"
+  "Overview", "Work Done", "Kanban", "Credentials",
+  "Milestones", "Assets", "Report Issue", "Report Issue To Management", "Chat", "Payout"
 ];
 
 export default function ProjectTabs({ activeTab, setActiveTab }: any) {

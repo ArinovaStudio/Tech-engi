@@ -3,14 +3,16 @@
 import KanbanTab from "./KanbanTab";
 import OverviewTab from "./OverviewTab";
 import WorkDoneTab from "./WorkDoneTab";
-import TeamTab from "./TeamTab";
+// import TeamTab from "./TeamTab";
 import MilestoneTab from "./MilestoneTab";
 import AssetsTab from "./AssetsTab";
 import StatusTab from "./StatusTab";
 import TicketsTab from "./TicketsTab";
 import ReportIssueTab from "./ReportIssueTab";
-import UsefulTipsTab from "./TipsTab";
+// import UsefulTipsTab from "./TipsTab";
 import ClientUpdate from "./ClientUpdate";
+import ChatTab from "./ChatTab";
+import CredentialsTab from "./CredentialsTab";
 
 export default function TabContent({ activeTab, project }: any) {
 
@@ -24,8 +26,8 @@ export default function TabContent({ activeTab, project }: any) {
     case "Kanban":
       return <KanbanTab projectId={project.id} />;
 
-    case "Team":
-      return <TeamTab projectId={project.id} />;
+    case "Credentials":
+      return <CredentialsTab  />;
 
     case "Milestones":
       return <MilestoneTab projectId={project.id} />;
@@ -36,16 +38,16 @@ export default function TabContent({ activeTab, project }: any) {
     case "Progress":
       return <StatusTab projectId={project.id} />;
 
-    case "Tickets":
+    case "Report Issues":
       return <TicketsTab projectId={project.id} />;
 
-    case "Report Issue":
+    case "Report Issue to Management":
       return <ReportIssueTab projectId={project.id} />;
 
-    case "Tips":
-      return <UsefulTipsTab projectId={project.id} />;
+    case "Chat":
+      return <ChatTab projectId={project.id} />;
 
-    case "Client Update":
+    case "Payout":
       return <ClientUpdate projectId={project.id} />
     // default:
     //   return <OverviewTab project={project} />;

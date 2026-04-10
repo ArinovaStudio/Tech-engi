@@ -19,7 +19,7 @@ export async function GET( req: NextRequest, { params }: { params: Promise<{ pro
       include: {
         engineer: { include: { user: { select: { name: true, image: true, email: true } } } },
         resources: { orderBy: { createdAt: "desc" } },
-        deletionRequest: true,
+        cancellationRequests: true,
         invitations: {
           include: { engineer: { include: { user: { select: { name: true, image: true, email: true } } } } },
           orderBy: { createdAt: "desc" }

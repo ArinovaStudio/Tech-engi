@@ -6,17 +6,17 @@ export default function registerChatHandlers(io: Server, socket: Socket) {
   
   socket.on("join_project", async (data: { projectId: string; userId: string }) => {
     try {
+      const user = await prisma.user.findUnique({ where: { id: data.userId } });
       const project = await prisma.project.findUnique({
         where: { id: data.projectId },
         include: { client: true, engineer: true }
       });
 
-      if (!project) return;
+      if (!project || !user) return;
 
-      const isClient = project.client?.userId === data.userId;
-      const isEngineer = project.engineer?.userId === data.userId;
+      const isParticipant = user.role === "ADMIN" || project.client?.userId === data.userId || project.engineer?.userId === data.userId;
 
-      if (isClient || isEngineer) {
+      if (isParticipant) {
         socket.join(`project_${data.projectId}`);
       } else {
         socket.emit("message_error", { message: "Unauthorized" });
@@ -28,6 +28,10 @@ export default function registerChatHandlers(io: Server, socket: Socket) {
 
   socket.on("send_message", async (data: { projectId: string; senderId: string; content: string }) => {
     try {
+      const sender = await prisma.user.findUnique({ where: { id: data.senderId } });
+      if (sender?.role === "ADMIN") {
+        return socket.emit("message_error", { message: "Admins have read-only access to chats" });
+      }
 
       const validation = validateChatMessage(data.content);
       if (!validation.isValid) {
@@ -68,6 +72,11 @@ export default function registerChatHandlers(io: Server, socket: Socket) {
 
   socket.on("edit_message", async (data: { messageId: string; senderId: string; content: string }) => {
     try {
+      const sender = await prisma.user.findUnique({ where: { id: data.senderId } });
+      if (sender?.role === "ADMIN") {
+        return socket.emit("message_error", { message: "Admins have read-only access to chats." });
+      }
+
       const existingMessage = await prisma.chatMessage.findUnique({ where: { id: data.messageId } });
       if (!existingMessage){
         return socket.emit("message_error", { message: "Message not found" });
@@ -99,6 +108,11 @@ export default function registerChatHandlers(io: Server, socket: Socket) {
 
   socket.on("delete_message", async (data: { messageId: string; senderId: string }) => {
     try {
+      const sender = await prisma.user.findUnique({ where: { id: data.senderId } });
+      if (sender?.role === "ADMIN") {
+        return socket.emit("message_error", { message: "Admins have read-only access to chats." });
+      }
+      
       const existingMessage = await prisma.chatMessage.findUnique({ where: { id: data.messageId } });
       if (!existingMessage){
         return socket.emit("message_error", { message: "Message not found" });

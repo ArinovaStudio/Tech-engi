@@ -15,14 +15,10 @@ const engineerSelect = {
   skills: true,
   completedProjects: true,
   createdAt: true,
-  // embedding intentionally excluded (unsupported vector type)
   user: { select: { name: true, image: true, email: true } }
 } as const;
 
-export async function GET(
-  req: NextRequest,
-  context: { params: Promise<{ projectId: string }> }
-) {
+export async function GET( req: NextRequest, context: { params: Promise<{ projectId: string }> } ) {
   try {
     const { user, error } = await getAdmin();
     if (error || !user) {
@@ -51,9 +47,7 @@ export async function GET(
     }
 
     return NextResponse.json({ success: true, project }, { status: 200 });
-  } catch (err) {
-    console.error("ADMIN PROJECT ERROR:", err); // ← add this
-
+  } catch {
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }

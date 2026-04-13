@@ -26,9 +26,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ proj
     }
     const isAdmin = user.role === "ADMIN";
 
-    const isParticipant =
-      (user.role === "CLIENT" && project.client?.userId === user.id) ||
-      (user.role === "ENGINEER" && project.engineer?.userId === user.id);
+    const isParticipant = user.role === "ADMIN" || 
+    (user.role === "CLIENT" && project.client?.userId === user.id) ||
+    (user.role === "ENGINEER" && project.engineer?.userId === user.id);
 
     if (!isParticipant && !isAdmin) {
       return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });

@@ -5,7 +5,7 @@ import { z } from "zod";
 import { deletionRequestedClientTemplate, deletionRequestedEngineerTemplate } from "@/lib/templates";
 import sendEmail from "@/lib/email";
 
-export async function GET( req: NextRequest, { params }: { params: Promise<{ projectId: string }> } ) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
   try {
     const { user, error } = await getClient();
     if (error || !user?.clientProfile) {
@@ -21,25 +21,31 @@ export async function GET( req: NextRequest, { params }: { params: Promise<{ pro
         resources: { orderBy: { createdAt: "desc" } },
         cancellationRequests: true,
         invitations: {
-          include: { engineer: { include: { user: { select: { name: true, image: true, email: true } } } } },
+          include: {
+            engineer: {
+              include: {
+                user: true
+              }
+            }
+          },
           orderBy: { createdAt: "desc" }
         }
       }
     });
 
-    if (!project){ 
+    if (!project) {
       return NextResponse.json({ success: false, message: "Project not found" }, { status: 404 });
     }
 
-    if (project.clientId !== user.clientProfile.id){
+    if (project.clientId !== user.clientProfile.id) {
       return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
     }
 
     const sanitizedResources = project.resources.map(res => {
       if (res.isLocked && !project.isFinalPaymentMade) {
-        return { 
-          ...res, 
-          content: "[LOCKED: Complete the final 60% payment to view these credentials]" 
+        return {
+          ...res,
+          content: "[LOCKED: Complete the final 60% payment to view these credentials]"
         };
       }
       return res;
@@ -48,13 +54,13 @@ export async function GET( req: NextRequest, { params }: { params: Promise<{ pro
     const acceptedInvitation = project.invitations.find(inv => inv.status === "ACCEPTED");
     const filteredInvitations = acceptedInvitation ? [acceptedInvitation] : project.invitations.filter(inv => inv.status === "SENT" || inv.status === "EXPIRED");
 
-    return NextResponse.json({ 
-      success: true, 
-      project: { 
-        ...project, 
+    return NextResponse.json({
+      success: true,
+      project: {
+        ...project,
         resources: sanitizedResources,
-        invitations: filteredInvitations 
-      } 
+        invitations: project.invitations
+      }
     }, { status: 200 });
 
   } catch {
@@ -65,35 +71,35 @@ export async function GET( req: NextRequest, { params }: { params: Promise<{ pro
 const updateProjectSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters"),
   description: z.string().min(20, "Please provide a more detailed description"),
-  budget: z.number().min(500, "Minimum budget must be ₹500"), 
+  budget: z.number().min(500, "Minimum budget must be ₹500"),
   instruments: z.array(z.string()).default([]),
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
   progress: z.number().min(0).max(100).optional(),
 });
 
-export async function PUT( req: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
   try {
     const { user, error } = await getClient();
-    if (error || !user || !user.clientProfile){
+    if (error || !user || !user.clientProfile) {
       return NextResponse.json({ success: false, message: error || "Unauthorized" }, { status: 401 });
     }
 
     const { projectId } = await params;
 
     const existingProject = await prisma.project.findUnique({ where: { id: projectId } });
-    if (!existingProject){
+    if (!existingProject) {
       return NextResponse.json({ success: false, message: "Project not found" }, { status: 404 });
     }
 
-    if (existingProject.clientId !== user.clientProfile.id){
+    if (existingProject.clientId !== user.clientProfile.id) {
       return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
     }
 
     const body = await req.json();
     const validation = updateProjectSchema.safeParse(body);
-    
-    if (!validation.success){
+
+    if (!validation.success) {
       return NextResponse.json({ success: false, message: validation.error.issues[0].message }, { status: 400 });
     }
 
@@ -105,7 +111,7 @@ export async function PUT( req: NextRequest, { params }: { params: Promise<{ pro
 
     if (startDate && endDate && startDate > endDate) {
       return NextResponse.json({ success: false, message: "Start date must be before end date" }, { status: 400 });
-    } 
+    }
 
     await prisma.project.update({
       where: { id: projectId },
@@ -118,10 +124,10 @@ export async function PUT( req: NextRequest, { params }: { params: Promise<{ pro
   }
 }
 
-export async function DELETE( req: NextRequest, { params }: { params: Promise<{ projectId: string }> } ) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
   try {
     const { user, error } = await getClient();
-    if (error || !user || !user.clientProfile){
+    if (error || !user || !user.clientProfile) {
       return NextResponse.json({ success: false, message: error || "Unauthorized" }, { status: 401 });
     }
 
@@ -129,19 +135,19 @@ export async function DELETE( req: NextRequest, { params }: { params: Promise<{ 
     const body = await req.json();
     const { reason } = body;
 
-    const project = await prisma.project.findUnique({ 
-      where: { id: projectId }, 
-      include: { 
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
+      include: {
         cancellationRequests: true,
         engineer: { include: { user: true } }
-      } 
+      }
     });
 
-    if (!project){
+    if (!project) {
       return NextResponse.json({ success: false, message: "Project not found" }, { status: 404 });
     }
 
-    if (project.clientId !== user.clientProfile.id){
+    if (project.clientId !== user.clientProfile.id) {
       return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
     }
 
@@ -153,17 +159,17 @@ export async function DELETE( req: NextRequest, { params }: { params: Promise<{ 
     if (hasPendingRequest) {
       return NextResponse.json({ success: false, message: "A cancellation request is already pending for this project" }, { status: 400 });
     }
-    
-    if (!reason || reason.length < 10) { 
+
+    if (!reason || reason.length < 10) {
       return NextResponse.json({ success: false, message: "A valid reason (at least 10 characters) is required to cancel a project" }, { status: 400 });
     }
 
     await prisma.projectCancellationRequest.create({
-      data: { 
+      data: {
         projectId: project.id,
         requestedById: user.id,
         initiator: "CLIENT",
-        reason: reason 
+        reason: reason
       }
     });
 

@@ -14,6 +14,7 @@ import {
   FileText,
   Link2,
   Plus,
+  LucideLoader,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -148,9 +149,8 @@ const CredentialsTab = ({ projectId }: CredentialsTabProps) => {
       });
 
       if (res.ok) {
-        alert("✅ Credential added successfully!");
-        // Refresh credentials
-        window.location.reload(); // simple way for now
+        alert("Credential added successfully!");
+        window.location.reload();
       } else {
         const data = await res.json();
         alert("Error: " + (data.error || "Failed to add"));
@@ -200,8 +200,8 @@ const CredentialsTab = ({ projectId }: CredentialsTabProps) => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[320px]">
-        <div className="w-8 h-8 border-2 border-[#1e2130] border-t-indigo-500 rounded-full animate-spin" />
+      <div className="w-full h-[50vh] flex justify-center items-center">
+        <LucideLoader className="animate-spin" style={{ color: "var(--primary)" }} size={40} />
       </div>
     );
   }

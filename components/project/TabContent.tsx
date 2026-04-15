@@ -15,11 +15,11 @@ import ChatTab from "./ChatTab";
 import CredentialsTab from "./CredentialsTab";
 import DailyTask from "./DailyTask";
 
-export default function TabContent({ activeTab, project }: any) {
+export default function TabContent({ activeTab, project, invitations }: any) {
 
   switch (activeTab) {
     case "Overview":
-      return <OverviewTab project={project} />;
+      return <OverviewTab project={project} invitations={invitations} />;
 
     case "Work Done":
       return <WorkDoneTab projectId={project.id} />;

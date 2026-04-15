@@ -41,7 +41,13 @@ export async function GET(
           orderBy: { createdAt: "desc" }
         },
         invitations: {
-          include: { engineer: { select: engineerSelect } },
+          include: {
+            engineer: {
+              include: {
+                user: true
+              }
+            }
+          },
           orderBy: { createdAt: "desc" }
         }
       }

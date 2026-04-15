@@ -68,8 +68,19 @@ type Project = {
   engineer?: EngineerProfile | null;
 };
 
+type Invitations = {
+  id: string;
+  status: "SENT" | "ACCEPTED" | "REJECTED" | "EXPIRED";
+  createdAt: string;
+  engineer?: EngineerProfile | null;
+  project?: Project | null;
+  engineerId: string;
+  projectId: string;
+}
+
 interface OverviewTabProps {
   project: Project;
+  invitations?: Invitations[];
 }
 
 /* ─── Shared input style ──────────────────────────────────────────────── */
@@ -398,7 +409,7 @@ const ProgressModal = ({
 };
 
 /* ─── Main OverviewTab ────────────────────────────────────────────────── */
-export default function OverviewTab({ project }: OverviewTabProps) {
+export default function OverviewTab({ project, invitations }: OverviewTabProps) {
   const [milestones, setMilestones] = useState({ ongoing: 0, total: 0 });
   const [showProgressModal, setShowProgressModal] = useState(false);
   const [currentProgress, setCurrentProgress] = useState(project?.progress || 0);
@@ -429,14 +440,18 @@ export default function OverviewTab({ project }: OverviewTabProps) {
         const stored = localStorage.getItem("user");
         if (!stored) return;
         const parsed = JSON.parse(stored);
+        console.log("User:", parsed);
         const role = parsed?.user?.role || parsed?.role || null;
+        console.log("Extracted role:", role);
         if (!role) return;
         const roleName = (typeof role === "string" ? role : role.name)?.toUpperCase().trim();
         if (roleName === "ADMIN") setIsAdmin(true);
         if (roleName === "ENGINEER") setIsEngineer(true);
         if (roleName === "CLIENT") setIsClient(true);
+        console.log("User role:", roleName);
       } catch { /* silent */ }
     };
+    console.log("invitations", invitations)
 
     const fetchMilestones = async () => {
       try {
@@ -492,11 +507,13 @@ export default function OverviewTab({ project }: OverviewTabProps) {
     borderRadius: 16, padding: "1.5rem",
   };
 
+  const accepted = invitations?.find(i => i.status === "ACCEPTED");
+
   // ── Team member section label ──
   const teamSectionLabel =
     isClient ? "Your Engineer" :
-    isEngineer ? "Client" :
-    "Team Members";
+      isEngineer ? "Client" :
+        "Team Members";
 
   return (
     <>
@@ -571,17 +588,63 @@ export default function OverviewTab({ project }: OverviewTabProps) {
             </div>
           )}
 
+          {/* Invited Engineers Section */}
+          <div className="mt-8">
+            <h3 className="text-lg font-semibold text-[#050A30] mb-4 flex items-center gap-2">
+              Invited Engineers
+            </h3>
+
+            {invitations && invitations.length > 0 ? (
+              <div className="space-y-3">
+                {invitations.map((inv: any) => (
+                  <div
+                    key={inv.id}
+                    className="border border-gray-200 rounded-2xl p-4 flex items-center justify-between bg-white"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div>
+                        <p className="font-semibold text-black">{inv.engineer?.user?.name || "Engineer"}</p>
+                        <p className="text-sm text-black">
+                          {inv.engineer?.skills?.slice(0, 3).join(", ") || "No skills listed"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className={`px-4 py-1.5 text-xs font-medium rounded-full ${inv.status === "ACCEPTED" ? "bg-green-100 text-green-700" :
+                      inv.status === "REJECTED" ? "bg-red-100 text-red-700" :
+                        "bg-yellow-100 text-yellow-700"
+                      }`}>
+                      {inv.status}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8 text-center">
+                <p className="text-gray-500">No invitations sent yet</p>
+                <p className="text-xs text-gray-400 mt-1">Invitations will appear here once matching starts</p>
+              </div>
+            )}
+          </div>
+
           {/* ── Team Members ── */}
           <div>
             <h2 style={{ fontSize: 16, fontWeight: 700, color: T.text, margin: "0 0 4px" }}>
               {teamSectionLabel}
             </h2>
 
+
             {/* CLIENT → sees only the engineer */}
             {isClient && (
-              project.engineer?.user
-                ? <TeamMemberCard user={project.engineer.user} label="Engineer" />
-                : <p style={{ fontSize: 13, color: T.textMuted, marginTop: 8 }}>No engineer assigned yet</p>
+              accepted?.engineer?.user ? (
+                <TeamMemberCard user={accepted.engineer.user} label="Engineer" />
+              ) : project.engineer?.user ? (
+                <TeamMemberCard user={project.engineer.user} label="Engineer" />
+              ) : (
+                <p style={{ fontSize: 13, color: T.textMuted, marginTop: 8 }}>
+                  No engineer assigned yet
+                </p>
+              )
             )}
 
             {/* ENGINEER → sees only the client */}

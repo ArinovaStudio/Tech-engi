@@ -53,51 +53,9 @@ function LockScreen({ status }: { status: UnlockStatus }) {
     <div className="relative min-h-[480px] flex items-center justify-center p-8 overflow-hidden bg-gray-50 rounded-2xl">
       <div className="relative z-10 bg-gray-100 rounded-[20px] px-9 py-10 max-w-[420px] w-full flex flex-col items-center gap-4 shadow-[0_0_0_1px_#ffffff06,0_32px_64px_#00000080]">
         <div className="relative w-[72px] h-[72px] flex items-center justify-center mb-1">
-          <Lock className="text-[var(--primary)] w-9 h-9 relative z-10" strokeWidth={1.5} />
+          <Lock className="text-[var(--primary)] w-20 h-20 relative z-10" strokeWidth={1.5} />
         </div>
-
-        <h2 className="font-serif text-2xl text-black tracking-tight m-0">
-          Credentials Locked
-        </h2>
-        <p className="text-sm text-slate-500 text-center">Complete all steps below to unlock</p>
-
-        <div className="w-full h-1 bg-gray-300 rounded-full overflow-hidden mt-1">
-          <div
-            className="h-full bg-gradient-to-r from-indigo-500 to-indigo-400 transition-all duration-500"
-            style={{ width: `${pct}%` }}
-          />
-        </div>
-
-        <span className="text-xs text-black self-end -mt-2">
-          {completedCount} / {steps.length} steps complete
-        </span>
-
-        <ul className="list-none p-0 mt-1 w-full flex flex-col gap-2.5">
-          {steps.map((step, i) => (
-            <li
-              key={i}
-              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl border transition-colors ${step.done
-                  ? "bg-indigo-500/5 border-indigo-500/20"
-                  : "bg-gray-300 border-white/[0.05]"
-                }`}
-            >
-              <span
-                className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] flex-shrink-0 ${step.done
-                    ? "bg-indigo-500 text-white"
-                    : "bg-gray-300 text-black border border-[#2d3148]"
-                  }`}
-              >
-                {step.done ? <CheckCheck size={13} /> : i + 1}
-              </span>
-              <span className={`text-[13px] ${step.done ? "text-black" : "text-black"}`}>
-                {step.label}
-              </span>
-            </li>
-          ))}
-        </ul>
-
         <div className="flex items-center gap-2 mt-2 text-[11px] text-black">
-          <ShieldCheck size={14} className="text-black" />
           <span>Credentials are end-to-end encrypted and auto-unlock on completion</span>
         </div>
       </div>

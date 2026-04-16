@@ -589,7 +589,7 @@ export default function OverviewTab({ project, invitations }: OverviewTabProps) 
           )}
 
           {/* Invited Engineers Section */}
-          <div className="mt-8">
+          {/* <div className="mt-8">
             <h3 className="text-lg font-semibold text-[#050A30] mb-4 flex items-center gap-2">
               Invited Engineers
             </h3>
@@ -625,7 +625,7 @@ export default function OverviewTab({ project, invitations }: OverviewTabProps) 
                 <p className="text-xs text-gray-400 mt-1">Invitations will appear here once matching starts</p>
               </div>
             )}
-          </div>
+          </div> */}
 
           {/* ── Team Members ── */}
           <div>

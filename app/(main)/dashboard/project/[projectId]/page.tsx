@@ -75,36 +75,6 @@ export default function ProjectDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("");
-  const [isMatching, setIsMatching] = useState(false);
-
-  const handleStartMatching = async () => {
-    if (!project) return;
-
-    setIsMatching(true);
-
-    try {
-      const res = await fetch("/api/match", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId: project.id }),
-      });
-
-      const data = await res.json();
-
-      if (data.success) {
-        toast.success("Matching started! Finding best engineers...");
-        setTimeout(() => {
-          window.location.reload();
-        }, 1800);
-      } else {
-        toast.error(data.message || "Failed to start matching");
-      }
-    } catch (err) {
-      toast.error("Something went wrong. Please try again.");
-    } finally {
-      setIsMatching(false);
-    }
-  };
 
   useEffect(() => {
     if (!role || !projectId) return;
@@ -177,62 +147,20 @@ export default function ProjectDetailPage() {
                 )}
               </div>
             </div>
-
-            {!project.advancePaid && (
-              <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg flex items-center justify-between gap-5">
-                <div>
-                  <p className="text-sm font-semibold text-yellow-800">
-                    Complete advance payment to start matching
-                  </p>
-                  <p className="text-xs text-yellow-600">
-                    Pay 40% to find best engineer
-                  </p>
-                </div>
-
-                <button
-                  // onClick={handlePayment}
-                  className="px-4 py-2 bg-yellow-500 text-white rounded-lg text-sm"
-                >
-                  Pay Now
-                </button>
-              </div>
-            )}
-            {project.advancePaid && project.status === "AWAITING_ADVANCE" && (
-              <button
-                onClick={handleStartMatching}
-                className="px-4 py-2 bg-[var(--primary)] text-white rounded-lg text-sm"
-              >
-                Find Engineer
-              </button>
-            )}
-
-            {project.status === "SEARCHING" && (
-              <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg flex items-center gap-3">
-                <Loader2 className="animate-spin text-blue-600" size={18} />
-                <div>
-                  <p className="text-sm font-semibold text-blue-800">
-                    Finding best engineers for your project...
-                  </p>
-                  <p className="text-xs text-blue-600">
-                    AI is matching top candidates
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
-      <TabBar tabs={tabs} active={activeTab} setActive={setActiveTab} />
+        <TabBar tabs={tabs} active={activeTab} setActive={setActiveTab} />
 
-      <div className="mt-6 px-2">
-        <RoleTabContent
-          tab={activeTab}
-          project={project}
-          role={role}
-          invitations={project.invitations}
-        />
+        <div className="mt-6 px-2">
+          <RoleTabContent
+            tab={activeTab}
+            project={project}
+            role={role}
+            invitations={project.invitations}
+          />
+        </div>
       </div>
-    </div>
     </DashboardShell >
   );
 }

@@ -7,38 +7,59 @@ export async function POST(req: NextRequest) {
   try {
     const { user, error } = await getClient();
     if (error || !user?.clientProfile) {
-      return NextResponse.json({ success: false, message: error || "Unauthorized" }, { status: 401 });
+      return NextResponse.json(
+        { success: false, message: error || "Unauthorized" },
+        { status: 401 }
+      );
     }
 
     const { projectId } = await req.json();
-    if (!projectId){
-      return NextResponse.json({ success: false, message: "Project ID required" }, { status: 400 });
+    if (!projectId) {
+      return NextResponse.json(
+        { success: false, message: "Project ID required" },
+        { status: 400 }
+      );
     }
 
-    const project = await prisma.project.findUnique({ where: { id: projectId } });
-    if (!project || project.clientId !== user.clientProfile.id) {
-      return NextResponse.json({ success: false, message: "Project not found" }, { status: 404 });
-    }
-
-    if (project.status !== "AWAITING_ADVANCE" && project.status !== "AWAITING_FINAL_PAYMENT") {
-      return NextResponse.json({ success: false, message: "Project is not ready to be paid" }, { status: 400 });
-    }
-
-    if (project.isFinalPaymentMade) {
-      return NextResponse.json({ success: false, message: "Project is already fully paid" }, { status: 400 });
-    }
-
-    const isAdvance = !project.advancePaid;
-    const amountToPay = isAdvance ? project.budget * 0.40 : project.budget * 0.60;
-    const transactionType = isAdvance ? "ADVANCE_PAYMENT" : "FINAL_PAYMENT";
-
-
-    const order = await razorpay.orders.create({
-      amount: Math.round(amountToPay * 100),
-      currency: "INR",
-      receipt: `rep_${projectId}`
+    const project = await prisma.project.findUnique({
+      where: { id: projectId },
     });
 
+    if (!project || project.clientId !== user.clientProfile.id) {
+      return NextResponse.json(
+        { success: false, message: "Project not found" },
+        { status: 404 }
+      );
+    }
+
+    // For new projects: check if DRAFT status
+    if (project.status !== "DRAFT" && project.status !== "AWAITING_ADVANCE" && project.status !== "AWAITING_FINAL_PAYMENT") {
+      return NextResponse.json(
+        { success: false, message: "Project is not ready for payment" },
+        { status: 400 }
+      );
+    }
+
+    // Determine payment type and amount
+    const isAdvance = !project.advancePaid;
+    const amountToPay = isAdvance
+      ? project.budget * 0.4 // 40% advance
+      : project.budget * 0.6; // 60% final payment
+
+    const transactionType = isAdvance ? "ADVANCE_PAYMENT" : "FINAL_PAYMENT";
+
+    // Create Razorpay order
+    const order = await razorpay.orders.create({
+      amount: Math.round(amountToPay * 100), // Amount in paise
+      currency: "INR",
+      receipt: `${transactionType === "ADVANCE_PAYMENT" ? "adv" : "fin"}_${projectId}`,
+      notes: {
+        projectId,
+        type: transactionType,
+      },
+    });
+
+    // Create transaction record (PENDING)
     await prisma.transaction.create({
       data: {
         projectId: project.id,
@@ -46,13 +67,19 @@ export async function POST(req: NextRequest) {
         amount: amountToPay,
         type: transactionType,
         status: "PENDING",
-        razorpayOrderId: order.id
-      }
+        razorpayOrderId: order.id,
+      },
     });
 
-    return NextResponse.json({ success: true, order }, { status: 200 });
-
-  } catch {
-    return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { success: true, order },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("POST /api/razorpay/order error:", error);
+    return NextResponse.json(
+      { success: false, message: "Failed to create payment order" },
+      { status: 500 }
+    );
   }
 }

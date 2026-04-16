@@ -17,9 +17,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Missing project ID" }, { status: 400 });
     }
 
+    // Fetch full project details
     const project = await prisma.project.findUnique({
       where: { id: projectId },
-      select: { id: true, clientId: true, title: true, advancePaid: true, engineerId: true }
+      select: {
+        id: true,
+        clientId: true,
+        title: true,
+        description: true,
+        budget: true,
+        advancePaid: true,
+        engineerId: true,
+        status: true,
+      }
     });
 
     if (!project) {
@@ -38,42 +48,57 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Project already assigned" }, { status: 400 });
     }
 
-    // Update status
+    // Update status to SEARCHING
     await prisma.project.update({
       where: { id: projectId },
       data: { status: "SEARCHING" }
     });
 
-    console.log("Starting matching for project:", projectId);
-
     const topEngineerIds: string[] = await getTopMatches(projectId);
 
-    console.log("Top engineer IDs returned:", topEngineerIds);
-
     if (topEngineerIds && topEngineerIds.length > 0) {
+      // Calculate 70% for engineer
+      const engineerEarnings = Math.floor(project.budget * 0.7);
+
       const invitationPromises = topEngineerIds.map(async (engId) => {
         try {
-          await prisma.projectInvitation.createMany({
-            data: topEngineerIds.map((engId) => ({
+          // Create invitation
+          await prisma.projectInvitation.create({
+            data: {
               projectId,
               engineerId: engId,
               status: "SENT"
-            })),
-            skipDuplicates: true
+            }
           });
 
+          // Get engineer details
           const engineer = await prisma.engineerProfile.findUnique({
             where: { id: engId },
-            include: { user: { select: { email: true, name: true } } }
+            include: { 
+              user: { 
+                select: { email: true, name: true } 
+              } 
+            }
           });
 
           if (engineer?.user?.email) {
-            const emailHtml = projectInvitationTemplate(engineer.user.name || "Engineer", project.title);
-            await sendEmail(engineer.user.email, `New Match: ${project.title}`, emailHtml);
-            console.log(`Email sent to engineer ${engId}`);
+            const emailHtml = projectInvitationTemplate(
+              engineer.user.name || "Engineer",
+              project.title,
+              project.description || "No description provided.",
+              engineerEarnings
+            );
+
+            await sendEmail(
+              engineer.user.email, 
+              `New Project Match: ${project.title}`, 
+              emailHtml
+            );
+
+            console.log(`Invitation email sent to engineer ${engId}`);
           }
         } catch (invErr) {
-          console.error(`Failed to process invitation for engineer ${engId}:`, invErr);
+          console.error(`Failed for engineer ${engId}:`, invErr);
         }
       });
 
@@ -82,18 +107,16 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Matching completed",
-      matchedEngineers: topEngineerIds.length
+      message: "Matching completed successfully",
+      matchedEngineers: topEngineerIds.length,
     });
 
   } catch (err: any) {
-    console.error("=== MATCH API ERROR ===");
-    console.error("Message:", err.message);
-    console.error("Stack:", err.stack);
+    console.error("=== MATCH API ERROR ===", err);
     return NextResponse.json({
       success: false,
       message: "Internal server error",
-      error: err.message   // ← This will help you see the real error
+      error: err.message
     }, { status: 500 });
   }
 }

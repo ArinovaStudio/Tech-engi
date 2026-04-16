@@ -43,47 +43,60 @@ export const engineerRejectionTemplate = (name: string, reason: string) => {
   `;
 };
 
-export const projectInvitationTemplate = (name: string, projectTitle: string) => {
-  const dashboardUrl = `${process.env.NEXTAUTH_URL}/dashboard/opportunities`;
+export const projectInvitationTemplate = (
+  name: string,
+  projectTitle: string,
+  projectDescription: string,
+  engineerEarnings: number
+) => {
+  const dashboardUrl = `${process.env.NEXTAUTH_URL}/dashboard/engineer/invitations`;
 
   return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px;">
-      <div style="text-align: center; margin-bottom: 20px;">
-        <span style="background-color: #fff8e1; color: #f0b31e; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; border: 1px solid #ffe082;">
-          New Match Found
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 12px; background-color: #ffffff;">
+      
+      <div style="text-align: center; margin-bottom: 25px;">
+        <span style="background-color: #fff8e1; color: #f0b31e; padding: 6px 18px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; border: 1px solid #ffe082;">
+          AI MATCH FOUND
         </span>
       </div>
       
-      <h2 style="color: #333; text-align: center;">New Project Opportunity!</h2>
+      <h2 style="color: #1f2937; text-align: center; margin-bottom: 8px;">New Project Opportunity!</h2>
+      <p style="color: #6b7280; text-align: center; font-size: 15px;">This matches your skills perfectly</p>
       
-      <p style="color: #555; font-size: 16px;">Hi <strong>${name}</strong>,</p>
-      
-      <p style="color: #555; font-size: 16px; line-height: 1.5;">
-        Our AI has matched your profile with a new hardware project that fits your skills perfectly. 
-      </p>
-      
-      <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin: 25px 0; border: 1px border-gray-100;">
-        <p style="margin: 0; color: #71717a; font-size: 13px; text-transform: uppercase; font-weight: bold;">Project Title</p>
-        <p style="margin: 5px 0 0 0; color: #0f172a; font-size: 18px; font-weight: bold;">${projectTitle}</p>
+      <div style="background-color: #f8fafc; padding: 20px; border-radius: 10px; margin: 25px 0; border: 1px solid #e2e8f0;">
+        <p style="margin: 0 0 8px 0; color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase;">Project Title</p>
+        <p style="margin: 0; color: #0f172a; font-size: 20px; font-weight: bold; line-height: 1.3;">${projectTitle}</p>
       </div>
-      
-      <p style="color: #ef4444; font-size: 14px; font-weight: bold; text-align: center;">
-        ⚡ This is a first-come, first-served opportunity!
+
+      <div style="background-color: #f8fafc; padding: 20px; border-radius: 10px; margin: 20px 0; border: 1px solid #e2e8f0;">
+        <p style="margin: 0 0 8px 0; color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase;">Description</p>
+        <p style="margin: 0; color: #334155; font-size: 15px; line-height: 1.6;">${projectDescription}</p>
+      </div>
+
+      <div style="background: linear-gradient(135deg, #f0b31e, #fbbf24); color: white; padding: 18px; border-radius: 10px; text-align: center; margin: 25px 0;">
+        <p style="margin: 0 0 4px 0; font-size: 13px; opacity: 0.9;">You will earn</p>
+        <p style="margin: 0; font-size: 28px; font-weight: bold;">₹${engineerEarnings.toLocaleString('en-IN')}</p>
+      </div>
+
+      <p style="color: #ef4444; font-size: 14px; font-weight: bold; text-align: center; margin: 20px 0;">
+        First-come, first-served! Respond quickly.
       </p>
 
-      <div style="margin: 30px 0; text-align: center;">
-        <a href="${dashboardUrl}" style="background-color: #f0b31e; color: white; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; shadow: 0 4px 6px rgba(240, 179, 30, 0.2);">
-          View Project Details
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${dashboardUrl}" 
+           style="background-color: #f0b31e; color: white; padding: 15px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block; box-shadow: 0 4px 12px rgba(240, 179, 30, 0.3);">
+          View & Accept Project
         </a>
       </div>
-      
-      <p style="color: #777; font-size: 13px; line-height: 1.5; text-align: center;">
-        If you're interested, please review and accept the project quickly before another engineer claims it.
+
+      <p style="color: #6b7280; font-size: 14px; line-height: 1.6; text-align: center;">
+        If you're interested, review the full details and accept before someone else takes it.
       </p>
       
-      <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
-      <p style="color: #bbb; font-size: 12px; text-align: center;">
-        Arinova Studio &copy; 2026 • Dedicated Hardware Services
+      <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 35px 0 20px;" />
+      
+      <p style="color: #9ca3af; font-size: 12px; text-align: center;">
+        Arinova Studio © 2026 • Connecting Clients with Top Hardware Engineers
       </p>
     </div>
   `;
@@ -94,10 +107,10 @@ export const deletionRequestApprovedTemplate = (name: string, projectTitle: stri
     <h2>Project Cancelled</h2>
     <p>Hello ${name},</p>
     <p>The project <b>${projectTitle}</b> has been officially cancelled</p>
-    <p>${isEngineer 
-      ? `As compensation for your time, a payout of <b>₹${amount.toLocaleString("en-IN")}</b> has been added to your ledger and will be processed shortly.` 
-      : `A refund of <b>₹${amount.toLocaleString("en-IN")}</b> has been added to your ledger and will be processed back to your account shortly.`
-    }</p>
+    <p>${isEngineer
+    ? `As compensation for your time, a payout of <b>₹${amount.toLocaleString("en-IN")}</b> has been added to your ledger and will be processed shortly.`
+    : `A refund of <b>₹${amount.toLocaleString("en-IN")}</b> has been added to your ledger and will be processed back to your account shortly.`
+  }</p>
   </div>
 `;
 
@@ -130,9 +143,9 @@ export const extensionReviewedTemplate = (engineerName: string, projectTitle: st
     <h2 style="color: ${isApproved ? '#5cb85c' : '#d9534f'};">Deadline Extension ${isApproved ? 'Approved' : 'Rejected'}</h2>
     <p>Hello ${engineerName},</p>
     <p>Your request to extend the deadline for <b>${projectTitle}</b> has been <b>${isApproved ? 'Approved' : 'Rejected'}</b> by the client.</p>
-    ${isApproved 
-      ? '<p>The project timeline has been officially updated.</p>' 
-      : '<p>The original deadline still stands. If this causes a major issue, please raise a Ticket from your dashboard.</p>'}
+    ${isApproved
+    ? '<p>The project timeline has been officially updated.</p>'
+    : '<p>The original deadline still stands. If this causes a major issue, please raise a Ticket from your dashboard.</p>'}
     <br/>
     <p>Regards,<br/>The Platform Team</p>
   </div>

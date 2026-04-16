@@ -59,7 +59,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ proj
       project: {
         ...project,
         resources: sanitizedResources,
-        invitations: project.invitations
+        invitations: filteredInvitations
       }
     }, { status: 200 });
 

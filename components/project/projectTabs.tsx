@@ -1,9 +1,8 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
 
 const TABS = [
-  "Overview", "Work Done", "Kanban", "Credentials",
+  "Overview","Kanban", "Credentials",
   "Milestones", "Assets", "Report Issue", "Report Issue To Management", "Chat", "Payout"
 ];
 

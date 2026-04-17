@@ -8,20 +8,16 @@ import {
   Paperclip,
   User,
   Calendar,
-  Flag,
   X,
   Plus,
   Search,
-  Send,
-  AlertCircle,
-  Tag,
   LucideLoader,
   LucideXCircle,
   BellElectric
 } from 'lucide-react';
 // import { SidePanel } from '@/app/(admin)/(main)/kanban/page';
 import toast from 'react-hot-toast';
-import Loader from '../common/Loading';
+// import Loader from '../common/Loading';
 // import RichTextEditor from '../common/editor/Editor';
 // import { htmlToText } from '../common/editor/htmlToText';
 
@@ -369,7 +365,7 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
 
   const columns = [
     { id: 'on-hold', title: 'On Hold', icon: BellElectric, color: 'orange' },
-    { id: 'assigned', title: 'Assigned', icon: User, color: 'blue' },
+    { id: 'Not Started', title: 'Not Started', icon: User, color: 'blue' },
     { id: 'in-progress', title: 'In Progress', icon: Clock, color: 'yellow' },
     { id: 'completed', title: 'Completed', icon: CheckCircle2, color: 'green' }
   ];

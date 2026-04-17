@@ -68,19 +68,8 @@ type Project = {
   engineer?: EngineerProfile | null;
 };
 
-type Invitations = {
-  id: string;
-  status: "SENT" | "ACCEPTED" | "REJECTED" | "EXPIRED";
-  createdAt: string;
-  engineer?: EngineerProfile | null;
-  project?: Project | null;
-  engineerId: string;
-  projectId: string;
-}
-
 interface OverviewTabProps {
   project: Project;
-  invitations?: Invitations[];
 }
 
 /* ─── Shared input style ──────────────────────────────────────────────── */
@@ -409,7 +398,7 @@ const ProgressModal = ({
 };
 
 /* ─── Main OverviewTab ────────────────────────────────────────────────── */
-export default function OverviewTab({ project, invitations }: OverviewTabProps) {
+export default function OverviewTab({ project }: OverviewTabProps) {
   const [milestones, setMilestones] = useState({ ongoing: 0, total: 0 });
   const [showProgressModal, setShowProgressModal] = useState(false);
   const [currentProgress, setCurrentProgress] = useState(project?.progress || 0);
@@ -451,7 +440,6 @@ export default function OverviewTab({ project, invitations }: OverviewTabProps) 
         console.log("User role:", roleName);
       } catch { /* silent */ }
     };
-    console.log("invitations", invitations)
 
     const fetchMilestones = async () => {
       try {
@@ -507,8 +495,6 @@ export default function OverviewTab({ project, invitations }: OverviewTabProps) 
     borderRadius: 16, padding: "1.5rem",
   };
 
-  const accepted = invitations?.find(i => i.status === "ACCEPTED");
-
   // ── Team member section label ──
   const teamSectionLabel =
     isClient ? "Your Engineer" :
@@ -531,7 +517,7 @@ export default function OverviewTab({ project, invitations }: OverviewTabProps) 
         />
       )}
 
-      <div style={{ background: T.bg, padding: "1.5rem", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+      <div className="bg-gray-50" style={{ padding: "1.5rem", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
 
         {/* ══════════════ LEFT COLUMN ══════════════ */}
         <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
@@ -636,9 +622,7 @@ export default function OverviewTab({ project, invitations }: OverviewTabProps) 
 
             {/* CLIENT → sees only the engineer */}
             {isClient && (
-              accepted?.engineer?.user ? (
-                <TeamMemberCard user={accepted.engineer.user} label="Engineer" />
-              ) : project.engineer?.user ? (
+              project.engineer?.user ? (
                 <TeamMemberCard user={project.engineer.user} label="Engineer" />
               ) : (
                 <p style={{ fontSize: 13, color: T.textMuted, marginTop: 8 }}>

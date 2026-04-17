@@ -1,9 +1,9 @@
 "use client";
 
+import { useAuth } from "@/app/hooks/useAuth";
 import DashboardShell from "@/components/layout/DashboardShell";
 import { Plus, Search, Filter, Users, Calendar, AlertCircle, Clock, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useState, useMemo, useEffect } from "react";
 import toast from "react-hot-toast";
@@ -24,6 +24,11 @@ interface Project {
   isFinalPaymentMade?: boolean;
 }
 
+interface User {
+  name: string;
+  email: string;
+}
+
 const STATUS_META: Record<string, { label: string; color: string }> = {
   DRAFT: { label: "Draft", color: "bg-gray-100 text-gray-600" },
   AWAITING_ADVANCE: { label: "Awaiting Advance", color: "bg-yellow-100 text-yellow-700" },
@@ -36,6 +41,7 @@ const STATUS_META: Record<string, { label: string; color: string }> = {
 };
 
 function StatusBadge({ status }: { status: string }) {
+  if (status === "AWAITING_ADVANCE") return null;
   const meta = STATUS_META[status] ?? { label: status, color: "bg-gray-100 text-gray-600" };
   return (
     <span className={`text-[10px] font-semibold font-inter px-2 py-0.5 rounded-full ${meta.color}`}>
@@ -44,12 +50,12 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function ProjectCard({ project, role }: { project: Project; role: string }) {
-  const amount = role === "ENGINEER" ? project.earnings : project.budget;
-  const amountLabel = role === "ENGINEER" ? "Earnings" : "Budget";
+function ProjectCard({ project }: { project: Project }) {
+  const amount = project.budget;
+  const amountLabel = "Budget";
 
   return (
-    <Link href={`/dashboard/project/${project.id}`}>
+    <Link href={`/client/project/${project.id}`}>
       <div className="bg-white border border-[var(--border)] rounded-xl p-5 hover:shadow-md hover:border-[var(--primary)] transition-all cursor-pointer group">
         <div className="flex items-start justify-between gap-2 mb-2">
           <h3 className="text-sm font-bold font-inter text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--primary)] transition-colors">
@@ -105,9 +111,8 @@ function ProjectCard({ project, role }: { project: Project; role: string }) {
 }
 
 // ── Client: Create Project Modal with Razorpay ──────────────────────────────────
-function CreateProjectModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void; onCreated: () => void, user: User }) {
   const router = useRouter();
-  const { data: session } = useSession();
   const [form, setForm] = useState({ title: "", description: "", budget: "", startDate: "", endDate: "" });
   const [instruments, setInstruments] = useState<string[]>([]);
   const [instrInput, setInstrInput] = useState("");
@@ -115,7 +120,6 @@ function CreateProjectModal({ onClose, onCreated }: { onClose: () => void; onCre
   const [error, setError] = useState("");
   const [processingPayment, setProcessingPayment] = useState(false);
   const [isMatching, setIsMatching] = useState(false);
-
   const addInstrument = () => {
     const v = instrInput.trim();
     if (v && !instruments.includes(v)) setInstruments((p) => [...p, v]);
@@ -169,7 +173,7 @@ function CreateProjectModal({ onClose, onCreated }: { onClose: () => void; onCre
 
               onCreated();
               onClose();
-              router.push(`/dashboard/project/${projectId}`);
+              router.push(`/client/project/${projectId}`);
             } else {
               setError("Payment verification failed");
             }
@@ -181,8 +185,8 @@ function CreateProjectModal({ onClose, onCreated }: { onClose: () => void; onCre
           }
         },
         prefill: {
-          name: session?.user?.name || "",
-          email: session?.user?.email || "",
+          name: user?.name || "",
+          email: user?.email || "",
         },
         theme: {
           color: "var(--primary)",
@@ -472,23 +476,19 @@ function CreateProjectModal({ onClose, onCreated }: { onClose: () => void; onCre
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function ProjectsPage() {
-  const { data: session } = useSession();
-  const role = session?.user?.role;
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [showCreate, setShowCreate] = useState(false);
-
+  const { user } = useAuth();
+  
   const fetchProjects = async () => {
-    if (!role) return;
+    if (!user) return;
     setLoading(true);
     try {
-      const endpoint =
-        role === "CLIENT" ? "/api/client/projects" :
-          role === "ADMIN" ? "/api/admin/project" :
-            "/api/engineer/projects";
+      const endpoint = "/api/client/projects";
       const res = await fetch(endpoint);
       const data = await res.json();
       if (data.success) setProjects(data.projects);
@@ -496,7 +496,7 @@ export default function ProjectsPage() {
     finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchProjects(); }, [role]);
+  useEffect(() => { fetchProjects(); }, [user]);
 
   const filtered = useMemo(() => projects.filter((p) => {
     const matchSearch = p.title.toLowerCase().includes(search.toLowerCase()) || p.description.toLowerCase().includes(search.toLowerCase());
@@ -517,19 +517,15 @@ export default function ProjectsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold font-id text-[var(--text-primary)]">
-              {role === "CLIENT" ? "My Projects" : role === "ADMIN" ? "All Projects" : "Assigned Projects"}
+              My Projects
             </h1>
             <p className="text-xs font-inter text-[var(--text-muted)] mt-0.5">
-              {role === "CLIENT" ? "Manage your projects and track progress"
-                : role === "ADMIN" ? "Overview of all client projects"
-                  : "Projects you are working on"}
+              Manage your projects and track progress
             </p>
           </div>
-          {role === "CLIENT" && (
-            <button onClick={() => setShowCreate(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm font-semibold" style={{ background: "var(--primary)" }}>
-              <Plus size={15} /> New Project
-            </button>
-          )}
+          <button onClick={() => setShowCreate(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm font-semibold" style={{ background: "var(--primary)" }}>
+            <Plus size={15} /> New Project
+          </button>
         </div>
 
         {/* Stats */}
@@ -586,17 +582,17 @@ export default function ProjectsPage() {
             <XCircle size={40} className="text-[var(--border)] mb-3" />
             <p className="text-sm font-inter font-semibold text-[var(--text-primary)]">No projects found</p>
             <p className="text-xs font-inter text-[var(--text-muted)] mt-1">
-              {projects.length === 0 ? (role === "CLIENT" ? "Create your first project to get started." : "You haven't been assigned to any projects yet.") : "Try adjusting your search or filter."}
+              {projects.length === 0 ? "Create your first project to get started." : "Try adjusting your search or filter."}
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map((p) => <ProjectCard key={p.id} project={p} role={role ?? ""} />)}
+            {filtered.map((p) => <ProjectCard key={p.id} project={p} />)}
           </div>
         )}
       </div>
 
-      {showCreate && <CreateProjectModal onClose={() => setShowCreate(false)} onCreated={fetchProjects} />}
+      {showCreate && <CreateProjectModal onClose={() => setShowCreate(false)} onCreated={fetchProjects} user={user} />}
     </DashboardShell>
   );
 }

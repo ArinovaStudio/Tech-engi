@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";   // ← Add this import
+import { useSession } from "next-auth/react";
 import {
   Lock,
   ShieldCheck,
@@ -11,20 +11,22 @@ import {
   CheckCheck,
   KeyRound,
   ExternalLink,
-  FileText,
-  Link2,
   Plus,
-  LucideLoader,
+  Loader2,
 } from "lucide-react";
+import toast from "react-hot-toast";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
 interface Credential {
   id: string;
   title: string;
-  type: "CREDENTIALS" | "FILE" | "LINK" | "TEXT";
+  type: string;
   content: string;
   isLocked: boolean;
   createdAt: string;
+  addedBy: {
+    name: string;
+    image?: string;
+  };
 }
 
 interface UnlockStatus {
@@ -38,24 +40,14 @@ interface CredentialsTabProps {
   projectId: string;
 }
 
-// ─── Lock Screen ──────────────────────────────────────────────────────────────
 function LockScreen({ status }: { status: UnlockStatus }) {
-  const steps = [
-    { label: "Project progress at 100%", done: status.progress === 100 },
-    { label: "Engineer marks work as finished", done: status.isEngineerFinished },
-    { label: "Client reviews & approves project", done: status.isReviewApproved },
-    { label: "Final payment completed", done: status.isFinalPaymentMade },
-  ];
-
-  const completedCount = steps.filter((s) => s.done).length;
-  const pct = Math.round((completedCount / steps.length) * 100);
 
   return (
     <div className="relative min-h-[480px] flex items-center justify-center p-8 overflow-hidden bg-gray-50 rounded-2xl">
       <div className="relative z-10 bg-gray-100 rounded-[20px] px-9 py-10 max-w-[420px] w-full flex flex-col items-center gap-4 shadow-[0_0_0_1px_#ffffff06,0_32px_64px_#00000080]">
         <div className="relative w-[72px] h-[72px] flex items-center justify-center mb-1">
           <Lock className="text-[var(--primary)] w-20 h-20 relative z-10" strokeWidth={1.5} />
-        </div>
+            </div>
         <div className="flex items-center gap-2 mt-2 text-[11px] text-black">
           <span>Credentials are end-to-end encrypted and auto-unlock on completion</span>
         </div>
@@ -64,198 +56,249 @@ function LockScreen({ status }: { status: UnlockStatus }) {
   );
 }
 
-// ─── Credential Card ──────────────────────────────────────────────────────────
 function CredentialCard({ cred }: { cred: Credential }) {
   const [visible, setVisible] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const copy = async (text: string) => {
-    await navigator.clipboard.writeText(text);
+  const copy = async () => {
+    await navigator.clipboard.writeText(cred.content);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 1800);
+    toast.success("Copied!");
   };
 
-  const icon =
-    cred.type === "LINK" ? <Link2 size={14} /> :
-      cred.type === "FILE" ? <FileText size={14} /> :
-        <KeyRound size={14} />;
-
   return (
-    <div className="bg-gray-200 rounded-lg px-5 py-4 flex flex-col gap-2.5">
-      <div className="flex items-center gap-3 flex-wrap">
-        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-widest uppercase text-indigo-400 bg-indigo-500/[0.07] border border-indigo-500/20 px-2 py-0.5 rounded-md">
-          {icon} {cred.type}
-        </span>
-        <span className="text-[15px] font-semibold text-black flex-1">{cred.title}</span>
+    <div className="bg-white text-black border border-gray-200 rounded-xl p-5 hover:shadow-sm transition-all">
+      <div className="flex items-start justify-between mb-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <KeyRound size={18} className="text-[var(--primary)]" />
+            <span className="font-semibold text-lg">{cred.title}</span>
+          </div>
+          <p className="text-xs text-slate-500 mt-0.5">Added by {cred.addedBy.name}</p>
+        </div>
 
-        <div className="flex items-center gap-1 ml-auto">
-          {cred.type !== "FILE" && (
-            <button
-              onClick={() => setVisible((v) => !v)}
-              className="rounded-lg p-1.5 text-slate-500 hover:bg-gray-300 hover:text-black transition-colors"
-            >
-              {visible ? <EyeOff size={14} /> : <Eye size={14} />}
-            </button>
-          )}
+        <div className="flex gap-1">
           <button
-            onClick={() => copy(cred.content)}
-            className="rounded-lg p-1.5 text-slate-500 hover:bg-gray-300 hover:text-black transition-colors"
+            onClick={() => setVisible(!visible)}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            {copied ? <CheckCheck size={14} className="text-green-400" /> : <Copy size={14} />}
+            {visible ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
-          {cred.type === "LINK" && (
-            <a
-              href={cred.content}
-              target="_blank"
-              rel="noreferrer"
-              className="rounded-lg p-1.5 text-slate-500 hover:bg-gray-300 hover:text-black  transition-colors"
-            >
-              <ExternalLink size={14} />
+          <button
+            onClick={copy}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            {copied ? <CheckCheck size={18} className="text-green-500" /> : <Copy size={18} />}
+          </button>
+          {cred.content.startsWith("http") && (
+            <a href={cred.content} target="_blank" rel="noreferrer" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <ExternalLink size={18} />
             </a>
           )}
         </div>
       </div>
 
-      <div
-        className={`font-mono text-[13px] border border-gray-400 rounded-lg px-3.5 py-2.5 break-all bg-gray-300 ${visible || cred.type === "FILE" ? "text-black" : "text-[#334155] tracking-widest select-none"
-          }`}
-      >
-        {visible || cred.type === "FILE" ? cred.content : "•".repeat(Math.min(cred.content.length, 32))}
+      <div className="font-mono text-sm bg-gray-50 border border-gray-200 rounded-lg p-4 break-all min-h-[60px]">
+        {visible ? cred.content : "••••••••••••••••••••••••••••••••"}
       </div>
     </div>
   );
 }
 
-// ─── Main Component ────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 const CredentialsTab = ({ projectId }: CredentialsTabProps) => {
-  const { data: session } = useSession();   // ← Get session for role
-  const isAdmin = session?.user?.role === "ADMIN";
+  const { data: session } = useSession();
+  const userRole = session?.user?.role;
 
-  const [status, setStatus] = useState<UnlockStatus | null>(null);
+  const isPrivileged = userRole === "ADMIN" || userRole === "ENGINEER"; // Both can upload & view
+
   const [credentials, setCredentials] = useState<Credential[]>([]);
+  const [status, setStatus] = useState<UnlockStatus | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newContent, setNewContent] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  // Add Credential Function (Only for Admin right now - you can extend later)
-  const addTestCredential = async () => {
+  const fetchCredentials = async () => {
     try {
-      const res = await fetch(`/api/admin/project/${projectId}/credentials`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: "Admin Test Login",
-          content: "Username: admin\nPassword: TestPass123!\nURL: https://example.com",
-        }),
-      });
+      const res = await fetch(`/api/resources?projectId=${projectId}`);
+      const data = await res.json();
 
-      if (res.ok) {
-        alert("Credential added successfully!");
-        window.location.reload();
-      } else {
-        const data = await res.json();
-        alert("Error: " + (data.error || "Failed to add"));
+      if (data.success) {
+        // Filter only CREDENTIALS type
+        const creds = data.resources.filter((r: any) => r.type === "CREDENTIALS");
+        setCredentials(creds);
       }
     } catch (err) {
-      alert("Failed to add credential");
+      console.error(err);
+      toast.error("Failed to load credentials");
+    }
+  };
+
+  const fetchUnlockStatus = async () => {
+    try {
+      const res = await fetch(`/api/project/${projectId}`);
+      const data = await res.json();
+
+      if (data.success && data.project) {
+        setStatus({
+          progress: data.project.progress || 0,
+          isEngineerFinished: data.project.isEngineerFinished || false,
+          isFinalPaymentMade: data.project.isFinalPaymentMade || false,
+          isReviewApproved: data.project.isReviewApproved || false,
+        });
+      }
+    } catch (err) {
+      console.error("Status fetch failed", err);
     }
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const statusRes = await fetch(`/api/admin/project/${projectId}/credentials/status`);
-        if (!statusRes.ok) throw new Error("Failed to fetch status");
-
-        const statusData: UnlockStatus = await statusRes.json();
-        setStatus(statusData);
-
-        // If user is Admin OR all conditions met → fetch credentials
-        const shouldUnlock = isAdmin || (
-          statusData.progress === 100 &&
-          statusData.isEngineerFinished &&
-          statusData.isReviewApproved &&
-          statusData.isFinalPaymentMade
-        );
-
-        if (shouldUnlock) {
-          const credsRes = await fetch(`/api/admin/project/${projectId}/credentials`);
-          if (credsRes.ok) {
-            const credsData = await credsRes.json();
-            setCredentials(credsData.credentials ?? []);
-          }
-        }
-      } catch (err: any) {
-        console.error(err);
-        setError(err.message || "Something went wrong");
-      } finally {
-        setLoading(false);
-      }
+    const loadAll = async () => {
+      setLoading(true);
+      await Promise.all([fetchUnlockStatus(), fetchCredentials()]);
+      setLoading(false);
     };
 
-    fetchData();
-  }, [projectId, isAdmin]);
+    loadAll();
+  }, [projectId]);
+
+  const isUnlocked = status && (
+    status.progress === 100 &&
+    status.isEngineerFinished &&
+    status.isReviewApproved &&
+    status.isFinalPaymentMade
+  );
+
+  // Show lock screen only to CLIENT when not unlocked
+  if (!isPrivileged && status && !isUnlocked) {
+    return <LockScreen status={status} />;
+  }
+
+  const handleAddCredential = async () => {
+    if (!newTitle || !newContent) {
+      toast.error("Title and content are required");
+      return;
+    }
+
+    setSubmitting(true);
+    const formData = new FormData();
+    formData.append("projectId", projectId);
+    formData.append("title", newTitle);
+    formData.append("type", "CREDENTIALS");
+    formData.append("content", newContent);
+
+    try {
+      const res = await fetch("/api/resources", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        toast.success("Credential added successfully");
+        setShowAddModal(false);
+        setNewTitle("");
+        setNewContent("");
+        await fetchCredentials();
+      } else {
+        toast.error(data.message || "Failed to add credential");
+      }
+    } catch {
+      toast.error("Something went wrong");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (loading) {
     return (
       <div className="w-full h-[50vh] flex justify-center items-center">
-        <LucideLoader className="animate-spin" style={{ color: "var(--primary)" }} size={40} />
+        <Loader2 className="animate-spin" style={{ color: "var(--primary)" }} size={40} />
       </div>
     );
   }
 
-  const isUnlockedForNormalUser =
-    status !== null &&
-    status.progress === 100 &&
-    status.isEngineerFinished &&
-    status.isReviewApproved &&
-    status.isFinalPaymentMade;
-
-  // Show LockScreen only to non-admins when not unlocked
-  if (!isAdmin && !isUnlockedForNormalUser && status) {
-    return <LockScreen status={status} />;
-  }
-
   return (
-    <div className="flex flex-col gap-6 py-6">
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <div className="flex items-center gap-3.5">
-          <ShieldCheck className="w-7 h-7 text-indigo-500 flex-shrink-0" />
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <ShieldCheck className="w-8 h-8 text-[var(--primary)]" />
           <div>
-            <h2 className="font-serif text-[22px] tracking-tight m-0 text-black">
-              Project Credentials
-            </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              {isAdmin ? "Admin Mode - Full Access" : "Visible only after project completion"}
+            <h2 className="text-2xl font-bold text-black">Project Credentials</h2>
+            <p className="text-sm text-slate-500">
+              {isPrivileged ? "Full access • You can add credentials" : "Unlocked after final milestone"}
             </p>
           </div>
         </div>
 
-        {/* Add Button - Visible to Admin */}
-        {isAdmin && (
+        {isPrivileged && (
           <button
-            onClick={addTestCredential}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-colors"
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-2 bg-[var(--primary)] text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-95"
           >
             <Plus size={18} />
-            Add Test Credential
+            Add Credential
           </button>
         )}
       </div>
 
       {credentials.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 py-16 text-slate-600 text-center">
-          <KeyRound size={48} className="text-[#1e2130]" />
-          <p>No credentials added yet.</p>
-          {isAdmin && <p className="text-xs">Click "Add Test Credential" above to test</p>}
+        <div className="bg-white border border-dashed border-gray-300 rounded-2xl py-20 text-center">
+          <KeyRound size={52} className="mx-auto text-gray-400 mb-4" />
+          <p className="text-lg font-medium text-gray-600">No credentials added yet</p>
+          {isPrivileged && <p className="text-sm text-gray-500 mt-1">Click "Add Credential" to get started</p>}
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="grid gap-4">
           {credentials.map((cred) => (
             <CredentialCard key={cred.id} cred={cred} />
           ))}
+        </div>
+      )}
+
+      {/* Add Credential Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 text-black bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6">
+            <h3 className="text-xl font-semibold mb-4">Add New Credential</h3>
+
+            <input
+              type="text"
+              placeholder="Title (e.g., Hosting Login, Database, etc.)"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              className="w-full px-4 py-3 border rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+
+            <textarea
+              placeholder="Enter credentials here...&#10;Username: ...&#10;Password: ...&#10;URL: ..."
+              value={newContent}
+              onChange={(e) => setNewContent(e.target.value)}
+              rows={6}
+              className="w-full px-4 py-3 border rounded-xl font-mono text-sm resize-y min-h-[140px] focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="flex-1 py-3 border border-gray-300 rounded-xl font-medium hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddCredential}
+                disabled={submitting}
+                className="flex-1 py-3 bg-[var(--primary)] text-white rounded-xl font-medium hover:bg-indigo-700 disabled:opacity-70 flex items-center justify-center gap-2"
+              >
+                {submitting && <Loader2 className="animate-spin" size={18} />}
+                Add Credential
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

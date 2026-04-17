@@ -2,11 +2,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, CreditCard, Users, MessageSquare, LogOut, ChevronLeft, ChevronRight,
-  ProportionsIcon, User, UserKeyIcon, FolderKanban, Wallet
+  User, UserKeyIcon, FolderKanban
 } from "lucide-react";
+import { useAuth } from "@/app/hooks/useAuth";
 
 interface NavItem {
   label: string;
@@ -16,73 +17,63 @@ interface NavItem {
 }
 
 const ADMIN_NAV: NavItem[] = [
-  { label: "Dashboard",           icon: <LayoutDashboard size={18} />, href: "/dashboard" },
-  { label: "Projects",            icon: <FolderKanban size={18} />,    href: "/dashboard/project" },
-  { label: "Client Management",   icon: <User size={18} />,            href: "/dashboard/client-management" },
-  { label: "Engineer Management", icon: <UserKeyIcon size={18} />,     href: "/dashboard/engineer-management" },
-  { label: "Payment",             icon: <CreditCard size={18} />,      href: "/dashboard/payment" },
-  { label: "Customers",           icon: <Users size={18} />,           href: "/dashboard/customers" },
-  { label: "Message",             icon: <MessageSquare size={18} />,   href: "/dashboard/message"},];
+  { label: "Dashboard", icon: <LayoutDashboard size={18} />, href: "/admin" },
+  { label: "Projects", icon: <FolderKanban size={18} />, href: "/admin/project" },
+  { label: "Client Management", icon: <User size={18} />, href: "/admin/client-management" },
+  { label: "Engineer Management", icon: <UserKeyIcon size={18} />, href: "/admin/engineer-management" },
+  { label: "Payment", icon: <CreditCard size={18} />, href: "/admin/payment" },
+  { label: "Customers", icon: <Users size={18} />, href: "/admin/customers" },
+  { label: "Message", icon: <MessageSquare size={18} />, href: "/admin/message" },];
 
 const CLIENT_NAV: NavItem[] = [
-  { label: "Dashboard", icon: <LayoutDashboard size={18} />, href: "/dashboard" },
-  { label: "Projects",  icon: <FolderKanban size={18} />,   href: "/dashboard/project" },
+  { label: "Dashboard", icon: <LayoutDashboard size={18} />, href: "/client" },
+  { label: "Projects", icon: <FolderKanban size={18} />, href: "/client/project" },
 ];
 
 const ENGINEER_NAV: NavItem[] = [
-  { label: "Dashboard", icon: <LayoutDashboard size={18} />, href: "/dashboard" },
-  { label: "Projects",  icon: <FolderKanban size={18} />,   href: "/dashboard/project" },
-  { label: "Payout",    icon: <Wallet size={18} />,         href: "/dashboard/payout" },
+  { label: "Dashboard", icon: <LayoutDashboard size={18} />, href: "/engineer" },
+  { label: "Projects", icon: <FolderKanban size={18} />, href: "/engineer/project" },
 ];
+
+const NavLink = ({ item, collapsed }: { item: NavItem; collapsed: boolean }) => {
+  const pathname = usePathname();
+  const isActive = pathname === item.href;
+  return (
+    <Link
+      href={item.href}
+      className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-bold font-inter transition-all duration-200 group relative
+          ${isActive
+          ? "bg-[#fff4e6] text-[var(--text-primary)]"
+          : "text-[var(--text-secondary)] hover:bg-[#fff4e6] hover:text-[var(--text-primary)]"
+        }`}
+    >
+      <span className={`shrink-0 ${isActive ? "text-[#FFAE58]" : "text-gray-400 group-hover:text-[#FFAE58]"}`}>
+        {item.icon}
+      </span>
+      {!collapsed && <span className="flex-1 text-left">{item.label}</span>}
+      {!collapsed && item.badge && (
+        <span className={`text-xs px-1.5 py-0.5 font-semibold font-inter
+            ${typeof item.badge === "number"
+            ? "bg-[#FFAE58] text-white"
+            : "bg-black text-white"
+          }`}
+        >
+          {item.badge}
+        </span>
+      )}
+      {collapsed && (
+        <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 whitespace-nowrap z-50 pointer-events-none">
+          {item.label}
+        </span>
+      )}
+    </Link>
+  );
+};
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
-  const pathname = usePathname();
-  const { data: session } = useSession();
-  const role = session?.user?.role;
-
-  const nav = role === "CLIENT" ? CLIENT_NAV : role === "ENGINEER" ? ENGINEER_NAV : ADMIN_NAV;
-
-  const NavLink = ({ item }: { item: NavItem }) => {
-    const isActive = pathname === item.href;
-    return (
-      <Link
-        href={item.href}
-        className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-bold font-inter transition-all duration-200 group relative
-          ${isActive
-            ? "bg-[#fff4e6] text-[var(--text-primary)]"
-            : "text-[var(--text-secondary)] hover:bg-[#fff4e6] hover:text-[var(--text-primary)]"
-          }`}
-      >
-        <span className={`shrink-0 ${isActive ? "text-[#FFAE58]" : "text-gray-400 group-hover:text-[#FFAE58]"}`}>
-          {item.icon}
-        </span>
-        {!collapsed && <span className="flex-1 text-left">{item.label}</span>}
-        {!collapsed && item.badge && (
-          <span className={`text-xs px-1.5 py-0.5 font-semibold font-inter
-            ${typeof item.badge === "number"
-              ? "bg-[#FFAE58] text-white"
-              : "bg-black text-white"
-            }`}
-          >
-            {item.badge}
-          </span>
-        )}
-        {collapsed && (
-          <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 whitespace-nowrap z-50 pointer-events-none">
-            {item.label}
-          </span>
-        )}
-      </Link>
-    );
-  };
-
-  const SectionLabel = ({ label }: { label: string }) =>
-    !collapsed ? (
-      <p className="text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-widest px-3 mb-1 mt-5">
-        {label}
-      </p>
-    ) : <div className="my-2 border-t border-gray-100" />;
+  const { isAdmin, isEngineer, isClient } = useAuth();
+  const nav = isAdmin ? ADMIN_NAV : isEngineer ? ENGINEER_NAV : isClient ? CLIENT_NAV : [];
 
   return (
     <aside
@@ -101,7 +92,7 @@ export default function Sidebar() {
       </button>
 
       <nav className="flex-1 overflow-y-auto px-3 py-2">
-        {nav.map((item) => <NavLink key={item.label} item={item} />)}
+        {nav.map((item) => <NavLink key={item.label} item={item} collapsed={collapsed} />)}
       </nav>
 
       <div className="border-t border-[var(--border)] p-3 space-y-2">

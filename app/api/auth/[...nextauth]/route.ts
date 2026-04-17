@@ -51,7 +51,7 @@ export const authOptions: NextAuthOptions = {
         if (!existingUser) {
           const cookieStore = await cookies();
           const intendedRole = cookieStore.get("oauth_role")?.value;
-          
+
           const finalRole = intendedRole === "ENGINEER" ? "ENGINEER" : "CLIENT";
 
           await prisma.user.create({
@@ -65,20 +65,19 @@ export const authOptions: NextAuthOptions = {
           });
         }
       }
-      return true; 
+      return true;
     },
 
     async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
-        token.role = user.role; 
-      }
-      
-      if (trigger === "signIn" || trigger === "signUp") {
-        const dbUser = await prisma.user.findUnique({ where: { id: token.id as string } });
+
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string }
+        });
         if (dbUser) token.role = dbUser.role;
       }
-      
+
       return token;
     },
 

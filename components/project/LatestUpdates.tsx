@@ -26,7 +26,7 @@ export default function LatestUpdates({ projectId }: { projectId: string }) {
       });
       
       if (!res.ok) {
-        throw new Error('Failed to fetch tasks');
+        console.log('Failed to fetch tasks');
       }
       
       const data = await res.json();

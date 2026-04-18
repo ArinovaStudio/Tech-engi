@@ -67,8 +67,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: false, message: "Project not found" }, { status: 404 });
     }
 
-    const isParticipant = (user.role === "CLIENT" && project.client?.userId === user.id) || 
-                          (user.role === "ENGINEER" && project.engineer?.userId === user.id);
+    const isParticipant = (user.role === "ENGINEER" && project.engineer?.userId === user.id);
 
     if (!isParticipant) return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
 
@@ -93,7 +92,8 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ success: true, message: "Milestone added successfully" }, { status: 201 });
-  } catch {
+  } catch(error: any) {
+    console.log(error.message);
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }

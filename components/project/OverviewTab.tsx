@@ -443,7 +443,7 @@ export default function OverviewTab({ project }: OverviewTabProps) {
 
     const fetchMilestones = async () => {
       try {
-        const res = await fetch(`/api/project/milestone?projectId=${project.id}`);
+        const res = await fetch(`/api/milestones?projectId=${project.id}`);
         const data = await res.json();
         if (data.success && data.milestones) {
           const total = data.milestones.length;

@@ -15,14 +15,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ mi
     
     const title = formData.get("title") as string;
     const type = formData.get("type") as "IMAGE" | "ZIP" | "DOCUMENT" | "LINK";
-
+    const completed = formData.get("completed")==="true" ? true:false;
     const existingMilestone = await prisma.milestone.findUnique({ where: { id: milestoneId } });
     if (!existingMilestone) {
       return NextResponse.json({ success: false, message: "Milestone not found" }, { status: 404 });
     }
 
     if (existingMilestone.addedById !== user.id && user.role !== "ADMIN") {
-      return NextResponse.json({ success: false, message: "You can only edit your own milestones" }, { status: 403 });
+      return NextResponse.json({ success: false, message: "You can only view your own milestones" }, { status: 403 });
     }
 
     let content = existingMilestone.content;
@@ -30,7 +30,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ mi
     if (type === "LINK") {
       const newLink = formData.get("content") as string;
       if (newLink) content = newLink;
-    } else {
+    } else if(type) {
       const file = formData.get("file") as File;
       if (file && file.size > 0) {
         if (existingMilestone.type !== "LINK" && existingMilestone.content) {
@@ -39,15 +39,28 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ mi
         content = await uploadFile(file, "milestones"); 
       }
     }
-
+    const data: any = {};
+    if(title){
+      data.title = title;
+    }
+    if(type){
+      data.type = type;
+    }
+    if(content){
+      data.content = content;
+    }
+    if(completed){
+      data.completed = completed
+    }
     await prisma.milestone.update({
       where: { id: milestoneId },
-      data: { title, type, content }
+      data: data
     });
 
     return NextResponse.json({ success: true, message: "Milestone updated" }, { status: 200 });
 
-  } catch {
+  } catch(error: any) {
+    console.log(error.message);
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }

@@ -389,7 +389,7 @@ model Milestone {
   content     String        @db.Text
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
-
+  completed   Boolean @default(false)
   project     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
   addedBy     User          @relation(fields: [addedById], references: [id], onDelete: Cascade)
 }

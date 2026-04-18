@@ -13,6 +13,7 @@
   --text-primary: #050A30;
   --text-secondary: #4B4B4B;
   --text-muted: #6F6F6F;
+  --destructive: rgb(185, 32, 32);
 }
 
 @keyframes marquee {

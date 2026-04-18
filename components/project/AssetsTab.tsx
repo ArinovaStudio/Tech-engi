@@ -200,13 +200,11 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
 
   const fetchResources = async () => {
     try {
-      const res = await fetch(`/api/resources?projectId=${projectId}`);
+      const res = await fetch(`/api/resources?projectId=${projectId}&tab=assets`);
       const data = await res.json();
 
       if (data.success) {
-        // IMPORTANT: Filter out CREDENTIALS so clients can't see them here
-        const filtered = data.resources.filter((r: Resource) => r.type !== "CREDENTIALS");
-        setResources(filtered);
+        setResources(data.resources);
       }
     } catch (err) {
       console.error(err);

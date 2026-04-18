@@ -35,7 +35,7 @@ export default function MilestoneTab({ projectId }: any) {
 
   const fetchMilestones = async () => {
     try {
-      const res = await fetch(`/api/project/milestone?projectId=${projectId}`);
+      const res = await fetch(`/api/milestone?projectId=${projectId}`);
       const data = await res.json();
       if (data.success) setMilestones(data.milestones);
     } catch (err) { console.error("Milestone fetch error:", err); }

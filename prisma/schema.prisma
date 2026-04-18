@@ -278,12 +278,18 @@ enum TicketStatus {
   CLOSED
 }
 
+enum TicketTarget {
+  PLATFORM
+  CLIENT
+}
+
 model Ticket {
   id         String @id @default(uuid())
   projectId  String
   raisedById String
 
   issueType   TicketType
+  target      TicketTarget @default(PLATFORM)
   description String       @db.Text
   images      String[]
   status      TicketStatus @default(OPEN)

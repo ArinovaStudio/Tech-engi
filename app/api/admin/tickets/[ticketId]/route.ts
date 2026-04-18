@@ -14,7 +14,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ tick
     const { ticketId } = await params;
 
     const ticket = await prisma.ticket.findUnique({
-      where: { id: ticketId },
+      where: { id: ticketId, target: "PLATFORM" },
       include: {
         project: {
           select: {
@@ -58,6 +58,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ ti
       return NextResponse.json({ success: false, message: "Invalid status" }, { status: 400 });
     }
 
+    const existingTicket = await prisma.ticket.findUnique({ where: { id: ticketId, target: "PLATFORM" } });
+    if (!existingTicket) {
+      return NextResponse.json({ success: false, message: "Ticket not found" }, { status: 404 });
+    }
+
     await prisma.ticket.update({
       where: { id: ticketId },
       data: { status: validation.data.status }
@@ -78,7 +83,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ t
 
     const { ticketId } = await params;
 
-    const existingTicket = await prisma.ticket.findUnique({ where: { id: ticketId } });
+    const existingTicket = await prisma.ticket.findUnique({ where: { id: ticketId, target: "PLATFORM" } });
     if (!existingTicket) {
       return NextResponse.json({ success: false, message: "Ticket not found" }, { status: 404 });
     }

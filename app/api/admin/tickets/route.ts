@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
 
     const queryOptions: any = {
         orderBy: { createdAt: "desc" },
+        where: { target: "PLATFORM" },
         include: { 
             project: { select: {
                 title: true,

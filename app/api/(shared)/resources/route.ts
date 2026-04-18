@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const projectId = searchParams.get("projectId");
+    const tab = searchParams.get("tab") || "assets";
 
     if (!projectId){
         return NextResponse.json({ success: false, message: "Project ID is required" }, { status: 400 });
@@ -27,20 +28,30 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ success: false, message: "Project not found" }, { status: 404 });
     }
 
-    const isParticipant = (user.role === "CLIENT" && project.client?.userId === user.id) || (user.role === "ENGINEER" && project.engineer?.userId === user.id);
+    const isParticipant = (user.role === "CLIENT" && project.client?.userId === user.id) || 
+                          (user.role === "ENGINEER" && project.engineer?.userId === user.id);
 
     if (!isParticipant){
         return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
     }
 
+    let typeFilter: any = {};
+    if (tab === "credentials") {
+      typeFilter = { equals: "CREDENTIALS" };
+    } else if (tab === "assets") {
+      typeFilter = { not: "CREDENTIALS" };
+    }
+
     const resources = await prisma.projectResource.findMany({
-      where: { projectId },
+      where: { 
+        projectId,
+        ...(tab ? { type: typeFilter } : {})
+      },
       orderBy: { createdAt: "desc" },
       include: { addedBy: { select: { name: true, role: true, image: true } } }
     });
 
     const sanitizedResources = resources.map((res: typeof resources[number]) => {
-
       if (user.role === "CLIENT" && res.isLocked && !project.isFinalPaymentMade) {
         return { 
           ...res, 
@@ -52,7 +63,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ success: true, resources: sanitizedResources }, { status: 200 });
   } catch {
-    return NextResponse.json({ success: false, message: "Inernal Server error" }, { status: 500 });
+    return NextResponse.json({ success: false, message: "Internal Server error" }, { status: 500 });
   }
 }
 

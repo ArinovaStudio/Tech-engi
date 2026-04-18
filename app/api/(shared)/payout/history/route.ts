@@ -29,7 +29,6 @@ export async function GET() {
       }
 
       stats = { totalReceived, totalPending };
-
     } 
     
     else if (user.role === "CLIENT") {

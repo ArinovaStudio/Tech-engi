@@ -123,13 +123,11 @@ const CredentialsTab = ({ projectId }: CredentialsTabProps) => {
 
   const fetchCredentials = async () => {
     try {
-      const res = await fetch(`/api/resources?projectId=${projectId}`);
+      const res = await fetch(`/api/resources?projectId=${projectId}&tab=credentials`);
       const data = await res.json();
 
       if (data.success) {
-        // Filter only CREDENTIALS type
-        const creds = data.resources.filter((r: any) => r.type === "CREDENTIALS");
-        setCredentials(creds);
+        setCredentials(data.resources);
       }
     } catch (err) {
       console.error(err);

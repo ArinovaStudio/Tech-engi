@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
     const invitations = await prisma.projectInvitation.findMany({
       where: {
         engineerId: user.engineerProfile.id,
-        ...(statusFilter ? { status: statusFilter } : {}),
+        status: statusFilter ? statusFilter : { not: "PENDING_ADMIN" }
       },
       include: {
         project: {

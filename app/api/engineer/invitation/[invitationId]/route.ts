@@ -13,7 +13,7 @@ export async function GET( req: NextRequest, { params }: { params: Promise<{ inv
     }
 
     const invitation = await prisma.projectInvitation.findUnique({
-      where: { id: invitationId },
+      where: { id: invitationId, status: { not: "PENDING_ADMIN" } },
       include: {
         project: {
           select: {

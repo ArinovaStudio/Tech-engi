@@ -35,7 +35,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ ta
     });
 
     return NextResponse.json({ success: true, message: "Status updated", task: updatedTask }, { status: 200 });
-  } catch {
+  } catch(error: any) {
+    console.log(error.message);
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }
+

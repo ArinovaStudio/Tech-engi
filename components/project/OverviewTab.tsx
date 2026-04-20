@@ -443,11 +443,11 @@ export default function OverviewTab({ project }: OverviewTabProps) {
 
     const fetchMilestones = async () => {
       try {
-        const res = await fetch(`/api/milestones?projectId=${project.id}`);
+        const res = await fetch(`/api/milestones?projectId=${project.id}`); 
         const data = await res.json();
-        if (data.success && data.milestones) {
+        if (data.success && data.milestones) { 
           const total = data.milestones.length;
-          const ongoing = data.milestones.filter((m: any) => m.status === "PENDING" || m.status === "IN_PROGRESS").length;
+          const ongoing = data.milestones.filter((m: any) => m.completed).length;
           setMilestones({ ongoing, total });
         }
       } catch { /* silent */ }

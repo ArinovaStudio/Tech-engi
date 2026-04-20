@@ -316,10 +316,10 @@ const DailyTask = ({ projectId }: { projectId: string }) => {
                             {/* Task Cards */}
                             <div className="space-y-4">
                                 {grouped[dateKey].map((task) => {
+                                    const isAdmin = currentUser?.role === "ADMIN";
                                     const canEdit = isTaskEditable(task.createdAt) || isAdmin;
                                     const hoursRemaining = getHoursRemaining(task.createdAt);
                                     const isOwnTask = currentUser?.id === task.createdBy?.id;
-                                    const isAdmin = currentUser?.role === "ADMIN";
 
                                     return (
                                         <div

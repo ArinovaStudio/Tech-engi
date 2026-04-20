@@ -23,75 +23,75 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
   const isEngineer = role === "ENGINEER";
   const isClient = role === "CLIENT";
 
-  // const fetchAdmins = async () => {
-  //   try { const res = await fetch("/api/admin/adminOnly"); const data = await res.json(); if (data.success) setIsAdmin(data.users); } catch { }
-  // };
+  const fetchAdmins = async () => {
+    // try { const res = await fetch("/api/admin/adminOnly"); const data = await res.json(); if (data.success) (data.users); } catch { }
+  };
 
-  // const fetchProjectClient = async () => {
-  //   try {
-  //     const res = await fetch(`/api/project/${projectId}`); const data = await res.json();
-  //     if (data.success && data.project) {
-  //       const c = data.project.members?.find((m: any) => m.user?.role.name === "CLIENT");
-  //       if (c) setProjectClient(c.user);
-  //     }
-  //   } catch { }
-  // };
+  const fetchProjectClient = async () => {
+    try {
+      const res = await fetch(`/api/project/${projectId}`); const data = await res.json();
+      if (data.success && data.project) {
+        const c = data.project.members?.find((m: any) => m.user?.role.name === "CLIENT");
+        if (c) setProjectClient(c.user);
+      }
+    } catch { }
+  };
 
 
 
-  // useEffect(() => { fetchAdmins(); if (projectId) fetchProjectClient(); }, [projectId]);
+  useEffect(() => { fetchAdmins(); if (projectId) fetchProjectClient(); }, [projectId]);
 
-  // useEffect(() => {
-  //   if (projectId)
-  //   fetchTasks();
-  // }, [projectId]);
+  useEffect(() => {
+    if (projectId)
+    fetchTasks();
+  }, [projectId]);
 
-  // useEffect(() => { if (tasks.length > 0) fetchAllReports(); }, [tasks]);
+  useEffect(() => { if (tasks.length > 0) fetchAllReports(); }, [tasks]);
 
-  // const fetchTasks = async () => {
-  //   try { const res = await fetch(`/api/kanban/task?projectId=${projectId}`); const data = await res.json(); if (data.tasks) setTasks(data.tasks); } catch { } finally { setLoading(false); }
-  // };
+  const fetchTasks = async () => {
+    try { const res = await fetch(`/api/kanban/task?projectId=${projectId}`); const data = await res.json(); if (data.tasks) setTasks(data.tasks); } catch { } finally { setLoading(false); }
+  };
 
-  // const fetchAllReports = async () => {
-  //   try {
-  //     const all: any[] = [];
-  //     for (const task of tasks as any[]) {
-  //       try {
-  //         const res = await fetch(`/api/kanban/report?taskId=${task.id}`);
-  //         if (res.ok) { const d = await res.json(); if (d.success && d.messages) all.push(...d.messages.map((m: any) => ({ ...m, taskTitle: task.title }))); }
-  //       } catch { }
-  //     }
-  //     setReports(all.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
-  //   } catch { } finally { setLoading(false); }
-  // };
+  const fetchAllReports = async () => {
+    try {
+      const all: any[] = [];
+      for (const task of tasks as any[]) {
+        try {
+          const res = await fetch(`/api/kanban/report?taskId=${task.id}`);
+          if (res.ok) { const d = await res.json(); if (d.success && d.messages) all.push(...d.messages.map((m: any) => ({ ...m, taskTitle: task.title }))); }
+        } catch { }
+      }
+      setReports(all.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+    } catch { } finally { setLoading(false); }
+  };
+ 
+  const createClientIssue = async () => {
+    if (!clientIssueTitle.trim()) { toast.error("Please enter a title"); return; }
+    if (!projectClient) { toast.error("No client found"); return; }
+    try {
+      setCreatingClientIssue(true);
+      const res = await fetch("/api/client/analytics/risk-blockage", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ projectId, clientId: (projectClient as any).id, riskTitle: clientIssueTitle.trim() }) });
+      const data = await res.json();
+      if (data.success) { setShowClientIssueModal(false); setClientIssueTitle(""); toast.success(`Reported to ${(projectClient as any).name}!`); }
+      else toast.error(data.message || "Failed");
+    } catch { toast.error("Error reporting"); } finally { setCreatingClientIssue(false); }
+  };
 
-  // const createClientIssue = async () => {
-  //   if (!clientIssueTitle.trim()) { toast.error("Please enter a title"); return; }
-  //   if (!projectClient) { toast.error("No client found"); return; }
-  //   try {
-  //     setCreatingClientIssue(true);
-  //     const res = await fetch("/api/client/analytics/risk-blockage", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ projectId, clientId: (projectClient as any).id, riskTitle: clientIssueTitle.trim() }) });
-  //     const data = await res.json();
-  //     if (data.success) { setShowClientIssueModal(false); setClientIssueTitle(""); toast.success(`Reported to ${(projectClient as any).name}!`); }
-  //     else toast.error(data.message || "Failed");
-  //   } catch { toast.error("Error reporting"); } finally { setCreatingClientIssue(false); }
-  // };
+  const createReport = async () => {
+    if (!newReport.message.trim()) { toast.error("Please describe the issue"); return; }
+    if (issueType === "task" && !newReport.taskId) { toast.error("Please select a task"); return; }
+    try {
+      setCreating(true);
+      const taskId = issueType === "project" ? (tasks[0] as any)?.id : newReport.taskId;
+      if (!taskId) { toast.error("No tasks available"); return; }
+      const res = await fetch("/api/kanban/report", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: `[${issueType.toUpperCase()} ISSUE] ${newReport.message.trim()}`, taskId }) });
+      const data = await res.json();
+      if (data.success) { setShowModal(false); setNewReport({ message: "", taskId: "" }); setIssueType("project"); await fetchAllReports(); toast.success("Issue reported!"); }
+      else toast.error(data.error || "Failed");
+    } catch { toast.error("Error reporting"); } finally { setCreating(false); }
+  };
 
-  // const createReport = async () => {
-  //   if (!newReport.message.trim()) { toast.error("Please describe the issue"); return; }
-  //   if (issueType === "task" && !newReport.taskId) { toast.error("Please select a task"); return; }
-  //   try {
-  //     setCreating(true);
-  //     const taskId = issueType === "project" ? (tasks[0] as any)?.id : newReport.taskId;
-  //     if (!taskId) { toast.error("No tasks available"); return; }
-  //     const res = await fetch("/api/kanban/report", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: `[${issueType.toUpperCase()} ISSUE] ${newReport.message.trim()}`, taskId }) });
-  //     const data = await res.json();
-  //     if (data.success) { setShowModal(false); setNewReport({ message: "", taskId: "" }); setIssueType("project"); await fetchAllReports(); toast.success("Issue reported!"); }
-  //     else toast.error(data.error || "Failed");
-  //   } catch { toast.error("Error reporting"); } finally { setCreating(false); }
-  // };
-
-  // const inputCls = "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)] font-inter text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
+  const inputCls = "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)] font-inter text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
 
   if (sessionStatus === "loading")
     return (

@@ -543,7 +543,7 @@ export default function MilestoneTab({ projectId }: any) {
                   </span>
                 </div>
               </div>
-              {currentUser.role === "ENGINEER" && (
+              {currentUser?.role === "ENGINEER" && (
                 <div className="self-end space-x-2">
                   <button
                     onClick={() => {

@@ -18,7 +18,7 @@ export default function LatestUpdates({ projectId }: { projectId: string }) {
     
     try {
       setLoading(true);
-      const res = await fetch(`/api/project/work-done?projectId=${projectId}`, {
+      const res = await fetch(`/api/kanban?projectId=${projectId}`, {
         cache: 'no-store',
         headers: {
           'Cache-Control': 'no-cache'
@@ -63,7 +63,7 @@ export default function LatestUpdates({ projectId }: { projectId: string }) {
 
     return { color: "text-gray-600", icon: <Clock size={18} /> };
   };
-
+ 
   if (loading) {
     return (
       <div className="w-full h-[50vh] flex justify-center items-center">
@@ -74,8 +74,8 @@ export default function LatestUpdates({ projectId }: { projectId: string }) {
   }
 
   return (
-    <div className="bg-white p-5 rounded-xl dark:border-gray-700">
-      <h3 className="text-lg font-semibold mb-4 dark:text-white">Latest Updates</h3>
+    <div className="bg-white p-5 rounded-xl text-black! dark:border-gray-700">
+      <h3 className="text-lg font-semibold mb-4 dark:text-white text-black!">Latest Updates</h3>
 
       {updates.length === 0 ? (
         <p className="text-gray-500 dark:text-gray-400">No recent activity</p>
@@ -89,7 +89,7 @@ export default function LatestUpdates({ projectId }: { projectId: string }) {
                 <div className={`${m.color}`}>{m.icon}</div>
 
                 <div>
-                  <p className="text-gray-900 dark:text-white font-medium">
+                  <p className="text-gray-900 text-black! dark:text-white font-medium">
                     {task.title}
                   </p>
 

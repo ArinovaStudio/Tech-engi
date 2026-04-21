@@ -6,10 +6,7 @@ export async function GET() {
     const { user, error } = await getUser();
 
     if (!user) {
-      return NextResponse.json(
-        { success: false, message: error || "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json( { success: false, message: error || "Unauthorized" }, { status: 401 } );
     }
 
     return NextResponse.json(
@@ -25,12 +22,8 @@ export async function GET() {
       },
       { status: 200 }
     );
-  } catch (error) {
-    console.error("GET /api/auth/me error:", error);
 
-    return NextResponse.json(
-      { success: false, message: "Failed to fetch user" },
-      { status: 500 }
-    );
+  } catch {
+    return NextResponse.json( { success: false, message: "Internal server error" }, { status: 500 } );
   }
 }

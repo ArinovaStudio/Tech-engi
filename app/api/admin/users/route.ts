@@ -46,7 +46,6 @@ export async function GET(req: NextRequest) {
         return {
           ...baseData,
           status: u.engineerProfile.status,
-          employeeId: u.engineerProfile.idNumber,
           joinedAt: u.engineerProfile.createdAt,
           skills: u.engineerProfile.skills,
           completedProjects: u.engineerProfile.completedProjects,

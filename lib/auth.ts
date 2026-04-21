@@ -21,6 +21,10 @@ export async function getUser() {
     return { user: null, error: "Please verify your email first" };
   }
 
+  if (user.isSuspended) {
+    return { user: null, error: "Your account has been suspended by the administrator" };
+  }
+
   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
   if (user.lastActiveAt < twentyFourHoursAgo) {

@@ -37,8 +37,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tra
         return NextResponse.json({ success: false, message: "Original advance payment not found" }, { status: 400 });
       }
 
+      let refundResponse;
       try {
-        await razorpay.payments.refund(advanceTransaction.razorpayPaymentId, {
+        refundResponse = await razorpay.payments.refund(advanceTransaction.razorpayPaymentId, {
           amount: Math.round(transaction.amount * 100), // 20%
           notes: { reason: "Admin Approved Refund" }
         });
@@ -48,7 +49,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tra
 
       await prisma.transaction.update({
         where: { id: transactionId },
-        data: { status: "SUCCESS" }
+        data: { 
+          status: "SUCCESS",
+          razorpayRefundId: refundResponse.id,
+          completedAt: new Date()
+        }
       });
 
       if (transaction.user.email) {
@@ -72,6 +77,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tra
         return NextResponse.json({ success: false, message: "Engineer has not set up their payout details" }, { status: 400 });
       }
 
+      let payout;
       try {
 
         const basicAuth = Buffer.from(`${process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID}:${process.env.RAZORPAY_KEY_SECRET}`).toString("base64");
@@ -134,7 +140,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tra
           })
         });
 
-        const payout = await payoutRes.json();
+        payout = await payoutRes.json();
         if (!payoutRes.ok) throw new Error(`Payout API Error: ${payout.error?.description || "Failed"}`);
 
       } catch (e){
@@ -144,7 +150,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tra
 
       await prisma.transaction.update({
         where: { id: transactionId },
-        data: { status: "SUCCESS" }
+        data: { 
+          status: "SUCCESS",
+          razorpayPayoutId: payout.id,
+          completedAt: new Date()
+        }
       });
 
       if (transaction.user.email) {

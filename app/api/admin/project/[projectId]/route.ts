@@ -122,9 +122,40 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ p
 
     await prisma.$transaction(async (tx) => {
 
+      if (clientRequested) {
+        await tx.projectCancellationRequest.update({
+          where: { id: project.cancellationRequests[0].id, status: "PENDING" },
+          data: { status: "APPROVED" }
+        });
+      }
+
       await tx.project.update({
         where: { id: project.id },
         data: { status: "CANCELED" }
+      });
+
+      await tx.projectInvitation.updateMany({
+        where: { 
+          projectId: project.id, 
+          status: { in: ["SENT", "PENDING_ADMIN"] } 
+        },
+        data: { status: "EXPIRED" }
+      });
+
+      await tx.deadlineExtensionRequest.updateMany({
+        where: { 
+          projectId: project.id, 
+          status: "PENDING" 
+        },
+        data: { status: "REJECTED" }
+      });
+
+      await tx.ticket.updateMany({
+        where: { 
+          projectId: project.id, 
+          status: { in: ["OPEN", "IN_PROGRESS"] } 
+        },
+        data: { status: "CLOSED" }
       });
 
       await tx.transaction.create({

@@ -11,10 +11,15 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const projectId = searchParams.get("projectId");
+    const status = searchParams.get("status");
 
     const whereClause: any = {};
     if (projectId) {
       whereClause.projectId = projectId;
+    }
+
+    if (status && ["PENDING_ADMIN", "SENT", "ACCEPTED", "REJECTED", "ADMIN_REJECTED", "EXPIRED", "DROPPED"].includes(status)) {
+      whereClause.status = status;
     }
 
     const invitations = await prisma.projectInvitation.findMany({

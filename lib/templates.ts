@@ -271,3 +271,26 @@ export const adminForceDeletionTemplate = (
     </div>
   `;
 };
+
+export const invitationDeclinedAdminTemplate = (
+  engineerName: string, 
+  projectName: string, 
+  isTimeout: boolean = false
+) => {
+  const reason = isTimeout 
+    ? "did not respond to your invitation within the required timeframe" 
+    : "rejected your invitation";
+
+  return `
+    <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; max-width: 600px; line-height: 1.5;">
+      <h3 style="color: #d9534f; border-bottom: 1px solid #eee; padding-bottom: 10px;">Action Required: Engineer Match Failed</h3>
+      <p>Hello Admin,</p>
+      <p>The engineer <b>${engineerName}</b> ${reason} for the project <b>${projectName}</b>.</p>
+      <div style="background-color: #f9f9f9; border-left: 4px solid #f0ad4e; padding: 15px; margin: 20px 0;">
+        <strong>Next Steps:</strong><br/>
+        You have to send a new invitation to one of the remaining engineers in the match queue for this project.
+      </div>
+      <p>Please log in to your dashboard to proceed.</p>
+    </div>
+  `;
+};

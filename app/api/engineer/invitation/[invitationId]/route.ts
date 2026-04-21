@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getEngineer } from "@/lib/auth";
 import { z } from "zod";
+import { invitationDeclinedAdminTemplate } from "@/lib/templates";
+import sendEmail from "@/lib/email";
 
 export async function GET( req: NextRequest, { params }: { params: Promise<{ invitationId: string }> } ) {
   try {
@@ -95,10 +97,26 @@ export async function PATCH( req: NextRequest, { params }: { params: Promise<{ i
     }
 
     if (action === "REJECT") {
-      await prisma.projectInvitation.update({
-        where: { id: invitationId },
-        data: { status: "REJECTED" }
-      });
+
+      await prisma.projectInvitation.update({ where: { id: invitationId }, data: { status: "REJECTED" } });
+
+      const admins = await prisma.user.findMany({ where: { role: "ADMIN" }, select: { email: true } });
+
+      const adminEmails = admins.map(admin => admin.email).filter(Boolean);
+
+      if (adminEmails.length > 0) {
+        const emailHtml = invitationDeclinedAdminTemplate(
+          user.name || "An Engineer", 
+          invitation.project.title, 
+          false
+        );
+
+        const emailPromises = adminEmails.map(email => 
+          sendEmail(email, `Alert: Invitation Rejected for ${invitation.project.title}`, emailHtml)
+        );
+
+        await Promise.allSettled(emailPromises);
+      }
 
       return NextResponse.json({ success: true, message: "Invitation rejected" }, { status: 200 });
     }
@@ -135,12 +153,12 @@ export async function PATCH( req: NextRequest, { params }: { params: Promise<{ i
         where: {
             projectId: invitation.projectId,
             id: { not: invitationId },
-            status: "SENT"
+            status: { in: ["SENT", "PENDING_ADMIN"] }
         },
         data: { status: "EXPIRED" }
     });
 
-    return NextResponse.json({ success: true, message: "Project accepted successfully!" }, { status: 200 });
+    return NextResponse.json({ success: true, message: "Project accepted successfully" }, { status: 200 });
 
   } catch {
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });

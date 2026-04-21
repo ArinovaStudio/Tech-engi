@@ -80,6 +80,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ in
       return NextResponse.json({ success: false, message: "Pending invitation not found" }, { status: 404 });
     }
 
+    if (invitation.project.status !== "SEARCHING" || invitation.project.engineerId !== null) {
+      return NextResponse.json({ success: false, message: "This project has already been assigned to an engineer" }, { status: 400 });
+    }
+
     if (validation.data.action === "REJECT") {
       await prisma.projectInvitation.update({
         where: { id: invitationId },

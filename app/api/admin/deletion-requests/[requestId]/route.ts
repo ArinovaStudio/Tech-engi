@@ -112,6 +112,30 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ re
         data: { status: "CANCELED" }
       });
 
+      await tx.projectInvitation.updateMany({
+        where: { 
+          projectId: project.id, 
+          status: { in: ["SENT", "PENDING_ADMIN"] } 
+        },
+        data: { status: "EXPIRED" }
+      });
+
+      await tx.deadlineExtensionRequest.updateMany({
+        where: { 
+          projectId: project.id, 
+          status: "PENDING" 
+        },
+        data: { status: "REJECTED" }
+      });
+
+      await tx.ticket.updateMany({
+        where: { 
+          projectId: project.id, 
+          status: { in: ["OPEN", "IN_PROGRESS"] } 
+        },
+        data: { status: "CLOSED" }
+      });
+
       await tx.transaction.create({
         data: {
           projectId: project.id,

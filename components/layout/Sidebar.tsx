@@ -29,11 +29,13 @@ const ADMIN_NAV: NavItem[] = [
 const CLIENT_NAV: NavItem[] = [
   { label: "Dashboard", icon: <LayoutDashboard size={18} />, href: "/client" },
   { label: "Projects", icon: <FolderKanban size={18} />, href: "/client/project" },
+  { label: "Message", icon: <MessageSquare size={18} />, href: "/client/message" },
 ];
 
 const ENGINEER_NAV: NavItem[] = [
   { label: "Dashboard", icon: <LayoutDashboard size={18} />, href: "/engineer" },
   { label: "Projects", icon: <FolderKanban size={18} />, href: "/engineer/project" },
+  { label: "Message", icon: <MessageSquare size={18} />, href: "/engineer/message" },
 ];
 
 const NavLink = ({ item, collapsed }: { item: NavItem; collapsed: boolean }) => {

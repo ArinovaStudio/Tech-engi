@@ -1,7 +1,7 @@
 import { Eye, ReceiptText, Activity, Calendar, Filter, Download } from "lucide-react";
 import StatCard from "@/components/dashboard/StatCard";
-import SalesDistribution from "@/components/dashboard/SalesDistribution";
-import TotalSubscriber from "@/components/dashboard/TotalSubscriber";
+import SalesDistribution from "@/components/dashboard/ProjectDistribution";
+import TotalSubscriber from "@/components/dashboard/RevenueChart";
 import DashboardShell from "@/components/layout/DashboardShell";
 
 export default function DashboardPage() {

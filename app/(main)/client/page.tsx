@@ -39,8 +39,8 @@ export default function DashboardPage() {
 
       {/* Charts */}
       <div className="grid grid-cols-2 gap-4">
-        <SalesDistribution />
-        <TotalSubscriber />
+        <SalesDistribution data={[]} />
+        <TotalSubscriber data={{ monthly: [], yearly: [] }} totalRevenue={0} />
       </div>
     </DashboardShell>
   );

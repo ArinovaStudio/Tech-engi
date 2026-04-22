@@ -31,6 +31,7 @@ export const authOptions: NextAuthOptions = {
         const user = await prisma.user.findUnique({ where: { email: credentials.email } });
 
         if (!user) throw new Error("User not found");
+        if (user.isSuspended) throw new Error("Your account has been suspended.");
         if (user.password === null) throw new Error("Password is not set, please login with Google");
 
         const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
@@ -48,7 +49,12 @@ export const authOptions: NextAuthOptions = {
           where: { email: user.email! }
         });
 
-        if (!existingUser) {
+        if (existingUser) {
+          if (existingUser.isSuspended) {
+            throw new Error("Your account has been suspended."); 
+          }
+        } 
+        else {
           const cookieStore = await cookies();
           const intendedRole = cookieStore.get("oauth_role")?.value;
 

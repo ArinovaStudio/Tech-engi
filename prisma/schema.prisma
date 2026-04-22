@@ -139,6 +139,12 @@ enum ProjectStatus {
   CANCELED
 }
 
+enum ProjectPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
 model Project {
   id         String  @id @default(uuid())
   clientId   String
@@ -150,6 +156,9 @@ model Project {
   instruments String[]
 
   progress           Int     @default(0)
+  priority ProjectPriority @default(LOW)
+
+  repository String?
   finalProjectLink   String? @db.Text
   isEngineerFinished Boolean @default(false)
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Send, MessageSquare, Loader2, User as UserIcon, X } from "lucide-react";
+import { Send, MessageSquare, Loader2, User as UserIcon, X, CheckSquare, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { globalSocket } from "@/components/SocketAnnouncer";
 import MessageItem from "./MessageItem";
@@ -9,6 +9,9 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
   const [inputMessage, setInputMessage] = useState("");
   const [editingMessage, setEditingMessage] = useState<any>(null);
   
+  const [isSelectMode, setIsSelectMode] = useState(false);
+  const [selectedMessageIds, setSelectedMessageIds] = useState<string[]>([]);
+  
   // Pagination State
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
@@ -17,7 +20,7 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // 1. Fetch Initial History when contact changes
+  // Fetch Initial History when contact changes
   useEffect(() => {
     if (!selectedContact) return;
     const fetchInitialHistory = async () => {
@@ -32,9 +35,13 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
     };
     fetchInitialHistory();
     globalSocket.emit("join_dm", { currentUserId: currentUser?.id, targetUserId: selectedContact.id });
+    
+    // Reset selection state when switching chats
+    setIsSelectMode(false);
+    setSelectedMessageIds([]);
   }, [selectedContact, currentUser]);
 
-  // 2. Load More History (Pagination)
+  // Load More History (Pagination)
   const handleScroll = async () => {
     if (!scrollContainerRef.current || !hasMore || isLoadingMore) return;
     
@@ -50,7 +57,6 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
         setCursor(data.nextCursor);
         setHasMore(!!data.nextCursor);
         
-        // Maintain scroll position after loading older messages
         setTimeout(() => {
           if (scrollContainerRef.current) {
             scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight - prevHeight;
@@ -61,12 +67,11 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
     }
   };
 
-  // 3. Socket Listeners for Real-Time Updates
+  // Socket Listeners for Real-Time Updates
   useEffect(() => {
     const handleReceiveMessage = (newMessage: any) => {
       if (selectedContact && (newMessage.senderId === selectedContact.id || newMessage.senderId === currentUser?.id)) {
         setMessages(prev => {
-          // Optimistic UI Resolver: If I sent it, replace the "pending" placeholder
           if (newMessage.senderId === currentUser.id) {
             const pendingIdx = prev.findIndex(m => m.isPending);
             if (pendingIdx !== -1) {
@@ -88,16 +93,24 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
 
     const handleMessageDeleted = ({ messageId }: { messageId: string }) => {
       setMessages(prev => prev.map(m => m.id === messageId ? { ...m, isDeleted: true, content: "" } : m));
+      setSelectedMessageIds(prev => prev.filter(id => id !== messageId));
+    };
+
+    const handleMassDeleted = ({ messageIds }: { messageIds: string[] }) => {
+      setMessages(prev => prev.map(m => messageIds.includes(m.id) ? { ...m, isDeleted: true, content: "" } : m));
+      setSelectedMessageIds(prev => prev.filter(id => !messageIds.includes(id)));
     };
 
     globalSocket.on("receive_dm", handleReceiveMessage);
     globalSocket.on("dm_edited", handleMessageEdited);
     globalSocket.on("dm_deleted", handleMessageDeleted);
+    globalSocket.on("mass_dm_deleted", handleMassDeleted);
 
     return () => {
       globalSocket.off("receive_dm", handleReceiveMessage);
       globalSocket.off("dm_edited", handleMessageEdited);
       globalSocket.off("dm_deleted", handleMessageDeleted);
+      globalSocket.off("mass_dm_deleted", handleMassDeleted);
     };
   }, [selectedContact, currentUser, mutateContacts]);
 
@@ -105,24 +118,40 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
     setTimeout(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, 100);
   };
 
-  // 4. Send or Edit Message
+  const toggleSelectMessage = (id: string) => {
+    setSelectedMessageIds(prev => prev.includes(id) ? prev.filter(msgId => msgId !== id) : [...prev, id]);
+  };
+
+  const handleMassDelete = () => {
+    if (selectedMessageIds.length === 0) return;
+    
+    setMessages(prev => prev.map(m => selectedMessageIds.includes(m.id) ? { ...m, isDeleted: true, content: "" } : m));
+    
+    globalSocket.emit("mass_delete_dm", { 
+      messageIds: selectedMessageIds, 
+      senderId: currentUser.id,
+      receiverId: selectedContact.id
+    });
+    
+    setIsSelectMode(false);
+    setSelectedMessageIds([]);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputMessage.trim() || !selectedContact || !currentUser) return;
 
     if (editingMessage) {
-      // Handle Edit
       globalSocket.emit("edit_dm", { messageId: editingMessage.id, senderId: currentUser.id, content: inputMessage.trim() });
       setMessages(prev => prev.map(m => m.id === editingMessage.id ? { ...m, content: inputMessage.trim(), isEdited: true } : m));
       setEditingMessage(null);
     } else {
-      // Handle Send (Optimistic UI)
       const tempMessage = {
         id: `temp_${Date.now()}`,
         senderId: currentUser.id,
         content: inputMessage.trim(),
         createdAt: new Date().toISOString(),
-        isPending: true // Marks it with the clock icon
+        isPending: true
       };
       
       setMessages(prev => [...prev, tempMessage]);
@@ -147,21 +176,57 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
 
   return (
     <div className="flex-1 flex flex-col bg-[#f0f2f5] relative">
-      {/* Header with Live Status */}
-      <div className="h-16 shrink-0 bg-white border-b border-[var(--border)] flex items-center px-6 gap-4 z-10">
-        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden relative">
-          {selectedContact.image ? (
-            <Image src={selectedContact.image} alt={selectedContact.name} width={40} height={40} className="object-cover" />
-          ) : (
-            <UserIcon size={20} className="text-gray-500" />
-          )}
-        </div>
-        <div>
-          <h3 className="font-bold text-[var(--text-primary)] font-inter">{selectedContact.name}</h3>
-          <div className="flex items-center gap-1.5">
-            <span className={`w-2 h-2 rounded-full ${isOnline ? "bg-green-500" : "bg-gray-300"}`} />
-            <span className="text-xs text-gray-500 font-inter">{isOnline ? "Online" : "Offline"}</span>
+      {/* Header with Live Status & Select Actions */}
+      <div className="h-16 shrink-0 bg-white border-b border-[var(--border)] flex items-center justify-between px-6 z-10">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden relative">
+            {selectedContact.image ? (
+              <Image src={selectedContact.image} alt={selectedContact.name} width={40} height={40} className="object-cover" />
+            ) : (
+              <UserIcon size={20} className="text-gray-500" />
+            )}
           </div>
+          <div>
+            <div className="flex items-baseline gap-2">
+              <h3 className="font-bold text-[var(--text-primary)] font-inter">{selectedContact.name}</h3>
+              {selectedContact.projectNames && (
+                <span className="text-[10px] text-[var(--primary)] font-semibold uppercase tracking-wider truncate max-w-[200px]">
+                  • {selectedContact.projectNames}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className={`w-2 h-2 rounded-full ${isOnline ? "bg-green-500" : "bg-gray-300"}`} />
+              <span className="text-xs text-gray-500 font-inter">{isOnline ? "Online" : "Offline"}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center">
+          {isSelectMode ? (
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={() => { setIsSelectMode(false); setSelectedMessageIds([]); }} 
+                className="text-sm font-medium text-gray-500 hover:text-gray-700 px-3 py-1.5 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleMassDelete} 
+                disabled={selectedMessageIds.length === 0} 
+                className="text-sm font-semibold bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1.5 rounded-lg disabled:opacity-50 transition-colors flex items-center gap-1"
+              >
+                <Trash2 size={14} /> Delete {selectedMessageIds.length > 0 ? `(${selectedMessageIds.length})` : ""}
+              </button>
+            </div>
+          ) : (
+            <button 
+              onClick={() => setIsSelectMode(true)} 
+              className="text-sm font-medium text-gray-500 hover:text-[var(--primary)] flex items-center gap-1 transition-colors"
+            >
+              <CheckSquare size={16} /> Select
+            </button>
+          )}
         </div>
       </div>
 
@@ -169,20 +234,26 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
       <div ref={scrollContainerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-6 flex flex-col gap-3">
         {isLoadingMore && <div className="flex justify-center py-2"><Loader2 className="animate-spin text-gray-400" size={20} /></div>}
         
-        {messages.map((msg: any) => (
-          <MessageItem 
-            key={msg.id} 
-            msg={msg} 
-            isMine={msg.senderId === currentUser?.id}
-            onEdit={(m: any) => { setEditingMessage(m); setInputMessage(m.content); }}
-            onDelete={(id: string) => globalSocket.emit("delete_dm", { messageId: id, senderId: currentUser.id })}
-          />
-        ))}
+        {messages.map((msg: any) => {
+          const isMine = msg.senderId === currentUser?.id;
+          return (
+            <MessageItem 
+              key={msg.id} 
+              msg={msg} 
+              isMine={isMine}
+              onEdit={(m: any) => { setEditingMessage(m); setInputMessage(m.content); }}
+              onDelete={(id: string) => globalSocket.emit("delete_dm", { messageId: id, senderId: currentUser.id })}
+              isSelectMode={isSelectMode && isMine} 
+              isSelected={selectedMessageIds.includes(msg.id)}
+              onToggleSelect={toggleSelectMessage}
+            />
+          );
+        })}
         <div ref={messagesEndRef} />
       </div>
 
       {/* Input Area */}
-      <div className="p-4 bg-white border-t border-[var(--border)]">
+      <div className={`p-4 bg-white border-t border-[var(--border)] transition-opacity ${isSelectMode ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
         {editingMessage && (
           <div className="flex items-center justify-between bg-orange-50 px-4 py-2 rounded-t-lg border-b border-orange-100 text-sm text-orange-800">
             <span>Editing message...</span>

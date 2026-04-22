@@ -34,8 +34,9 @@ export async function GET( req: NextRequest, { params }: { params: Promise<{ pro
   }
 }
 
-const progressSchema = z.object({
-  progress: z.number().min(0, "Progress cannot be less than 0").max(99, "Only the client can mark the project as 100% complete")
+const engineerUpdateSchema = z.object({
+  progress: z.number().min(0).max(99, "Only the client can mark the project as 100% complete").optional(),
+  repository: z.string().url("Please provide a valid repository URL").optional().nullable()
 });
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
@@ -47,7 +48,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ proj
 
     const { projectId } = await params;
     const body = await req.json();
-    const validation = progressSchema.safeParse(body);
+    const validation = engineerUpdateSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json({ success: false, message: validation.error.issues[0].message }, { status: 400 });
@@ -55,25 +56,38 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ proj
 
     const project = await prisma.project.findUnique({ where: { id: projectId } });
 
-    if (!project){
+    if (!project) {
       return NextResponse.json({ success: false, message: "Project not found" }, { status: 404 });
     }
-
-    if (project.engineerId !== user.engineerProfile.id){
+    if (project.engineerId !== user.engineerProfile.id) {
       return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
     }
 
-    if (project.status !== "IN_PROGRESS"){
+    const { progress, repository } = validation.data;
+
+    if (project.status === "COMPLETED" && progress !== 100) {
+      return NextResponse.json({ success: false, message: "Cannot update the progress of a completed project" }, { status: 400 });
+    }
+
+    if (project.status !== "IN_PROGRESS") {
       return NextResponse.json({ success: false, message: "Project is not in progress" }, { status: 400 });
+    }
+
+
+    const updateData: any = {};
+    if (progress !== undefined) updateData.progress = progress;
+    if (repository !== undefined) updateData.repository = repository;
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ success: false, message: "No data provided to update" }, { status: 400 });
     }
 
     await prisma.project.update({
       where: { id: projectId },
-      data: { progress: validation.data.progress }
+      data: updateData
     });
 
-    return NextResponse.json({ success: true, message: "Progress updated successfully" }, { status: 200 });
-
+    return NextResponse.json({ success: true, message: "Project updated successfully" }, { status: 200 });
   } catch {
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }

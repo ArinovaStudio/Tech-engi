@@ -56,7 +56,7 @@ export default function ProjectDetailPage() {
   useEffect(() => {
     if (!projectId) return;
 
-    const endpoint = `/api/admin/project/${projectId}`;
+    const endpoint = `/api/overview/${projectId}`;
 
     fetch(endpoint)
       .then((r) => r.json())

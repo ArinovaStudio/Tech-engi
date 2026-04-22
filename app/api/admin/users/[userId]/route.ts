@@ -4,6 +4,8 @@ import { getAdmin } from "@/lib/auth";
 import { deleteFile } from "@/lib/uploads";
 import { z } from "zod";
 import { generateEmbedding } from "@/lib/embeddings";
+import { engineerApprovalTemplate, engineerRejectionTemplate } from "@/lib/templates";
+import sendEmail from "@/lib/email";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
   try {
@@ -68,7 +70,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
     }
 
 
-    await prisma.user.update({ where: { id: userId }, data: { name } });
+    const user = await prisma.user.update({ where: { id: userId }, data: { name } });
 
     if (existingUser.role === "CLIENT" && expertise) {
         await prisma.clientProfile.upsert({
@@ -112,6 +114,26 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
             `;
           })
           .catch((err) => console.error("[embedding PUT]", err));
+        }
+
+        const previousStatus = existingUser.engineerProfile?.status;
+        const statusChanged = approvalStatus && approvalStatus !== previousStatus;
+
+        if (statusChanged && ["APPROVED", "REJECTED"].includes(approvalStatus)){
+          let emailSubject = "";
+          let emailHtml = "";
+
+          if (approvalStatus === "APPROVED") {
+            emailSubject = "Your Account is Approved!";
+            emailHtml = engineerApprovalTemplate(user.name || name || "Engineer");
+          } else if (approvalStatus === "REJECTED") {
+            emailSubject = "Update on your Engineer Application";
+            emailHtml = engineerRejectionTemplate(user.name || name || "Engineer", rejectionReason || "No reason provided");
+          }
+
+          if (emailHtml) {
+            sendEmail(user.email, emailSubject, emailHtml);
+          }
         }
     }
 

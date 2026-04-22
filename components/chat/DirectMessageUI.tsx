@@ -1,27 +1,51 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import useSWR from "swr";
+import useSWRInfinite from "swr/infinite";
 import { fetcher } from "@/lib/fetcher";
 import { useAuth } from "@/app/hooks/useAuth";
 import { globalSocket } from "@/components/SocketAnnouncer";
 import ChatSidebar from "./direct/ChatSidebar";
 import ChatArea from "./direct/ChatArea";
+import { Loader2 } from "lucide-react";
 
 export default function DirectMessageUI() {
   const { user: currentUser } = useAuth();
   const [selectedContact, setSelectedContact] = useState<any>(null);
   const [liveUsers, setLiveUsers] = useState<Record<string, boolean>>({});
 
-  const { data: contactsData, mutate: mutateContacts } = useSWR("/api/chat/direct/contacts", fetcher);
-  const contacts = contactsData?.contacts || [];
+  // Sidebar filtering states lifted up to feed the API
+  const [activeTab, setActiveTab] = useState<string>("ALL");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedSearch(search), 500);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  // SWR Infinite Pagination
+  const getKey = (pageIndex: number, previousPageData: any) => {
+    if (previousPageData && !previousPageData.hasMore) return null;
+    return `/api/chat/direct/contacts?search=${encodeURIComponent(debouncedSearch)}&role=${activeTab}&page=${pageIndex + 1}&limit=20`;
+  };
+
+  const { data, size, setSize, isValidating, mutate } = useSWRInfinite(getKey, fetcher, { keepPreviousData: true });
+
+  // Safely flatten the paginated contacts
+  const contacts = data ? data.flatMap(page => page.contacts || []) : [];
+  const isLoadingInitialData = !data && isValidating;
+  const isReachingEnd = data && data[data.length - 1]?.hasMore === false;
 
   useEffect(() => {
     if (contacts.length === 0) return;
 
-    // Ask server who is online out of our contacts
-    const userIds = contacts.map((c: any) => c.id);
-    globalSocket.emit("check_multiple_users_status", userIds);
+    // Filter out undefined/null ids just in case
+    const userIds = contacts.map((c: any) => c.id).filter(Boolean); 
+    
+    if (userIds.length > 0) {
+      globalSocket.emit("check_multiple_users_status", userIds);
+    }
 
     const handleBulkStatus = (statuses: Record<string, boolean>) => {
       setLiveUsers(prev => ({ ...prev, ...statuses }));
@@ -40,6 +64,14 @@ export default function DirectMessageUI() {
     };
   }, [contacts]);
 
+  if (!currentUser) {
+    return (
+      <div className="flex items-center justify-center h-[60vh]">
+        <Loader2 className="animate-spin text-[var(--primary)]" size={36} />
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-[calc(100vh-100px)] bg-white border border-[var(--border)] rounded-xl overflow-hidden shadow-sm">
       <ChatSidebar 
@@ -48,12 +80,20 @@ export default function DirectMessageUI() {
         selectedContact={selectedContact} 
         setSelectedContact={setSelectedContact}
         liveUsers={liveUsers}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        search={search}
+        setSearch={setSearch}
+        isLoading={isLoadingInitialData}
+        isValidating={isValidating}
+        isReachingEnd={isReachingEnd}
+        loadMore={() => setSize(size + 1)}
       />
       <ChatArea 
         currentUser={currentUser} 
         selectedContact={selectedContact} 
         isOnline={selectedContact ? liveUsers[selectedContact.id] : false}
-        mutateContacts={mutateContacts}
+        mutateContacts={mutate}
       />
     </div>
   );

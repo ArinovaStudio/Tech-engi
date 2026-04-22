@@ -6,48 +6,14 @@ import { deleteFile } from "@/lib/uploads";
 import { adminActionRequiredTemplate, adminForceDeletionTemplate, deletionRequestApprovedTemplate } from "@/lib/templates";
 import sendEmail from "@/lib/email";
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
-  try {
-    const { error } = await getAdmin();
-    if (error) {
-      return NextResponse.json({ success: false, message: error || "Unauthorized" }, { status: 401 });
-    }
-
-    const { projectId } = await params;
-
-    const project = await prisma.project.findUnique({
-      where: { id: projectId },
-      include: {
-        client: { include: { user: { select: { name: true, email: true, image: true } } } },
-        engineer: { include: { user: { select: { name: true, email: true, image: true } } } },
-        resources: { orderBy: { createdAt: "desc" } },
-        cancellationRequests: { include: { requestedBy: { select: { name: true, role: true } } } },
-        invitations: {
-          include: { engineer: { include: { user: { select: { name: true, email: true } } } } },
-          orderBy: { createdAt: "desc" }
-        },
-        milestones: true,
-        tickets: true
-      }
-    });
-
-    if (!project) {
-      return NextResponse.json({ success: false, message: "Project not found" }, { status: 404 });
-    }
-
-    return NextResponse.json({ success: true, project }, { status: 200 });
-
-  } catch {
-    return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
-  }
-}
-
 const adminUpdateSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters").optional(),
   description: z.string().min(10, "Please provide a more detailed description").optional(),
   budget: z.number().min(500, "Minimum budget must be ₹500").optional(),
-  status: z.enum(["SEARCHING", "IN_PROGRESS", "COMPLETED", "CANCELED"]).optional(),
+  status: z.enum(["DRAFT", "AWAITING_ADVANCE", "SEARCHING", "IN_PROGRESS", "IN_REVIEW", "AWAITING_FINAL_PAYMENT", "COMPLETED", "CANCELED"]).optional(),
   progress: z.number().min(0).max(100).optional(),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH"]).optional(),
+  repository: z.string().url("Must be a valid URL").optional().nullable(),
   startDate: z.coerce.date().optional().nullable(),
   endDate: z.coerce.date().optional().nullable(),
   instruments: z.array(z.string()).optional(),
@@ -56,21 +22,19 @@ const adminUpdateSchema = z.object({
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
   try {
     const { error } = await getAdmin();
-    if (error) {
-      return NextResponse.json({ success: false, message: error || "Unauthorized" }, { status: 401 });
-    }
+    if (error) return NextResponse.json({ success: false, message: error || "Unauthorized" }, { status: 401 });
 
     const { projectId } = await params;
     const body = await req.json();
 
     const validation = adminUpdateSchema.safeParse(body);
-    if (!validation.success) {
-      return NextResponse.json({ success: false, message: validation.error.issues[0].message }, { status: 400 });
-    }
+    if (!validation.success) return NextResponse.json({ success: false, message: validation.error.issues[0].message }, { status: 400 });
 
     const existingProject = await prisma.project.findUnique({ where: { id: projectId } });
-    if (!existingProject) {
-      return NextResponse.json({ success: false, message: "Project not found" }, { status: 404 });
+    if (!existingProject) return NextResponse.json({ success: false, message: "Project not found" }, { status: 404 });
+
+    if (existingProject.status === "COMPLETED" && validation.data.progress !== 100) {
+      return NextResponse.json({ success: false, message: "Cannot update the progress of a completed project" }, { status: 400 });
     }
 
     await prisma.project.update({

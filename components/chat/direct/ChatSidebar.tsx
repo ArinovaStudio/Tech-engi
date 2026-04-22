@@ -1,17 +1,33 @@
-import React, { useState } from "react";
-import { Search, User as UserIcon } from "lucide-react";
+import React, { useEffect, useRef } from "react";
+import { Search, User as UserIcon, Loader2 } from "lucide-react";
 import Image from "next/image";
 
-export default function ChatSidebar({ currentUser, contacts, selectedContact, setSelectedContact, liveUsers }: any) {
-  const [activeTab, setActiveTab] = useState<string>("ALL");
-  const [search, setSearch] = useState("");
+export default function ChatSidebar({ 
+  currentUser, contacts, selectedContact, setSelectedContact, liveUsers,
+  activeTab, setActiveTab, search, setSearch,
+  isLoading, isValidating, isReachingEnd, loadMore 
+}: any) {
 
-  const filteredContacts = contacts.filter((c: any) => {
-    const matchesSearch = c.name?.toLowerCase().includes(search.toLowerCase());
-    if (!matchesSearch) return false;
-    if (activeTab === "ALL") return true;
-    return c.role === activeTab;
-  });
+  // Intersection Observer for Infinite Scroll
+  const observerTarget = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !isReachingEnd && !isValidating) {
+        loadMore();
+      }
+    }, { threshold: 1.0 });
+    
+    if (observerTarget.current) observer.observe(observerTarget.current);
+    return () => observer.disconnect();
+  }, [isReachingEnd, isValidating, loadMore]);
+
+  // Auto-select first contact
+  useEffect(() => {
+    if (!selectedContact && contacts.length > 0) {
+      setSelectedContact(contacts[0]);
+    }
+  }, [contacts, selectedContact, setSelectedContact]);
 
   const getTabs = () => {
     if (currentUser?.role === "ADMIN") return ["ALL", "CLIENT", "ENGINEER"];
@@ -51,11 +67,16 @@ export default function ChatSidebar({ currentUser, contacts, selectedContact, se
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {filteredContacts.length === 0 ? (
+        {isLoading ? (
+          <div className="p-6 flex justify-center"><Loader2 className="animate-spin text-gray-400" size={24} /></div>
+        ) : contacts.length === 0 ? (
           <div className="p-6 text-center text-sm text-gray-400 font-inter">No contacts found.</div>
         ) : (
-          filteredContacts.map((contact: any) => {
+          contacts.map((contact: any) => {
+            if (!contact || !contact.id) return null; // Safe guard against undefined objects
+
             const isOnline = liveUsers[contact.id] || false;
+            
             return (
               <button
                 key={contact.id}
@@ -70,13 +91,20 @@ export default function ChatSidebar({ currentUser, contacts, selectedContact, se
                   ) : (
                     <UserIcon size={20} className="text-gray-500" />
                   )}
-                  {/* Real-time Green Dot */}
                   {isOnline && <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-baseline mb-0.5">
                     <span className="font-bold text-sm text-[var(--text-primary)] truncate font-inter">{contact.name}</span>
                   </div>
+                  
+                  {/* Displays Project Name under the User's Name! */}
+                  {contact.projectNames && (
+                    <p className="text-[10px] text-[var(--primary)] font-semibold truncate mb-0.5">
+                      {contact.projectNames}
+                    </p>
+                  )}
+                  
                   <p className="text-xs text-gray-500 truncate font-inter">
                     {contact.lastMessage || `Start a conversation...`}
                   </p>
@@ -85,6 +113,10 @@ export default function ChatSidebar({ currentUser, contacts, selectedContact, se
             );
           })
         )}
+        {/* Infinite Scroll Loader Trigger */}
+        <div ref={observerTarget} className="h-4 w-full flex justify-center mt-2">
+          {isValidating && !isLoading && <Loader2 className="animate-spin text-gray-400" size={16} />}
+        </div>
       </div>
     </div>
   );

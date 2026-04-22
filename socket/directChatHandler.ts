@@ -161,4 +161,24 @@ export default function registerDirectChatHandlers(io: Server, socket: Socket) {
       
     }
   });
+
+  socket.on("mass_delete_dm", async (data: { messageIds: string[]; senderId: string; receiverId: string }) => {
+    try {
+      if (!data.messageIds || data.messageIds.length === 0) return;
+
+      await prisma.directMessage.deleteMany({
+        where: {
+          id: { in: data.messageIds },
+          senderId: data.senderId 
+        }
+      });
+
+      const roomName = `dm_${getRoomId(data.senderId, data.receiverId)}`;
+      
+      io.to(roomName).emit("mass_dm_deleted", { messageIds: data.messageIds });
+      
+    } catch {
+      socket.emit("dm_error", { message: "Failed to delete messages" });
+    }
+  });
 }

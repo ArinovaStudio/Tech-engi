@@ -1,29 +1,70 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getEngineer } from "@/lib/auth";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const { user, error } = await getEngineer();
     if (error || !user || !user.engineerProfile) {
       return NextResponse.json({ success: false, message: error || "Unauthorized" }, { status: 403 });
     }
-    const assignedProjects = await prisma.project.findMany({
-      where: { engineerId: user.engineerProfile.id },
-      orderBy: {
-        updatedAt: 'desc'
-      }
-    });
+
+    const { searchParams } = new URL(req.url);
+    const search = searchParams.get("search") || "";
+    const status = searchParams.get("status") || "ALL";
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "12", 10);
+    const skip = (page - 1) * limit;
+
+    const engineerId = user.engineerProfile.id;
+
+    const whereClause: any = { engineerId };
+
+    if (status !== "ALL") {
+      whereClause.status = status;
+    }
+
+    if (search.trim() !== "") {
+      whereClause.OR = [
+        { title: { contains: search.trim(), mode: "insensitive" } },
+        { description: { contains: search.trim(), mode: "insensitive" } },
+      ];
+    }
+
+    const [ assignedProjects, totalFilteredCount, totalProjects, activeProjects, completedProjects ] = await Promise.all([
+      prisma.project.findMany({
+        where: whereClause,
+        skip,
+        take: limit,
+        orderBy: { updatedAt: 'desc' }
+      }),
+      prisma.project.count({ where: whereClause }),
+      prisma.project.count({ where: { engineerId } }),
+      prisma.project.count({ where: { engineerId, status: { in: ["IN_PROGRESS", "IN_REVIEW", "AWAITING_FINAL_PAYMENT"] } } }),
+      prisma.project.count({ where: { engineerId, status: "COMPLETED" } })
+    ]);
 
     const projectsWithEarnings = assignedProjects.map((project) => {
       const { budget, ...publicProjectData } = project;
-      
       const engineerEarnings = budget * 0.7;
-
       return { ...publicProjectData, earnings: engineerEarnings };
     });
 
-    return NextResponse.json({ success: true, projects: projectsWithEarnings }, { status: 200 });
+    return NextResponse.json({ 
+      success: true, 
+      projects: projectsWithEarnings,
+      pagination: {
+        total: totalFilteredCount,
+        page,
+        limit,
+        totalPages: Math.ceil(totalFilteredCount / limit)
+      },
+      globalStats: {
+        total: totalProjects,
+        active: activeProjects,
+        completed: completedProjects
+      }
+    }, { status: 200 });
 
   } catch {
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });

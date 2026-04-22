@@ -3,26 +3,66 @@ import { prisma } from "@/lib/prisma";
 import { getClient } from "@/lib/auth";
 import { z } from "zod";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const { user, error } = await getClient();
-    if (error || !user) {
+    if (error || !user || !user.clientProfile) {
       return NextResponse.json({ success: false, message: error || "Unauthorized" }, { status: 401 });
     }
 
-    if (!user.clientProfile) {
-      return NextResponse.json({ success: false, message: "Please complete your profile first" }, { status: 403 });
+    const { searchParams } = new URL(req.url);
+    const search = searchParams.get("search") || "";
+    const status = searchParams.get("status") || "ALL";
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "12", 10);
+    const skip = (page - 1) * limit;
+
+    const clientId = user.clientProfile.id;
+
+    const whereClause: any = { clientId };
+
+    if (status !== "ALL") {
+      whereClause.status = status;
     }
 
-    const projects = await prisma.project.findMany({
-      where: { clientId: user.clientProfile.id },
-      include: {
-        engineer: { include: { user: { select: { name: true, image: true } } } }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
+    if (search.trim() !== "") {
+      whereClause.OR = [
+        { title: { contains: search.trim(), mode: "insensitive" } },
+        { description: { contains: search.trim(), mode: "insensitive" } },
+      ];
+    }
 
-    return NextResponse.json({ success: true, projects }, { status: 200 });
+    const [ projects, totalFilteredCount, totalProjects, activeProjects, completedProjects ] = await Promise.all([
+      prisma.project.findMany({
+        where: whereClause,
+        skip,
+        take: limit,
+        include: {
+          engineer: { include: { user: { select: { name: true, image: true } } } }
+        },
+        orderBy: { createdAt: 'desc' }
+      }),
+      prisma.project.count({ where: whereClause }),
+      prisma.project.count({ where: { clientId } }),
+      prisma.project.count({ where: { clientId, status: { in: ["IN_PROGRESS", "IN_REVIEW", "SEARCHING"] } } }),
+      prisma.project.count({ where: { clientId, status: "COMPLETED" } })
+    ]);
+
+    return NextResponse.json({ 
+      success: true, 
+      projects,
+      pagination: {
+        total: totalFilteredCount,
+        page,
+        limit,
+        totalPages: Math.ceil(totalFilteredCount / limit)
+      },
+      globalStats: {
+        total: totalProjects,
+        active: activeProjects,
+        completed: completedProjects
+      }
+    }, { status: 200 });
 
   } catch {
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });

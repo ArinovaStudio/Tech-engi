@@ -2,10 +2,10 @@
 
 import { useAuth } from "@/app/hooks/useAuth";
 import DashboardShell from "@/components/layout/DashboardShell";
-import { Plus, Search, Filter, Users, Calendar, AlertCircle, Clock, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { Plus, Search, Filter, Users, Calendar, AlertCircle, Clock, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 
 interface Project {
@@ -56,41 +56,43 @@ function ProjectCard({ project }: { project: Project }) {
 
   return (
     <Link href={`/client/project/${project.id}`}>
-      <div className="bg-white border border-[var(--border)] rounded-xl p-5 hover:shadow-md hover:border-[var(--primary)] transition-all cursor-pointer group">
-        <div className="flex items-start justify-between gap-2 mb-2">
-          <h3 className="text-sm font-bold font-inter text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--primary)] transition-colors">
-            {project.title}
-          </h3>
-          <StatusBadge status={project.status} />
-        </div>
-
-        <p className="text-xs font-inter text-[var(--text-muted)] line-clamp-2 mb-4 leading-relaxed">
-          {project.description}
-        </p>
-
-        {project.instruments?.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-3">
-            {project.instruments.slice(0, 3).map((inst) => (
-              <span key={inst} className="text-[10px] font-inter px-2 py-0.5 bg-[var(--primary-light)] text-[var(--primary)] border border-[#ffd9a8] rounded-full">
-                {inst}
-              </span>
-            ))}
-            {project.instruments.length > 3 && (
-              <span className="text-[10px] font-inter text-[var(--text-muted)]">+{project.instruments.length - 3}</span>
-            )}
+      <div className="bg-white border border-[var(--border)] rounded-xl p-5 hover:shadow-md hover:border-[var(--primary)] transition-all cursor-pointer group h-full flex flex-col justify-between">
+        <div>
+          <div className="flex items-start justify-between gap-2 mb-2">
+            <h3 className="text-sm font-bold font-inter text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--primary)] transition-colors">
+              {project.title}
+            </h3>
+            <StatusBadge status={project.status} />
           </div>
-        )}
 
-        <div className="mb-3">
-          <div className="flex justify-between text-[10px] font-inter text-[var(--text-muted)] mb-1">
-            <span>Progress</span>
-            <span className="font-semibold text-[var(--text-primary)]">{project.progress}%</span>
-          </div>
-          <div className="w-full h-1.5 bg-[var(--bg)] rounded-full overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all"
-              style={{ width: `${project.progress}%`, background: "var(--primary)" }}
-            />
+          <p className="text-xs font-inter text-[var(--text-muted)] line-clamp-2 mb-4 leading-relaxed">
+            {project.description}
+          </p>
+
+          {project.instruments?.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-3">
+              {project.instruments.slice(0, 3).map((inst) => (
+                <span key={inst} className="text-[10px] font-inter px-2 py-0.5 bg-[var(--primary-light)] text-[var(--primary)] border border-[#ffd9a8] rounded-full">
+                  {inst}
+                </span>
+              ))}
+              {project.instruments.length > 3 && (
+                <span className="text-[10px] font-inter text-[var(--text-muted)]">+{project.instruments.length - 3}</span>
+              )}
+            </div>
+          )}
+
+          <div className="mb-4">
+            <div className="flex justify-between text-[10px] font-inter text-[var(--text-muted)] mb-1">
+              <span>Progress</span>
+              <span className="font-semibold text-[var(--text-primary)]">{project.progress}%</span>
+            </div>
+            <div className="w-full h-1.5 bg-[var(--bg)] rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all"
+                style={{ width: `${project.progress}%`, background: "var(--primary)" }}
+              />
+            </div>
           </div>
         </div>
 
@@ -110,7 +112,6 @@ function ProjectCard({ project }: { project: Project }) {
   );
 }
 
-// ── Client: Create Project Modal with Razorpay ──────────────────────────────────
 function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void; onCreated: () => void, user: User }) {
   const router = useRouter();
   const [form, setForm] = useState({ title: "", description: "", budget: "", startDate: "", endDate: "" });
@@ -120,6 +121,7 @@ function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void;
   const [error, setError] = useState("");
   const [processingPayment, setProcessingPayment] = useState(false);
   const [isMatching, setIsMatching] = useState(false);
+
   const addInstrument = () => {
     const v = instrInput.trim();
     if (v && !instruments.includes(v)) setInstruments((p) => [...p, v]);
@@ -130,7 +132,6 @@ function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void;
     try {
       setProcessingPayment(true);
 
-      // Get Razorpay order from backend
       const orderRes = await fetch("/api/razorpay/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -153,7 +154,6 @@ function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void;
         image: "/logo.png",
         handler: async (response: any) => {
           try {
-            // Verify payment on backend
             const verifyRes = await fetch("/api/razorpay/verify", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -167,10 +167,7 @@ function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void;
             const verifyData = await verifyRes.json();
             if (verifyData.success) {
               toast.success("Payment successful! Project created.");
-
-              // start matching process
               await handleStartMatching(projectId);
-
               onCreated();
               onClose();
               router.push(`/client/project/${projectId}`);
@@ -199,7 +196,6 @@ function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void;
         },
       };
 
-      // Load Razorpay script and open checkout
       const script = document.createElement("script");
       script.src = "https://checkout.razorpay.com/v1/checkout.js";
       script.async = true;
@@ -219,23 +215,16 @@ function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void;
 
   const handleStartMatching = async (projectId: string) => {
     if (!projectId) return;
-
     setIsMatching(true);
-
     try {
       const res = await fetch("/api/match", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ projectId: projectId }),
       });
-
       const data = await res.json();
-
       if (data.success) {
         toast.success("Matching started! Finding best engineers...");
-        setTimeout(() => {
-          window.location.reload();
-        }, 1800);
       } else {
         toast.error(data.message || "Failed to start matching");
       }
@@ -252,24 +241,10 @@ function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void;
     setLoading(true);
 
     try {
-      // Validate form
-      if (form.title.length < 5) {
-        setError("Title must be at least 5 characters");
-        setLoading(false);
-        return;
-      }
-      if (form.description.length < 20) {
-        setError("Description must be at least 20 characters");
-        setLoading(false);
-        return;
-      }
-      if (Number(form.budget) < 500) {
-        setError("Budget must be at least ₹500");
-        setLoading(false);
-        return;
-      }
+      if (form.title.length < 5) { setError("Title must be at least 5 characters"); setLoading(false); return; }
+      if (form.description.length < 20) { setError("Description must be at least 20 characters"); setLoading(false); return; }
+      if (Number(form.budget) < 500) { setError("Budget must be at least ₹500"); setLoading(false); return; }
 
-      // Create project
       const res = await fetch("/api/client/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -289,13 +264,10 @@ function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void;
         setLoading(false);
         return;
       }
-      console.log("API RESPONSE:", data);
+      
       const projectId = data.projectId;
-      const advanceAmount = Number(form.budget) * 0.4; // 40% advance
-
+      const advanceAmount = Number(form.budget) * 0.4;
       setLoading(false);
-
-      // Redirect to Razorpay payment
       await handleRazorpayPayment(projectId, advanceAmount);
     } catch (err) {
       console.error("Project creation error:", err);
@@ -333,7 +305,6 @@ function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void;
                 disabled={loading || processingPayment}
                 required
               />
-              <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{form.title.length}/100</p>
             </div>
 
             <div>
@@ -348,7 +319,6 @@ function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void;
                 disabled={loading || processingPayment}
                 required
               />
-              <p className="text-[10px] text-[var(--text-muted)] mt-0.5">{form.description.length}/500</p>
             </div>
 
             <div>
@@ -448,25 +418,10 @@ function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void;
                 className="flex-1 px-4 py-2 text-white rounded-lg text-sm font-inter font-semibold disabled:opacity-50 flex items-center justify-center gap-2"
                 style={{ background: "var(--primary)" }}
               >
-                {loading ? (
-                  <>
-                    <Loader2 size={14} className="animate-spin" /> Creating...
-                  </>
-                ) : processingPayment ? (
-                  <>
-                    <Loader2 size={14} className="animate-spin" /> Opening Payment...
-                  </>
-                ) : (
-                  <>
-                    <Plus size={14} /> Create & Pay
-                  </>
-                )}
+                {loading ? <Loader2 size={14} className="animate-spin" /> : processingPayment ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} 
+                {processingPayment ? "Processing..." : "Create & Pay"}
               </button>
             </div>
-
-            <p className="text-[10px] text-[var(--text-muted)] text-center pt-2 border-t border-[var(--border)]">
-              ✅ Secure payments powered by Razorpay
-            </p>
           </form>
         </div>
       </div>
@@ -474,45 +429,66 @@ function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void;
   );
 }
 
-// ── Main Page ─────────────────────────────────────────────────────────────────
-export default function ProjectsPage() {
-
+export default function ClientProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL");
   const [showCreate, setShowCreate] = useState(false);
-  const { user } = useAuth() as {user: User};
+  const { user } = useAuth() as { user: User };
+
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   
+  const [stats, setStats] = useState({ total: 0, active: 0, completed: 0 });
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, statusFilter]);
+
   const fetchProjects = async () => {
     if (!user) return;
     setLoading(true);
     try {
-      const endpoint = "/api/client/projects";
-      const res = await fetch(endpoint);
+      const query = new URLSearchParams({
+        search: debouncedSearch,
+        status: statusFilter,
+        page: page.toString(),
+        limit: "15"
+      }).toString();
+
+      const res = await fetch(`/api/client/projects?${query}`);
       const data = await res.json();
-      if (data.success) setProjects(data.projects);
-    } catch { /* silent */ }
-    finally { setLoading(false); }
+      
+      if (data.success) {
+        setProjects(data.projects);
+        setTotalPages(data.pagination.totalPages);
+        setTotalItems(data.pagination.total);
+        setStats(data.globalStats);
+      }
+    } catch { 
+      // silent fail
+    } finally { 
+      setLoading(false); 
+    }
   };
 
-  useEffect(() => { fetchProjects(); }, [user]);
-
-  const filtered = useMemo(() => projects.filter((p) => {
-    const matchSearch = p.title.toLowerCase().includes(search.toLowerCase()) || p.description.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === "ALL" || p.status === statusFilter;
-    return matchSearch && matchStatus;
-  }), [projects, search, statusFilter]);
-
-  const stats = useMemo(() => ({
-    total: projects.length,
-    active: projects.filter((p) => ["IN_PROGRESS", "IN_REVIEW", "SEARCHING"].includes(p.status)).length,
-    completed: projects.filter((p) => p.status === "COMPLETED").length,
-  }), [projects]);
+  useEffect(() => { 
+    fetchProjects(); 
+  }, [debouncedSearch, statusFilter, page, user]);
 
   return (
     <DashboardShell>
-      <div className="space-y-6">
+      <div className="space-y-6 pb-10">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -523,7 +499,7 @@ export default function ProjectsPage() {
               Manage your projects and track progress
             </p>
           </div>
-          <button onClick={() => setShowCreate(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm font-semibold" style={{ background: "var(--primary)" }}>
+          <button onClick={() => setShowCreate(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm font-semibold hover:bg-[#e89b45] transition-colors" style={{ background: "var(--primary)" }}>
             <Plus size={15} /> New Project
           </button>
         </div>
@@ -535,7 +511,7 @@ export default function ProjectsPage() {
             { label: "Active", value: stats.active, icon: <Clock size={16} />, color: "text-green-600" },
             { label: "Completed", value: stats.completed, icon: <CheckCircle size={16} />, color: "text-blue-600" },
           ].map((s) => (
-            <div key={s.label} className="bg-white border border-[var(--border)] rounded-xl p-4 flex items-center gap-3">
+            <div key={s.label} className="bg-white border border-[var(--border)] rounded-xl p-4 flex items-center gap-3 shadow-sm">
               <div className={`${s.color}`}>{s.icon}</div>
               <div>
                 <p className={`text-xl font-bold font-id ${s.color}`}>{s.value}</p>
@@ -545,23 +521,23 @@ export default function ProjectsPage() {
           ))}
         </div>
 
-        {/* Filters */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="relative">
+        {/* Responsive Search & Filters */}
+        <div className="flex flex-col md:flex-row items-center gap-3 bg-white p-3 rounded-xl border border-[var(--border)] shadow-sm">
+          <div className="relative w-full md:w-64 shrink-0">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
             <input
               placeholder="Search projects..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 pr-4 py-2 border border-[var(--border)] rounded-lg text-sm font-inter bg-white text-[var(--text-primary)] outline-none focus:ring-2 focus:ring-[var(--primary)] w-52"
+              className="w-full pl-9 pr-4 py-2 border border-[var(--border)] rounded-lg text-sm font-inter bg-gray-50 text-[var(--text-primary)] outline-none focus:ring-1 focus:ring-[var(--primary)]"
             />
           </div>
-          <div className="relative">
+          <div className="relative w-full md:w-auto shrink-0">
             <Filter size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="pl-8 pr-3 py-2 border border-[var(--border)] rounded-lg text-sm font-inter bg-white text-[var(--text-primary)] outline-none appearance-none cursor-pointer"
+              className="w-full md:w-auto pl-8 pr-8 py-2 border border-[var(--border)] rounded-lg text-sm font-inter bg-gray-50 text-[var(--text-primary)] outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[var(--primary)]"
             >
               <option value="ALL">All Status</option>
               {Object.entries(STATUS_META).map(([k, v]) => (
@@ -569,7 +545,9 @@ export default function ProjectsPage() {
               ))}
             </select>
           </div>
-          <span className="text-xs font-inter text-[var(--text-muted)]">{filtered.length} shown</span>
+          <span className="text-xs font-inter text-[var(--text-muted)] px-2 font-medium w-full md:w-auto text-center md:text-left mt-1 md:mt-0">
+            {totalItems} results found
+          </span>
         </div>
 
         {/* Content */}
@@ -577,18 +555,46 @@ export default function ProjectsPage() {
           <div className="flex items-center justify-center py-24">
             <Loader2 className="animate-spin text-[var(--primary)]" size={36} />
           </div>
-        ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
+        ) : projects.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 text-center bg-white border border-[var(--border)] rounded-xl">
             <XCircle size={40} className="text-[var(--border)] mb-3" />
             <p className="text-sm font-inter font-semibold text-[var(--text-primary)]">No projects found</p>
             <p className="text-xs font-inter text-[var(--text-muted)] mt-1">
-              {projects.length === 0 ? "Create your first project to get started." : "Try adjusting your search or filter."}
+              {search === "" && statusFilter === "ALL" ? "Create your first project to get started." : "Try adjusting your search or filter."}
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map((p) => <ProjectCard key={p.id} project={p} />)}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {projects.map((p) => <ProjectCard key={p.id} project={p} />)}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-6">
+                <span className="text-sm text-[var(--text-muted)] font-inter">
+                  Page <span className="font-semibold text-[var(--text-primary)]">{page}</span> of {totalPages}
+                </span>
+                
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className="flex items-center gap-1 px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm font-inter font-medium text-[var(--text-secondary)] bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronLeft size={16} /> Prev
+                  </button>
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                    className="flex items-center gap-1 px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm font-inter font-medium text-[var(--text-secondary)] bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Next <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 

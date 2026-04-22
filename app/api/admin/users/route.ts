@@ -78,7 +78,7 @@ export async function GET(req: NextRequest) {
     if (roleFilter === "ENGINEER" && statusFilter === "ALL") {
       const orderMap: Record<string, number> = { PENDING: 1, APPROVED: 2, REJECTED: 3 };
       
-      formattedUsers.sort((a, b) => {
+      formattedUsers.sort((a: any, b: any) => {
         const orderA = orderMap[a?.status as string] || 99;
         const orderB = orderMap[b?.status as string] || 99;
         

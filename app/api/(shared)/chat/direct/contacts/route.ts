@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUser } from "@/lib/auth";
+import { Role } from "@prisma/client";
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,8 +17,10 @@ export async function GET(req: NextRequest) {
     const allowedContacts: any[] = [];
     const projectMap = new Map<string, string[]>(); 
 
-    let targetRoles = ["ADMIN", "CLIENT", "ENGINEER"];
-    if (roleFilter !== "ALL") targetRoles = [roleFilter];
+    let targetRoles: Role[] = ["ADMIN", "CLIENT", "ENGINEER"];
+    if (roleFilter !== "ALL") {
+      targetRoles = [roleFilter as Role];
+    }
 
     if (user.role === "ADMIN") {
       const users = await prisma.user.findMany({

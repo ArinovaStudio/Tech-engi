@@ -8,11 +8,11 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
   const [messages, setMessages] = useState<any[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [editingMessage, setEditingMessage] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
   
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedMessageIds, setSelectedMessageIds] = useState<string[]>([]);
   
-  // Pagination State
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -22,7 +22,8 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
 
   // Fetch Initial History when contact changes
   useEffect(() => {
-    if (!selectedContact) return;
+    if (!selectedContact || !currentUser) return;
+    
     const fetchInitialHistory = async () => {
       const res = await fetch(`/api/chat/direct/history/${selectedContact.id}`);
       const data = await res.json();
@@ -31,14 +32,20 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
         setCursor(data.nextCursor);
         setHasMore(!!data.nextCursor);
         scrollToBottom();
+
+        data.messages.forEach((msg: any) => {
+          if (msg.senderId !== currentUser.id && !msg.isRead) {
+            globalSocket.emit("mark_dm_read", { messageId: msg.id, readerId: currentUser.id });
+          }
+        });
       }
     };
     fetchInitialHistory();
     globalSocket.emit("join_dm", { currentUserId: currentUser?.id, targetUserId: selectedContact.id });
     
-    // Reset selection state when switching chats
     setIsSelectMode(false);
     setSelectedMessageIds([]);
+    setError(null);
   }, [selectedContact, currentUser]);
 
   // Load More History (Pagination)
@@ -57,6 +64,13 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
         setCursor(data.nextCursor);
         setHasMore(!!data.nextCursor);
         
+        // Emit read receipts for older unread messages too
+        data.messages.forEach((msg: any) => {
+          if (msg.senderId !== currentUser?.id && !msg.isRead) {
+            globalSocket.emit("mark_dm_read", { messageId: msg.id, readerId: currentUser?.id });
+          }
+        });
+
         setTimeout(() => {
           if (scrollContainerRef.current) {
             scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight - prevHeight;
@@ -69,6 +83,8 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
 
   // Socket Listeners for Real-Time Updates
   useEffect(() => {
+    if (!currentUser) return;
+
     const handleReceiveMessage = (newMessage: any) => {
       if (selectedContact && (newMessage.senderId === selectedContact.id || newMessage.senderId === currentUser?.id)) {
         setMessages(prev => {
@@ -83,6 +99,11 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
           return [...prev, newMessage];
         });
         scrollToBottom();
+
+        // Emit read receipt instantly if we receive a message from the contact while chat is open
+        if (newMessage.senderId !== currentUser.id) {
+          globalSocket.emit("mark_dm_read", { messageId: newMessage.id, readerId: currentUser.id });
+        }
       }
       mutateContacts();
     };
@@ -101,16 +122,31 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
       setSelectedMessageIds(prev => prev.filter(id => !messageIds.includes(id)));
     };
 
+    // Handle Read Receipts to turn ticks blue
+    const handleReadReceipt = ({ messageId }: { messageId: string }) => {
+      setMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, isRead: true } : m)));
+    };
+
+    // Handle Errors
+    const handleDmError = ({ message }: { message: string }) => {
+      setError(message);
+      setTimeout(() => setError(null), 4000); // Auto-hide after 4s
+    };
+
     globalSocket.on("receive_dm", handleReceiveMessage);
     globalSocket.on("dm_edited", handleMessageEdited);
     globalSocket.on("dm_deleted", handleMessageDeleted);
     globalSocket.on("mass_dm_deleted", handleMassDeleted);
+    globalSocket.on("dm_read_receipt", handleReadReceipt);
+    globalSocket.on("dm_error", handleDmError);
 
     return () => {
       globalSocket.off("receive_dm", handleReceiveMessage);
       globalSocket.off("dm_edited", handleMessageEdited);
       globalSocket.off("dm_deleted", handleMessageDeleted);
       globalSocket.off("mass_dm_deleted", handleMassDeleted);
+      globalSocket.off("dm_read_receipt", handleReadReceipt);
+      globalSocket.off("dm_error", handleDmError);
     };
   }, [selectedContact, currentUser, mutateContacts]);
 
@@ -123,7 +159,7 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
   };
 
   const handleMassDelete = () => {
-    if (selectedMessageIds.length === 0) return;
+    if (selectedMessageIds.length === 0 || !currentUser) return;
     
     setMessages(prev => prev.map(m => selectedMessageIds.includes(m.id) ? { ...m, isDeleted: true, content: "" } : m));
     
@@ -140,6 +176,7 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputMessage.trim() || !selectedContact || !currentUser) return;
+    setError(null);
 
     if (editingMessage) {
       globalSocket.emit("edit_dm", { messageId: editingMessage.id, senderId: currentUser.id, content: inputMessage.trim() });
@@ -251,6 +288,14 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
         })}
         <div ref={messagesEndRef} />
       </div>
+
+      {/* NEW: Error Banner */}
+      {error && (
+        <div className="mx-6 mb-2 mt-2 px-3 py-2 bg-red-50 border border-red-200 flex items-center justify-between rounded-md">
+          <p className="text-xs font-inter text-red-600 font-medium">{error}</p>
+          <button onClick={() => setError(null)}><X size={13} className="text-red-400 hover:text-red-600" /></button>
+        </div>
+      )}
 
       {/* Input Area */}
       <div className={`p-4 bg-white border-t border-[var(--border)] transition-opacity ${isSelectMode ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>

@@ -1,228 +1,266 @@
 "use client";
-import { useEffect, useRef, useState, useCallback } from "react";
-import { useSession } from "next-auth/react";
-import { Send, Pencil, Trash2, X, Check, ChevronUp } from "lucide-react";
-import { getSocket } from "@/lib/socket";
 
-interface Sender {
-  id: string;
-  name: string | null;
-  role: string;
-  image: string | null;
-}
-
-interface Message {
-  id: string;
-  content: string;
-  senderId: string;
-  isEdited: boolean;
-  createdAt: string;
-  sender: Sender;
-}
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import { useAuth } from "@/app/hooks/useAuth";
+import { Send, X, CheckSquare, Trash2, Loader2, ChevronUp } from "lucide-react";
+import { globalSocket } from "@/components/SocketAnnouncer";
+import MessageItem from "../chat/direct/MessageItem";
 
 export default function ChatTab({ projectId }: { projectId: string }) {
-  const { data: session } = useSession();
-  const userId = session?.user?.id;
+  const { user } = useAuth();
+  const isAdmin = user?.role === "ADMIN";
 
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editContent, setEditContent] = useState("");
+  const [messages, setMessages] = useState<any[]>([]);
+  const [inputMessage, setInputMessage] = useState("");
+  const [editingMessage, setEditingMessage] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  const [isSelectMode, setIsSelectMode] = useState(false);
+  const [selectedMessageIds, setSelectedMessageIds] = useState<string[]>([]);
+  
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
-  const isAdmin = session?.user?.role === "ADMIN";
+  const [loadingInitial, setLoadingInitial] = useState(true);
+  
+  const [roomParticipants, setRoomParticipants] = useState<{ clientId: string, engineerId: string } | null>(null);
+  
   const bottomRef = useRef<HTMLDivElement>(null);
-  const socket = getSocket();
 
+  // Fetch Chat History & Participants
   const loadMessages = useCallback(async (cursor?: string) => {
-    const url = `/api/chat/${projectId}${cursor ? `?cursor=${cursor}` : ""}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data.success) {
-      if (cursor) {
-        setMessages((prev) => [...data.messages, ...prev]);
-      } else {
-        setMessages(data.messages);
-        setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+    try {
+      const url = `/api/chat/${projectId}${cursor ? `?cursor=${cursor}` : ""}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      
+      if (data.success) {
+        if (cursor) {
+          setMessages((prev) => [...data.messages, ...prev]);
+        } else {
+          setMessages(data.messages);
+          if (data.clientUserId && data.engineerUserId) {
+            setRoomParticipants({ clientId: data.clientUserId, engineerId: data.engineerUserId });
+          }
+          setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+        }
+        setNextCursor(data.nextCursor);
+
+        if (!isAdmin && user) {
+          data.messages.forEach((msg: any) => {
+            if (msg.senderId !== user.id && !msg.isRead) {
+              globalSocket.emit("mark_dm_read", { messageId: msg.id, readerId: user.id });
+            }
+          });
+        }
       }
-      setNextCursor(data.nextCursor);
+    } catch (err) {
+      console.error("Failed to load project chat", err);
+    } finally {
+      setLoadingInitial(false);
+      setLoadingMore(false);
     }
-  }, [projectId]);
+  }, [projectId, user, isAdmin]);
 
-  // Join room + load history on mount
+  // Initial Load
   useEffect(() => {
-    console.log("USER ID:", userId);
-    if (!userId || !projectId) return;
-    socket.emit("join_project", { projectId, userId });
-    loadMessages();
-    return () => { socket.emit("leave_project", { projectId }); };
-  }, [projectId, userId, socket, loadMessages]);
+    if (user && projectId) {
+      loadMessages();
+    }
+  }, [user, projectId, loadMessages]);
 
-  // Socket listeners
+  // Join Socket Room & Listen to Events
   useEffect(() => {
-    socket.on("receive_message", (msg: Message) => {
-      setMessages((prev) => [...prev, msg]);
-      setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+    if (!roomParticipants || !user) return;
+
+    globalSocket.emit("join_dm", { 
+      currentUserId: roomParticipants.clientId, 
+      targetUserId: roomParticipants.engineerId 
     });
-    socket.on("message_edited", (updated: Message) => {
-      setMessages((prev) => prev.map((m) => (m.id === updated.id ? updated : m)));
-    });
-    socket.on("message_deleted", ({ messageId }: { messageId: string }) => {
-      setMessages((prev) => prev.filter((m) => m.id !== messageId));
-    });
-    socket.on("message_error", ({ message }: { message: string }) => setError(message));
-    return () => {
-      socket.off("receive_message");
-      socket.off("message_edited");
-      socket.off("message_deleted");
-      socket.off("message_error");
+
+    const handleReceiveMessage = (msg: any) => {
+      setMessages((prev) => {
+        if (msg.senderId === user.id) {
+          const pendingIdx = prev.findIndex(m => m.isPending);
+          if (pendingIdx !== -1) {
+            const newArr = [...prev];
+            newArr[pendingIdx] = msg;
+            return newArr;
+          }
+        }
+        return [...prev, msg];
+      });
+      setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+
+      if (!isAdmin && msg.senderId !== user.id) {
+        globalSocket.emit("mark_dm_read", { messageId: msg.id, readerId: user.id });
+      }
     };
-  }, [socket]);
 
-  const sendMessage = () => {
-    if (!input.trim() || !userId) return;
+    const handleMessageEdited = (updated: any) => setMessages((prev) => prev.map((m) => (m.id === updated.id ? updated : m)));
+    const handleMessageDeleted = ({ messageId }: { messageId: string }) => setMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, isDeleted: true, content: "" } : m)));
+    const handleMassDeleted = ({ messageIds }: { messageIds: string[] }) => {
+      setMessages(prev => prev.map(m => messageIds.includes(m.id) ? { ...m, isDeleted: true, content: "" } : m));
+      setSelectedMessageIds(prev => prev.filter(id => !messageIds.includes(id)));
+    };
+    const handleReadReceipt = ({ messageId }: { messageId: string }) => {
+      setMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, isRead: true } : m)));
+    };
+    
+    const handleDmError = ({ message }: { message: string }) => {
+      setError(message);
+      setTimeout(() => setError(null), 4000);
+    };
+
+    globalSocket.on("receive_dm", handleReceiveMessage);
+    globalSocket.on("dm_edited", handleMessageEdited);
+    globalSocket.on("dm_deleted", handleMessageDeleted);
+    globalSocket.on("mass_dm_deleted", handleMassDeleted);
+    globalSocket.on("dm_read_receipt", handleReadReceipt);
+    globalSocket.on("dm_error", handleDmError);
+
+    return () => {
+      globalSocket.off("receive_dm", handleReceiveMessage);
+      globalSocket.off("dm_edited", handleMessageEdited);
+      globalSocket.off("dm_deleted", handleMessageDeleted);
+      globalSocket.off("mass_dm_deleted", handleMassDeleted);
+      globalSocket.off("dm_read_receipt", handleReadReceipt);
+      globalSocket.off("dm_error", handleDmError);
+    };
+  }, [roomParticipants, user, isAdmin]);
+
+  const receiverId = user?.id === roomParticipants?.clientId ? roomParticipants?.engineerId : roomParticipants?.clientId;
+
+  // Action Handlers
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!inputMessage.trim() || !user || !receiverId || isAdmin) return;
     setError(null);
-    socket.emit("send_message", { projectId, senderId: userId, content: input.trim() });
-    setInput("");
+
+    if (editingMessage) {
+      globalSocket.emit("edit_dm", { messageId: editingMessage.id, senderId: user.id, content: inputMessage.trim() });
+      setMessages(prev => prev.map(m => m.id === editingMessage.id ? { ...m, content: inputMessage.trim(), isEdited: true } : m));
+      setEditingMessage(null);
+    } else {
+      const tempMessage = { id: `temp_${Date.now()}`, senderId: user.id, content: inputMessage.trim(), createdAt: new Date().toISOString(), isPending: true };
+      setMessages(prev => [...prev, tempMessage]);
+      globalSocket.emit("send_dm", { senderId: user.id, receiverId, content: inputMessage.trim() });
+      setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+    }
+    setInputMessage("");
   };
 
-  const submitEdit = (messageId: string) => {
-    if (!editContent.trim() || !userId) return;
+  const handleMassDelete = () => {
+    if (selectedMessageIds.length === 0 || !user || !receiverId) return;
     setError(null);
-    socket.emit("edit_message", { messageId, senderId: userId, content: editContent.trim() });
-    setEditingId(null);
+    setMessages(prev => prev.map(m => selectedMessageIds.includes(m.id) ? { ...m, isDeleted: true, content: "" } : m));
+    globalSocket.emit("mass_delete_dm", { messageIds: selectedMessageIds, senderId: user.id, receiverId });
+    setIsSelectMode(false);
+    setSelectedMessageIds([]);
   };
 
-  const deleteMessage = (messageId: string) => {
-    if (!userId) return;
-    socket.emit("delete_message", { messageId, senderId: userId });
-  };
+  const toggleSelectMessage = (id: string) => setSelectedMessageIds(prev => prev.includes(id) ? prev.filter(msgId => msgId !== id) : [...prev, id]);
 
-  const loadMore = async () => {
-    if (!nextCursor) return;
-    setLoadingMore(true);
-    await loadMessages(nextCursor);
-    setLoadingMore(false);
-  };
-
-  const initials = (name: string | null) =>
-    name ? name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) : "?";
-
-  const formatTime = (iso: string) =>
-    new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  if (loadingInitial) {
+    return <div className="flex items-center justify-center h-[500px] bg-white border border-[var(--border)]"><Loader2 className="animate-spin text-[var(--primary)]" /></div>;
+  }
 
   return (
-    <div className="flex flex-col bg-white border border-[var(--border)]" style={{ height: "calc(100vh - 220px)" }}>
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+    <div className="flex flex-col bg-white border border-[var(--border)] relative" style={{ height: "calc(100vh - 220px)" }}>
+      
+      {/* Header Actions (For Mass Delete) - Hidden from Admin */}
+      {!isAdmin && (
+        <div className="absolute top-4 right-6 z-10">
+          {isSelectMode ? (
+            <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg shadow-sm border border-gray-200">
+              <button onClick={() => { setIsSelectMode(false); setSelectedMessageIds([]); }} className="text-xs font-medium text-gray-500 hover:text-gray-700 px-2 py-1">Cancel</button>
+              <button onClick={handleMassDelete} disabled={selectedMessageIds.length === 0} className="text-xs font-semibold bg-red-50 text-red-600 hover:bg-red-100 px-2 py-1 rounded disabled:opacity-50 flex items-center gap-1 transition-colors">
+                <Trash2 size={12} /> Delete {selectedMessageIds.length > 0 && `(${selectedMessageIds.length})`}
+              </button>
+            </div>
+          ) : (
+             <button onClick={() => setIsSelectMode(true)} className="text-xs font-medium text-gray-400 hover:text-[var(--primary)] flex items-center gap-1 bg-white px-2 py-1 rounded shadow-sm border border-gray-100 transition-colors">
+              <CheckSquare size={14} /> Select
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto px-6 py-6 bg-[#f0f2f5] space-y-2">
         {nextCursor && (
-          <div className="flex justify-center">
-            <button
-              onClick={loadMore}
-              disabled={loadingMore}
-              className="flex items-center gap-1 text-xs font-inter text-[var(--text-muted)] hover:text-[var(--primary)] transition-colors"
-            >
-              <ChevronUp size={14} />
-              {loadingMore ? "Loading..." : "Load older messages"}
+          <div className="flex justify-center mb-4">
+            <button onClick={() => { setLoadingMore(true); loadMessages(nextCursor); }} disabled={loadingMore} className="flex items-center gap-1 text-xs font-inter text-[var(--text-muted)] bg-white px-3 py-1.5 rounded-full shadow-sm hover:text-[var(--primary)] transition-colors">
+              {loadingMore ? <Loader2 size={14} className="animate-spin" /> : <><ChevronUp size={14} /> Load older messages</>}
             </button>
           </div>
         )}
 
         {messages.length === 0 && (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-xs font-inter text-[var(--text-muted)]">No messages yet. Say hello!</p>
-          </div>
+          <div className="flex items-center justify-center h-full"><p className="text-sm font-inter text-[var(--text-muted)]">No messages yet.</p></div>
         )}
 
-        {messages.map((msg) => {
-          const isOwn = msg.senderId === userId;
+        {messages.map((msg, index) => {
+          const isMine = isAdmin ? msg.sender?.role === "ENGINEER" : msg.senderId === user?.id; 
+
+          const showAdminLabel = isAdmin && (index === 0 || messages[index - 1].senderId !== msg.senderId);
+
           return (
-            <div key={msg.id} className={`flex gap-2.5 group ${isOwn ? "flex-row-reverse" : ""}`}>
-              <div className="w-7 h-7 shrink-0 flex items-center justify-center bg-[var(--primary-light)] text-[var(--primary)] text-[10px] font-bold font-id overflow-hidden">
-                {msg.sender.image
-                  ? <img src={msg.sender.image} className="w-7 h-7 object-cover" alt="" />
-                  : initials(msg.sender.name)
-                }
-              </div>
-
-              <div className={`max-w-[65%] flex flex-col gap-0.5 ${isOwn ? "items-end" : "items-start"}`}>
-                <div className={`flex items-center gap-2 ${isOwn ? "flex-row-reverse" : ""}`}>
-                  <span className="text-[10px] font-inter text-[var(--text-muted)]">{msg.sender.name ?? "Unknown"}</span>
-                  <span className="text-[10px] font-inter text-[var(--text-muted)]">{formatTime(msg.createdAt)}</span>
-                  {msg.isEdited && <span className="text-[9px] font-inter text-[var(--text-muted)] italic">edited</span>}
-                </div>
-
-                {editingId === msg.id ? (
-                  <div className="flex items-center gap-1.5">
-                    <input
-                      value={editContent}
-                      onChange={(e) => setEditContent(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && submitEdit(msg.id)}
-                      className="text-xs font-inter border border-[var(--border)] px-2 py-1.5 outline-none focus:border-[var(--primary)] w-48 text-gray-900"
-                      autoFocus
-                    />
-                    <button onClick={() => submitEdit(msg.id)} className="text-green-600 hover:text-green-700"><Check size={14} /></button>
-                    <button onClick={() => setEditingId(null)} className="text-gray-400 hover:text-gray-600"><X size={14} /></button>
-                  </div>
-                ) : (
-                  <div className={`relative px-3 py-2 text-xs font-inter leading-relaxed
-                    ${isOwn ? "bg-[var(--primary)] text-white" : "bg-gray-100 text-[var(--text-primary)]"}`}
-                  >
-                    {msg.content}
-                    {isOwn && (
-                      <div className="absolute -top-5 right-0 hidden group-hover:flex items-center gap-1 bg-white border border-[var(--border)] shadow-sm px-1.5 py-0.5">
-                        <button onClick={() => { setEditingId(msg.id); setEditContent(msg.content); }} className="text-gray-400 hover:text-[var(--primary)] transition-colors">
-                          <Pencil size={11} />
-                        </button>
-                        <button onClick={() => deleteMessage(msg.id)} className="text-gray-400 hover:text-red-500 transition-colors">
-                          <Trash2 size={11} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+            <div key={msg.id} className="flex flex-col w-full">
+              {/* Admin UI Labels */}
+              {showAdminLabel && (
+                <span className={`text-[10px] font-semibold text-gray-400 mb-1 px-3 ${isMine ? 'text-right' : 'text-left'}`}>
+                  {msg.sender?.name} ({msg.sender?.role === "ENGINEER" ? "Engineer" : "Client"})
+                </span>
+              )}
+              
+              <MessageItem 
+                msg={msg} 
+                isMine={isMine}
+                onEdit={(m: any) => { setEditingMessage(m); setInputMessage(m.content); }}
+                onDelete={(id: string) => globalSocket.emit("delete_dm", { messageId: id, senderId: user?.id })}
+                isSelectMode={isSelectMode && isMine && !isAdmin} 
+                isSelected={selectedMessageIds.includes(msg.id)}
+                onToggleSelect={toggleSelectMessage}
+              />
             </div>
           );
         })}
         <div ref={bottomRef} />
       </div>
 
-      {/* Error */}
+      {/* Error Banner Display */}
       {error && (
-        <div className="mx-5 mb-2 px-3 py-2 bg-red-50 border border-red-200 flex items-center justify-between">
-          <p className="text-xs font-inter text-red-600">{error}</p>
-          <button onClick={() => setError(null)}><X size={13} className="text-red-400" /></button>
+        <div className="mx-5 mb-2 mt-2 px-3 py-2 bg-red-50 border border-red-200 flex items-center justify-between rounded-md">
+          <p className="text-xs font-inter text-red-600 font-medium">{error}</p>
+          <button onClick={() => setError(null)}><X size={13} className="text-red-400 hover:text-red-600" /></button>
         </div>
       )}
 
-
-      {/* // In the input section at the bottom: */}
-      {!isAdmin && (
-        <div className="px-5 py-3 border-t border-[var(--border)] flex items-center gap-3">
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-            placeholder="Type a message..."
-            className="flex-1 text-gray-900 text-sm font-inter border border-[var(--border)] px-3 py-2 outline-none focus:border-[var(--primary)] transition-colors"
-          />
-          <button
-            onClick={sendMessage}
-            disabled={!input.trim()}
-            className="w-9 h-9 bg-[var(--primary)] flex items-center justify-center text-white disabled:opacity-40 hover:bg-[#f09d3e] transition-colors shrink-0"
-          >
-            <Send size={15} />
-          </button>
+      {/* Input Area */}
+      {isAdmin ? (
+        <div className="p-4 bg-gray-50 border-t border-[var(--border)] flex justify-center">
+          <p className="text-xs font-inter text-gray-500 font-medium">You are viewing this project chat as an Admin (Read-Only).</p>
         </div>
-      )}
-
-      {isAdmin && (
-        <div className="px-5 py-3 border-t border-[var(--border)]">
-          <p className="text-xs font-inter text-[var(--text-muted)] text-center">
-            You are viewing this chat as an admin (read-only)
-          </p>
+      ) : (
+        <div className={`p-4 bg-white border-t border-[var(--border)] transition-opacity ${isSelectMode ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+          {editingMessage && (
+            <div className="flex items-center justify-between bg-orange-50 px-4 py-2 rounded-t-lg border-b border-orange-100 text-sm text-orange-800">
+              <span>Editing message...</span>
+              <button onClick={() => { setEditingMessage(null); setInputMessage(""); }}><X size={16} /></button>
+            </div>
+          )}
+          <form onSubmit={handleSubmit} className="flex gap-2 mt-2">
+            <input
+              type="text"
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              placeholder="Type a message..."
+              className="flex-1 bg-gray-100 border-none rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--primary)] font-inter text-gray-900"
+            />
+            <button type="submit" disabled={!inputMessage.trim()} className="w-11 h-11 shrink-0 bg-[#FFAE58] text-white rounded-full flex items-center justify-center hover:bg-[#e89b45] disabled:opacity-50">
+              <Send size={18} className="ml-1" />
+            </button>
+          </form>
         </div>
       )}
     </div>

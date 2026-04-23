@@ -12,32 +12,54 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ proj
     }
 
     const { projectId } = await params;
-
     const { searchParams } = new URL(req.url);
     const cursor = searchParams.get("cursor");
 
     const project = await prisma.project.findUnique({
       where: { id: projectId },
-      include: { client: true, engineer: true }
+      include: {
+        client: { select: { userId: true } },
+        engineer: { select: { userId: true } }
+      }
     });
 
     if (!project) {
       return NextResponse.json({ success: false, message: "Project not found" }, { status: 404 });
     }
 
-    const isParticipant = user.role === "ADMIN" || 
-    (user.role === "CLIENT" && project.client?.userId === user.id) ||
-    (user.role === "ENGINEER" && project.engineer?.userId === user.id);
+    const clientUserId = project.client?.userId;
+    const engineerUserId = project.engineer?.userId;
 
-    if (!isParticipant) {
+    const isAdmin = user.role === "ADMIN";
+    const isClient = user.role === "CLIENT" && user.id === clientUserId;
+    const isEngineer = user.role === "ENGINEER" && user.id === engineerUserId;
+
+    if (!isAdmin && !isClient && !isEngineer) {
       return NextResponse.json({ success: false, message: "You don't have permission to view this project" }, { status: 403 });
     }
 
-    const messages = await prisma.chatMessage.findMany({
+    if (!engineerUserId || !clientUserId) {
+      return NextResponse.json({ success: true, messages: [], nextCursor: null }, { status: 200 });
+    }
+
+    const conversation = await prisma.conversation.findFirst({
+      where: {
+        OR: [
+          { user1Id: clientUserId, user2Id: engineerUserId },
+          { user1Id: engineerUserId, user2Id: clientUserId }
+        ]
+      }
+    });
+
+    if (!conversation) {
+      return NextResponse.json({ success: true, messages: [], nextCursor: null }, { status: 200 });
+    }
+
+    const messages = await prisma.directMessage.findMany({
       take: MESSAGES_PER_PAGE,
       skip: cursor ? 1 : 0,
       cursor: cursor ? { id: cursor } : undefined,
-      where: { projectId },
+      where: { conversationId: conversation.id },
       orderBy: { createdAt: "desc" },
       include: {
         sender: { select: { id: true, name: true, role: true, image: true } }
@@ -48,7 +70,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ proj
 
     const nextCursor = messages.length === MESSAGES_PER_PAGE ? sortedMessages[0].id : null;
 
-    return NextResponse.json({ success: true, messages: sortedMessages, nextCursor: nextCursor }, { status: 200 });
+    return NextResponse.json({ success: true, messages: sortedMessages, nextCursor, clientUserId, engineerUserId }, { status: 200 });
 
   } catch {
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });

@@ -3,7 +3,6 @@ import { createServer } from "http";
 import { parse } from "url";
 import next from "next";
 import { Server } from "socket.io";
-import registerChatHandlers from "./socket/chatHandler";
 import registerDirectChatHandlers from "./socket/directChatHandler";
 
 const dev = process.env.NODE_ENV !== "production";
@@ -56,7 +55,6 @@ app.prepare().then(() => {
       socket.emit("multiple_users_status_result", statuses);
     });
 
-    registerChatHandlers(io, socket);
     registerDirectChatHandlers(io, socket);
 
     socket.on("disconnect", () => {

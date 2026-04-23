@@ -1,7 +1,6 @@
 "use client";
 
 import { useAuth } from "@/app/hooks/useAuth";
-import DashboardShell from "@/components/layout/DashboardShell";
 import { Plus, Search, Filter, Users, Calendar, AlertCircle, Clock, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -264,7 +263,7 @@ function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void;
         setLoading(false);
         return;
       }
-      
+
       const projectId = data.projectId;
       const advanceAmount = Number(form.budget) * 0.4;
       setLoading(false);
@@ -418,7 +417,7 @@ function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void;
                 className="flex-1 px-4 py-2 text-white rounded-lg text-sm font-inter font-semibold disabled:opacity-50 flex items-center justify-center gap-2"
                 style={{ background: "var(--primary)" }}
               >
-                {loading ? <Loader2 size={14} className="animate-spin" /> : processingPayment ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />} 
+                {loading ? <Loader2 size={14} className="animate-spin" /> : processingPayment ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                 {processingPayment ? "Processing..." : "Create & Pay"}
               </button>
             </div>
@@ -441,7 +440,7 @@ export default function ClientProjectsPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  
+
   const [stats, setStats] = useState({ total: 0, active: 0, completed: 0 });
 
   useEffect(() => {
@@ -468,26 +467,26 @@ export default function ClientProjectsPage() {
 
       const res = await fetch(`/api/client/projects?${query}`);
       const data = await res.json();
-      
+
       if (data.success) {
         setProjects(data.projects);
         setTotalPages(data.pagination.totalPages);
         setTotalItems(data.pagination.total);
         setStats(data.globalStats);
       }
-    } catch { 
+    } catch {
       // silent fail
-    } finally { 
-      setLoading(false); 
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => { 
-    fetchProjects(); 
+  useEffect(() => {
+    fetchProjects();
   }, [debouncedSearch, statusFilter, page, user]);
 
   return (
-    <DashboardShell>
+    <>
       <div className="space-y-6 pb-10">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -575,7 +574,7 @@ export default function ClientProjectsPage() {
                 <span className="text-sm text-[var(--text-muted)] font-inter">
                   Page <span className="font-semibold text-[var(--text-primary)]">{page}</span> of {totalPages}
                 </span>
-                
+
                 <div className="flex gap-2">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -599,6 +598,6 @@ export default function ClientProjectsPage() {
       </div>
 
       {showCreate && <CreateProjectModal onClose={() => setShowCreate(false)} onCreated={fetchProjects} user={user} />}
-    </DashboardShell>
+    </>
   );
 }

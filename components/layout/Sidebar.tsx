@@ -5,7 +5,11 @@ import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, CreditCard, Users, MessageSquare, LogOut, ChevronLeft, ChevronRight,
-  User, UserKeyIcon, FolderKanban
+  User, UserKeyIcon, FolderKanban,
+  Presentation,
+  Lightbulb,
+  FileUp,
+  Handshake
 } from "lucide-react";
 import { useAuth } from "@/app/hooks/useAuth";
 
@@ -28,8 +32,14 @@ const ADMIN_NAV: NavItem[] = [
 
 const CLIENT_NAV: NavItem[] = [
   { label: "Dashboard", icon: <LayoutDashboard size={18} />, href: "/client" },
-  { label: "Projects", icon: <FolderKanban size={18} />, href: "/client/project" },
+  { label: "Documents", icon: <FileUp size={18} />, href: "/client/documents" },
+  { label: "Features", icon: <Lightbulb size={18} />, href: "/client/feature-requests" },
+  { label: "Feedback", icon: <Handshake size={18} />, href: "/client/feedbacks" },
   { label: "Message", icon: <MessageSquare size={18} />, href: "/client/message" },
+  { label: "Meetings", icon: <Presentation size={18} />, href: "/client/schedule-meet" },
+  { label: "Projects", icon: <FolderKanban size={18} />, href: "/client/project" },
+  { label: "Payout", icon: <CreditCard size={18} />, href: "/client/account" },
+  { label: "Profile", icon: <User size={18} />, href: "/client/profile" },
 ];
 
 const ENGINEER_NAV: NavItem[] = [

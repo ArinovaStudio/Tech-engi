@@ -9,7 +9,7 @@ import RiskBlockage from '@/components/clients/analytics/RiskBlockage';
 import Milestones from '@/components/clients/analytics/Milestones';
 import BudgetAndDocs from '@/components/clients/analytics/BudgetAndDocs';
 import DesignPreviewSection from '@/components/clients/analytics/DesignPreviewSection';
-import { useAuth } from '@/app/hooks/useAuth';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Project {
   id: string;

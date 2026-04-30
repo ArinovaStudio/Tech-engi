@@ -103,8 +103,7 @@ export async function GET( req: NextRequest, { params }: { params: Promise<{ pro
     }
 
     return NextResponse.json({ success: true, stats, transactions }, { status: 200 });
-  } catch (e) {
-    console.log("Payout Fetch Error:", e);
+  } catch {
     return NextResponse.json( { success: false, message: "Internal Server error" }, { status: 500 } );
   }
 }

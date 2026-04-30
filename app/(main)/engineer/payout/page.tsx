@@ -1,32 +1,26 @@
 "use client";
 import { useState, useEffect } from "react";
-import { DollarSign, Wallet, TrendingUp, Clock, CheckCircle, CreditCard } from "lucide-react";
+import { DollarSign, Wallet, Clock, CheckCircle, CreditCard, Landmark } from "lucide-react";
 import DashboardShell from "@/components/layout/DashboardShell";
 
-interface PayoutItem {
+interface Transaction {
   id: string;
   amount: number;
-  projectTitle: string;
-  date: string;
+  status: string;
+  type: string;
+  createdAt: string;
+  project?: { title: string };
 }
 
-interface Financials {
-  totalEarned: number;
+interface Stats {
+  totalReceived: number;
   totalPending: number;
-  totalPotentialEarnings: number;
-  pendingPayouts: { count: number; items: PayoutItem[] };
-  completedPayouts: { count: number; items: PayoutItem[] };
-}
-
-interface Overview {
-  totalAssigned: number;
-  completedProjects: number;
-  newInvitations: number;
 }
 
 export default function EngineerPayoutPage() {
-  const [financials, setFinancials] = useState<Financials | null>(null);
-  const [overview, setOverview] = useState<Overview | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [stats, setStats] = useState<Stats>({ totalReceived: 0, totalPending: 0 });
+  const [hasPayoutDetails, setHasPayoutDetails] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,12 +29,22 @@ export default function EngineerPayoutPage() {
 
   async function fetchData() {
     try {
-      const response = await fetch("/api/engineer/analytics");
-      if (response.ok) {
-        const data = await response.json();
+      // Fetch Transaction History
+      const historyRes = await fetch("/api/payout/history");
+      if (historyRes.ok) {
+        const data = await historyRes.json();
         if (data.success) {
-          setFinancials(data.data.financials);
-          setOverview(data.data.overview);
+          setTransactions(data.transactions || []);
+          setStats(data.stats || { totalReceived: 0, totalPending: 0 });
+        }
+      }
+
+      // Fetch Payout Details Status
+      const detailsRes = await fetch("/api/payout/details");
+      if (detailsRes.ok) {
+        const data = await detailsRes.json();
+        if (data.success) {
+          setHasPayoutDetails(!!data.payoutDetails);
         }
       }
     } catch (err) {
@@ -86,15 +90,8 @@ export default function EngineerPayoutPage() {
     );
   }
 
-  const amountReceived = financials?.totalEarned || 0;
-  const amountPending = financials?.totalPending || 0;
-  const totalPotential = financials?.totalPotentialEarnings || 0;
-  const lastPayout = financials?.completedPayouts.items[0] || null;
-
-  const allTransactions = [
-    ...(financials?.completedPayouts.items || []).map((t) => ({ ...t, status: "SUCCESS" })),
-    ...(financials?.pendingPayouts.items || []).map((t) => ({ ...t, status: "PENDING" })),
-  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const totalPotential = stats.totalReceived + stats.totalPending;
+  const lastPayout = transactions.find(t => t.status === "SUCCESS");
 
   return (
     <DashboardShell>
@@ -105,10 +102,11 @@ export default function EngineerPayoutPage() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          
           {/* 1. Total Potential Earnings */}
           <div className="rounded-xl p-5 text-white" style={{ background: "var(--primary)" }}>
             <Wallet size={28} className="opacity-70 mb-3" />
-            <p className="text-xs font-inter">Total Amount</p>
+            <p className="text-xs font-inter">Total Earnings</p>
             <p className="text-2xl font-bold font-id mt-0.5">₹{totalPotential.toLocaleString()}</p>
           </div>
 
@@ -119,7 +117,7 @@ export default function EngineerPayoutPage() {
               Amount Received
             </p>
             <p className="text-2xl font-bold font-id mt-0.5" style={{ color: "var(--text-primary)" }}>
-              ₹{amountReceived.toLocaleString()}
+              ₹{stats.totalReceived.toLocaleString()}
             </p>
             <p className="text-xs mt-1 font-inter text-green-600">Successfully paid out</p>
           </div>
@@ -131,22 +129,22 @@ export default function EngineerPayoutPage() {
               Amount Pending
             </p>
             <p className="text-2xl font-bold font-id mt-0.5" style={{ color: "var(--text-primary)" }}>
-              ₹{amountPending.toLocaleString()}
+              ₹{stats.totalPending.toLocaleString()}
             </p>
             <p className="text-xs mt-1 font-inter text-yellow-600">Awaiting release</p>
           </div>
 
-          {/* 4. Total Projects */}
+          {/* 4. Bank Details Status */}
           <div className="rounded-xl p-5 bg-white border border-[var(--border)]">
-            <TrendingUp size={28} className="text-blue-500 mb-3" />
+            <Landmark size={28} className={hasPayoutDetails ? "text-blue-500 mb-3" : "text-red-500 mb-3"} />
             <p className="text-xs font-inter" style={{ color: "var(--text-muted)" }}>
-              Total Projects
+              Bank Details
             </p>
-            <p className="text-2xl font-bold font-id mt-0.5" style={{ color: "var(--text-primary)" }}>
-              {overview?.totalAssigned || 0}
+            <p className="text-lg font-bold font-id mt-0.5" style={{ color: "var(--text-primary)" }}>
+              {hasPayoutDetails ? "Configured" : "Missing"}
             </p>
-            <p className="text-xs mt-1 font-inter" style={{ color: "var(--text-muted)" }}>
-              {overview?.completedProjects || 0} completed
+            <p className={`text-xs mt-1 font-inter ${hasPayoutDetails ? "text-blue-600" : "text-red-600"}`}>
+              {hasPayoutDetails ? "Ready for payouts" : "Please add in settings"}
             </p>
           </div>
 
@@ -162,10 +160,10 @@ export default function EngineerPayoutPage() {
                   ₹{lastPayout.amount.toLocaleString()}
                 </p>
                 <p className="text-xs font-inter mt-0.5 truncate" style={{ color: "var(--text-muted)" }}>
-                  {lastPayout.projectTitle}
+                  {lastPayout.project?.title || "Project"}
                 </p>
                 <p className="text-xs font-inter mt-0.5" style={{ color: "var(--text-muted)" }}>
-                  {formatDate(lastPayout.date)}
+                  {formatDate(lastPayout.createdAt)}
                 </p>
               </>
             ) : (
@@ -187,7 +185,7 @@ export default function EngineerPayoutPage() {
             </p>
           </div>
 
-          {allTransactions.length === 0 ? (
+          {transactions.length === 0 ? (
             <div className="text-center py-16">
               <DollarSign className="mx-auto mb-3" size={40} style={{ color: "var(--border)" }} />
               <p className="font-inter text-sm" style={{ color: "var(--text-muted)" }}>
@@ -196,7 +194,7 @@ export default function EngineerPayoutPage() {
             </div>
           ) : (
             <div className="divide-y divide-[var(--border)]">
-              {allTransactions.map((t) => (
+              {transactions.map((t) => (
                 <div
                   key={t.id}
                   className="flex items-center justify-between px-5 py-4 hover:bg-[var(--bg)] transition-colors"
@@ -210,10 +208,10 @@ export default function EngineerPayoutPage() {
                     </div>
                     <div>
                       <p className="font-semibold font-inter text-sm" style={{ color: "var(--text-primary)" }}>
-                        {t.projectTitle}
+                        {t.project?.title || "Unknown Project"}
                       </p>
                       <p className="text-xs font-inter mt-0.5" style={{ color: "var(--text-muted)" }}>
-                        Engineer Payout · {formatDate(t.date)}
+                        Engineer Payout • {formatDate(t.createdAt)}
                       </p>
                       <p className="text-xs font-mono mt-0.5" style={{ color: "var(--text-muted)" }}>
                         {t.id.slice(0, 18)}...

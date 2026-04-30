@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import useSWRInfinite from "swr/infinite";
 import { fetcher } from "@/lib/fetcher";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { globalSocket } from "@/components/SocketAnnouncer";
 import ChatSidebar from "./direct/ChatSidebar";
 import ChatArea from "./direct/ChatArea";

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { useAuth } from "@/app/hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { Send, X, CheckSquare, Trash2, Loader2, ChevronUp } from "lucide-react";
 import { globalSocket } from "@/components/SocketAnnouncer";
 import MessageItem from "../chat/direct/MessageItem";

@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { DollarSign, CreditCard, TrendingUp, Clock, CheckCircle, Wallet, AlertCircle, Loader2 } from "lucide-react";
-import toast from "react-hot-toast";
+import { useAuth } from "@/hooks/useAuth"; 
+import { useRazorpay } from "@/hooks/useRazorpay";
 
 interface Transaction {
   id: string;
@@ -16,6 +17,9 @@ interface Stats {
   totalSpent: number;
   totalRefunded: number;
   pendingRefunds: number;
+  totalBudget: number;
+  totalProjects: number;
+  pendingAmount: number;
 }
 
 interface PendingProject {
@@ -26,52 +30,32 @@ interface PendingProject {
   endDate?: string;
 }
 
-interface User {
-  name: string;
-  email: string;
-}
-
 export default function ClientAccountPage() {
+  const { user } = useAuth();
+  const { initiatePayment, loading: isPaying } = useRazorpay();
+  
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
-  const [totalProjects, setTotalProjects] = useState(0);
-  const [totalBudget, setTotalBudget] = useState(0);
   const [pendingProjects, setPendingProjects] = useState<PendingProject[]>([]);
-  const [user, setUser] = useState<User | null>(null);
-  const [paying, setPaying] = useState<string | null>(null);
+  const [paying, setPaying] = useState<string | null>(null); 
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => {
+    if (user) fetchData();
+  }, [user]);
 
   async function fetchData() {
     try {
-      const [historyRes, projectsRes, meRes] = await Promise.all([
-        fetch("/api/payout/history"),
-        fetch("/api/client/projects"),
-        fetch("/api/auth/me"),
-      ]);
+      setLoading(true);
+      const historyRes = await fetch("/api/payout/history");
 
       if (historyRes.ok) {
         const data = await historyRes.json();
-        if (data.success) { setTransactions(data.transactions || []); setStats(data.stats); }
-      }
-
-      if (projectsRes.ok) {
-        const data = await projectsRes.json();
-        if (data.success) {
-          setTotalProjects(data.globalStats?.total || 0);
-          const budgetSum = (data.projects || []).reduce((acc: number, p: any) => acc + (p.budget || 0), 0);
-          setTotalBudget(budgetSum);
-          const pending = (data.projects || []).filter((p: any) =>
-            p.status === "AWAITING_ADVANCE" || p.status === "AWAITING_FINAL_PAYMENT"
-          );
-          setPendingProjects(pending);
+        if (data.success) { 
+          setTransactions(data.transactions || []); 
+          setStats(data.stats); 
+          setPendingProjects(data.pendingProjects || []);
         }
-      }
-
-      if (meRes.ok) {
-        const data = await meRes.json();
-        if (data.success) setUser(data.user);
       }
     } catch (err) {
       console.error("Failed to fetch account data:", err);
@@ -82,55 +66,26 @@ export default function ClientAccountPage() {
 
   async function handlePay(project: PendingProject) {
     setPaying(project.id);
-    try {
-      const orderRes = await fetch("/api/razorpay/order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId: project.id }),
-      });
-      const orderData = await orderRes.json();
-      if (!orderData.success) { toast.error(orderData.message || "Failed to create order"); setPaying(null); return; }
+    
+    const isAdvance = project.status === "AWAITING_ADVANCE";
+    const description = isAdvance ? "Advance Payment (40%)" : "Final Payment (60%)";
 
-      const isAdvance = project.status === "AWAITING_ADVANCE";
-      const amount = isAdvance ? project.budget * 0.4 : project.budget * 0.6;
-
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.async = true;
-      script.onload = () => {
-        const rzp = new (window as any).Razorpay({
-          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-          order_id: orderData.order.id,
-          amount: Math.round(amount * 100),
-          currency: "INR",
-          name: "Tech-Engi",
-          description: isAdvance ? "Advance Payment (40%)" : "Final Payment (60%)",
-          image: "/logo.png",
-          prefill: { name: user?.name || "", email: user?.email || "" },
-          theme: { color: "#FFAE58" },
-          handler: async (response: any) => {
-            try {
-              const verifyRes = await fetch("/api/razorpay/verify", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  razorpay_order_id: response.razorpay_order_id,
-                  razorpay_payment_id: response.razorpay_payment_id,
-                  razorpay_signature: response.razorpay_signature,
-                }),
-              });
-              const verifyData = await verifyRes.json();
-              if (verifyData.success) { toast.success("Payment successful!"); fetchData(); }
-              else toast.error("Payment verification failed");
-            } catch { toast.error("Verification failed"); }
-            finally { setPaying(null); }
-          },
-          modal: { ondismiss: () => { setPaying(null); toast.error("Payment cancelled"); } },
-        });
-        rzp.open();
-      };
-      document.body.appendChild(script);
-    } catch { toast.error("Payment setup failed"); setPaying(null); }
+    initiatePayment({
+      projectId: project.id,
+      user: { name: user?.name, email: user?.email },
+      description,
+      onSuccess: () => {
+        fetchData();
+        setPaying(null);
+      },
+      onError: () => {
+        fetchData();
+        setPaying(null);
+      },
+      onDismiss: () => {
+        setPaying(null);
+      }
+    });
   }
 
   const formatDate = (d: string) => {
@@ -150,12 +105,9 @@ export default function ClientAccountPage() {
       : status === "PENDING" ? "bg-yellow-50 text-yellow-700 border-yellow-200"
         : "bg-red-50 text-red-700 border-red-200";
 
-  // Derived values
   const successTxns = transactions.filter(t => t.status === "SUCCESS" && (t.type === "ADVANCE_PAYMENT" || t.type === "FINAL_PAYMENT"));
   const totalPaymentsCount = successTxns.length;
-  const pendingAmount = totalBudget - (stats?.totalSpent || 0);
-
-  const lastTxn = transactions.find(t => t.status === "SUCCESS" && (t.type === "ADVANCE_PAYMENT" || t.type === "FINAL_PAYMENT"));
+  const lastTxn = successTxns[0];
 
   if (loading) {
     return (
@@ -176,7 +128,7 @@ export default function ClientAccountPage() {
         <div className="rounded-xl p-5 text-white col-span-1" style={{ background: "var(--primary)" }}>
           <Wallet size={28} className="opacity-70 mb-3" />
           <p className="text-xs opacity-80 font-inter">Total Budget</p>
-          <p className="text-2xl font-bold font-id mt-0.5">₹{(totalBudget || 0).toLocaleString()}</p>
+          <p className="text-2xl font-bold font-id mt-0.5">₹{(stats?.totalBudget || 0).toLocaleString()}</p>
           <p className="text-xs opacity-60 mt-1 font-inter">All projects</p>
         </div>
 
@@ -193,7 +145,7 @@ export default function ClientAccountPage() {
           <Clock size={28} className="text-yellow-400 mb-3" />
           <p className="text-xs text-[var(--text-muted)] font-inter">Remaining to Pay</p>
           <p className="text-2xl font-bold text-[var(--text-primary)] font-id mt-0.5">
-            ₹{Math.max(0, pendingAmount).toLocaleString()}
+            ₹{(stats?.pendingAmount || 0).toLocaleString()}
           </p>
           <p className="text-xs mt-1 text-[var(--text-muted)] font-inter">Across all projects</p>
         </div>
@@ -213,7 +165,7 @@ export default function ClientAccountPage() {
           <TrendingUp size={28} className="text-green-400 mb-3" />
           <p className="text-xs text-[var(--text-muted)] font-inter">Total Projects</p>
           <p className="text-2xl font-bold text-[var(--text-primary)] font-id mt-0.5">
-            {totalProjects}
+            {stats?.totalProjects || 0}
           </p>
           <p className="text-xs mt-1 text-[var(--text-muted)] font-inter">All time</p>
         </div>
@@ -331,7 +283,7 @@ export default function ClientAccountPage() {
                     </div>
                     <button
                       onClick={() => handlePay(p)}
-                      disabled={paying === p.id}
+                      disabled={paying === p.id || isPaying}
                       className="w-full py-2 text-white rounded-lg text-xs font-inter font-semibold flex items-center justify-center gap-1.5 disabled:opacity-50"
                       style={{ background: "var(--primary)" }}
                     >
@@ -346,7 +298,6 @@ export default function ClientAccountPage() {
         </div>
 
       </div>
-
     </div>
   );
 }

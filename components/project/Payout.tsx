@@ -1,4 +1,4 @@
-import { useAuth } from '@/app/hooks/useAuth'
+import { useAuth } from '@/hooks/useAuth'
 import React from 'react'
 import PayoutEngineer from './PayoutEngineer';
 import PayoutClient from './PayoutClient';

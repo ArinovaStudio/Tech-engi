@@ -67,30 +67,6 @@ export async function POST(req: NextRequest) {
           },
         });
 
-        // Create payout transaction for engineer if assigned
-        if (project.engineerId) {
-          const existingPayout = await tx.transaction.findFirst({
-            where: {
-              projectId: project.id,
-              type: "PAYOUT_ENGINEER",
-              userId: project.engineer!.userId
-            }
-          });
-
-          if (!existingPayout) {
-            const payoutAmount = project.budget * 0.7;
-            await tx.transaction.create({
-              data: {
-                projectId: project.id,
-                userId: project.engineer!.userId,
-                amount: payoutAmount,
-                type: "PAYOUT_ENGINEER",
-                status: "PENDING",
-              },
-            });
-          }
-        }
-
       } else if (transaction.type === "FINAL_PAYMENT") {
         await tx.project.update({
           where: { id: project.id },
@@ -141,7 +117,7 @@ export async function POST(req: NextRequest) {
         payoutAmount
       );
 
-      await sendEmail( project.engineer.user.email, `Project Completed: ${project.title}`, engineerEmailHtml );
+      sendEmail( project.engineer.user.email, `Project Completed: ${project.title}`, engineerEmailHtml );
     }
 
     return NextResponse.json( { success: true, message: "Payment verified successfully" }, { status: 200 } );

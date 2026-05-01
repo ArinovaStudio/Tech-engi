@@ -121,7 +121,7 @@ export default function ScheduleMeet() {
 
 
 
-  const openRescheduleModal = (meeting) => {
+  const openRescheduleModal = (meeting: any) => {
     setSelectedMeeting(meeting);
     setRescheduleModal(true);
   };

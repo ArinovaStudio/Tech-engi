@@ -287,7 +287,7 @@ export default function ClientDashboardV2({ user }: { user: any }) {
 
           <div>
             <ul className="space-y-4">
-            {dashboard.latestUpdates.slice(0, 3).map((update) => (
+            {dashboard.latestUpdates.slice(0, 3).map((update: any) => (
               <li key={update.id} className="p-4 rounded-lg bg-gray-100 dark:bg-gray-800">
                 <p className="font-medium text-gray-800 dark:text-gray-100">{update.title}</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{update.date}</p>
@@ -300,7 +300,7 @@ export default function ClientDashboardV2({ user }: { user: any }) {
         {/* Work Done */}
         <CardBox title="Work Completed">
           <ul className="space-y-4">
-            {dashboard.workDone.map((work) => (
+            {dashboard.workDone.map((work: any) => (
               <li key={work.id} className="p-4 rounded-lg bg-gray-100 dark:bg-gray-800">
                 <p className="font-medium text-gray-800 dark:text-gray-100">{work.task}</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{work.completedOn}</p>

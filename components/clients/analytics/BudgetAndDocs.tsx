@@ -1,28 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Download, FileText, Receipt, Wallet, ArrowDownCircle, Loader2 } from 'lucide-react';
+import { Download, FileText, Receipt, Wallet, ArrowDownCircle } from 'lucide-react';
 
-const BudgetAndDocs = ({ projectId }: { projectId: string }) => {
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch(`/api/client/analytics/budget?projectId=${projectId}`)
-      .then(r => r.json())
-      .then(res => { if (res.success) setData(res.data); })
-      .finally(() => setLoading(false));
-  }, [projectId]);
-
-  if (loading) return (
-    <div className="flex justify-center py-16">
-      <Loader2 className="animate-spin text-blue-500" size={32} />
-    </div>
-  );
-
+const BudgetAndDocs = ({ data }: { data: any }) => {
   if (!data) return null;
 
-  const { scopeTitle, scopeDate, paymentDate, invoiceName, paidAmount, remainingAmount, totalBudget, docs = [] } = data;
+  const { paidAmount = 0, remainingAmount = 0, totalBudget = 0, docs = [] } = data;
 
   const findDoc = (pattern: string) => docs.find((d: any) => d.title.toLowerCase().includes(pattern.toLowerCase()));
   const scopeDoc = findDoc('scope');
@@ -32,17 +15,13 @@ const BudgetAndDocs = ({ projectId }: { projectId: string }) => {
   const openDoc = (url: string) => window.open(url, '_blank');
   const circumference = +(2 * Math.PI * 80).toFixed(1);
 
-  const paidPercentage = totalBudget > 0
-    ? Math.round((paidAmount / totalBudget) * 100)
-    : 0;
+  const paidPercentage = totalBudget > 0 ? Math.round((paidAmount / totalBudget) * 100) : 0;
   const remainingPercentage = 100 - paidPercentage;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 h-full gap-6 mt-10">
-
       {/* Left Cards */}
       <div className="col-span-1 h-full flex flex-col gap-4">
-
         {/* Scope of Work */}
         <div className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 flex justify-between items-center flex-1">
           <div className="flex items-center gap-3">
@@ -50,9 +29,9 @@ const BudgetAndDocs = ({ projectId }: { projectId: string }) => {
               <FileText className="w-6 h-6 text-purple-700 dark:text-purple-300" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white">{scopeTitle}</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white">Scope of Work</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {scopeDoc ? `Uploaded at ${new Date(scopeDoc.createdAt).toLocaleDateString()}` : `Date: ${scopeDate}`}
+                {scopeDoc ? `Uploaded ${new Date(scopeDoc.createdAt).toLocaleDateString()}` : `Not generated yet`}
               </p>
             </div>
           </div>
@@ -71,7 +50,7 @@ const BudgetAndDocs = ({ projectId }: { projectId: string }) => {
             <div>
               <h3 className="font-semibold text-gray-900 dark:text-white">Payment History</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {paymentHistoryDocs.length > 0 ? `${paymentHistoryDocs.length} document${paymentHistoryDocs.length > 1 ? 's' : ''}` : `Paid on ${paymentDate}`}
+                {paymentHistoryDocs.length > 0 ? `${paymentHistoryDocs.length} receipt${paymentHistoryDocs.length > 1 ? 's' : ''}` : `No receipts yet`}
               </p>
             </div>
           </div>
@@ -102,7 +81,7 @@ const BudgetAndDocs = ({ projectId }: { projectId: string }) => {
             </div>
             <div>
               <h3 className="font-semibold text-gray-900 dark:text-white">Latest Invoice</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{invoiceDoc ? invoiceDoc.title : invoiceName}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{invoiceDoc ? invoiceDoc.title : "Not generated yet"}</p>
             </div>
           </div>
           {invoiceDoc
@@ -151,22 +130,17 @@ const BudgetAndDocs = ({ projectId }: { projectId: string }) => {
         <div className="w-1/2 flex items-center justify-center">
           <div className="relative w-48 h-48">
             <svg className="w-full h-full -rotate-90" viewBox="0 0 200 200">
-              {/* Track */}
-              <circle cx="100" cy="100" r="80" fill="none" stroke="#e5e7eb" strokeWidth="20" />
-              {/* Remaining (orange) — drawn first, full arc */}
+              <circle cx="100" cy="100" r="80" fill="none" stroke="#e5e7eb" strokeWidth="20" className="dark:stroke-gray-600" />
               <circle
                 cx="100" cy="100" r="80" fill="none" stroke="#f97316" strokeWidth="20"
                 strokeDasharray={`${(remainingPercentage / 100) * circumference} ${circumference}`}
-                strokeLinecap="butt"
-                className="transition-all duration-500 ease-out"
+                strokeLinecap="butt" className="transition-all duration-500 ease-out"
               />
-              {/* Paid (purple) — drawn on top, offset so it starts where remaining ends */}
               <circle
                 cx="100" cy="100" r="80" fill="none" stroke="#9333ea" strokeWidth="20"
                 strokeDasharray={`${(paidPercentage / 100) * circumference} ${circumference}`}
                 strokeDashoffset={`${-(remainingPercentage / 100) * circumference}`}
-                strokeLinecap="butt"
-                className="transition-all duration-500 ease-out"
+                strokeLinecap="butt" className="transition-all duration-500 ease-out"
               />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center flex-col">
@@ -174,7 +148,6 @@ const BudgetAndDocs = ({ projectId }: { projectId: string }) => {
               <span className="text-gray-500 dark:text-gray-400 text-sm">Paid</span>
             </div>
           </div>
-          {/* Legend */}
           <div className="ml-4 space-y-2">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-purple-600 shrink-0" />

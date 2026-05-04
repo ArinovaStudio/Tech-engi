@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { Loader, AlertCircle, Filter, Search, Calendar } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import ClientOverview from '@/components/clients/analytics/ClientOverview';
 import DesignOverview from '@/components/clients/analytics/DesignOverview';
 import LatestUpdates from '@/components/clients/analytics/LatestUpdates';
@@ -9,7 +10,6 @@ import RiskBlockage from '@/components/clients/analytics/RiskBlockage';
 import Milestones from '@/components/clients/analytics/Milestones';
 import BudgetAndDocs from '@/components/clients/analytics/BudgetAndDocs';
 import DesignPreviewSection from '@/components/clients/analytics/DesignPreviewSection';
-import { useAuth } from '@/hooks/useAuth';
 
 interface Project {
   id: string;
@@ -34,16 +34,18 @@ const PRIORITY_COLOR: Record<string, string> = {
 };
 
 const ClientAnalyticsDashboard = () => {
+  const { user } = useAuth() as { user: User };
+
   const [projectId, setProjectId] = useState<string | null>(null);
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projectsList, setProjectsList] = useState<Project[]>([]);
+  const [projectAnalytics, setProjectAnalytics] = useState<any>(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('ALL');
   const [showProjects, setShowProjects] = useState(true);
-
-  const { user } = useAuth() as { user: User };
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(searchTerm), 500);
@@ -53,29 +55,38 @@ const ClientAnalyticsDashboard = () => {
   useEffect(() => {
     if (!user?.id) return;
     setLoading(true);
-    const query = new URLSearchParams({ search: debouncedSearch, page: '1', limit: '15' }).toString();
-    fetch(`/api/client/projects?${query}`)
+    
+    // Call the single master endpoint
+    const url = projectId && !showProjects 
+      ? `/api/client/analytics?projectId=${projectId}` 
+      : `/api/client/analytics?search=${debouncedSearch}`;
+
+    fetch(url)
       .then(r => r.json())
       .then(res => {
-        if (res.success && res.projects?.length > 0) {
-          setProjects(res.projects);
-          const urlId = new URLSearchParams(window.location.search).get('projectId');
-          setProjectId(urlId || res.projects[0].id);
-          setShowProjects(false);
+        if (res.success) {
+          if (projectId && !showProjects) {
+            setProjectAnalytics(res.data);
+          } else {
+            setProjectsList(res.projects || []);
+            const urlId = new URLSearchParams(window.location.search).get('projectId');
+            if (urlId && res.projects?.some((p: any) => p.id === urlId)) {
+                setProjectId(urlId);
+                setShowProjects(false);
+            }
+          }
         } else {
-          setProjects([]);
-          setProjectId(null);
-          setShowProjects(true);
+            setError(res.message || "Failed to load");
         }
       })
       .catch(err => {
-        setError(err instanceof Error ? err.message : 'Failed to fetch projects');
+        setError(err instanceof Error ? err.message : 'Failed to fetch');
         setShowProjects(true);
-      })
+      }) 
       .finally(() => setLoading(false));
-  }, [debouncedSearch, user?.id]);
+  }, [debouncedSearch, projectId, showProjects, user?.id]);
 
-  const filteredProjects = projects.filter(p => {
+  const filteredProjects = projectsList.filter(p => {
     const matchSearch = p.title?.toLowerCase().includes(searchTerm.toLowerCase()) || p.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchPriority = priorityFilter === 'ALL' || p.priority === priorityFilter;
     return matchSearch && matchPriority;
@@ -103,6 +114,7 @@ const ClientAnalyticsDashboard = () => {
     </div>
   );
 
+  // Projects List
   if (!projectId || showProjects) return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -137,12 +149,8 @@ const ClientAnalyticsDashboard = () => {
       {filteredProjects.length === 0 ? (
         <div className="text-center py-12">
           <AlertCircle className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-            {projects.length === 0 ? 'No Projects' : 'No Results'}
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400">
-            {projects.length === 0 ? "You haven't been assigned to any projects yet." : 'No projects match your search criteria.'}
-          </p>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No Projects</h3>
+          <p className="text-gray-600 dark:text-gray-400">No projects match your search criteria.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -174,7 +182,6 @@ const ClientAnalyticsDashboard = () => {
                   <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${Math.min(100, Math.max(0, project.progress))}%` }} />
                 </div>
               </div>
-              {project.basicDetails && <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">{project.basicDetails}</p>}
             </div>
           ))}
         </div>
@@ -182,35 +189,34 @@ const ClientAnalyticsDashboard = () => {
     </div>
   );
 
-  const currentProject = projects.find(p => p.id === projectId);
-
+  // Detailed Project Analytics
   return (
     <div className="space-y-10">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{currentProject?.title || 'Project Analytics'}</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{projectAnalytics?.overview?.name || 'Project Analytics'}</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">Analytics dashboard for your project</p>
         </div>
-        <button onClick={() => setShowProjects(true)} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap">
+        <button onClick={() => { setShowProjects(true); window.history.pushState({}, '', window.location.pathname); }} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap">
           Switch Project
         </button>
       </div>
 
-      <ClientOverview projectId={projectId} />
-      <DesignOverview projectId={projectId} />
+      <ClientOverview data={projectAnalytics?.overview} />
+      <DesignOverview data={projectAnalytics?.design} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <LatestUpdates projectId={projectId} />
+          <LatestUpdates updates={projectAnalytics?.updates} />
         </div>
         <div className="lg:col-span-1 space-y-6">
-          <RiskBlockage projectId={projectId} />
-          <Milestones projectId={projectId} />
+          <RiskBlockage tickets={projectAnalytics?.tickets} />
+          <Milestones milestones={projectAnalytics?.milestones} />
         </div>
       </div>
 
-      <BudgetAndDocs projectId={projectId} />
-      <DesignPreviewSection projectId={projectId} />
+      <BudgetAndDocs data={projectAnalytics?.budget} />
+      <DesignPreviewSection data={projectAnalytics?.preview} />
     </div>
   );
 };

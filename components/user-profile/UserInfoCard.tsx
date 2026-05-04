@@ -12,6 +12,7 @@ interface User {
   id?: string;
   name?: string;
   email?: string;
+  subRole?: any;
   phone?: string;
   projectMembers?: number;
   bio?: string;
@@ -67,7 +68,7 @@ export default function UserInfoCard({ user, onUpdate }: UserInfoCardProps) {
     closeModal();
   };
 
-  const verifyPassword = async (e) => {
+  const verifyPassword = async (e: any) => {
     e.preventDefault()
     setLoading(true)
     const req = await fetch(`/api/change-pass?oldPass=${oldPassword.trim()}`)
@@ -82,7 +83,7 @@ export default function UserInfoCard({ user, onUpdate }: UserInfoCardProps) {
   }
 
 
-  const changePass = async (e) => {
+  const changePass = async (e: any) => {
     e.preventDefault()
     if (newPass !== confirmPassword) {
       return setError("Password & Confirm password didn't match.")

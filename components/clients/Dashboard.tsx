@@ -54,7 +54,7 @@ const ProgressGauge = ({ progress = 0 }: { progress?: number }) => {
 };
 
 
-export default function ClientDashboard({ data}) {
+export default function ClientDashboard({ data }: { data: any }) {
   const { projectId } = useParams();
   const [dashboard, setDashboard] = useState(data);
   const [userRole, setUserRole] = useState(null);
@@ -104,7 +104,7 @@ export default function ClientDashboard({ data}) {
 
       if (res.ok) {
         const result = await res.json();
-        setDashboard(prev => ({
+        setDashboard((prev: any) => ({
           ...prev,
           latestUpdates: [result.update, ...prev.latestUpdates].slice(0, 3)
         }));
@@ -216,7 +216,7 @@ export default function ClientDashboard({ data}) {
 
           <div>
             <ul className="space-y-4">
-            {dashboard.latestUpdates.slice(0, 3).map((update) => (
+            {dashboard.latestUpdates.slice(0, 3).map((update: any) => (
               <li key={update.id} className="p-4 rounded-lg bg-gray-100 dark:bg-gray-800">
                 <p className="font-medium text-gray-800 dark:text-gray-100">{update.title}</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{update.date}</p>
@@ -229,7 +229,7 @@ export default function ClientDashboard({ data}) {
         {/* Work Done */}
         <CardBox title="Work Completed">
           <ul className="space-y-4">
-            {dashboard.workDone.map((work) => (
+            {dashboard.workDone.map((work: any) => (
               <li key={work.id} className="p-4 rounded-lg bg-gray-100 dark:bg-gray-800">
                 <p className="font-medium text-gray-800 dark:text-gray-100">{work.task}</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{work.completedOn}</p>
@@ -254,7 +254,7 @@ export default function ClientDashboard({ data}) {
       {/* Documents */}
       <CardBox title="Project Documents">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {dashboard.documents.map((doc) => (
+          {dashboard.documents.map((doc: any) => (
             <div key={doc.id} className="p-4 rounded-lg border dark:border-gray-700">
               <p className="font-medium text-gray-800 dark:text-gray-100">{doc.title}</p>
               <p className="text-sm text-gray-500 dark:text-gray-400">{doc.type}</p>
@@ -273,7 +273,7 @@ export default function ClientDashboard({ data}) {
             <p className="text-center text-gray-500 dark:text-gray-400 py-8">No feedbacks received yet</p>
           ) : (
             <div className="grid gap-4">
-              {feedbacks.slice(0, 5).map((fb) => (
+              {feedbacks.slice(0, 5).map((fb: any) => (
                 <div key={fb.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-white/[0.05]">
                   <div className="flex justify-between items-start mb-2">
                     <div>

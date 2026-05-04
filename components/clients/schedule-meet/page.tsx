@@ -3,12 +3,12 @@
 import React, { useState } from "react";
 
 export default function ScheduleMeet() {
-  const [reason, setReason] = useState("");
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
-  const [duration, setDuration] = useState("30 minutes");
+  const [reason, setReason] = useState<string>("");
+  const [date, setDate] = useState<string>("");
+  const [time, setTime] = useState<string>("");
+  const [duration, setDuration] = useState<string>("30 minutes");
 
-  const [meetings, setMeetings] = useState([]);
+  const [meetings, setMeetings] = useState<any[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

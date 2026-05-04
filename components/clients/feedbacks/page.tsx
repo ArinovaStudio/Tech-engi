@@ -5,9 +5,9 @@ import { MessageSquare, Send } from "lucide-react";
 
 
 export default function FeedbacksPage() {
-    const [feedbacks, setFeedbacks] = useState([]);
-    const [newFeedback, setNewFeedback] = useState("");
-    const [feedbackType, setFeedbackType] = useState("project");
+    const [feedbacks, setFeedbacks] = useState<any[]>([]);
+    const [newFeedback, setNewFeedback] = useState<string>("");
+    const [feedbackType, setFeedbackType] = useState<string>("project");
 
     const handleSubmit = (e: any) => {
         e.preventDefault();

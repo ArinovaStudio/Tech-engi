@@ -387,10 +387,10 @@ function UserAccountCard({ userId }: { userId: string }) {
             </div>
 
             <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-              <Button size="sm" variant="outline" onClick={handleModalClose} type="button">
+              <Button size="sm" variant="outline" onClick={handleModalClose}>
                 Close
               </Button>
-              <Button className="bg-[var(--primary)] hover:bg-[var(--primary-light)]" size="sm" type="submit" disabled={loading}>
+              <Button className="bg-[var(--primary)] hover:bg-[var(--primary-light)]" size="sm" disabled={loading}>
                 {loading
                   ? editingMethod
                     ? "Updating..."

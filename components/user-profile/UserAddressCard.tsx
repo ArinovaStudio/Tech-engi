@@ -33,9 +33,9 @@ export default function UserAddressCard({ user, onUpdate }: UserAddressCardProps
     }
   }, [user]);
 
-  const handleSave = (e) => {
+  const handleSave = (e: any) => {
     e.preventDefault()
-    onUpdate(formData);
+    onUpdate?.(formData);
     closeModal();
   };
 

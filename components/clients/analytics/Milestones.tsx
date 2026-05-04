@@ -1,30 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Check, Loader2 } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { format } from 'date-fns';
 
-const Milestones = ({ projectId }: { projectId: string }) => {
-  const [milestones, setMilestones] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch(`/api/client/analytics/milestone?projectId=${projectId}`)
-      .then(r => r.json())
-      .then(res => { if (res.success && Array.isArray(res.data)) setMilestones(res.data); })
-      .finally(() => setLoading(false));
-  }, [projectId]);
-
+const Milestones = ({ milestones = [] }: { milestones: any[] }) => {
   return (
     <div className="space-y-4 relative">
       <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Milestones</h2>
 
-      {loading ? (
-        <div className="flex justify-center py-8">
-          <Loader2 className="animate-spin text-blue-500" size={24} />
-        </div>
-      ) : milestones.length === 0 ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-6">No milestones yet.</p>
+      {milestones.length === 0 ? (
+        <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-6 bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700">No milestones yet.</p>
       ) : (
         <div className="relative max-h-72 overflow-y-auto pr-2 no-scrollbar pb-10">
           {milestones.map((m) => (
@@ -35,10 +20,10 @@ const Milestones = ({ projectId }: { projectId: string }) => {
                   <span className="bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300 px-3 py-1 rounded-full text-xs font-medium">
                     {format(new Date(m.createdAt), 'dd/MM/yyyy')}
                   </span>
-                  <Check className="w-4 h-4 text-green-500" />
+                  {m.completed && <Check className="w-4 h-4 text-green-500" />}
                 </div>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 leading-relaxed">{m.description}</p>
+              {m.description && <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 leading-relaxed">{m.description}</p>}
             </div>
           ))}
           <div className="pointer-events-none absolute inset-x-0 right-2 bottom-6 rounded-xl h-12 bg-gradient-to-t from-gray-100 dark:from-gray-800/60 to-transparent" />

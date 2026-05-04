@@ -5,7 +5,7 @@ import { PlusCircle } from "lucide-react";
 export default function FeatureRequestPage() {
     const [title, setTitle] = useState("");
     const [desc, setDesc] = useState("");
-    const [features, setFeatures] = useState([]);
+    const [features, setFeatures] = useState<any[]>([]);
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
@@ -128,8 +128,8 @@ export default function FeatureRequestPage() {
     );
 }
 
-const StatusBadge = ({ status}) => {
-    const colors = {
+const StatusBadge = ({ status }: { status: string }) => {
+    const colors: Record<string, string> = {
         pending:
             "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300",
         approved:

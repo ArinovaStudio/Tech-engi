@@ -37,7 +37,7 @@ export function StatusBadge({ status }: { status: string }) {
   if (status === "AWAITING_ADVANCE") return null;
   const meta = STATUS_META[status] ?? { label: status, color: "bg-gray-100 text-gray-600" };
   return (
-    <span className={`text-[10px] font-semibold font-inter px-2 py-0.5 rounded-full ${meta.color}`}>
+    <span className={`text-[10px] font-semibold  px-2 py-0.5 rounded-full ${meta.color}`}>
       {meta.label}
     </span>
   );
@@ -51,31 +51,31 @@ export function ProjectCard({ project }: { project: Project }) {
       <div className="bg-white border border-[var(--border)] rounded-xl p-5 hover:shadow-md hover:border-[var(--primary)] transition-all cursor-pointer group h-full flex flex-col justify-between">
         <div>
           <div className="flex items-start justify-between gap-2 mb-2">
-            <h3 className="text-sm font-bold font-inter text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--primary)] transition-colors">
+            <h3 className="text-sm font-bold  text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--primary)] transition-colors">
               {project.title}
             </h3>
             <StatusBadge status={project.status} />
           </div>
 
-          <p className="text-xs font-inter text-[var(--text-muted)] line-clamp-2 mb-4 leading-relaxed">
+          <p className="text-xs  text-[var(--text-muted)] line-clamp-2 mb-4 leading-relaxed">
             {project.description}
           </p>
 
           {project.instruments?.length > 0 && (
             <div className="flex flex-wrap gap-1 mb-3">
               {project.instruments.slice(0, 3).map((inst) => (
-                <span key={inst} className="text-[10px] font-inter px-2 py-0.5 bg-[var(--primary-light)] text-[var(--primary)] border border-[#ffd9a8] rounded-full">
+                <span key={inst} className="text-[10px]  px-2 py-0.5 bg-[var(--primary-light)] text-[var(--primary)] border border-[#ffd9a8] rounded-full">
                   {inst}
                 </span>
               ))}
               {project.instruments.length > 3 && (
-                <span className="text-[10px] font-inter text-[var(--text-muted)]">+{project.instruments.length - 3}</span>
+                <span className="text-[10px]  text-[var(--text-muted)]">+{project.instruments.length - 3}</span>
               )}
             </div>
           )}
 
           <div className="mb-4">
-            <div className="flex justify-between text-[10px] font-inter text-[var(--text-muted)] mb-1">
+            <div className="flex justify-between text-[10px]  text-[var(--text-muted)] mb-1">
               <span>Progress</span>
               <span className="font-semibold text-[var(--text-primary)]">{project.progress}%</span>
             </div>
@@ -89,12 +89,12 @@ export function ProjectCard({ project }: { project: Project }) {
         </div>
 
         <div className="flex items-center justify-between pt-3 border-t border-[var(--border)]">
-          <div className="flex items-center gap-1 text-[10px] font-inter text-[var(--text-muted)]">
+          <div className="flex items-center gap-1 text-[10px]  text-[var(--text-muted)]">
             <Calendar size={11} />
             {new Date(project.createdAt).toLocaleDateString()}
           </div>
           {amount !== undefined && (
-            <span className="text-xs font-bold font-inter text-[var(--text-primary)]">
+            <span className="text-xs font-bold  text-[var(--text-primary)]">
               Budget: ₹{amount.toLocaleString()}
             </span>
           )}

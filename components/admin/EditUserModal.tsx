@@ -118,7 +118,7 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-[#e5e5e5] bg-white rounded-t-2xl">
-          <h2 className="text-xl font-bold text-[#050A30] font-id">
+          <h2 className="text-xl font-bold text-[#050A30] ">
             Edit {user.role === "ENGINEER" ? "Engineer" : "Client"}
           </h2>
           <button onClick={onClose} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
@@ -128,7 +128,7 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
 
         <div className="p-6 space-y-5">
           <div>
-            <label className="block text-sm font-semibold text-[#4B4B4B] mb-1 font-inter">Name</label>
+            <label className="block text-sm font-semibold text-[#4B4B4B] mb-1 ">Name</label>
             <input
               type="text"
               value={formData.name}
@@ -140,7 +140,7 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
           {/* Client: Expertise Tags */}
           {user.role === "CLIENT" && (
             <div>
-              <label className="block text-sm font-semibold text-[#4B4B4B] mb-2 font-inter">Expertise</label>
+              <label className="block text-sm font-semibold text-[#4B4B4B] mb-2 ">Expertise</label>
               
               <div className="flex flex-wrap gap-2 mb-3">
                 {formData.expertise.map((exp, idx) => (
@@ -177,7 +177,7 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
           {user.role === "ENGINEER" && (
             <>
               <div>
-                <label className="block text-sm font-semibold text-[#4B4B4B] mb-2 font-inter">Skills</label>
+                <label className="block text-sm font-semibold text-[#4B4B4B] mb-2 ">Skills</label>
                 
                 <div className="flex flex-wrap gap-2 mb-3">
                   {formData.skills.map((skill, idx) => (
@@ -211,7 +211,7 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-[#4B4B4B] mb-1 font-inter">Qualification</label>
+                  <label className="block text-sm font-semibold text-[#4B4B4B] mb-1 ">Qualification</label>
                   <select
                     value={formData.qualification}
                     onChange={(e) => setFormData({ ...formData, qualification: e.target.value })}
@@ -223,7 +223,7 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-[#4B4B4B] mb-1 font-inter">Status</label>
+                  <label className="block text-sm font-semibold text-[#4B4B4B] mb-1 ">Status</label>
                   <select
                     value={formData.approvalStatus}
                     onChange={(e) => setFormData({ ...formData, approvalStatus: e.target.value })}
@@ -238,7 +238,7 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
 
               {formData.approvalStatus === "REJECTED" && (
                 <div>
-                  <label className="block text-sm font-semibold text-[#4B4B4B] mb-1 font-inter">Rejection Reason</label>
+                  <label className="block text-sm font-semibold text-[#4B4B4B] mb-1 ">Rejection Reason</label>
                   <textarea
                     value={formData.rejectionReason}
                     onChange={(e) => setFormData({ ...formData, rejectionReason: e.target.value })}
@@ -252,13 +252,13 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
         </div>
 
         <div className="sticky bottom-0 z-10 flex gap-3 px-6 py-4 border-t border-[#e5e5e5] bg-white rounded-b-2xl">
-          <button onClick={onClose} className="flex-1 px-4 py-2 rounded-lg font-inter text-sm bg-gray-100 text-gray-700 hover:bg-gray-200">
+          <button onClick={onClose} className="flex-1 px-4 py-2 rounded-lg  text-sm bg-gray-100 text-gray-700 hover:bg-gray-200">
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="flex-1 px-4 py-2 rounded-lg font-inter text-sm bg-[#FFAE58] hover:bg-[#e89b45] text-white flex justify-center items-center"
+            className="flex-1 px-4 py-2 rounded-lg  text-sm bg-[#FFAE58] hover:bg-[#e89b45] text-white flex justify-center items-center"
           >
             {loading ? <LucideLoader className="animate-spin" size={18} /> : "Save Changes"}
           </button>

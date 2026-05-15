@@ -46,15 +46,15 @@ export default function TicketsTab({ projectId }: { projectId: string }) {
     } catch { toast.error("Error deleting ticket"); }
   };
 
-  const inputCls = "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)] font-inter text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
+  const inputCls = "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)]  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
 
   if (loading) return <div className="flex items-center justify-center py-12"><LucideLoader className="animate-spin" style={{ color: "var(--primary)" }} size={40} /></div>;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold font-id flex items-center gap-2" style={{ color: "var(--text-primary)" }}><AlertTriangle size={22} /> Blockage Tickets</h2>
-        <button onClick={() => setShowModal(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm bg-red-500 hover:bg-red-600">
+        <h2 className="text-2xl font-bold  flex items-center gap-2" style={{ color: "var(--text-primary)" }}><AlertTriangle size={22} /> Blockage Tickets</h2>
+        <button onClick={() => setShowModal(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm bg-red-500 hover:bg-red-600">
           <Plus size={16} /> Report Blockage
         </button>
       </div>
@@ -62,7 +62,7 @@ export default function TicketsTab({ projectId }: { projectId: string }) {
       {tickets.length === 0 ? (
         <div className="text-center py-12">
           <AlertTriangle className="mx-auto h-10 w-10 mb-3" style={{ color: "var(--border)" }} />
-          <p className="font-inter text-sm" style={{ color: "var(--text-muted)" }}>No blockages reported yet.</p>
+          <p className=" text-sm" style={{ color: "var(--text-muted)" }}>No blockages reported yet.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -72,16 +72,16 @@ export default function TicketsTab({ projectId }: { projectId: string }) {
                 <div className="flex items-start gap-3 flex-1">
                   <AlertTriangle className="text-red-500 mt-0.5 shrink-0" size={18} />
                   <div className="flex-1">
-                    <p className="font-semibold font-inter" style={{ color: "var(--text-primary)" }}>Project Blockage Issue</p>
-                    <p className="text-sm font-inter mt-1" style={{ color: "var(--text-secondary)" }}>{ticket.reason}</p>
+                    <p className="font-semibold " style={{ color: "var(--text-primary)" }}>Project Blockage Issue</p>
+                    <p className="text-sm  mt-1" style={{ color: "var(--text-secondary)" }}>{ticket.reason}</p>
                     {ticket.blockedTeammates?.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 mt-2">
                         {ticket.blockedTeammates.map((t: string, i: number) => (
-                          <span key={i} className="px-2 py-0.5 text-xs font-inter rounded-full bg-red-50 text-red-700 border border-red-200">{t}</span>
+                          <span key={i} className="px-2 py-0.5 text-xs  rounded-full bg-red-50 text-red-700 border border-red-200">{t}</span>
                         ))}
                       </div>
                     )}
-                    <div className="flex items-center gap-4 mt-3 text-xs font-inter" style={{ color: "var(--text-muted)" }}>
+                    <div className="flex items-center gap-4 mt-3 text-xs " style={{ color: "var(--text-muted)" }}>
                       <span className="flex items-center gap-1"><User size={12} /> {ticket.reportedBy}</span>
                       <span className="flex items-center gap-1"><Clock size={12} /> {new Date(ticket.createdAt).toLocaleDateString()}</span>
                     </div>
@@ -99,28 +99,28 @@ export default function TicketsTab({ projectId }: { projectId: string }) {
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg">
-            <h3 className="text-lg font-semibold font-inter mb-4" style={{ color: "var(--text-primary)" }}>Report Project Blockage</h3>
+            <h3 className="text-lg font-semibold  mb-4" style={{ color: "var(--text-primary)" }}>Report Project Blockage</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium font-inter mb-1.5" style={{ color: "var(--text-secondary)" }}>Describe the blockage *</label>
+                <label className="block text-sm font-medium  mb-1.5" style={{ color: "var(--text-secondary)" }}>Describe the blockage *</label>
                 <textarea value={newTicket.reason} onChange={(e) => setNewTicket((p) => ({ ...p, reason: e.target.value }))} className={`${inputCls} resize-none`} rows={4} placeholder="e.g., Frontend blocked waiting for design mockups..." disabled={creating} />
               </div>
               <div>
-                <label className="block text-sm font-medium font-inter mb-1.5" style={{ color: "var(--text-secondary)" }}>Blocked Teammates</label>
+                <label className="block text-sm font-medium  mb-1.5" style={{ color: "var(--text-secondary)" }}>Blocked Teammates</label>
                 <div className="space-y-1.5 max-h-32 overflow-y-auto border border-[var(--border)] rounded-lg p-2 bg-[var(--bg)]">
                   {teammates.map((t: any) => (
                     <label key={t.id} className="flex items-center gap-2 cursor-pointer p-1 rounded hover:bg-white transition-colors">
                       <input type="checkbox" checked={newTicket.blockedTeammates.includes(t.user.name)} onChange={(e) => setNewTicket((p) => ({ ...p, blockedTeammates: e.target.checked ? [...p.blockedTeammates, t.user.name] : p.blockedTeammates.filter((n) => n !== t.user.name) }))} className="rounded" disabled={creating} />
-                      <span className="text-sm font-inter" style={{ color: "var(--text-secondary)" }}>{t.user.name}</span>
+                      <span className="text-sm " style={{ color: "var(--text-secondary)" }}>{t.user.name}</span>
                     </label>
                   ))}
-                  {teammates.length === 0 && <p className="text-xs font-inter p-1" style={{ color: "var(--text-muted)" }}>No teammates found</p>}
+                  {teammates.length === 0 && <p className="text-xs  p-1" style={{ color: "var(--text-muted)" }}>No teammates found</p>}
                 </div>
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-6">
-              <button onClick={() => { setShowModal(false); setNewTicket({ reason: "", blockedTeammates: [] }); }} className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg font-inter text-sm" style={{ color: "var(--text-secondary)" }} disabled={creating}>Cancel</button>
-              <button onClick={createTicket} disabled={creating || !newTicket.reason.trim()} className="px-4 py-2 text-white rounded-lg font-inter text-sm disabled:opacity-40 bg-red-500 hover:bg-red-600">
+              <button onClick={() => { setShowModal(false); setNewTicket({ reason: "", blockedTeammates: [] }); }} className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg  text-sm" style={{ color: "var(--text-secondary)" }} disabled={creating}>Cancel</button>
+              <button onClick={createTicket} disabled={creating || !newTicket.reason.trim()} className="px-4 py-2 text-white rounded-lg  text-sm disabled:opacity-40 bg-red-500 hover:bg-red-600">
                 {creating ? "Creating..." : "Report Blockage"}
               </button>
             </div>

@@ -54,25 +54,25 @@ export default function TicketsClientTab({ projectId }: { projectId: string }) {
     finally { setSubmitting(false); }
   };
 
-  const inputCls = "w-full px-3 py-2 border border-[var(--border)] rounded-lg text-sm font-inter outline-none focus:ring-2 focus:ring-[var(--primary)] bg-white text-[var(--text-primary)]";
+  const inputCls = "w-full px-3 py-2 border border-[var(--border)] rounded-lg text-sm  outline-none focus:ring-2 focus:ring-[var(--primary)] bg-white text-[var(--text-primary)]";
 
   if (loading) return <div className="flex justify-center py-16"><Loader2 className="animate-spin text-[var(--primary)]" size={32} /></div>;
 
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold font-id text-[var(--text-primary)]">Support Tickets</h2>
-        <button onClick={() => setOpen(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm" style={{ background: "var(--primary)" }}>
+        <h2 className="text-xl font-bold  text-[var(--text-primary)]">Support Tickets</h2>
+        <button onClick={() => setOpen(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm" style={{ background: "var(--primary)" }}>
           <Plus size={15} /> Raise Ticket
         </button>
       </div>
 
-      <div className="text-xs font-inter p-3 rounded-lg border bg-[var(--primary-light)] border-[#ffd9a8] text-[var(--text-secondary)]">
+      <div className="text-xs  p-3 rounded-lg border bg-[var(--primary-light)] border-[#ffd9a8] text-[var(--text-secondary)]">
         You can raise up to <strong>3 tickets per day</strong>. Tickets are reviewed by our admin team.
       </div>
 
       {tickets.length === 0 ? (
-        <div className="text-center py-16 text-sm font-inter text-[var(--text-muted)]">No tickets raised yet.</div>
+        <div className="text-center py-16 text-sm  text-[var(--text-muted)]">No tickets raised yet.</div>
       ) : (
         <div className="space-y-3">
           {tickets.map((t: any) => (
@@ -80,13 +80,13 @@ export default function TicketsClientTab({ projectId }: { projectId: string }) {
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div className="flex items-center gap-2">
                   <AlertCircle size={15} className="text-[var(--primary)] shrink-0" />
-                  <span className="text-xs font-semibold font-inter text-[var(--text-primary)]">{t.issueType}</span>
+                  <span className="text-xs font-semibold  text-[var(--text-primary)]">{t.issueType}</span>
                 </div>
-                <span className={`text-[10px] font-semibold font-inter px-2 py-0.5 rounded-full border ${STATUS_COLOR[t.status] ?? "bg-gray-100 text-gray-600"}`}>
+                <span className={`text-[10px] font-semibold  px-2 py-0.5 rounded-full border ${STATUS_COLOR[t.status] ?? "bg-gray-100 text-gray-600"}`}>
                   {t.status}
                 </span>
               </div>
-              <p className="text-xs font-inter text-[var(--text-secondary)] leading-relaxed">{t.description}</p>
+              <p className="text-xs  text-[var(--text-secondary)] leading-relaxed">{t.description}</p>
               {t.images?.length > 0 && (
                 <div className="flex gap-2 mt-2 flex-wrap">
                   {t.images.map((img: string, i: number) => (
@@ -96,7 +96,7 @@ export default function TicketsClientTab({ projectId }: { projectId: string }) {
                   ))}
                 </div>
               )}
-              <p className="text-[10px] font-inter text-[var(--text-muted)] mt-2">{new Date(t.createdAt).toLocaleDateString()}</p>
+              <p className="text-[10px]  text-[var(--text-muted)] mt-2">{new Date(t.createdAt).toLocaleDateString()}</p>
             </div>
           ))}
         </div>
@@ -105,15 +105,15 @@ export default function TicketsClientTab({ projectId }: { projectId: string }) {
       {open && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white p-6 rounded-xl max-w-md w-full border border-[var(--border)] shadow-lg">
-            <h3 className="text-base font-semibold font-inter mb-4 text-[var(--text-primary)]">Raise a Ticket</h3>
+            <h3 className="text-base font-semibold  mb-4 text-[var(--text-primary)]">Raise a Ticket</h3>
             <div className="space-y-3">
               <select className={inputCls} value={form.issueType} onChange={(e) => setForm({ ...form, issueType: e.target.value })}>
                 {ISSUE_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
               </select>
               <textarea className={`${inputCls} resize-none`} rows={4} placeholder="Describe the issue (min 10 chars)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
               <div>
-                <label className="block text-xs font-inter text-[var(--text-muted)] mb-1">Attach images (max 5)</label>
-                <input type="file" accept="image/*" multiple onChange={(e) => setImages(Array.from(e.target.files ?? []).slice(0, 5))} className="text-xs font-inter text-[var(--text-secondary)]" />
+                <label className="block text-xs  text-[var(--text-muted)] mb-1">Attach images (max 5)</label>
+                <input type="file" accept="image/*" multiple onChange={(e) => setImages(Array.from(e.target.files ?? []).slice(0, 5))} className="text-xs  text-[var(--text-secondary)]" />
                 {images.length > 0 && (
                   <div className="flex gap-1 mt-2 flex-wrap">
                     {images.map((img, i) => (
@@ -129,8 +129,8 @@ export default function TicketsClientTab({ projectId }: { projectId: string }) {
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-4">
-              <button onClick={() => setOpen(false)} className="px-4 py-2 border border-[var(--border)] rounded-lg text-sm font-inter text-[var(--text-secondary)]">Cancel</button>
-              <button onClick={handleSubmit} disabled={submitting} className="px-4 py-2 text-white rounded-lg text-sm font-inter disabled:opacity-40 flex items-center gap-2" style={{ background: "var(--primary)" }}>
+              <button onClick={() => setOpen(false)} className="px-4 py-2 border border-[var(--border)] rounded-lg text-sm  text-[var(--text-secondary)]">Cancel</button>
+              <button onClick={handleSubmit} disabled={submitting} className="px-4 py-2 text-white rounded-lg text-sm  disabled:opacity-40 flex items-center gap-2" style={{ background: "var(--primary)" }}>
                 {submitting && <Loader2 size={13} className="animate-spin" />} Submit
               </button>
             </div>

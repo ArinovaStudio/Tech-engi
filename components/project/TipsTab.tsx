@@ -35,15 +35,15 @@ export default function UsefulTipsTab({ projectId }: { projectId: string }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold font-id flex items-center gap-2" style={{ color: "var(--text-primary)" }}><Lightbulb size={22} /> Useful Tips</h2>
-        <button onClick={() => setShowModal(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm" style={{ background: "var(--primary)" }}>
+        <h2 className="text-2xl font-bold  flex items-center gap-2" style={{ color: "var(--text-primary)" }}><Lightbulb size={22} /> Useful Tips</h2>
+        <button onClick={() => setShowModal(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm" style={{ background: "var(--primary)" }}>
           <Plus size={14} /> Add Tip
         </button>
       </div>
 
       <div className="rounded-lg p-4 border" style={{ background: "var(--primary-light)", borderColor: "#ffd9a8" }}>
-        <h3 className="font-semibold font-inter text-sm mb-1" style={{ color: "var(--text-primary)" }}>Contribution Guidelines</h3>
-        <ul className="text-xs font-inter space-y-0.5" style={{ color: "var(--text-secondary)" }}>
+        <h3 className="font-semibold  text-sm mb-1" style={{ color: "var(--text-primary)" }}>Contribution Guidelines</h3>
+        <ul className="text-xs  space-y-0.5" style={{ color: "var(--text-secondary)" }}>
           <li><strong>Open to All:</strong> Anyone involved can contribute suggestions</li>
           <li><strong>Examples:</strong> Best practices, shortcuts, tools, workflow improvements</li>
         </ul>
@@ -52,7 +52,7 @@ export default function UsefulTipsTab({ projectId }: { projectId: string }) {
       {tips.length === 0 ? (
         <div className="text-center py-12">
           <Lightbulb className="mx-auto h-10 w-10 mb-3" style={{ color: "var(--border)" }} />
-          <p className="font-inter text-sm" style={{ color: "var(--text-muted)" }}>No tips shared yet. Be the first!</p>
+          <p className=" text-sm" style={{ color: "var(--text-muted)" }}>No tips shared yet. Be the first!</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -61,8 +61,8 @@ export default function UsefulTipsTab({ projectId }: { projectId: string }) {
               <div className="flex items-start gap-3">
                 <Lightbulb size={18} style={{ color: "var(--primary)", marginTop: 2 }} />
                 <div className="flex-1">
-                  <p className="text-sm font-inter" style={{ color: "var(--text-secondary)" }}>{tip.tip}</p>
-                  <div className="flex items-center gap-4 mt-2 text-xs font-inter" style={{ color: "var(--text-muted)" }}>
+                  <p className="text-sm " style={{ color: "var(--text-secondary)" }}>{tip.tip}</p>
+                  <div className="flex items-center gap-4 mt-2 text-xs " style={{ color: "var(--text-muted)" }}>
                     <span className="flex items-center gap-1"><User size={11} /> {tip.user}</span>
                     <span className="flex items-center gap-1"><Calendar size={11} /> {new Date(tip.createdAt).toLocaleDateString()}</span>
                   </div>
@@ -76,11 +76,11 @@ export default function UsefulTipsTab({ projectId }: { projectId: string }) {
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg">
-            <h3 className="text-lg font-semibold font-inter mb-4" style={{ color: "var(--text-primary)" }}>Share a Useful Tip</h3>
-            <textarea value={newTip.tip} onChange={(e) => setNewTip({ tip: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)] font-inter text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] resize-none" rows={4} placeholder="Share your insight..." disabled={creating} />
+            <h3 className="text-lg font-semibold  mb-4" style={{ color: "var(--text-primary)" }}>Share a Useful Tip</h3>
+            <textarea value={newTip.tip} onChange={(e) => setNewTip({ tip: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)]  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] resize-none" rows={4} placeholder="Share your insight..." disabled={creating} />
             <div className="flex justify-end gap-3 mt-4">
-              <button onClick={() => { setShowModal(false); setNewTip({ tip: "" }); }} className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg font-inter text-sm" style={{ color: "var(--text-secondary)" }}>Cancel</button>
-              <button onClick={createTip} disabled={creating || !newTip.tip.trim()} className="px-4 py-2 text-white rounded-lg font-inter text-sm disabled:opacity-40" style={{ background: "var(--primary)" }}>
+              <button onClick={() => { setShowModal(false); setNewTip({ tip: "" }); }} className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg  text-sm" style={{ color: "var(--text-secondary)" }}>Cancel</button>
+              <button onClick={createTip} disabled={creating || !newTip.tip.trim()} className="px-4 py-2 text-white rounded-lg  text-sm disabled:opacity-40" style={{ background: "var(--primary)" }}>
                 {creating ? "Adding..." : "Add Tip"}
               </button>
             </div>

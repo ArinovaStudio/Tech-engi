@@ -59,7 +59,7 @@ export default function ExtensionsTab({ projectId, role }: { projectId: string; 
     } catch { toast.error("Failed"); }
   };
 
-  const inputCls = "w-full px-3 py-2 border border-[var(--border)] rounded-lg text-sm font-inter outline-none focus:ring-2 focus:ring-[var(--primary)] bg-white text-[var(--text-primary)]";
+  const inputCls = "w-full px-3 py-2 border border-[var(--border)] rounded-lg text-sm  outline-none focus:ring-2 focus:ring-[var(--primary)] bg-white text-[var(--text-primary)]";
 
   const STATUS_ICON: Record<string, React.ReactNode> = {
     PENDING:  <Clock size={15} className="text-yellow-500" />,
@@ -72,16 +72,16 @@ export default function ExtensionsTab({ projectId, role }: { projectId: string; 
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold font-id text-[var(--text-primary)]">Deadline Extensions</h2>
+        <h2 className="text-xl font-bold  text-[var(--text-primary)]">Deadline Extensions</h2>
         {role === "ENGINEER" && (
-          <button onClick={() => setOpen(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm" style={{ background: "var(--primary)" }}>
+          <button onClick={() => setOpen(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm" style={{ background: "var(--primary)" }}>
             <Plus size={15} /> Request Extension
           </button>
         )}
       </div>
 
       {extensions.length === 0 ? (
-        <div className="text-center py-16 text-sm font-inter text-[var(--text-muted)]">No extension requests yet.</div>
+        <div className="text-center py-16 text-sm  text-[var(--text-muted)]">No extension requests yet.</div>
       ) : (
         <div className="space-y-3">
           {extensions.map((ext: any) => (
@@ -89,24 +89,24 @@ export default function ExtensionsTab({ projectId, role }: { projectId: string; 
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-2">
                   {STATUS_ICON[ext.status] ?? <Clock size={15} />}
-                  <span className="text-xs font-semibold font-inter text-[var(--text-primary)]">
+                  <span className="text-xs font-semibold  text-[var(--text-primary)]">
                     Requested: {new Date(ext.requestedEndDate).toLocaleDateString()}
                   </span>
                 </div>
-                <span className={`text-[10px] font-semibold font-inter px-2 py-0.5 rounded-full border
+                <span className={`text-[10px] font-semibold  px-2 py-0.5 rounded-full border
                   ${ext.status === "APPROVED" ? "bg-green-50 text-green-700 border-green-200" :
                     ext.status === "REJECTED" ? "bg-red-50 text-red-700 border-red-200" :
                     "bg-yellow-50 text-yellow-700 border-yellow-200"}`}>
                   {ext.status}
                 </span>
               </div>
-              <p className="text-xs font-inter text-[var(--text-secondary)] mt-2 leading-relaxed">{ext.reason}</p>
-              <p className="text-[10px] font-inter text-[var(--text-muted)] mt-1">{new Date(ext.createdAt).toLocaleDateString()}</p>
+              <p className="text-xs  text-[var(--text-secondary)] mt-2 leading-relaxed">{ext.reason}</p>
+              <p className="text-[10px]  text-[var(--text-muted)] mt-1">{new Date(ext.createdAt).toLocaleDateString()}</p>
 
               {role === "CLIENT" && ext.status === "PENDING" && (
                 <div className="flex gap-2 mt-3">
-                  <button onClick={() => handleReview(ext.id, "APPROVE")} className="px-3 py-1.5 bg-green-600 text-white text-xs font-inter rounded-lg hover:bg-green-700">Approve</button>
-                  <button onClick={() => handleReview(ext.id, "REJECT")} className="px-3 py-1.5 bg-red-500 text-white text-xs font-inter rounded-lg hover:bg-red-600">Reject</button>
+                  <button onClick={() => handleReview(ext.id, "APPROVE")} className="px-3 py-1.5 bg-green-600 text-white text-xs  rounded-lg hover:bg-green-700">Approve</button>
+                  <button onClick={() => handleReview(ext.id, "REJECT")} className="px-3 py-1.5 bg-red-500 text-white text-xs  rounded-lg hover:bg-red-600">Reject</button>
                 </div>
               )}
             </div>
@@ -117,20 +117,20 @@ export default function ExtensionsTab({ projectId, role }: { projectId: string; 
       {open && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white p-6 rounded-xl max-w-md w-full border border-[var(--border)] shadow-lg">
-            <h3 className="text-base font-semibold font-inter mb-4 text-[var(--text-primary)]">Request Deadline Extension</h3>
+            <h3 className="text-base font-semibold  mb-4 text-[var(--text-primary)]">Request Deadline Extension</h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-inter text-[var(--text-muted)] mb-1">New Requested End Date</label>
+                <label className="block text-xs  text-[var(--text-muted)] mb-1">New Requested End Date</label>
                 <input type="date" className={inputCls} value={form.requestedEndDate} onChange={(e) => setForm({ ...form, requestedEndDate: e.target.value })} />
               </div>
               <div>
-                <label className="block text-xs font-inter text-[var(--text-muted)] mb-1">Reason (min 10 chars)</label>
+                <label className="block text-xs  text-[var(--text-muted)] mb-1">Reason (min 10 chars)</label>
                 <textarea className={`${inputCls} resize-none`} rows={3} value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} placeholder="Explain why you need more time..." />
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-4">
-              <button onClick={() => setOpen(false)} className="px-4 py-2 border border-[var(--border)] rounded-lg text-sm font-inter text-[var(--text-secondary)]">Cancel</button>
-              <button onClick={handleRequest} disabled={submitting} className="px-4 py-2 text-white rounded-lg text-sm font-inter disabled:opacity-40 flex items-center gap-2" style={{ background: "var(--primary)" }}>
+              <button onClick={() => setOpen(false)} className="px-4 py-2 border border-[var(--border)] rounded-lg text-sm  text-[var(--text-secondary)]">Cancel</button>
+              <button onClick={handleRequest} disabled={submitting} className="px-4 py-2 text-white rounded-lg text-sm  disabled:opacity-40 flex items-center gap-2" style={{ background: "var(--primary)" }}>
                 {submitting && <Loader2 size={13} className="animate-spin" />} Send Request
               </button>
             </div>

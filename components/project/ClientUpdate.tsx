@@ -13,8 +13,8 @@ export function MinimalCard({ id, description, createdBy, date, onDelete }: Card
       <button onClick={() => onDelete?.(id)} className="absolute right-3 top-3 p-1.5 rounded-lg hover:bg-red-50 transition-colors" style={{ color: "var(--text-muted)" }}>
         <Trash2 size={14} />
       </button>
-      <p className="text-sm font-inter leading-relaxed pr-8" style={{ color: "var(--text-secondary)" }}>{description}</p>
-      <div className="mt-4 flex items-center justify-between text-xs font-inter">
+      <p className="text-sm  leading-relaxed pr-8" style={{ color: "var(--text-secondary)" }}>{description}</p>
+      <div className="mt-4 flex items-center justify-between text-xs ">
         <span style={{ color: "var(--text-muted)" }}>{createdBy}</span>
         <span style={{ color: "var(--text-muted)" }}>{date}</span>
       </div>
@@ -62,10 +62,10 @@ function ClientUpdate({ projectId }: { projectId: string }) {
     <div className="relative space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold font-id" style={{ color: "var(--text-primary)" }}>Client Update</h2>
-          <p className="text-sm font-inter mt-0.5" style={{ color: "var(--text-muted)" }}>Report to client for the latest updates.</p>
+          <h2 className="text-2xl font-bold " style={{ color: "var(--text-primary)" }}>Client Update</h2>
+          <p className="text-sm  mt-0.5" style={{ color: "var(--text-muted)" }}>Report to client for the latest updates.</p>
         </div>
-        <button onClick={() => setShowAddUpdate(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm" style={{ background: "var(--primary)" }}>
+        <button onClick={() => setShowAddUpdate(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm" style={{ background: "var(--primary)" }}>
           <PlusCircle size={15} /> Update
         </button>
       </div>
@@ -73,11 +73,11 @@ function ClientUpdate({ projectId }: { projectId: string }) {
       {showAddUpdate && (
         <div className="fixed inset-0 flex items-center justify-center p-4 z-50 bg-black/40">
           <div className="w-full max-w-md bg-white p-6 rounded-xl border border-[var(--border)] shadow-lg">
-            <h1 className="text-lg font-semibold font-inter mb-4" style={{ color: "var(--text-primary)" }}>Update to Client</h1>
-            <TextArea value={update} onChange={(e) => setUpdate(e)} className="min-h-40 bg-[var(--bg)] resize-none border border-[var(--border)] rounded-lg font-inter text-sm" />
+            <h1 className="text-lg font-semibold  mb-4" style={{ color: "var(--text-primary)" }}>Update to Client</h1>
+            <TextArea value={update} onChange={(e) => setUpdate(e)} className="min-h-40 bg-[var(--bg)] resize-none border border-[var(--border)] rounded-lg  text-sm" />
             <div className="flex justify-end gap-3 mt-4">
-              <button onClick={() => { setShowAddUpdate(false); setUpdate(""); }} className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg font-inter text-sm" style={{ color: "var(--text-secondary)" }}>Cancel</button>
-              <button onClick={handleAddUpdate} disabled={updating} className="px-4 py-2 text-white rounded-lg font-inter text-sm disabled:opacity-40" style={{ background: "var(--primary)" }}>Save</button>
+              <button onClick={() => { setShowAddUpdate(false); setUpdate(""); }} className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg  text-sm" style={{ color: "var(--text-secondary)" }}>Cancel</button>
+              <button onClick={handleAddUpdate} disabled={updating} className="px-4 py-2 text-white rounded-lg  text-sm disabled:opacity-40" style={{ background: "var(--primary)" }}>Save</button>
             </div>
           </div>
         </div>
@@ -90,7 +90,7 @@ function ClientUpdate({ projectId }: { projectId: string }) {
           ))}
         </div>
       ) : (
-        <p className="text-center font-inter text-sm py-12" style={{ color: "var(--text-muted)" }}>No updates added yet.</p>
+        <p className="text-center  text-sm py-12" style={{ color: "var(--text-muted)" }}>No updates added yet.</p>
       )}
     </div>
   );

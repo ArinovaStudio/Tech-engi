@@ -133,19 +133,19 @@ export default function TeamTab({ projectId }: { projectId: string }) {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold font-id" style={{ color: "var(--text-primary)" }}>Project Team</h2>
+        <h2 className="text-2xl font-bold " style={{ color: "var(--text-primary)" }}>Project Team</h2>
         {isAdmin && (
           <div className="flex items-center gap-3">
             <button
               onClick={isClientAvailable ? () => {} : () => { fetchAvailableUsers("CLIENT"); setShowAddModal(true); setClientModel(true); }}
-              className={`px-4 py-2 border border-[var(--border)] rounded-lg flex items-center gap-2 transition-colors font-inter text-sm ${isClientAvailable ? "opacity-40 cursor-not-allowed" : "hover:bg-[var(--primary-light)]"}`}
+              className={`px-4 py-2 border border-[var(--border)] rounded-lg flex items-center gap-2 transition-colors  text-sm ${isClientAvailable ? "opacity-40 cursor-not-allowed" : "hover:bg-[var(--primary-light)]"}`}
               style={{ color: "var(--text-secondary)" }}
             >
               <Plus size={16} /> Add Client
             </button>
             <button
               onClick={() => { fetchAvailableUsers("EMPLOYEE"); setShowAddModal(true); }}
-              className="px-4 py-2 text-white rounded-lg flex items-center gap-2 transition-colors font-inter text-sm"
+              className="px-4 py-2 text-white rounded-lg flex items-center gap-2 transition-colors  text-sm"
               style={{ background: "var(--primary)" }}
             >
               <Plus size={16} /> Add Member
@@ -155,7 +155,7 @@ export default function TeamTab({ projectId }: { projectId: string }) {
       </div>
 
       {members.length === 0 && (
-        <p className="text-sm font-inter" style={{ color: "var(--text-muted)" }}>No team members added yet.</p>
+        <p className="text-sm " style={{ color: "var(--text-muted)" }}>No team members added yet.</p>
       )}
 
       <div className="space-y-3">
@@ -165,25 +165,25 @@ export default function TeamTab({ projectId }: { projectId: string }) {
             <div key={m.id} className="p-5 bg-white border border-[var(--border)] rounded-xl">
               <div className="flex justify-between items-center">
                 <div className="flex-1">
-                  <p className="font-semibold font-inter" style={{ color: "var(--text-primary)" }}>{m.user.name}</p>
+                  <p className="font-semibold " style={{ color: "var(--text-primary)" }}>{m.user.name}</p>
                   {editingMember?.id === m.id ? (
                     <div className="flex items-center gap-2 mt-2">
                       <input
                         type="text"
                         value={newRole}
                         onChange={(e) => setNewRole(e.target.value)}
-                        className="px-2 py-1 text-sm border border-[var(--border)] rounded bg-[var(--bg)] font-inter"
+                        className="px-2 py-1 text-sm border border-[var(--border)] rounded bg-[var(--bg)] "
                         style={{ color: "var(--text-primary)" }}
                         placeholder="Enter role"
                       />
-                      <button onClick={saveRole} className="px-2 py-1 text-white text-xs rounded font-inter" style={{ background: "var(--primary)" }}>Save</button>
-                      <button onClick={() => setEditingMember(null)} className="px-2 py-1 bg-gray-100 text-xs rounded font-inter" style={{ color: "var(--text-secondary)" }}>Cancel</button>
+                      <button onClick={saveRole} className="px-2 py-1 text-white text-xs rounded " style={{ background: "var(--primary)" }}>Save</button>
+                      <button onClick={() => setEditingMember(null)} className="px-2 py-1 bg-gray-100 text-xs rounded " style={{ color: "var(--text-secondary)" }}>Cancel</button>
                     </div>
                   ) : (
-                    <p className="text-sm font-inter" style={{ color: "var(--text-muted)" }}>{m.role?.name || "Not assigned"}</p>
+                    <p className="text-sm " style={{ color: "var(--text-muted)" }}>{m.role?.name || "Not assigned"}</p>
                   )}
                   {m.isLeader && (
-                    <p className="flex items-center gap-1 mt-1 text-sm font-inter" style={{ color: "var(--primary)" }}>
+                    <p className="flex items-center gap-1 mt-1 text-sm " style={{ color: "var(--primary)" }}>
                       <Crown size={14} /> Team Leader
                     </p>
                   )}
@@ -193,7 +193,7 @@ export default function TeamTab({ projectId }: { projectId: string }) {
                     {m.user.role.name !== "CLIENT" && (
                       <button
                         onClick={() => updateRole(m.userId, m.role.name || "Member", !m.isLeader)}
-                        className="flex items-center gap-1 px-3 py-1 rounded text-xs font-inter border border-[var(--border)]"
+                        className="flex items-center gap-1 px-3 py-1 rounded text-xs  border border-[var(--border)]"
                         style={m.isLeader ? { background: "var(--primary)", color: "#fff", borderColor: "var(--primary)" } : { color: "var(--text-secondary)" }}
                       >
                         <ShieldCheck size={12} />
@@ -219,17 +219,17 @@ export default function TeamTab({ projectId }: { projectId: string }) {
       {(showAddModal || clientModel) && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg">
-            <h2 className="text-lg font-semibold font-inter mb-4" style={{ color: "var(--text-primary)" }}>
+            <h2 className="text-lg font-semibold  mb-4" style={{ color: "var(--text-primary)" }}>
               Add {clientModel ? "Client" : "Team Member"}
             </h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium font-inter mb-1.5" style={{ color: "var(--text-secondary)" }}>Select User</label>
+                <label className="block text-sm font-medium  mb-1.5" style={{ color: "var(--text-secondary)" }}>Select User</label>
                 <select
                   value={selectedUser}
                   onChange={(e) => setSelectedUser(e.target.value)}
                   disabled={usersLoading}
-                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] font-inter text-sm bg-white focus:outline-none"
+                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)]  text-sm bg-white focus:outline-none"
                   style={{ color: "var(--text-primary)" }}
                 >
                   {usersLoading ? (
@@ -245,13 +245,13 @@ export default function TeamTab({ projectId }: { projectId: string }) {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium font-inter mb-1.5" style={{ color: "var(--text-secondary)" }}>Role</label>
+                <label className="block text-sm font-medium  mb-1.5" style={{ color: "var(--text-secondary)" }}>Role</label>
                 <input
                   type="text"
                   value={clientModel ? "CLIENT" : memberRole}
                   disabled={clientModel}
                   onChange={(e) => setMemberRole(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)] font-inter text-sm focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)]  text-sm focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ color: "var(--text-primary)" }}
                   placeholder="Enter role (e.g., Developer, Designer)"
                 />
@@ -260,7 +260,7 @@ export default function TeamTab({ projectId }: { projectId: string }) {
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => { setShowAddModal(false); setSelectedUser(""); setMemberRole(""); setClientModel(false); }}
-                className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg font-inter text-sm"
+                className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg  text-sm"
                 style={{ color: "var(--text-secondary)" }}
               >
                 Cancel
@@ -268,7 +268,7 @@ export default function TeamTab({ projectId }: { projectId: string }) {
               <button
                 onClick={() => addMember(clientModel)}
                 disabled={!selectedUser}
-                className="px-4 py-2 text-white rounded-lg font-inter text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-white rounded-lg  text-sm disabled:opacity-40 disabled:cursor-not-allowed"
                 style={{ background: "var(--primary)" }}
               >
                 Add Member

@@ -70,23 +70,23 @@ export default function ResourcesTab({ projectId, role, project }: { projectId: 
     } catch { toast.error("Failed to delete"); }
   };
 
-  const inputCls = "w-full px-3 py-2 border border-[var(--border)] rounded-lg text-sm font-inter outline-none focus:ring-2 focus:ring-[var(--primary)] bg-white text-[var(--text-primary)]";
+  const inputCls = "w-full px-3 py-2 border border-[var(--border)] rounded-lg text-sm  outline-none focus:ring-2 focus:ring-[var(--primary)] bg-white text-[var(--text-primary)]";
 
   if (loading) return <div className="flex justify-center py-16"><Loader2 className="animate-spin text-[var(--primary)]" size={32} /></div>;
 
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold font-id text-[var(--text-primary)]">Resources</h2>
+        <h2 className="text-xl font-bold  text-[var(--text-primary)]">Resources</h2>
         {canAdd && (
-          <button onClick={() => setOpen(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm" style={{ background: "var(--primary)" }}>
+          <button onClick={() => setOpen(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm" style={{ background: "var(--primary)" }}>
             <Plus size={15} /> Add Resource
           </button>
         )}
       </div>
 
       {resources.length === 0 ? (
-        <div className="text-center py-16 text-sm font-inter text-[var(--text-muted)]">No resources yet.</div>
+        <div className="text-center py-16 text-sm  text-[var(--text-muted)]">No resources yet.</div>
       ) : (
         <div className="space-y-3">
           {resources.map((r: any) => {
@@ -97,15 +97,15 @@ export default function ResourcesTab({ projectId, role, project }: { projectId: 
                   <div className="mt-0.5 text-[var(--primary)]">{TYPE_ICONS[r.type] ?? <FileText size={14} />}</div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-semibold font-inter text-[var(--text-primary)] truncate">{r.title}</p>
+                      <p className="text-sm font-semibold  text-[var(--text-primary)] truncate">{r.title}</p>
                       {isLocked && <Lock size={12} className="text-[var(--text-muted)] shrink-0" />}
                     </div>
-                    <p className="text-xs font-inter text-[var(--text-muted)] mt-0.5">{r.type} · Added by {r.addedBy?.name}</p>
+                    <p className="text-xs  text-[var(--text-muted)] mt-0.5">{r.type} · Added by {r.addedBy?.name}</p>
                     {!isLocked && (
-                      <p className="text-xs font-inter text-[var(--text-secondary)] mt-1 break-all line-clamp-2">{r.content}</p>
+                      <p className="text-xs  text-[var(--text-secondary)] mt-1 break-all line-clamp-2">{r.content}</p>
                     )}
                     {isLocked && (
-                      <p className="text-xs font-inter text-orange-500 mt-1">🔒 Complete final payment to unlock</p>
+                      <p className="text-xs  text-orange-500 mt-1">🔒 Complete final payment to unlock</p>
                     )}
                   </div>
                 </div>
@@ -130,7 +130,7 @@ export default function ResourcesTab({ projectId, role, project }: { projectId: 
       {open && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white p-6 rounded-xl max-w-md w-full border border-[var(--border)] shadow-lg">
-            <h3 className="text-base font-semibold font-inter mb-4 text-[var(--text-primary)]">Add Resource</h3>
+            <h3 className="text-base font-semibold  mb-4 text-[var(--text-primary)]">Add Resource</h3>
             <div className="space-y-3">
               <input className={inputCls} placeholder="Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
               <select className={inputCls} value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value, content: "" })}>
@@ -141,13 +141,13 @@ export default function ResourcesTab({ projectId, role, project }: { projectId: 
                 <option value="IMAGE">Image</option>
               </select>
               {isFileType
-                ? <input type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="text-sm font-inter text-[var(--text-secondary)]" />
+                ? <input type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="text-sm  text-[var(--text-secondary)]" />
                 : <textarea className={`${inputCls} resize-none`} rows={3} placeholder="Content / URL / Credentials" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} />
               }
             </div>
             <div className="flex justify-end gap-3 mt-4">
-              <button onClick={() => setOpen(false)} className="px-4 py-2 border border-[var(--border)] rounded-lg text-sm font-inter text-[var(--text-secondary)]">Cancel</button>
-              <button onClick={handleAdd} disabled={uploading} className="px-4 py-2 text-white rounded-lg text-sm font-inter disabled:opacity-40 flex items-center gap-2" style={{ background: "var(--primary)" }}>
+              <button onClick={() => setOpen(false)} className="px-4 py-2 border border-[var(--border)] rounded-lg text-sm  text-[var(--text-secondary)]">Cancel</button>
+              <button onClick={handleAdd} disabled={uploading} className="px-4 py-2 text-white rounded-lg text-sm  disabled:opacity-40 flex items-center gap-2" style={{ background: "var(--primary)" }}>
                 {uploading && <Loader2 size={13} className="animate-spin" />} Add
               </button>
             </div>

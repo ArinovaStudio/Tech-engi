@@ -51,15 +51,15 @@ export default function BlockageTab({ projectId }: { projectId: string }) {
     RESOLVED: <CheckCircle className="text-green-500" size={18} />,
   }[s] || <XCircle style={{ color: "var(--text-muted)" }} size={18} />);
 
-  const inputCls = "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)] font-inter text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
+  const inputCls = "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)]  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
 
   if (loading) return <div className="flex items-center justify-center py-12"><LucideLoader className="animate-spin" style={{ color: "var(--primary)" }} size={40} /></div>;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold font-id flex items-center gap-2" style={{ color: "var(--text-primary)" }}><AlertTriangle size={22} /> Blockage Tickets</h2>
-        <button onClick={() => setShowModal(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm bg-red-500 hover:bg-red-600">
+        <h2 className="text-2xl font-bold  flex items-center gap-2" style={{ color: "var(--text-primary)" }}><AlertTriangle size={22} /> Blockage Tickets</h2>
+        <button onClick={() => setShowModal(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm bg-red-500 hover:bg-red-600">
           <Plus size={14} /> Report Blockage
         </button>
       </div>
@@ -67,7 +67,7 @@ export default function BlockageTab({ projectId }: { projectId: string }) {
       {tickets.length === 0 ? (
         <div className="text-center py-12">
           <AlertTriangle className="mx-auto h-10 w-10 mb-3" style={{ color: "var(--border)" }} />
-          <p className="font-inter text-sm" style={{ color: "var(--text-muted)" }}>No blockages reported yet.</p>
+          <p className=" text-sm" style={{ color: "var(--text-muted)" }}>No blockages reported yet.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -77,26 +77,26 @@ export default function BlockageTab({ projectId }: { projectId: string }) {
                 <div className="flex items-start gap-3">
                   {getStatusIcon(ticket.status)}
                   <div>
-                    <h3 className="font-semibold font-inter" style={{ color: "var(--text-primary)" }}>{ticket.title}</h3>
-                    <p className="text-sm font-inter mt-0.5" style={{ color: "var(--text-secondary)" }}>{ticket.description}</p>
+                    <h3 className="font-semibold " style={{ color: "var(--text-primary)" }}>{ticket.title}</h3>
+                    <p className="text-sm  mt-0.5" style={{ color: "var(--text-secondary)" }}>{ticket.description}</p>
                   </div>
                 </div>
-                <span className={`px-2.5 py-0.5 text-xs font-semibold font-inter rounded-full border ${getPriorityStyle(ticket.priority)}`}>{ticket.priority}</span>
+                <span className={`px-2.5 py-0.5 text-xs font-semibold  rounded-full border ${getPriorityStyle(ticket.priority)}`}>{ticket.priority}</span>
               </div>
               <div className="bg-[var(--bg)] rounded-lg p-3 mb-3 border border-[var(--border)]">
-                <p className="text-sm font-inter" style={{ color: "var(--text-secondary)" }}><strong>Blocked by:</strong> {ticket.blockedBy}</p>
+                <p className="text-sm " style={{ color: "var(--text-secondary)" }}><strong>Blocked by:</strong> {ticket.blockedBy}</p>
               </div>
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 text-xs font-inter" style={{ color: "var(--text-muted)" }}>
+                <div className="flex items-center gap-4 text-xs " style={{ color: "var(--text-muted)" }}>
                   <span className="flex items-center gap-1"><User size={11} /> Reported by Developer</span>
                   <span>{new Date(ticket.createdAt).toLocaleDateString()}</span>
                 </div>
                 {currentUser?.role.name === "ADMIN" && ticket.status !== "RESOLVED" && (
                   <div className="flex gap-2">
                     {ticket.status === "OPEN" && (
-                      <button onClick={() => updateTicketStatus(ticket.id, "IN_PROGRESS")} className="px-3 py-1 text-white text-xs rounded font-inter" style={{ background: "var(--primary)" }}>Start Progress</button>
+                      <button onClick={() => updateTicketStatus(ticket.id, "IN_PROGRESS")} className="px-3 py-1 text-white text-xs rounded " style={{ background: "var(--primary)" }}>Start Progress</button>
                     )}
-                    <button onClick={() => updateTicketStatus(ticket.id, "RESOLVED")} className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded font-inter">Mark Resolved</button>
+                    <button onClick={() => updateTicketStatus(ticket.id, "RESOLVED")} className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded ">Mark Resolved</button>
                   </div>
                 )}
               </div>
@@ -108,14 +108,14 @@ export default function BlockageTab({ projectId }: { projectId: string }) {
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg">
-            <h3 className="text-lg font-semibold font-inter mb-4" style={{ color: "var(--text-primary)" }}>Report Project Blockage</h3>
+            <h3 className="text-lg font-semibold  mb-4" style={{ color: "var(--text-primary)" }}>Report Project Blockage</h3>
             <div className="space-y-4">
               {[{ label: "Issue Title *", key: "title", type: "input", placeholder: "e.g., Waiting for design assets" },
                 { label: "Description *", key: "description", type: "textarea", placeholder: "Describe the blockage..." },
                 { label: "Blocked By *", key: "blockedBy", type: "input", placeholder: "e.g., Design Team, External API" }
               ].map(({ label, key, type, placeholder }) => (
                 <div key={key}>
-                  <label className="block text-sm font-medium font-inter mb-1.5" style={{ color: "var(--text-secondary)" }}>{label}</label>
+                  <label className="block text-sm font-medium  mb-1.5" style={{ color: "var(--text-secondary)" }}>{label}</label>
                   {type === "textarea"
                     ? <textarea value={(newTicket as any)[key]} onChange={(e) => setNewTicket({ ...newTicket, [key]: e.target.value })} className={`${inputCls} resize-none`} rows={3} placeholder={placeholder} disabled={creating} />
                     : <input type="text" value={(newTicket as any)[key]} onChange={(e) => setNewTicket({ ...newTicket, [key]: e.target.value })} className={inputCls} placeholder={placeholder} disabled={creating} />
@@ -123,7 +123,7 @@ export default function BlockageTab({ projectId }: { projectId: string }) {
                 </div>
               ))}
               <div>
-                <label className="block text-sm font-medium font-inter mb-1.5" style={{ color: "var(--text-secondary)" }}>Priority</label>
+                <label className="block text-sm font-medium  mb-1.5" style={{ color: "var(--text-secondary)" }}>Priority</label>
                 <select value={newTicket.priority} onChange={(e) => setNewTicket({ ...newTicket, priority: e.target.value })} className={inputCls} disabled={creating}>
                   <option value="LOW">Low</option>
                   <option value="MEDIUM">Medium</option>
@@ -132,8 +132,8 @@ export default function BlockageTab({ projectId }: { projectId: string }) {
               </div>
             </div>
             <div className="flex justify-end gap-3 mt-6">
-              <button onClick={() => { setShowModal(false); setNewTicket({ title: "", description: "", blockedBy: "", priority: "MEDIUM" }); }} className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg font-inter text-sm" style={{ color: "var(--text-secondary)" }} disabled={creating}>Cancel</button>
-              <button onClick={createTicket} disabled={creating} className="px-4 py-2 text-white rounded-lg font-inter text-sm disabled:opacity-40 bg-red-500 hover:bg-red-600">
+              <button onClick={() => { setShowModal(false); setNewTicket({ title: "", description: "", blockedBy: "", priority: "MEDIUM" }); }} className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg  text-sm" style={{ color: "var(--text-secondary)" }} disabled={creating}>Cancel</button>
+              <button onClick={createTicket} disabled={creating} className="px-4 py-2 text-white rounded-lg  text-sm disabled:opacity-40 bg-red-500 hover:bg-red-600">
                 {creating ? "Creating..." : "Report Blockage"}
               </button>
             </div>

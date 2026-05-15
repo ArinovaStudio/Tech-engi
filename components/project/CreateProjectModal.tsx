@@ -94,7 +94,7 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
     }
   };
 
-  const inputCls = "w-full px-3 py-2 border border-[var(--border)] rounded-lg text-sm font-inter outline-none focus:ring-2 focus:ring-[var(--primary)] bg-white text-[var(--text-primary)]";
+  const inputCls = "w-full px-3 py-2 border border-[var(--border)] rounded-lg text-sm  outline-none focus:ring-2 focus:ring-[var(--primary)] bg-white text-[var(--text-primary)]";
   const budgetAmount = form.budget ? Number(form.budget) : 0;
   const advanceAmount = (budgetAmount * 0.4).toFixed(0);
 
@@ -102,8 +102,8 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div className="bg-white rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl" onClick={(e) => e.stopPropagation()}>
         <div className="p-6">
-          <h2 className="text-lg font-bold font-id text-[var(--text-primary)] mb-1">Create New Project</h2>
-          <p className="text-xs text-[var(--text-muted)] font-inter mb-5">You&apos;ll pay 40% advance after creation</p>
+          <h2 className="text-lg font-bold  text-[var(--text-primary)] mb-1">Create New Project</h2>
+          <p className="text-xs text-[var(--text-muted)]  mb-5">You&apos;ll pay 40% advance after creation</p>
 
           {error && (
             <div className="flex items-center gap-2 text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-4">
@@ -113,17 +113,17 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium font-inter text-[var(--text-secondary)] mb-1">Title *</label>
+              <label className="block text-xs font-medium  text-[var(--text-secondary)] mb-1">Title *</label>
               <input className={inputCls} placeholder="Project title (min 5 chars)" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} maxLength={100} disabled={loading || isPaying} required />
             </div>
 
             <div>
-              <label className="block text-xs font-medium font-inter text-[var(--text-secondary)] mb-1">Description *</label>
+              <label className="block text-xs font-medium  text-[var(--text-secondary)] mb-1">Description *</label>
               <textarea className={`${inputCls} resize-none`} rows={3} placeholder="Describe your project (min 20 chars)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} maxLength={500} disabled={loading || isPaying} required />
             </div>
 
             <div>
-              <label className="block text-xs font-medium font-inter text-[var(--text-secondary)] mb-1">Budget (₹) *</label>
+              <label className="block text-xs font-medium  text-[var(--text-secondary)] mb-1">Budget (₹) *</label>
               <input type="number" className={inputCls} placeholder="Min ₹500" value={form.budget} onChange={(e) => setForm({ ...form, budget: e.target.value })} min="500" disabled={loading || isPaying} required />
               {budgetAmount > 0 && (
                 <p className="text-[10px] text-[var(--text-muted)] mt-1.5 p-2 bg-blue-50 rounded border border-blue-100">
@@ -134,24 +134,24 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium font-inter text-[var(--text-secondary)] mb-1">Start Date</label>
+                <label className="block text-xs font-medium  text-[var(--text-secondary)] mb-1">Start Date</label>
                 <input type="date" className={inputCls} value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} disabled={loading || isPaying} />
               </div>
               <div>
-                <label className="block text-xs font-medium font-inter text-[var(--text-secondary)] mb-1">End Date</label>
+                <label className="block text-xs font-medium  text-[var(--text-secondary)] mb-1">End Date</label>
                 <input type="date" className={inputCls} value={form.endDate} min={form.startDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} disabled={loading || isPaying} />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-medium font-inter text-[var(--text-secondary)] mb-1">Instruments / Skills Needed</label>
+              <label className="block text-xs font-medium  text-[var(--text-secondary)] mb-1">Instruments / Skills Needed</label>
               <div className="flex gap-2 mb-2">
                 <input className={inputCls} placeholder="e.g. React, Node.js" value={instrInput} onChange={(e) => setInstrInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addInstrument())} disabled={loading || isPaying} />
-                <button type="button" onClick={addInstrument} disabled={loading || isPaying} className="px-3 py-2 bg-[var(--primary-light)] text-[var(--primary)] border border-[#ffd9a8] rounded-lg text-xs font-inter font-semibold disabled:opacity-50">Add</button>
+                <button type="button" onClick={addInstrument} disabled={loading || isPaying} className="px-3 py-2 bg-[var(--primary-light)] text-[var(--primary)] border border-[#ffd9a8] rounded-lg text-xs  font-semibold disabled:opacity-50">Add</button>
               </div>
               <div className="flex flex-wrap gap-1">
                 {instruments.map((i) => (
-                  <span key={i} className="text-[10px] font-inter px-2 py-0.5 bg-[var(--primary-light)] text-[var(--primary)] border border-[#ffd9a8] rounded-full flex items-center gap-1">
+                  <span key={i} className="text-[10px]  px-2 py-0.5 bg-[var(--primary-light)] text-[var(--primary)] border border-[#ffd9a8] rounded-full flex items-center gap-1">
                     {i} <button type="button" onClick={() => setInstruments((p) => p.filter((x) => x !== i))} disabled={loading || isPaying} className="hover:text-red-500 disabled:opacity-50">×</button>
                   </span>
                 ))}
@@ -159,8 +159,8 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
             </div>
 
             <div className="flex gap-3 pt-2">
-              <button type="button" onClick={onClose} disabled={loading || isPaying} className="flex-1 px-4 py-2 border border-[var(--border)] rounded-lg text-sm font-inter text-[var(--text-secondary)] hover:bg-[var(--bg)] disabled:opacity-50">Cancel</button>
-              <button type="submit" disabled={loading || isPaying || !form.title.trim() || !form.description.trim() || !form.budget} className="flex-1 px-4 py-2 text-white rounded-lg text-sm font-inter font-semibold disabled:opacity-50 flex items-center justify-center gap-2" style={{ background: "var(--primary)" }}>
+              <button type="button" onClick={onClose} disabled={loading || isPaying} className="flex-1 px-4 py-2 border border-[var(--border)] rounded-lg text-sm  text-[var(--text-secondary)] hover:bg-[var(--bg)] disabled:opacity-50">Cancel</button>
+              <button type="submit" disabled={loading || isPaying || !form.title.trim() || !form.description.trim() || !form.budget} className="flex-1 px-4 py-2 text-white rounded-lg text-sm  font-semibold disabled:opacity-50 flex items-center justify-center gap-2" style={{ background: "var(--primary)" }}>
                 {(loading || isPaying) ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                 {isPaying ? "Processing..." : "Create & Pay"}
               </button>

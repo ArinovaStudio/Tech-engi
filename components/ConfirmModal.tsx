@@ -36,21 +36,21 @@ export default function ConfirmModal({
           <div className={`p-2 rounded-full ${isDanger ? "bg-red-100 text-red-600" : "bg-orange-100 text-orange-600"}`}>
             <AlertTriangle size={24} />
           </div>
-          <h2 className="text-xl font-bold text-[#050A30] font-id">{title}</h2>
+          <h2 className="text-xl font-bold text-[#050A30] ">{title}</h2>
         </div>
-        <p className="text-[#4B4B4B] font-inter text-sm mb-6">{message}</p>
+        <p className="text-[#4B4B4B]  text-sm mb-6">{message}</p>
         <div className="flex gap-3 justify-end">
           <button
             onClick={onCancel}
             disabled={isLoading}
-            className="px-4 py-2 rounded-lg font-inter text-sm bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200"
+            className="px-4 py-2 rounded-lg  text-sm bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200"
           >
             {cancelText}
           </button>
           <button
             onClick={onConfirm}
             disabled={isLoading}
-            className={`flex items-center justify-center min-w-[90px] px-4 py-2 rounded-lg font-inter text-sm text-white ${
+            className={`flex items-center justify-center min-w-[90px] px-4 py-2 rounded-lg  text-sm text-white ${
               isDanger ? "bg-red-600 hover:bg-red-700" : "bg-[#FFAE58] hover:bg-[#e89b45]"
             }`}
           >

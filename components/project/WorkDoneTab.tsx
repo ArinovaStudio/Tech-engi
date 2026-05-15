@@ -74,8 +74,8 @@ export default function WorkDoneTab({ projectId }: any) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold font-id" style={{ color: 'var(--text-primary)' }}>Work Done Tracking</h2>
-      <p className="text-sm font-inter mb-4" style={{ color: 'var(--text-muted)' }}>View all tasks completed by team members.</p>
+      <h2 className="text-2xl font-bold " style={{ color: 'var(--text-primary)' }}>Work Done Tracking</h2>
+      <p className="text-sm  mb-4" style={{ color: 'var(--text-muted)' }}>View all tasks completed by team members.</p>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -83,8 +83,8 @@ export default function WorkDoneTab({ projectId }: any) {
           <div className="flex items-center gap-3">
             <CheckCircle className="text-green-600" size={24} />
             <div>
-              <p className="text-2xl font-bold font-id text-green-700">{tasks.length}</p>
-              <p className="text-sm font-inter text-green-600">Completed Tasks</p>
+              <p className="text-2xl font-bold  text-green-700">{tasks.length}</p>
+              <p className="text-sm  text-green-600">Completed Tasks</p>
             </div>
           </div>
         </div>
@@ -93,11 +93,11 @@ export default function WorkDoneTab({ projectId }: any) {
           <div className="flex items-center gap-3">
             <User size={24} style={{ color: 'var(--primary)' }} />
             <div>
-              <p className="text-2xl font-bold font-id" style={{ color: 'var(--text-primary)' }}>
+              <p className="text-2xl font-bold " style={{ color: 'var(--text-primary)' }}>
                 {/* {new Set(tasks.map(t => t.assignee)).size} */}
                 {tasks.filter((items) => items.completedBy.id === userId).length}
               </p>
-              <p className="text-sm font-inter" style={{ color: 'var(--primary)' }}>My Contributions</p>
+              <p className="text-sm " style={{ color: 'var(--primary)' }}>My Contributions</p>
             </div>
           </div>
         </div>
@@ -106,14 +106,14 @@ export default function WorkDoneTab({ projectId }: any) {
           <div className="flex items-center gap-3">
             <Clock size={24} style={{ color: 'var(--text-secondary)' }} />
             <div>
-              <p className="text-2xl font-bold font-id" style={{ color: 'var(--text-primary)' }}>
+              <p className="text-2xl font-bold " style={{ color: 'var(--text-primary)' }}>
                 {tasks.filter(t => {
                   const completedDate = new Date(t.updatedAt);
                   const today = new Date();
                   return completedDate.toDateString() === today.toDateString();
                 }).length}
               </p>
-              <p className="text-sm font-inter" style={{ color: 'var(--text-secondary)' }}>Completed Today</p>
+              <p className="text-sm " style={{ color: 'var(--text-secondary)' }}>Completed Today</p>
             </div>
           </div>
         </div>
@@ -122,15 +122,15 @@ export default function WorkDoneTab({ projectId }: any) {
       {/* Complete Inventory */}
       <div className="bg-white rounded-lg border border-[var(--border)]">
         <div className="p-6 border-b border-[var(--border)]">
-          <h3 className="text-lg font-semibold font-inter" style={{ color: 'var(--text-primary)' }}>Complete Inventory of Finished Tasks</h3>
-          <p className="text-sm font-inter mt-1" style={{ color: 'var(--text-muted)' }}>All tasks completed with assignee information</p>
+          <h3 className="text-lg font-semibold " style={{ color: 'var(--text-primary)' }}>Complete Inventory of Finished Tasks</h3>
+          <p className="text-sm  mt-1" style={{ color: 'var(--text-muted)' }}>All tasks completed with assignee information</p>
         </div>
 
         {tasks.length === 0 ? (
           <div className="p-12 text-center">
             <CheckCircle className="mx-auto h-12 w-12 mb-4" style={{ color: 'var(--border)' }} />
-            <h3 className="text-lg font-semibold font-inter mb-2" style={{ color: 'var(--text-primary)' }}>No completed tasks yet</h3>
-            <p className="text-sm font-inter" style={{ color: 'var(--text-muted)' }}>Completed tasks will appear here with assignee details</p>
+            <h3 className="text-lg font-semibold  mb-2" style={{ color: 'var(--text-primary)' }}>No completed tasks yet</h3>
+            <p className="text-sm " style={{ color: 'var(--text-muted)' }}>Completed tasks will appear here with assignee details</p>
           </div>
         ) : (
           <div className="divide-y divide-[var(--border)]">
@@ -149,7 +149,7 @@ export default function WorkDoneTab({ projectId }: any) {
                       <CheckCircle className="text-green-500 mt-1" size={20} />
                       <div className="flex-1">
 
-                        <h4 className="text-lg font-semibold font-inter" style={{ color: 'var(--text-primary)' }}>
+                        <h4 className="text-lg font-semibold " style={{ color: 'var(--text-primary)' }}>
                           {task.title}
                         </h4>
                         {task.description && (
@@ -161,7 +161,7 @@ export default function WorkDoneTab({ projectId }: any) {
                     </div>
 
                     <div className="mt-4">
-                      <h3 className="text-sm font-inter rounded-lg w-fit leading-none mb-2" style={{ color: 'var(--primary)' }}>Completed By</h3>
+                      <h3 className="text-sm  rounded-lg w-fit leading-none mb-2" style={{ color: 'var(--primary)' }}>Completed By</h3>
                       <div className="flex gap-1 justify-start items-center">
                         <div className="w-6 h-6 overflow-hidden rounded-full flex justify-center items-center border" style={{ background: 'var(--primary-light)', color: 'var(--primary)', borderColor: '#ffd9a8' }}>
                           {
@@ -187,7 +187,7 @@ export default function WorkDoneTab({ projectId }: any) {
                     {task.tags && task.tags.length > 0 && (
                       <div className="mt-3 flex flex-wrap gap-2">
                         {task.tags.map((tag: string, tagIndex: number) => (
-                          <span key={tagIndex} className="px-2 py-1 bg-[var(--bg)] text-xs rounded border border-[var(--border)] font-inter" style={{ color: 'var(--text-secondary)' }}>
+                          <span key={tagIndex} className="px-2 py-1 bg-[var(--bg)] text-xs rounded border border-[var(--border)] " style={{ color: 'var(--text-secondary)' }}>
                             #{tag}
                           </span>
                         ))}
@@ -204,11 +204,11 @@ export default function WorkDoneTab({ projectId }: any) {
                         {task.priority.toUpperCase()}
                       </span>
                     )}
-                    <div className="mt-2 text-sm font-inter" style={{ color: 'var(--text-muted)' }}>
+                    <div className="mt-2 text-sm " style={{ color: 'var(--text-muted)' }}>
                       <Clock size={14} className="inline mr-1" />
                       Due Date | Completed on
                     </div>
-                    <div className="text-sm font-inter mt-0.5" style={{ color: 'var(--text-primary)' }}>
+                    <div className="text-sm  mt-0.5" style={{ color: 'var(--text-primary)' }}>
                       {new Date(task.dueDate).toDateString()} | <span
                         className={`${new Date(task.updatedAt).toLocaleDateString() < new Date(task.dueDate).toLocaleDateString() ? "text-red-500" : "text-green-600"}`}
                       >{new Date(task.updatedAt).toDateString()}</span>

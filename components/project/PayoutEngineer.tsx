@@ -9,7 +9,7 @@ import PayoutHistory from "./PayoutHistory";
 function SummaryCard({ title, value }: { title: string; value: string }) {
   return (
     <div className="rounded-xl border border-[var(--border)] bg-white p-5">
-      <p className="text-sm font-inter" style={{ color: "var(--text-muted)" }}>
+      <p className="text-sm " style={{ color: "var(--text-muted)" }}>
         {title}
       </p>
       <h2
@@ -60,7 +60,7 @@ export default function PayoutEngineer({ projectId }: Props) {
           Payouts
         </h2>
         <p
-          className="text-sm mt-1 font-inter"
+          className="text-sm mt-1 "
           style={{ color: "var(--text-muted)" }}
         >
           Track payments and transaction history.

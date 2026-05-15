@@ -8,7 +8,7 @@ import { fetcher } from "@/lib/fetcher";
 function SummaryCard({ title, value }: { title: string; value: string }) {
   return (
     <div className="rounded-xl border border-[var(--border)] bg-white p-5">
-      <p className="text-sm font-inter" style={{ color: "var(--text-muted)" }}>
+      <p className="text-sm " style={{ color: "var(--text-muted)" }}>
         {title}
       </p>
       <h2
@@ -48,7 +48,7 @@ export default function PayoutClient({ projectId }: Props) {
         <h2 className="text-2xl font-bold" style={{ color: "var(--text-primary)" }}>
           Client Payments
         </h2>
-        <p className="text-sm mt-1 font-inter" style={{ color: "var(--text-muted)" }}>
+        <p className="text-sm mt-1 " style={{ color: "var(--text-muted)" }}>
           Manage your payments and remaining balance.
         </p>
       </div>
@@ -79,18 +79,18 @@ export default function PayoutClient({ projectId }: Props) {
         {/* CONDITIONAL PAYMENT BOX */}
         <div className="rounded-xl w-full lg:w-96 border border-[var(--border)] bg-white p-6 flex flex-col h-fit">
           <div>
-            <h3 className="text-lg font-semibold font-inter mb-4" style={{ color: "var(--text-primary)" }}>
+            <h3 className="text-lg font-semibold  mb-4" style={{ color: "var(--text-primary)" }}>
               Remaining Payment
             </h3>
 
             {!canPay ? (
-              <p className="text-sm font-inter text-[var(--text-muted)] bg-[var(--bg)] p-4 rounded-lg border border-[var(--border)]">
+              <p className="text-sm  text-[var(--text-muted)] bg-[var(--bg)] p-4 rounded-lg border border-[var(--border)]">
                 No activity yet. Payment will be enabled once the project is
                 approved and reaches 100% completion.
               </p>
             ) : (
               <>
-                <p className="text-sm font-inter text-[var(--text-muted)] mb-2">
+                <p className="text-sm  text-[var(--text-muted)] mb-2">
                   You need to pay the remaining 60% amount.
                 </p>
 

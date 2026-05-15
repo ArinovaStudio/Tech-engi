@@ -1,9 +1,7 @@
 "use client";
 
-import { fetcher } from "@/lib/fetcher";
-import { Eye, Edit, Trash2, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Eye, Edit, Trash2 } from "lucide-react";
 import React, { useState } from "react";
-import useSWR from "swr";
 import toast from "react-hot-toast";
 import ConfirmModal from "../ConfirmModal"; 
 
@@ -20,70 +18,89 @@ function PayoutRow({
   onDelete?: () => void;
   readOnly?: boolean;
 }) {
-  const displayDate = payout.completedAt ? new Date(payout.completedAt) : new Date(payout.createdAt);
-  const payoutDate = displayDate.toLocaleDateString();
+  const payoutDate = new Date(payout.createdAt).toLocaleDateString();
+  const payoutTime = new Date(payout.createdAt).toLocaleTimeString();
 
+  // Status colors
   const isSuccess = payout.status === "SUCCESS";
   const isFailed = payout.status === "FAILED";
-  
-  const borderColor = isSuccess 
-    ? "border-green-500 bg-green-50/20" 
-    : isFailed 
-      ? "border-red-500 bg-red-50/20" 
-      : "border-gray-300 bg-gray-50/50";
-      
-  const badgeColor = isSuccess 
-    ? "bg-green-100 text-green-700" 
-    : isFailed 
-      ? "bg-red-100 text-red-700" 
-      : "bg-yellow-100 text-yellow-700";
+  const borderColor = isSuccess ? "border-green-500" : isFailed ? "border-red-500" : "border-[var(--border)]";
+  const badgeColor = isSuccess ? "bg-green-100 text-green-700" : isFailed ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700";
 
   return (
-    <div className={`relative p-4 rounded-xl border mb-4 transition-colors ${borderColor}`}>
-      <div className="flex justify-between items-start mb-1">
-        <h3 className="font-bold text-lg text-gray-900 font-inter">
-          ₹{payout.amount.toLocaleString()}
-        </h3>
+    <div className={`flex items-center justify-between border ${borderColor} rounded-xl p-4 mb-3 bg-white`}>
+      <div className="space-y-2">
         <div className="flex items-center gap-3">
-          {isSuccess && <CheckCircle size={18} className="text-green-500" />}
-          {isFailed && <XCircle size={18} className="text-red-500" />}
-          {!isSuccess && !isFailed && <Clock size={18} className="text-yellow-500" />}
-          
-          {/* ONLY SHOW EDIT/DELETE IF NOT READ-ONLY */}
-          {!readOnly && onEdit && (
-            <button onClick={onEdit} className="text-blue-500 hover:text-blue-700 transition-colors">
-              <Edit size={16} />
-            </button>
-          )}
-          {!readOnly && onDelete && (
-            <button onClick={onDelete} className="text-red-500 hover:text-red-700 transition-colors">
-              <Trash2 size={16} />
-            </button>
-          )}
+          <p className=" text-sm">
+            <span className="font-semibold text-[13px]" style={{ color: "var(--text-primary)" }}>
+              Amount:
+            </span>{" "}
+            <span style={{ color: "var(--text-secondary)" }}>
+              ₹{payout.amount}
+            </span>
+          </p>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeColor}`}>
+            {payout.status}
+          </span>
         </div>
+
+        <p className=" text-sm">
+          <span className="font-semibold text-[13px]" style={{ color: "var(--text-primary)" }}>
+            Paid By:
+          </span>{" "}
+          <span style={{ color: "var(--text-muted)" }}>{payout.user?.name || "Anonymous"}</span>
+        </p>
+
+        <p className=" text-sm">
+          <span className="font-semibold text-[13px]" style={{ color: "var(--text-primary)" }}>
+            Date:
+          </span>{" "}
+          <span style={{ color: "var(--text-muted)" }}>{payoutDate}</span>
+        </p>
+
+        <p className=" text-sm">
+          <span className="font-semibold text-[13px]" style={{ color: "var(--text-primary)" }}>
+            Time:
+          </span>{" "}
+          <span style={{ color: "var(--text-muted)" }}>{payoutTime}</span>
+        </p>
+
+        <p className=" text-sm">
+          <span className="font-semibold text-[13px]" style={{ color: "var(--text-primary)" }}>
+            Payment ID:
+          </span>{" "}
+          <span className="font-mono text-xs px-2 py-1 rounded-md ml-1" style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text-muted)" }}>
+            {payout.razorpayPaymentId || "Id Not Found!"}
+          </span>
+        </p>
       </div>
 
-      <div className="flex flex-col gap-0.5 items-start">
-        <p className="text-sm text-gray-600 font-inter">
-          {payout.razorpayPaymentId || `Manual-TX-${payout.id.slice(-6)}`}
-        </p>
-        <p className="text-xs text-gray-500 font-inter">
-          {payout.razorpaySignature || "Bank"} • {payoutDate}
-        </p>
-        <p className="text-xs text-gray-500 font-inter">
-          From: {payout.user?.email || "admin@tech-engi.com"}
-        </p>
-
-        <span className={`mt-2 px-3 py-0.5 rounded-full text-[10px] font-bold tracking-wider font-inter ${badgeColor}`}>
-          {payout.status}
-        </span>
-
+      <div className="flex flex-col gap-2 min-w-[100px] items-end">
         <button
-          onClick={() => onView(payout?.proof)}
-          className="mt-3 flex items-center gap-1.5 text-xs text-blue-600 hover:text-blue-800 transition-colors font-medium font-inter"
+          onClick={() => onView(payout?.proof || "/two-guys.png")}
+          className="flex items-center justify-center w-full gap-1 text-sm  px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-[var(--bg)] transition-colors"
+          style={{ color: "var(--text-secondary)" }}
         >
-          <Eye size={14} /> View Proof
+          <Eye size={14} />
+          Proof
         </button>
+
+        {!readOnly && (
+          <div className="flex gap-2 w-full mt-1">
+            <button 
+              onClick={onEdit} 
+              className="flex-1 flex justify-center items-center py-1.5 rounded-lg border border-[var(--border)] text-blue-600 hover:bg-blue-50 transition-colors"
+            >
+              <Edit size={14} />
+            </button>
+            <button 
+              onClick={onDelete} 
+              className="flex-1 flex justify-center items-center py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -97,10 +114,11 @@ export default function PayoutHistory({
 }: { 
   transactions: any[], 
   onEdit?: (tx: any) => void, 
-  onMutate?: () => void,
-  readOnly?: boolean
+  onMutate?: () => void, 
+  readOnly?: boolean 
 }) {
   const [proofModal, setProofModal] = useState<string | null>(null);
+
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -127,28 +145,25 @@ export default function PayoutHistory({
   return (
     <>
       <div className="rounded-xl flex-1 border border-[var(--border)] bg-white p-5 h-full">
-        <h3 className="text-lg font-semibold font-inter mb-5" style={{ color: "var(--text-primary)" }}>
+        <h3 className="text-lg font-semibold  mb-4" style={{ color: "var(--text-primary)" }}>
           Payout History
         </h3>
 
         {transactions.length > 0 ? (
-          <div className="space-y-1">
+          <div className="space-y-2">
             {transactions.map((p: any) => (
               <PayoutRow
                 key={p.id}
                 payout={p}
                 readOnly={readOnly}
-                onView={(proof) => {
-                  if(proof) setProofModal(proof);
-                  else toast.error("No proof uploaded for this transaction.");
-                }}
+                onView={(proof) => setProofModal(proof || null)}
                 onEdit={onEdit ? () => onEdit(p) : undefined}
                 onDelete={() => setDeleteId(p.id)}
               />
             ))}
           </div>
         ) : (
-          <p className="text-sm text-center py-10 font-inter" style={{ color: "var(--text-muted)" }}>
+          <p className="text-sm text-center py-10 " style={{ color: "var(--text-muted)" }}>
             No payouts yet.
           </p>
         )}
@@ -169,7 +184,7 @@ export default function PayoutHistory({
       {proofModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
           <div className="bg-white rounded-xl p-5 max-w-lg w-full shadow-2xl relative">
-            <h2 className="font-bold text-lg mb-4 font-inter" style={{ color: "var(--text-primary)" }}>
+            <h2 className="font-semibold mb-3 " style={{ color: "var(--text-primary)" }}>
               Payment Proof
             </h2>
             <div className="bg-gray-50 rounded-lg border border-[var(--border)] p-2 flex items-center justify-center overflow-hidden min-h-[200px]">
@@ -177,15 +192,12 @@ export default function PayoutHistory({
                 src={proofModal}
                 alt="Payment Proof"
                 className="max-h-[60vh] object-contain rounded"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = "/two-guys.png"; 
-                }}
               />
             </div>
-            <div className="flex justify-end mt-5">
+            <div className="flex justify-end mt-4">
               <button
                 onClick={() => setProofModal(null)}
-                className="px-6 py-2 rounded-lg text-white text-sm font-semibold transition-colors"
+                className="px-5 py-2 rounded-lg text-white  text-sm transition-colors"
                 style={{ background: "var(--primary)" }}
               >
                 Close

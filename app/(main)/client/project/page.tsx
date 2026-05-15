@@ -69,14 +69,14 @@ export default function ClientProjectsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold font-id text-[var(--text-primary)]">
+            <h1 className="text-2xl font-bold  text-[var(--text-primary)]">
               My Projects
             </h1>
-            <p className="text-xs font-inter text-[var(--text-muted)] mt-0.5">
+            <p className="text-xs  text-[var(--text-muted)] mt-0.5">
               Manage your projects and track progress
             </p>
           </div>
-          <button onClick={() => setShowCreate(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm font-semibold hover:bg-[#e89b45] transition-colors" style={{ background: "var(--primary)" }}>
+          <button onClick={() => setShowCreate(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm font-semibold hover:bg-[#e89b45] transition-colors" style={{ background: "var(--primary)" }}>
             <Plus size={15} /> New Project
           </button>
         </div>
@@ -91,8 +91,8 @@ export default function ClientProjectsPage() {
             <div key={s.label} className="bg-white border border-[var(--border)] rounded-xl p-4 flex items-center gap-3 shadow-sm">
               <div className={`${s.color}`}>{s.icon}</div>
               <div>
-                <p className={`text-xl font-bold font-id ${s.color}`}>{s.value}</p>
-                <p className="text-[10px] font-inter text-[var(--text-muted)]">{s.label}</p>
+                <p className={`text-xl font-bold  ${s.color}`}>{s.value}</p>
+                <p className="text-[10px]  text-[var(--text-muted)]">{s.label}</p>
               </div>
             </div>
           ))}
@@ -106,7 +106,7 @@ export default function ClientProjectsPage() {
               placeholder="Search projects..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 border border-[var(--border)] rounded-lg text-sm font-inter bg-gray-50 text-[var(--text-primary)] outline-none focus:ring-1 focus:ring-[var(--primary)]"
+              className="w-full pl-9 pr-4 py-2 border border-[var(--border)] rounded-lg text-sm  bg-gray-50 text-[var(--text-primary)] outline-none focus:ring-1 focus:ring-[var(--primary)]"
             />
           </div>
           <div className="relative w-full md:w-auto shrink-0">
@@ -114,7 +114,7 @@ export default function ClientProjectsPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full md:w-auto pl-8 pr-8 py-2 border border-[var(--border)] rounded-lg text-sm font-inter bg-gray-50 text-[var(--text-primary)] outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[var(--primary)]"
+              className="w-full md:w-auto pl-8 pr-8 py-2 border border-[var(--border)] rounded-lg text-sm  bg-gray-50 text-[var(--text-primary)] outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[var(--primary)]"
             >
               <option value="ALL">All Status</option>
               {Object.entries(STATUS_META).map(([k, v]) => (
@@ -122,7 +122,7 @@ export default function ClientProjectsPage() {
               ))}
             </select>
           </div>
-          <span className="text-xs font-inter text-[var(--text-muted)] px-2 font-medium w-full md:w-auto text-center md:text-left mt-1 md:mt-0">
+          <span className="text-xs  text-[var(--text-muted)] px-2 font-medium w-full md:w-auto text-center md:text-left mt-1 md:mt-0">
             {totalItems} results found
           </span>
         </div>
@@ -135,8 +135,8 @@ export default function ClientProjectsPage() {
         ) : projects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center bg-white border border-[var(--border)] rounded-xl">
             <XCircle size={40} className="text-[var(--border)] mb-3" />
-            <p className="text-sm font-inter font-semibold text-[var(--text-primary)]">No projects found</p>
-            <p className="text-xs font-inter text-[var(--text-muted)] mt-1">
+            <p className="text-sm  font-semibold text-[var(--text-primary)]">No projects found</p>
+            <p className="text-xs  text-[var(--text-muted)] mt-1">
               {search === "" && statusFilter === "ALL" ? "Create your first project to get started." : "Try adjusting your search or filter."}
             </p>
           </div>
@@ -149,7 +149,7 @@ export default function ClientProjectsPage() {
             {/* Pagination Controls */}
             {totalPages > 1 && (
               <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-6">
-                <span className="text-sm text-[var(--text-muted)] font-inter">
+                <span className="text-sm text-[var(--text-muted)] ">
                   Page <span className="font-semibold text-[var(--text-primary)]">{page}</span> of {totalPages}
                 </span>
 
@@ -157,14 +157,14 @@ export default function ClientProjectsPage() {
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="flex items-center gap-1 px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm font-inter font-medium text-[var(--text-secondary)] bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm  font-medium text-[var(--text-secondary)] bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     <ChevronLeft size={16} /> Prev
                   </button>
                   <button
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page === totalPages}
-                    className="flex items-center gap-1 px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm font-inter font-medium text-[var(--text-secondary)] bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm  font-medium text-[var(--text-secondary)] bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     Next <ChevronRight size={16} />
                   </button>

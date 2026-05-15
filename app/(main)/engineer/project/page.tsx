@@ -29,7 +29,7 @@ const STATUS_META: Record<string, { label: string; color: string }> = {
 function StatusBadge({ status }: { status: string }) {
   const meta = STATUS_META[status] ?? { label: status, color: "bg-gray-100 text-gray-600" };
   return (
-    <span className={`text-[10px] font-semibold font-inter px-2 py-0.5 rounded-full ${meta.color}`}>
+    <span className={`text-[10px] font-semibold  px-2 py-0.5 rounded-full ${meta.color}`}>
       {meta.label}
     </span>
   );
@@ -40,31 +40,31 @@ function ProjectCard({ project }: { project: Project }) {
     <Link href={`/engineer/project/${project.id}`}>
       <div className="bg-white border border-[var(--border)] rounded-xl p-5 hover:shadow-md hover:border-[var(--primary)] transition-all cursor-pointer group">
         <div className="flex items-start justify-between gap-2 mb-2">
-          <h3 className="text-sm font-bold font-inter text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--primary)] transition-colors">
+          <h3 className="text-sm font-bold  text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--primary)] transition-colors">
             {project.title}
           </h3>
           <StatusBadge status={project.status} />
         </div>
 
-        <p className="text-xs font-inter text-[var(--text-muted)] line-clamp-2 mb-4 leading-relaxed">
+        <p className="text-xs  text-[var(--text-muted)] line-clamp-2 mb-4 leading-relaxed">
           {project.description}
         </p>
 
         {project.instruments?.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-3">
             {project.instruments.slice(0, 3).map((inst) => (
-              <span key={inst} className="text-[10px] font-inter px-2 py-0.5 bg-[var(--primary-light)] text-[var(--primary)] border border-[#ffd9a8] rounded-full">
+              <span key={inst} className="text-[10px]  px-2 py-0.5 bg-[var(--primary-light)] text-[var(--primary)] border border-[#ffd9a8] rounded-full">
                 {inst}
               </span>
             ))}
             {project.instruments.length > 3 && (
-              <span className="text-[10px] font-inter text-[var(--text-muted)]">+{project.instruments.length - 3}</span>
+              <span className="text-[10px]  text-[var(--text-muted)]">+{project.instruments.length - 3}</span>
             )}
           </div>
         )}
 
         <div className="mb-3">
-          <div className="flex justify-between text-[10px] font-inter text-[var(--text-muted)] mb-1">
+          <div className="flex justify-between text-[10px]  text-[var(--text-muted)] mb-1">
             <span>Progress</span>
             <span className="font-semibold text-[var(--text-primary)]">{project.progress}%</span>
           </div>
@@ -77,12 +77,12 @@ function ProjectCard({ project }: { project: Project }) {
         </div>
 
         <div className="flex items-center justify-between pt-3 border-t border-[var(--border)]">
-          <div className="flex items-center gap-1 text-[10px] font-inter text-[var(--text-muted)]">
+          <div className="flex items-center gap-1 text-[10px]  text-[var(--text-muted)]">
             <Calendar size={11} />
             {new Date(project.createdAt).toLocaleDateString()}
           </div>
           {project.earnings !== undefined && (
-            <span className="text-xs font-bold font-inter text-green-600">
+            <span className="text-xs font-bold  text-green-600">
               Earnings: ₹{project.earnings.toLocaleString()}
             </span>
           )}
@@ -152,10 +152,10 @@ export default function EngineerProjectsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold font-id text-[var(--text-primary)]">
+            <h1 className="text-2xl font-bold  text-[var(--text-primary)]">
               My Assigned Projects
             </h1>
-            <p className="text-xs font-inter text-[var(--text-muted)] mt-0.5">
+            <p className="text-xs  text-[var(--text-muted)] mt-0.5">
               Overview of all your active and completed work
             </p>
           </div>
@@ -171,8 +171,8 @@ export default function EngineerProjectsPage() {
             <div key={s.label} className="bg-white border border-[var(--border)] rounded-xl p-4 flex items-center gap-3 shadow-sm">
               <div className={`${s.color}`}>{s.icon}</div>
               <div>
-                <p className={`text-xl font-bold font-id ${s.color}`}>{s.value}</p>
-                <p className="text-[10px] font-inter text-[var(--text-muted)]">{s.label}</p>
+                <p className={`text-xl font-bold  ${s.color}`}>{s.value}</p>
+                <p className="text-[10px]  text-[var(--text-muted)]">{s.label}</p>
               </div>
             </div>
           ))}
@@ -186,7 +186,7 @@ export default function EngineerProjectsPage() {
               placeholder="Search projects..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 border border-[var(--border)] rounded-lg text-sm font-inter bg-gray-50 text-[var(--text-primary)] outline-none focus:ring-1 focus:ring-[var(--primary)]"
+              className="w-full pl-9 pr-4 py-2 border border-[var(--border)] rounded-lg text-sm  bg-gray-50 text-[var(--text-primary)] outline-none focus:ring-1 focus:ring-[var(--primary)]"
             />
           </div>
           <div className="relative w-full md:w-auto shrink-0">
@@ -194,7 +194,7 @@ export default function EngineerProjectsPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full md:w-auto pl-8 pr-8 py-2 border border-[var(--border)] rounded-lg text-sm font-inter bg-gray-50 text-[var(--text-primary)] outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[var(--primary)]"
+              className="w-full md:w-auto pl-8 pr-8 py-2 border border-[var(--border)] rounded-lg text-sm  bg-gray-50 text-[var(--text-primary)] outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[var(--primary)]"
             >
               <option value="ALL">All Status</option>
               {Object.entries(STATUS_META).map(([k, v]) => (
@@ -202,7 +202,7 @@ export default function EngineerProjectsPage() {
               ))}
             </select>
           </div>
-          <span className="text-xs font-inter text-[var(--text-muted)] px-2 font-medium w-full md:w-auto text-center md:text-left mt-1 md:mt-0">
+          <span className="text-xs  text-[var(--text-muted)] px-2 font-medium w-full md:w-auto text-center md:text-left mt-1 md:mt-0">
             {totalItems} results found
           </span>
         </div>
@@ -215,8 +215,8 @@ export default function EngineerProjectsPage() {
         ) : projects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-xl border border-[var(--border)]">
             <XCircle size={40} className="text-[var(--border)] mb-3" />
-            <p className="text-sm font-inter font-semibold text-[var(--text-primary)]">No projects found</p>
-            <p className="text-xs font-inter text-[var(--text-muted)] mt-1">Try adjusting your filters</p>
+            <p className="text-sm  font-semibold text-[var(--text-primary)]">No projects found</p>
+            <p className="text-xs  text-[var(--text-muted)] mt-1">Try adjusting your filters</p>
           </div>
         ) : (
           <>
@@ -227,7 +227,7 @@ export default function EngineerProjectsPage() {
             {/* Pagination Controls */}
             {totalPages > 1 && (
               <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-6">
-                <span className="text-sm text-[var(--text-muted)] font-inter">
+                <span className="text-sm text-[var(--text-muted)] ">
                   Page <span className="font-semibold text-[var(--text-primary)]">{page}</span> of {totalPages}
                 </span>
                 
@@ -235,14 +235,14 @@ export default function EngineerProjectsPage() {
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="flex items-center gap-1 px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm font-inter font-medium text-[var(--text-secondary)] bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm  font-medium text-[var(--text-secondary)] bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     <ChevronLeft size={16} /> Prev
                   </button>
                   <button
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page === totalPages}
-                    className="flex items-center gap-1 px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm font-inter font-medium text-[var(--text-secondary)] bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm  font-medium text-[var(--text-secondary)] bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     Next <ChevronRight size={16} />
                   </button>

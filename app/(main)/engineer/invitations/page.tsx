@@ -84,7 +84,7 @@ export default function EngineerInvitationsPage() {
     <DashboardShell>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold font-id text-[var(--text-primary)]">Project Invitations</h1>
+          <h1 className="text-2xl font-bold  text-[var(--text-primary)]">Project Invitations</h1>
           <p className="text-sm text-[var(--text-muted)]">Review and respond to AI-matched projects</p>
         </div>
 

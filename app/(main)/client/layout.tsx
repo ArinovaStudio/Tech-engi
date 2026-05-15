@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
+import DashboardShell from "@/components/layout/DashboardShell";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const auth = useAuth();
@@ -30,5 +31,17 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     );
   }
 
-  return <>{children}</>;
+  return (
+        <div className="min-h-screen">
+            {/* Sidebar and Backdrop */}
+            <DashboardShell>
+                <div
+                    className={`transition-all  duration-300 ease-in-out`}
+                >
+                    {/* Page Content */}
+                    <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">{children}</div>
+                </div>
+            </DashboardShell>
+        </div>
+    );
 }

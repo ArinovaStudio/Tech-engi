@@ -96,7 +96,7 @@ export default function EngineerPayoutPage() {
   return (
     <DashboardShell>
       <div className="space-y-6 p-1">
-        <h1 className="text-2xl font-bold font-id" style={{ color: "var(--text-primary)" }}>
+        <h1 className="text-2xl font-bold " style={{ color: "var(--text-primary)" }}>
           My Payouts
         </h1>
 
@@ -106,44 +106,44 @@ export default function EngineerPayoutPage() {
           {/* 1. Total Potential Earnings */}
           <div className="rounded-xl p-5 text-white" style={{ background: "var(--primary)" }}>
             <Wallet size={28} className="opacity-70 mb-3" />
-            <p className="text-xs font-inter">Total Earnings</p>
-            <p className="text-2xl font-bold font-id mt-0.5">₹{totalPotential.toLocaleString()}</p>
+            <p className="text-xs ">Total Earnings</p>
+            <p className="text-2xl font-bold  mt-0.5">₹{totalPotential.toLocaleString()}</p>
           </div>
 
           {/* 2. Amount Received */}
           <div className="rounded-xl p-5 bg-white border border-[var(--border)]">
             <CheckCircle size={28} className="text-green-500 mb-3" />
-            <p className="text-xs font-inter" style={{ color: "var(--text-muted)" }}>
+            <p className="text-xs " style={{ color: "var(--text-muted)" }}>
               Amount Received
             </p>
-            <p className="text-2xl font-bold font-id mt-0.5" style={{ color: "var(--text-primary)" }}>
+            <p className="text-2xl font-bold  mt-0.5" style={{ color: "var(--text-primary)" }}>
               ₹{stats.totalReceived.toLocaleString()}
             </p>
-            <p className="text-xs mt-1 font-inter text-green-600">Successfully paid out</p>
+            <p className="text-xs mt-1  text-green-600">Successfully paid out</p>
           </div>
 
           {/* 3. Amount Pending */}
           <div className="rounded-xl p-5 bg-white border border-[var(--border)]">
             <Clock size={28} className="text-yellow-500 mb-3" />
-            <p className="text-xs font-inter" style={{ color: "var(--text-muted)" }}>
+            <p className="text-xs " style={{ color: "var(--text-muted)" }}>
               Amount Pending
             </p>
-            <p className="text-2xl font-bold font-id mt-0.5" style={{ color: "var(--text-primary)" }}>
+            <p className="text-2xl font-bold  mt-0.5" style={{ color: "var(--text-primary)" }}>
               ₹{stats.totalPending.toLocaleString()}
             </p>
-            <p className="text-xs mt-1 font-inter text-yellow-600">Awaiting release</p>
+            <p className="text-xs mt-1  text-yellow-600">Awaiting release</p>
           </div>
 
           {/* 4. Bank Details Status */}
           <div className="rounded-xl p-5 bg-white border border-[var(--border)]">
             <Landmark size={28} className={hasPayoutDetails ? "text-blue-500 mb-3" : "text-red-500 mb-3"} />
-            <p className="text-xs font-inter" style={{ color: "var(--text-muted)" }}>
+            <p className="text-xs " style={{ color: "var(--text-muted)" }}>
               Bank Details
             </p>
-            <p className="text-lg font-bold font-id mt-0.5" style={{ color: "var(--text-primary)" }}>
+            <p className="text-lg font-bold  mt-0.5" style={{ color: "var(--text-primary)" }}>
               {hasPayoutDetails ? "Configured" : "Missing"}
             </p>
-            <p className={`text-xs mt-1 font-inter ${hasPayoutDetails ? "text-blue-600" : "text-red-600"}`}>
+            <p className={`text-xs mt-1  ${hasPayoutDetails ? "text-blue-600" : "text-red-600"}`}>
               {hasPayoutDetails ? "Ready for payouts" : "Please add in settings"}
             </p>
           </div>
@@ -151,23 +151,23 @@ export default function EngineerPayoutPage() {
           {/* 5. Last Payment */}
           <div className="rounded-xl p-5 bg-white border border-[var(--border)]">
             <CreditCard size={28} className="text-purple-500 mb-3" />
-            <p className="text-xs font-inter" style={{ color: "var(--text-muted)" }}>
+            <p className="text-xs " style={{ color: "var(--text-muted)" }}>
               Last Payment
             </p>
             {lastPayout ? (
               <>
-                <p className="text-sm font-bold font-id mt-0.5" style={{ color: "var(--text-primary)" }}>
+                <p className="text-sm font-bold  mt-0.5" style={{ color: "var(--text-primary)" }}>
                   ₹{lastPayout.amount.toLocaleString()}
                 </p>
-                <p className="text-xs font-inter mt-0.5 truncate" style={{ color: "var(--text-muted)" }}>
+                <p className="text-xs  mt-0.5 truncate" style={{ color: "var(--text-muted)" }}>
                   {lastPayout.project?.title || "Project"}
                 </p>
-                <p className="text-xs font-inter mt-0.5" style={{ color: "var(--text-muted)" }}>
+                <p className="text-xs  mt-0.5" style={{ color: "var(--text-muted)" }}>
                   {formatDate(lastPayout.createdAt)}
                 </p>
               </>
             ) : (
-              <p className="text-sm font-inter mt-1" style={{ color: "var(--text-muted)" }}>
+              <p className="text-sm  mt-1" style={{ color: "var(--text-muted)" }}>
                 No payments yet
               </p>
             )}
@@ -177,10 +177,10 @@ export default function EngineerPayoutPage() {
         {/* Payout History */}
         <div className="bg-white rounded-xl border border-[var(--border)]">
           <div className="p-5 border-b border-[var(--border)]">
-            <h2 className="text-lg font-bold font-id" style={{ color: "var(--text-primary)" }}>
+            <h2 className="text-lg font-bold " style={{ color: "var(--text-primary)" }}>
               Payout History
             </h2>
-            <p className="text-sm font-inter mt-0.5" style={{ color: "var(--text-muted)" }}>
+            <p className="text-sm  mt-0.5" style={{ color: "var(--text-muted)" }}>
               All your payout transactions
             </p>
           </div>
@@ -188,7 +188,7 @@ export default function EngineerPayoutPage() {
           {transactions.length === 0 ? (
             <div className="text-center py-16">
               <DollarSign className="mx-auto mb-3" size={40} style={{ color: "var(--border)" }} />
-              <p className="font-inter text-sm" style={{ color: "var(--text-muted)" }}>
+              <p className=" text-sm" style={{ color: "var(--text-muted)" }}>
                 No payout history yet
               </p>
             </div>
@@ -207,10 +207,10 @@ export default function EngineerPayoutPage() {
                       <CreditCard size={16} style={{ color: "var(--primary)" }} />
                     </div>
                     <div>
-                      <p className="font-semibold font-inter text-sm" style={{ color: "var(--text-primary)" }}>
+                      <p className="font-semibold  text-sm" style={{ color: "var(--text-primary)" }}>
                         {t.project?.title || "Unknown Project"}
                       </p>
-                      <p className="text-xs font-inter mt-0.5" style={{ color: "var(--text-muted)" }}>
+                      <p className="text-xs  mt-0.5" style={{ color: "var(--text-muted)" }}>
                         Engineer Payout • {formatDate(t.createdAt)}
                       </p>
                       <p className="text-xs font-mono mt-0.5" style={{ color: "var(--text-muted)" }}>
@@ -219,10 +219,10 @@ export default function EngineerPayoutPage() {
                     </div>
                   </div>
                   <div className="text-right flex flex-col items-end gap-1.5">
-                    <p className="font-bold font-id" style={{ color: "var(--text-primary)" }}>
+                    <p className="font-bold " style={{ color: "var(--text-primary)" }}>
                       ₹{t.amount.toLocaleString()}
                     </p>
-                    <span className={`text-xs px-2 py-0.5 rounded-full border font-inter ${getStatusStyle(t.status)}`}>
+                    <span className={`text-xs px-2 py-0.5 rounded-full border  ${getStatusStyle(t.status)}`}>
                       {t.status}
                     </span>
                   </div>

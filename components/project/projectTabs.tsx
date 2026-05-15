@@ -22,7 +22,7 @@ export default function ProjectTabs({ activeTab, setActiveTab }: any) {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`relative px-4 py-4 text-sm font-inter whitespace-nowrap transition-all duration-150
+              className={`relative px-4 py-4 text-sm  whitespace-nowrap transition-all duration-150
                 ${isActive
                   ? "text-[var(--primary)] font-semibold"
                   : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"

@@ -82,11 +82,11 @@ export default function PaymentModal({ isOpen, onClose, transaction, onSuccess }
           <X size={18} />
         </button>
         
-        <h2 className="text-2xl font-bold text-[var(--text-primary)] font-inter mb-6 border-b border-[var(--border)] pb-4">
+        <h2 className="text-2xl font-bold text-[var(--text-primary)]  mb-6 border-b border-[var(--border)] pb-4">
           {transaction.status === "PENDING" ? "Process Payment" : "Edit Payment"}
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-5 font-inter text-sm">
+        <form onSubmit={handleSubmit} className="space-y-5  text-sm">
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>

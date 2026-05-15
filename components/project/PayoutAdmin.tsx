@@ -17,8 +17,8 @@ type User = {
 function SummaryCard({ title, value }: { title: string; value: any }) {
   return (
     <div className="rounded-xl border border-[var(--border)] bg-white p-5">
-      <p className="text-sm font-inter" style={{ color: "var(--text-muted)" }}>{title}</p>
-      <h2 className="text-xl font-bold mt-1 font-id" style={{ color: "var(--text-primary)" }}>{value}</h2>
+      <p className="text-sm " style={{ color: "var(--text-muted)" }}>{title}</p>
+      <h2 className="text-xl font-bold mt-1 " style={{ color: "var(--text-primary)" }}>{value}</h2>
     </div>
   );
 }
@@ -50,7 +50,7 @@ export default function PayoutAdmin({ projectId }: { projectId: string }) {
       
       {/* SIDEBAR */}
       <div className="w-full lg:w-72 border border-[var(--border)] rounded-xl bg-white p-5 space-y-4 h-fit">
-        <h3 className="font-bold text-lg font-id text-[var(--text-primary)]">Project Users</h3>
+        <h3 className="font-bold text-lg  text-[var(--text-primary)]">Project Users</h3>
         <div className="space-y-3">
           {users.map((user: any) => (
             <button
@@ -63,8 +63,8 @@ export default function PayoutAdmin({ projectId }: { projectId: string }) {
                 }`}
             >
               <div>
-                <p className="font-bold text-sm font-inter text-[var(--text-primary)]">{user.name}</p>
-                <p className="text-xs font-inter text-[var(--text-muted)] mt-0.5">{user.role}</p>
+                <p className="font-bold text-sm  text-[var(--text-primary)]">{user.name}</p>
+                <p className="text-xs  text-[var(--text-muted)] mt-0.5">{user.role}</p>
               </div>
               <Clock size={16} className="text-[var(--text-muted)]" />
             </button>
@@ -82,7 +82,7 @@ export default function PayoutAdmin({ projectId }: { projectId: string }) {
             value={
               selectedUser ? (
                 selectedUser.payoutDetail ? (
-                  <div className="text-xs font-inter space-y-1.5 mt-2 text-[var(--text-secondary)]">
+                  <div className="text-xs  space-y-1.5 mt-2 text-[var(--text-secondary)]">
                     {selectedUser.payoutDetail.accountHolder && <p><span className="font-semibold text-[var(--text-primary)]">Name:</span> {selectedUser.payoutDetail.accountHolder}</p>}
                     {selectedUser.payoutDetail.bankName && <p><span className="font-semibold text-[var(--text-primary)]">Bank:</span> {selectedUser.payoutDetail.bankName}</p>}
                     {selectedUser.payoutDetail.accountNumber && <p><span className="font-semibold text-[var(--text-primary)]">A/C:</span> {selectedUser.payoutDetail.accountNumber}</p>}
@@ -109,13 +109,13 @@ export default function PayoutAdmin({ projectId }: { projectId: string }) {
           {/* PAYMENT ACTION CARD */}
           <div className="rounded-xl w-full lg:w-80 border border-[var(--border)] bg-white p-6 flex flex-col justify-between h-fit">
             <div>
-              <h3 className="text-lg font-semibold font-inter mb-4 text-[var(--text-primary)]">Pending Action</h3>
+              <h3 className="text-lg font-semibold  mb-4 text-[var(--text-primary)]">Pending Action</h3>
 
               {!selectedUser ? (
-                <p className="text-sm font-inter text-[var(--text-muted)]">Select a user to proceed.</p>
+                <p className="text-sm  text-[var(--text-muted)]">Select a user to proceed.</p>
               ) : pendingTx ? (
                 <>
-                  <p className="text-sm font-inter text-[var(--text-muted)] mb-6 leading-relaxed">
+                  <p className="text-sm  text-[var(--text-muted)] mb-6 leading-relaxed">
                     There is a pending <span className="font-bold text-[var(--text-primary)]">{pendingTx.type === "REFUND_CLIENT" ? "refund" : "payout"}</span> of <span className="font-bold text-[var(--text-primary)] border-b border-[var(--border)] pb-0.5">₹{pendingTx.amount}</span>.
                   </p>
                   <button
@@ -127,7 +127,7 @@ export default function PayoutAdmin({ projectId }: { projectId: string }) {
                   </button>
                 </>
               ) : (
-                <p className="text-sm font-inter text-[var(--text-muted)] bg-[var(--bg)] p-4 rounded-lg border border-[var(--border)] text-center">
+                <p className="text-sm  text-[var(--text-muted)] bg-[var(--bg)] p-4 rounded-lg border border-[var(--border)] text-center">
                   No pending payments for this user.
                 </p>
               )}

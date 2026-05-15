@@ -187,6 +187,7 @@
   --font-inter: var(--font-inter);
   --font-spacegrotesk: var(--font-spacegrotesk);
   --font-heading: var(--font-sans);
+  --font-dm:var(--font-dmserif);
 }
 
 /* =========================

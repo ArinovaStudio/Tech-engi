@@ -139,7 +139,7 @@ const AboutUs = () => {
           </div>
 
           {/* FAQ list */}
-          <div className="mt-8 max-w-170 mx-auto px-20 space-y-4 font-inter">
+          <div className="mt-8 max-w-300 mx-auto px-20 space-y-4 font-inter">
             {faqs.map((faq, i) => (
               <div key={i} className="border border-gray-200">
                 <button

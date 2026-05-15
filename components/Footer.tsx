@@ -5,8 +5,11 @@ const Footer = () => {
       <div className="max-w-full mx-auto px-16 pt-12 grid grid-cols-4 gap-8">
 
         <div>
-          <h2 className="text-[30px] font-bold font-[700] leading-tight text-black font-id">
-            Connecting Engineers<br />with Massive<br />Projects
+          <h2 className=" leading-tight text-black font-id">
+            <span className="text-[29px] font-extrabold">Connecting Engineers</span><br /> 
+            <span className="text-[29px] font-extrabold">with Massive</span>
+            <br /> 
+            <span className="text-[29px] font-extrabold">Projects</span>
           </h2>
         </div>
 

@@ -111,7 +111,7 @@ const Start = () => {
         {/* Orange Banner */}
         <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: "#FFAE58", minHeight: "418px" }}>
           {/* Two guys image — centered/left */}
-          <div  ref={bannerRef}  className="absolute top-75 -right-5 -translate-x-1/2" style={{ width: "850px" }}>
+          <div  ref={bannerRef}  className="absolute top-75 right-90 -translate-x-1/2" style={{ width: "850px" }}>
             <Image
               src="/two-guys.png"
               alt="Student and builder shaking hands"
@@ -123,8 +123,8 @@ const Start = () => {
           </div>
 
           {/* Bottom-left: Avatars + Trusted */}
-          <div className="absolute -bottom-35 left-20 flex flex-col items-center gap-3">
-            <div className="flex flex-start -space-x-3">
+          <div className="absolute bottom-15 left-20 flex flex-col items-center gap-3">
+            <div className="flex flex-start -space-x-3 w-full">
               {[
                 { bg: "#c0392b" },
                 { bg: "#27ae60" },
@@ -143,11 +143,11 @@ const Start = () => {
           </div>
 
           {/* Top-right: Testimonial card */}
-          <div className="absolute bottom-15 right-20 max-w-[320px] font-inter">
-            <p className="text-white font-bold text-[18px] mb-0.5">Tarun</p>
-            <p className="text-white/70 text-[10px] mb-2">student at XYZ college</p>
+          <div className="absolute bottom-60 right-30 max-w-[320px] font-inter">
+            <p className="text-white font-bold text-[25px] mb-0.5">Tarun</p>
+            <p className="text-white/70 text-[15px] mb-2">student at XYZ college</p>
             <div className="border-t border-white/40 pt-2">
-              <p className="text-white/90 text-[14px] leading-relaxed">
+              <p className="text-white/90 text-[15px] leading-relaxed">
                 Lorem ipsum dolor sit amet consectetur. Viverra imperdiet sit viverra sed fusca aliquet eget. Amet faucibus amet sapien dui. Est a at viverra cursus montes libero massa a. Urna.
               </p>
             </div>

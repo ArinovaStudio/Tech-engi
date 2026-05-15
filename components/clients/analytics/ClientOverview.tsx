@@ -23,7 +23,7 @@ const ClientOverview = ({ data }: { data: any }) => {
 
   return (
     <div className="dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto">
+      <div className="w-full">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           <div className="lg:col-span-8 space-y-4">
             {/* Top Cards */}
@@ -80,7 +80,7 @@ const ClientOverview = ({ data }: { data: any }) => {
                     </div>
                   </div>
 
-                  <div className="bg-gray-100 dark:bg-gray-800 w-full rounded-2xl p-5 shadow-sm border border-gray-400/50 dark:border-gray-700">
+                  <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-400/50 dark:border-gray-700">
                     <div className="flex flex-col items-start gap-1">
                       <span className="text-xs text-gray-600 dark:text-gray-400">Days Left</span>
                       <p className="text-lg font-bold text-gray-900 dark:text-white">

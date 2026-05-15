@@ -27,7 +27,7 @@ const HowItWorks = () => {
 
     return (
         <section className="w-full bg-white py-20 px-6">
-            <div className="mx-auto max-w-7xl">
+            <div className="w-full">
                 {/* Header */}
                 <div ref={headerRef} className="text-center space-y-6 mb-16">
                     <div className="inline-flex items-center gap-2 justify-center text-[#FFAE58] ">
@@ -42,13 +42,13 @@ const HowItWorks = () => {
                 </div>
 
                 {/* Cards Grid */}
-                <div ref={cardsRef} className="flex justify-between gap-20">
+                <div ref={cardsRef} className="flex justify-between gap-20 px-15">
                     {steps.map((step, index) => {
                         const Icon = step.icon
                         return (
                             <div key={index} className="relative gap-10 font-id">
                                 {/* Main Card */}
-                                <div className="relative z-10 h-[369px] w-[390px] bg-white rounded-3xl p-8 border border-slate-200">
+                                <div className="relative z-10 h-92.25 w-97.5 bg-white rounded-3xl p-8 border border-slate-200">
                                     {/* Icon */}
                                     <div className="mt-10 relative flex justify-center items-center">
                                         <div className="border-4 border-gray-200 rounded-2xl">

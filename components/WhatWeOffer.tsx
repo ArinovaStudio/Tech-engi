@@ -32,10 +32,10 @@ const WhatWeOffer = () => {
 
   return (
     <section className="w-full bg-white py-20 px-6">
-      <div className="mx-auto max-w-7xl">
+      <div className="w-full">
         {/* Title */}
         <h2 ref={titleRef} className="text-[64px] font-semibold text-black font-id text-center mb-16">
-          What we <span className="text-[#FFAE58] font-DMserif">offer?</span>
+          What we <span className="text-[#FFAE58] font-dm italic ">offer?</span>
         </h2>
 
         {/* Main Content */}
@@ -68,9 +68,9 @@ const WhatWeOffer = () => {
           </div>
 
           {/* Right Column - For Clients (offset to start at 2nd item) */}
-          <div ref={rightRef} className="flex items-stretch gap-0 mt-[150px]">
+          <div ref={rightRef} className="flex items-stretch gap-0 ">
             {/* Card */}
-            <div className="border border-b-0 border-slate-300 p-8">
+            <div className="border border-b-0 mt-40 border-slate-300 p-8 -mb-10">
               <div className="space-y-6">
                 {clientsOffers.map((offer, index) => (
                   <div key={index} className="pb-4 border-b border-slate-200 last:border-0">

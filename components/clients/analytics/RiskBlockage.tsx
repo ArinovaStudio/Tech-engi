@@ -84,7 +84,7 @@ const STATUS_COLOR: Record<string, string> = {
 };
 
 
-const RiskBlockage = () => {
+const RiskBlockage = ({ tickets = [] }: { tickets: any[] }) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 border-2 border-red-400 shadow-sm relative">
 

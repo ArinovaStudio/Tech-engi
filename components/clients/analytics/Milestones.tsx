@@ -66,7 +66,7 @@ const milestones = [
   },
 ];
 
-const Milestones = () => {
+const Milestones = ({ milestones = [] }: { milestones: any[] }) => {
   return (
     <div className="relative w-full h-[320px] rounded-[24px] border-2 border-[#d6d6d6] bg-[#f5f5f5] p-6 overflow-hidden">
 

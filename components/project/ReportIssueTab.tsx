@@ -229,7 +229,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
   // const handleUpdateTicket = async () => {};
   // const deleteTicket = async () => {};
   const inputCls =
-    "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)] font-inter text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
+    "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)]  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
 
   if (sessionStatus === "loading")
     return (
@@ -246,7 +246,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2
-          className="text-2xl font-bold font-id flex items-center gap-2"
+          className="text-2xl font-bold  flex items-center gap-2"
           style={{ color: "var(--text-primary)" }}
         >
           <AlertCircle size={22} /> Report an Issue
@@ -254,12 +254,12 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
         <div className="flex gap-2">
           {(isAdmin || isEngineer) && (
             <>
-              {/* <button onClick={() => setShowClientIssueModal(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm bg-red-500 hover:bg-red-600">
+              {/* <button onClick={() => setShowClientIssueModal(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm bg-red-500 hover:bg-red-600">
                 <Shield size={14} /> Client Issue
               </button> */}
               <button
                 onClick={() => setShowModal(true)}
-                className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm"
+                className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm"
                 style={{ background: "var(--primary)" }}
               >
                 <Plus size={14} /> Report Issue
@@ -274,13 +274,13 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
         style={{ background: "var(--primary-light)", borderColor: "#ffd9a8" }}
       >
         <h3
-          className="font-semibold font-inter text-sm mb-1"
+          className="font-semibold  text-sm mb-1"
           style={{ color: "var(--text-primary)" }}
         >
           Issue Reporting Guidelines
         </h3>
         <ul
-          className="text-xs font-inter space-y-0.5"
+          className="text-xs  space-y-0.5"
           style={{ color: "var(--text-secondary)" }}
         >
           <li>
@@ -305,7 +305,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
               style={{ color: "var(--border)" }}
             />
             <p
-              className="font-inter text-sm"
+              className=" text-sm"
               style={{ color: "var(--text-muted)" }}
             >
               No issues reported yet.
@@ -445,12 +445,12 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
       {/* {showClientIssueModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg">
-            <h3 className="text-lg font-semibold font-inter mb-4 flex items-center gap-2" style={{ color: "var(--text-primary)" }}><Shield size={18} className="text-red-500" /> Report Client Issue</h3>
+            <h3 className="text-lg font-semibold  mb-4 flex items-center gap-2" style={{ color: "var(--text-primary)" }}><Shield size={18} className="text-red-500" /> Report Client Issue</h3>
             <input type="text" value={clientIssueTitle} onChange={(e) => setClientIssueTitle(e.target.value)} className={`${inputCls} mb-3`} placeholder="Enter client issue title..." disabled={creatingClientIssue} />
-            <p className="text-xs font-inter p-3 rounded-lg bg-red-50 border border-red-200 text-red-700">This will be visible in the client's analytics dashboard.</p>
+            <p className="text-xs  p-3 rounded-lg bg-red-50 border border-red-200 text-red-700">This will be visible in the client's analytics dashboard.</p>
             <div className="flex justify-end gap-3 mt-6">
-              <button onClick={() => { setShowClientIssueModal(false); setClientIssueTitle(""); }} className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg font-inter text-sm" style={{ color: "var(--text-secondary)" }}>Cancel</button>
-              <button onClick={undefined} disabled={creatingClientIssue || !clientIssueTitle.trim()} className="px-4 py-2 text-white rounded-lg font-inter text-sm disabled:opacity-40 bg-red-500 hover:bg-red-600">
+              <button onClick={() => { setShowClientIssueModal(false); setClientIssueTitle(""); }} className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg  text-sm" style={{ color: "var(--text-secondary)" }}>Cancel</button>
+              <button onClick={undefined} disabled={creatingClientIssue || !clientIssueTitle.trim()} className="px-4 py-2 text-white rounded-lg  text-sm disabled:opacity-40 bg-red-500 hover:bg-red-600">
                 {creatingClientIssue ? "Reporting..." : "Report to Client"}
               </button>
             </div>
@@ -462,7 +462,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white text-black! w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg">
             <h3
-              className="text-lg font-semibold font-inter mb-4"
+              className="text-lg font-semibold  mb-4"
               style={{ color: "var(--text-primary)" }}
             >
               Raise a Ticket

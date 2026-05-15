@@ -395,7 +395,7 @@ export default function MilestoneTab({ projectId }: any) {
   };
 
   const inputCls =
-    "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)] font-inter text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
+    "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)]  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
 
   if (loading)
     return (
@@ -412,7 +412,7 @@ export default function MilestoneTab({ projectId }: any) {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2
-          className="text-2xl font-bold font-id"
+          className="text-2xl font-bold "
           style={{ color: "var(--text-primary)" }}
         >
           Milestones
@@ -420,7 +420,7 @@ export default function MilestoneTab({ projectId }: any) {
         {currentUser?.role !== "CLIENT" && (
           <button
             onClick={() => setOpen(true)}
-            className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm"
+            className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm"
             style={{ background: "var(--primary)" }}
           >
             <Plus size={16} /> Add Milestone
@@ -435,7 +435,7 @@ export default function MilestoneTab({ projectId }: any) {
             style={{ color: "var(--border)" }}
           />
           <p
-            className="font-inter text-sm"
+            className=" text-sm"
             style={{ color: "var(--text-muted)" }}
           >
             No milestones created yet.
@@ -461,7 +461,7 @@ export default function MilestoneTab({ projectId }: any) {
                   <div className="w-full space-y-2">
                     {/* TITLE */}
                     <h3
-                      className="font-semibold font-inter"
+                      className="font-semibold "
                       style={{ color: "var(--text-primary)" }}
                     >
                       {m.title}
@@ -469,7 +469,7 @@ export default function MilestoneTab({ projectId }: any) {
 
                     {/* CONTENT BASED ON TYPE */}
                     <div
-                      className="text-sm font-inter"
+                      className="text-sm "
                       style={{ color: "var(--text-muted)" }}
                     >
                       {m.type === "LINK" ? (
@@ -507,14 +507,14 @@ export default function MilestoneTab({ projectId }: any) {
 
                     {/* META INFO */}
                     <p
-                      className="text-xs font-inter"
+                      className="text-xs "
                       style={{ color: "var(--text-muted)" }}
                     >
                       Added on {new Date(m.createdAt).toLocaleDateString()}
                     </p>
 
                     <p
-                      className="text-xs font-inter"
+                      className="text-xs "
                       style={{ color: "var(--text-muted)" }}
                     >
                       By {m.addedBy?.name}
@@ -526,14 +526,14 @@ export default function MilestoneTab({ projectId }: any) {
                 <div className="flex flex-col items-end gap-2 shrink-0">
                   {/* TYPE BADGE */}
                   <span
-                    className={`text-xs px-2.5 py-0.5 rounded-full border font-inter font-semibold ${s.badge}`}
+                    className={`text-xs px-2.5 py-0.5 rounded-full border  font-semibold ${s.badge}`}
                   >
                     {m.type}
                   </span>
 
                   {/* COMPLETION BADGE */}
                   <span
-                    className={`text-[10px] px-2 py-0.5 rounded-full font-inter ${
+                    className={`text-[10px] px-2 py-0.5 rounded-full  ${
                       m.completed
                         ? "bg-green-100 text-green-600"
                         : "bg-gray-100 text-gray-500"
@@ -590,7 +590,7 @@ export default function MilestoneTab({ projectId }: any) {
             {/* HEADER */}
             <div className="flex justify-between items-center mb-4">
               <h2
-                className="text-lg font-semibold font-inter"
+                className="text-lg font-semibold "
                 style={{ color: "var(--text-primary)" }}
               >
                 {currentUser?.role !== "CLIENT"
@@ -616,7 +616,7 @@ export default function MilestoneTab({ projectId }: any) {
             <div className="space-y-4 text-black">
               {/* TITLE */}
               <div>
-                <label className="block text-sm font-medium font-inter mb-1.5">
+                <label className="block text-sm font-medium  mb-1.5">
                   Title *
                 </label>
                 <input
@@ -632,7 +632,7 @@ export default function MilestoneTab({ projectId }: any) {
 
               {/* TYPE */}
               <div>
-                <label className="block text-sm font-medium font-inter mb-1.5">
+                <label className="block text-sm font-medium  mb-1.5">
                   Type *
                 </label>
                 <select
@@ -656,7 +656,7 @@ export default function MilestoneTab({ projectId }: any) {
               {/* CONTENT */}
               {newMilestone.type === "LINK" ? (
                 <div>
-                  <label className="block text-sm font-medium font-inter mb-1.5">
+                  <label className="block text-sm font-medium  mb-1.5">
                     URL *
                   </label>
                   <input
@@ -674,14 +674,14 @@ export default function MilestoneTab({ projectId }: any) {
                 </div>
               ) : (
                 <div>
-                  <label className="block text-sm font-medium font-inter mb-1.5">
+                  <label className="block text-sm font-medium  mb-1.5">
                     {editMode ? "Replace File (optional)" : "Upload File *"}
                   </label>
 
                   <input
                     type="file"
                     onChange={(e) => setFile(e.target.files?.[0] || null)}
-                    className="w-full text-sm font-inter"
+                    className="w-full text-sm "
                     disabled={uploading || currentUser?.role === "CLIENT"}
                   />
 
@@ -719,7 +719,7 @@ export default function MilestoneTab({ projectId }: any) {
                       status: "PENDING",
                     });
                   }}
-                  className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg font-inter text-sm"
+                  className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg  text-sm"
                 >
                   Cancel
                 </button>
@@ -733,7 +733,7 @@ export default function MilestoneTab({ projectId }: any) {
                       : !editMode && !file) // 🔥 only require file in create mode
                   }
                   onClick={editMode ? editMilestone : uploadMilestoneFile}
-                  className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm disabled:opacity-40"
+                  className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm disabled:opacity-40"
                   style={{ background: "var(--primary)" }}
                 >
                   {uploading && <Loader2 className="animate-spin" size={14} />}

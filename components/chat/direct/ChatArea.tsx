@@ -205,8 +205,8 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
         <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-4">
           <MessageSquare size={32} className="text-gray-400" />
         </div>
-        <h3 className="text-xl font-bold font-id text-[var(--text-primary)] mb-2">Your Messages</h3>
-        <p className="font-inter text-sm">Select a contact to start chatting.</p>
+        <h3 className="text-xl font-bold  text-[var(--text-primary)] mb-2">Your Messages</h3>
+        <p className=" text-sm">Select a contact to start chatting.</p>
       </div>
     );
   }
@@ -225,7 +225,7 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
           </div>
           <div>
             <div className="flex items-baseline gap-2">
-              <h3 className="font-bold text-[var(--text-primary)] font-inter">{selectedContact.name}</h3>
+              <h3 className="font-bold text-[var(--text-primary)] ">{selectedContact.name}</h3>
               {selectedContact.projectNames && (
                 <span className="text-[10px] text-[var(--primary)] font-semibold uppercase tracking-wider truncate max-w-[200px]">
                   • {selectedContact.projectNames}
@@ -234,7 +234,7 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
             </div>
             <div className="flex items-center gap-1.5">
               <span className={`w-2 h-2 rounded-full ${isOnline ? "bg-green-500" : "bg-gray-300"}`} />
-              <span className="text-xs text-gray-500 font-inter">{isOnline ? "Online" : "Offline"}</span>
+              <span className="text-xs text-gray-500 ">{isOnline ? "Online" : "Offline"}</span>
             </div>
           </div>
         </div>
@@ -292,7 +292,7 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
       {/* NEW: Error Banner */}
       {error && (
         <div className="mx-6 mb-2 mt-2 px-3 py-2 bg-red-50 border border-red-200 flex items-center justify-between rounded-md">
-          <p className="text-xs font-inter text-red-600 font-medium">{error}</p>
+          <p className="text-xs  text-red-600 font-medium">{error}</p>
           <button onClick={() => setError(null)}><X size={13} className="text-red-400 hover:text-red-600" /></button>
         </div>
       )}
@@ -311,7 +311,7 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             placeholder="Type a message..."
-            className="flex-1 bg-gray-100 border-none rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--primary)] font-inter"
+            className="flex-1 bg-gray-100 border-none rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--primary)] "
           />
           <button type="submit" disabled={!inputMessage.trim()} className="w-11 h-11 shrink-0 bg-[#FFAE58] text-white rounded-full flex items-center justify-center hover:bg-[#e89b45] disabled:opacity-50">
             <Send size={18} className="ml-1" />

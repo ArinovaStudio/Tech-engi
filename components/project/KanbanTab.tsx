@@ -114,7 +114,7 @@ const NewTaskModal: React.FC<{
         <div className="sticky top-0 z-10 border-b px-6 py-4 border-[var(--border)] bg-white">
           <div className="flex items-center justify-between">
             <h2
-              className="text-xl font-bold font-id"
+              className="text-xl font-bold "
               style={{ color: "var(--text-primary)" }}
             >
               Create New Task
@@ -131,7 +131,7 @@ const NewTaskModal: React.FC<{
         <div className="p-6 space-y-6">
           <div>
             <label
-              className="block text-sm font-semibold font-inter mb-2"
+              className="block text-sm font-semibold  mb-2"
               style={{ color: "var(--text-secondary)" }}
             >
               Task Title *
@@ -143,13 +143,13 @@ const NewTaskModal: React.FC<{
                 setNewTask({ ...newTask, title: e.target.value })
               }
               placeholder="Enter task title..."
-              className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-white font-inter text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+              className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
               style={{ color: "var(--text-primary)" }}
             />
           </div>
           <div>
             <label
-              className="block text-sm font-semibold font-inter mb-2"
+              className="block text-sm font-semibold  mb-2"
               style={{ color: "var(--text-secondary)" }}
             >
               Describe Your Task
@@ -163,7 +163,7 @@ const NewTaskModal: React.FC<{
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label
-                className="block text-sm font-semibold font-inter mb-2"
+                className="block text-sm font-semibold  mb-2"
                 style={{ color: "var(--text-secondary)" }}
               >
                 Assignee
@@ -174,7 +174,7 @@ const NewTaskModal: React.FC<{
                   style={{ color: "var(--text-muted)" }}
                 />
                 <p
-                  className="font-inter text-sm"
+                  className=" text-sm"
                   style={{ color: "var(--text-primary)" }}
                 >
                   {currentUser?.name || newTask.assignee || "Loading..."}
@@ -183,7 +183,7 @@ const NewTaskModal: React.FC<{
             </div>
             <div>
               <label
-                className="block text-sm font-semibold font-inter mb-2"
+                className="block text-sm font-semibold  mb-2"
                 style={{ color: "var(--text-secondary)" }}
               >
                 Due Date
@@ -199,14 +199,14 @@ const NewTaskModal: React.FC<{
                   onChange={(e) =>
                     setNewTask({ ...newTask, dueDate: e.target.value })
                   }
-                  className="w-full pl-10 pr-4 py-3 rounded-lg border border-[var(--border)] bg-white font-inter text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                  className="w-full pl-10 pr-4 py-3 rounded-lg border border-[var(--border)] bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
                   style={{ color: "var(--text-primary)" }}
                 />
               </div>
             </div>
             <div>
               <label
-                className="block text-sm font-semibold font-inter mb-2"
+                className="block text-sm font-semibold  mb-2"
                 style={{ color: "var(--text-secondary)" }}
               >
                 Priority
@@ -216,7 +216,7 @@ const NewTaskModal: React.FC<{
                   <button
                     key={priority}
                     onClick={() => setNewTask({ ...newTask, priority })}
-                    className={`flex-1 px-4 py-3 rounded-lg border font-inter text-sm capitalize transition-all ${
+                    className={`flex-1 px-4 py-3 rounded-lg border  text-sm capitalize transition-all ${
                       newTask.priority === priority
                         ? priority === "LOW"
                           ? "bg-blue-50 text-blue-700 border-blue-300"
@@ -238,7 +238,7 @@ const NewTaskModal: React.FC<{
             </div>
             <div>
               <label
-                className="block text-sm font-semibold font-inter mb-2"
+                className="block text-sm font-semibold  mb-2"
                 style={{ color: "var(--text-secondary)" }}
               >
                 Status
@@ -251,7 +251,7 @@ const NewTaskModal: React.FC<{
                     status: e.target.value as Task["status"],
                   })
                 }
-                className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-white font-inter text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
                 style={{ color: "var(--text-primary)" }}
               >
                 <option value="NOT_STARTED">Assigned</option>
@@ -262,7 +262,7 @@ const NewTaskModal: React.FC<{
           </div>
           <div>
             <label
-              className="block text-sm font-semibold font-inter mb-2"
+              className="block text-sm font-semibold  mb-2"
               style={{ color: "var(--text-secondary)" }}
             >
               Tags
@@ -271,7 +271,7 @@ const NewTaskModal: React.FC<{
               {newTask.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-3 py-1 rounded-lg text-xs font-inter flex items-center gap-2 bg-[var(--primary-light)] border border-[#ffd9a8]"
+                  className="px-3 py-1 rounded-lg text-xs  flex items-center gap-2 bg-[var(--primary-light)] border border-[#ffd9a8]"
                   style={{ color: "var(--primary)" }}
                 >
                   {tag}
@@ -294,7 +294,7 @@ const NewTaskModal: React.FC<{
                   e.currentTarget.value = "";
                 }
               }}
-              className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-white font-inter text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+              className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
               style={{ color: "var(--text-primary)" }}
             />
           </div>
@@ -323,13 +323,13 @@ const NewTaskModal: React.FC<{
               style={{ color: "var(--text-muted)" }}
             />
             <p
-              className="text-sm mb-1 font-inter"
+              className="text-sm mb-1 "
               style={{ color: "var(--text-muted)" }}
             >
               Click to upload or drag and drop
             </p>
             <p
-              className="text-xs font-inter"
+              className="text-xs "
               style={{ color: "var(--text-muted)" }}
             >
               PDF, DOC, Images up to 10MB each
@@ -363,7 +363,7 @@ const NewTaskModal: React.FC<{
               {newTask.attachments?.map((file, index) => (
                 <div
                   key={`${file.name}-${index}`}
-                  className="flex items-center justify-between text-sm px-4 pr-3 py-3.5 rounded-lg bg-white border border-[var(--border)] font-inter"
+                  className="flex items-center justify-between text-sm px-4 pr-3 py-3.5 rounded-lg bg-white border border-[var(--border)] "
                   style={{ color: "var(--text-primary)" }}
                 >
                   <span className="truncate max-w-[80%]">{file.name}</span>
@@ -379,7 +379,7 @@ const NewTaskModal: React.FC<{
           <div className="flex gap-3 pt-4">
             <button
               onClick={onClose}
-              className="flex-1 px-6 py-3 rounded-lg font-inter text-sm bg-[var(--bg)] border border-[var(--border)]"
+              className="flex-1 px-6 py-3 rounded-lg  text-sm bg-[var(--bg)] border border-[var(--border)]"
               style={{ color: "var(--text-secondary)" }}
             >
               Cancel
@@ -392,7 +392,7 @@ const NewTaskModal: React.FC<{
                 !newTask.description.trim() ||
                 !newTask.dueDate
               }
-              className="flex-1 px-6 py-3 text-white rounded-lg font-inter text-sm disabled:opacity-40 disabled:cursor-not-allowed grid place-items-center"
+              className="flex-1 px-6 py-3 text-white rounded-lg  text-sm disabled:opacity-40 disabled:cursor-not-allowed grid place-items-center"
               style={{ background: "var(--primary)" }}
             >
               {isLoading ? (
@@ -934,7 +934,7 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
         <div className="max-w-[1600px] mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <h1
-              className="text-2xl font-bold font-id"
+              className="text-2xl font-bold "
               style={{ color: "var(--text-primary)" }}
             >
               Project Kanban Board
@@ -950,7 +950,7 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
                   placeholder="Search tasks..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4 py-2 rounded-lg border border-[var(--border)] bg-white font-inter text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] w-80"
+                  className="pl-10 pr-4 py-2 rounded-lg border border-[var(--border)] bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] w-80"
                   style={{ color: "var(--text-primary)" }}
                 />
               </div>
@@ -958,7 +958,7 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
                 currentUser?.role!=="CLIENT" && 
                 <button
                 onClick={() => setShowNewTaskModal(true)}
-                className="px-4 py-2 text-white rounded-lg font-inter text-sm flex items-center gap-2"
+                className="px-4 py-2 text-white rounded-lg  text-sm flex items-center gap-2"
                 style={{ background: "var(--primary)" }}
                 >
                 <Plus className="w-4 h-4" />
@@ -993,14 +993,14 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
                       <Icon className="w-5 h-5" />
                     </div>
                     <h2
-                      className="font-semibold text-base font-inter"
+                      className="font-semibold text-base "
                       style={{ color: "var(--text-primary)" }}
                     >
                       {column.title}
                     </h2>
                   </div>
                   <h2
-                    className="font-medium text-sm font-inter mr-4"
+                    className="font-medium text-sm  mr-4"
                     style={{ color: "var(--text-muted)" }}
                   >
                     {columnTasks.length}
@@ -1028,13 +1028,13 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
                     >
                       <div className="flex flex-col gap-4 items-start justify-between mb-3">
                         <h3
-                          className="font-semibold font-inter line-clamp-2"
+                          className="font-semibold  line-clamp-2"
                           style={{ color: "var(--text-primary)" }}
                         >
                           {task.title}
                         </h3>
                         <p
-                          className="font-inter text-sm line-clamp-2"
+                          className=" text-sm line-clamp-2"
                           style={{ color: "var(--text-primary)" }}
                         >
                           {task.description}
@@ -1052,7 +1052,7 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
                         {task.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="px-2 py-1 rounded-md text-xs font-inter bg-[var(--primary-light)] border border-[#ffd9a8]"
+                            className="px-2 py-1 rounded-md text-xs  bg-[var(--primary-light)] border border-[#ffd9a8]"
                             style={{ color: "var(--primary)" }}
                           >
                             {tag}
@@ -1067,7 +1067,7 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
                               style={{ color: "var(--text-muted)" }}
                             /> */}
                             <span
-                              className="text-sm font-inter"
+                              className="text-sm "
                               style={{ color: "var(--text-muted)" }}
                             >
                               {task.comments?.length}
@@ -1080,7 +1080,7 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
                                 style={{ color: "var(--text-muted)" }}
                               />
                               <span
-                                className="text-sm font-inter"
+                                className="text-sm "
                                 style={{ color: "var(--text-muted)" }}
                               >
                                 {task.attachments.length}

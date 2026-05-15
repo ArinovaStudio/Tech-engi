@@ -36,14 +36,14 @@ export default function StatCard({ title, value, change, changeType, icon, perio
           <div className="w-8 h-8 bg-gray-50 flex items-center justify-center text-gray-400 rounded-lg">
             {icon}
           </div>
-          <span className="text-sm font-bold font-inter text-[var(--text-secondary)]">{title}</span>
+          <span className="text-sm font-bold text-[var(--text-secondary)]">{title}</span>
         </div>
 
         {onPeriodChange && period ? (
           <div className="relative" ref={ref}>
             <button
               onClick={() => setOpen(o => !o)}
-              className="flex items-center gap-1 text-[11px] font-semibold font-inter text-[var(--text-muted)] border border-[var(--border)] rounded-md px-2 py-1 hover:bg-gray-50 capitalize"
+              className="flex items-center gap-1 text-[11px] font-semibold text-[var(--text-muted)] border border-[var(--border)] rounded-md px-2 py-1 hover:bg-gray-50 capitalize"
             >
               {period} <ChevronDown size={10} />
             </button>
@@ -53,7 +53,7 @@ export default function StatCard({ title, value, change, changeType, icon, perio
                   <button
                     key={p}
                     onClick={() => { onPeriodChange(p); setOpen(false); }}
-                    className={`w-full text-left px-3 py-1.5 text-xs font-inter capitalize hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${p === period ? "text-[var(--primary)] font-bold" : "text-[var(--text-secondary)]"}`}
+                    className={`w-full text-left px-3 py-1.5 text-xs capitalize hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${p === period ? "text-[var(--primary)] font-bold" : "text-[var(--text-secondary)]"}`}
                   >
                     {p}
                   </button>
@@ -71,7 +71,7 @@ export default function StatCard({ title, value, change, changeType, icon, perio
       </div>
 
       <div className="flex items-end gap-3">
-        <h2 className="text-3xl font-bold font-id text-[var(--text-primary)]">{value || "0"}</h2>
+        <h2 className="text-3xl font-bold text-[var(--text-primary)]">{value || "0"}</h2>
         {change && changeType && (
           <div className={`flex items-center gap-1 text-xs font-bold px-2 py-0.5 mb-0.5 border border-gray-200 rounded-lg ${isUp ? "text-green-500 bg-green-50/50" : "text-red-500 bg-red-50"}`}>
             {change}

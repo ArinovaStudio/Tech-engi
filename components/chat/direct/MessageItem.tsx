@@ -27,7 +27,7 @@ export default function MessageItem({
       )}
 
       <div 
-        className={`max-w-[70%] rounded-2xl px-4 py-2 font-inter text-[15px] shadow-sm relative ${
+        className={`max-w-[70%] rounded-2xl px-4 py-2  text-[15px] shadow-sm relative ${
           isMine 
             ? "bg-[#FFAE58] text-white rounded-br-none" 
             : "bg-white text-[var(--text-primary)] border border-gray-200 rounded-bl-none"

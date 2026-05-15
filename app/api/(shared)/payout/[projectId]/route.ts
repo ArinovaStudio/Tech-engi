@@ -66,7 +66,7 @@ export async function GET( req: NextRequest, { params }: { params: Promise<{ pro
       
       const clientProfile = await prisma.clientProfile.findUnique({
         where: { id: project.clientId },
-        include: { user: true },
+        include: { user: { include: { payoutDetail: true } } },
       });
 
       let engineerProfile = null;

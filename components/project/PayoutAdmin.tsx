@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
-import { Eye } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Clock } from "lucide-react";
 import PayoutHistory from "./PayoutHistory";
+import PaymentModal from "./payout/PayoutModal";
 import { fetcher } from "@/lib/fetcher";
 import useSWR from "swr";
 
@@ -13,185 +14,134 @@ type User = {
   payoutDetail: any;
 };
 
-type Payout = {
-  id: string;
-  amount: number;
-  source: string;
-  transactionId: string;
-  date: string;
-};
-
 function SummaryCard({ title, value }: { title: string; value: any }) {
   return (
     <div className="rounded-xl border border-[var(--border)] bg-white p-5">
-      <p className="text-sm font-inter" style={{ color: "var(--text-muted)" }}>
-        {title}
-      </p>
-      <h2
-        className="text-xl font-bold mt-1 font-id"
-        style={{ color: "var(--text-primary)" }}
-      >
-        {value}
-      </h2>
+      <p className="text-sm font-inter" style={{ color: "var(--text-muted)" }}>{title}</p>
+      <h2 className="text-xl font-bold mt-1 font-id" style={{ color: "var(--text-primary)" }}>{value}</h2>
     </div>
   );
 }
 
-//   const users: User[] = [
-//       { id: "1", name: "Rahul (Client)", role: "CLIENT" },
-//       {
-//           id: "2",
-//           name: "Amit (Engineer)",
-//           role: "ENGINEER",
-//           bank: "HDFC • 1234XXXX",
-//         },
-//     ];
-interface Props {
-  projectId: string;
-}
-export default function PayoutAdmin({ projectId }: Props) {
+export default function PayoutAdmin({ projectId }: { projectId: string }) {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const { data, isLoading } = useSWR(`/api/payout/${projectId}`, fetcher);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTx, setEditingTx] = useState<any>(null);
+
+  const { data, mutate } = useSWR(`/api/payout/${projectId}`, fetcher);
   const stats = data?.stats ?? {};
   const users = stats?.users ?? [];
-  const projectApproved = stats.approved ?? false;
-  const progress = stats?.progress ?? 0;
+  const transactions = data?.transactions ?? [];
   const totalAmount = stats?.budget ?? 0;
   const receivedAmount = stats?.totalReceived ?? 0;
-  console.log(users);
-  const canPayEngineer =
-    selectedUser?.role === "ENGINEER" && projectApproved && progress === 100;
+  
+  useEffect(() => {
+    if (users.length > 0 && !selectedUser) {
+      const client = users.find((u: any) => u.role === "CLIENT");
+      setSelectedUser(client || users[0]);
+    }
+  }, [users, selectedUser]);
+
+  const userTransactions = transactions.filter((t: any) => t.userId === selectedUser?.id);
+  const pendingTx = userTransactions.find((t: any) => t.status === "PENDING" && (t.type === "PAYOUT_ENGINEER" || t.type === "REFUND_CLIENT"));
 
   return (
-    <div className="flex gap-6 text-black!">
+    <div className="flex flex-col lg:flex-row gap-6 text-black">
+      
       {/* SIDEBAR */}
-      <div className="w-64 border border-[var(--border)] rounded-xl bg-white p-4 space-y-3">
-        <h3 className="font-semibold font-inter text-sm">Users</h3>
-
-        {users.map((user: any) => (
-          <button
-            key={user.id}
-            onClick={() => setSelectedUser(user)}
-            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-inter ${
-              selectedUser?.id === user?.id
-                ? "bg-[var(--primary)] text-white"
-                : "hover:bg-[var(--bg)]"
-            }`}
-          >
-            {user?.name}
-          </button>
-        ))}
+      <div className="w-full lg:w-72 border border-[var(--border)] rounded-xl bg-white p-5 space-y-4 h-fit">
+        <h3 className="font-bold text-lg font-id text-[var(--text-primary)]">Project Users</h3>
+        <div className="space-y-3">
+          {users.map((user: any) => (
+            <button
+              key={user.id}
+              onClick={() => setSelectedUser(user)}
+              className={`w-full text-left px-4 py-3 rounded-xl border transition-all flex items-center justify-between
+                ${selectedUser?.id === user?.id 
+                  ? "border-[var(--primary)] bg-[var(--primary)]/5 shadow-sm" 
+                  : "border-[var(--border)] hover:bg-[var(--bg)]"
+                }`}
+            >
+              <div>
+                <p className="font-bold text-sm font-inter text-[var(--text-primary)]">{user.name}</p>
+                <p className="text-xs font-inter text-[var(--text-muted)] mt-0.5">{user.role}</p>
+              </div>
+              <Clock size={16} className="text-[var(--text-muted)]" />
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* MAIN */}
+      {/* MAIN CONTENT */}
       <div className="flex-1 space-y-6">
-        {/* TOP CARDS */}
         <div className="grid md:grid-cols-3 gap-4">
-          <SummaryCard title="Total Project Amount" value={`₹${totalAmount}`} />
-          <SummaryCard title="Total Received" value={`₹${receivedAmount}`} />
+          <SummaryCard title="Total Project Amount" value={`₹${totalAmount.toLocaleString()}`} />
+          <SummaryCard title="Total Received" value={`₹${receivedAmount.toLocaleString()}`} />
           <SummaryCard
-            title="Engineer Bank Details"
+            title={`${selectedUser?.role === "CLIENT" ? "Client" : "Engineer"} Bank Details`}
             value={
-              selectedUser?.role === "ENGINEER" ? (
+              selectedUser ? (
                 selectedUser.payoutDetail ? (
-                  <div className="text-xs font-inter space-y-1">
-                    {selectedUser.payoutDetail.accountHolder && (
-                      <p>
-                        <span className="font-semibold">Name:</span>{" "}
-                        {selectedUser.payoutDetail.accountHolder}
-                      </p>
-                    )}
-                    {selectedUser.payoutDetail.bankName && (
-                      <p>
-                        <span className="font-semibold">Bank:</span>{" "}
-                        {selectedUser.payoutDetail.bankName}
-                      </p>
-                    )}
-                    {selectedUser.payoutDetail.accountNumber && (
-                      <p>
-                        <span className="font-semibold">A/C:</span>{" "}
-                        {selectedUser.payoutDetail.accountNumber}
-                      </p>
-                    )}
-
-                    {selectedUser.payoutDetail.ifscCode && (
-                      <p>
-                        <span className="font-semibold">IFSC:</span>{" "}
-                        {selectedUser.payoutDetail.ifscCode}
-                      </p>
-                    )}
-
-                    {selectedUser.payoutDetail.upiId && (
-                      <p>
-                        <span className="font-semibold">UPI:</span>{" "}
-                        {selectedUser.payoutDetail.upiId}
-                      </p>
-                    )}
+                  <div className="text-xs font-inter space-y-1.5 mt-2 text-[var(--text-secondary)]">
+                    {selectedUser.payoutDetail.accountHolder && <p><span className="font-semibold text-[var(--text-primary)]">Name:</span> {selectedUser.payoutDetail.accountHolder}</p>}
+                    {selectedUser.payoutDetail.bankName && <p><span className="font-semibold text-[var(--text-primary)]">Bank:</span> {selectedUser.payoutDetail.bankName}</p>}
+                    {selectedUser.payoutDetail.accountNumber && <p><span className="font-semibold text-[var(--text-primary)]">A/C:</span> {selectedUser.payoutDetail.accountNumber}</p>}
+                    {selectedUser.payoutDetail.ifscCode && <p><span className="font-semibold text-[var(--text-primary)]">IFSC:</span> {selectedUser.payoutDetail.ifscCode}</p>}
+                    {selectedUser.payoutDetail.upiId && <p><span className="font-semibold text-blue-600">UPI:</span> <span className="font-medium text-blue-600">{selectedUser.payoutDetail.upiId}</span></p>}
                   </div>
-                ) : (
-                  "Not added"
-                )
-              ) : (
-                "Select Engineer"
-              )
+                ) : <span className="text-sm font-normal text-[var(--text-muted)]">Not added</span>
+              ) : <span className="text-sm font-normal text-[var(--text-muted)]">Select User</span>
             }
           />
         </div>
 
-        {/* LOWER GRID */}
-        <div className="flex gap-4">
-          {/* PAYOUT HISTORY */}
-          <PayoutHistory projectId={projectId} />
+        <div className="flex flex-col lg:flex-row gap-4">
+          
+          {/* HISTORY */}
+          <div className="flex-1">
+            <PayoutHistory 
+              transactions={userTransactions}
+              onEdit={(tx) => { setEditingTx(tx); setIsModalOpen(true); }} 
+              onMutate={() => mutate()}
+            />
+          </div>
 
-          {/* PAYMENT CONTROL */}
-          <div className="rounded-xl w-xs md:w-sm border border-[var(--border)] bg-white p-5 flex flex-col justify-between">
+          {/* PAYMENT ACTION CARD */}
+          <div className="rounded-xl w-full lg:w-80 border border-[var(--border)] bg-white p-6 flex flex-col justify-between h-fit">
             <div>
-              <h3 className="text-lg font-semibold font-inter mb-2">
-                Engineer Payment
-              </h3>
+              <h3 className="text-lg font-semibold font-inter mb-4 text-[var(--text-primary)]">Pending Action</h3>
 
-              {selectedUser?.role !== "ENGINEER" ? (
-                <p className="text-sm text-[var(--text-muted)]">
-                  Select an engineer to proceed.
-                </p>
-              ) : !canPayEngineer ? (
-                <p className="text-sm text-[var(--text-muted)]">
-                  No activity yet. Payment will be enabled once project is
-                  approved and reaches 100%.
-                </p>
-              ) : (
+              {!selectedUser ? (
+                <p className="text-sm font-inter text-[var(--text-muted)]">Select a user to proceed.</p>
+              ) : pendingTx ? (
                 <>
-                  <p className="text-sm text-[var(--text-muted)]">
-                    Release payout to engineer
+                  <p className="text-sm font-inter text-[var(--text-muted)] mb-6 leading-relaxed">
+                    There is a pending <span className="font-bold text-[var(--text-primary)]">{pendingTx.type === "REFUND_CLIENT" ? "refund" : "payout"}</span> of <span className="font-bold text-[var(--text-primary)] border-b border-[var(--border)] pb-0.5">₹{pendingTx.amount}</span>.
                   </p>
-
-                  <div className="mt-4 space-y-3">
-                    <input
-                      placeholder="Amount"
-                      className="w-full border border-[var(--border)] rounded-lg p-2 text-sm"
-                    />
-                    <input
-                      placeholder="Transaction ID"
-                      className="w-full border border-[var(--border)] rounded-lg p-2 text-sm"
-                    />
-                    <input
-                      placeholder="Source (Bank/UPI)"
-                      className="w-full border border-[var(--border)] rounded-lg p-2 text-sm"
-                    />
-
-                    <button
-                      className="w-full py-2 rounded-lg text-white text-sm"
-                      style={{ background: "var(--primary)" }}
-                    >
-                      Release Payment
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => { setEditingTx(pendingTx); setIsModalOpen(true); }}
+                    className="w-full py-3 rounded-lg text-white text-sm font-semibold transition-colors shadow-md"
+                    style={{ background: "var(--primary)" }}
+                  >
+                    {pendingTx.type === "REFUND_CLIENT" ? "Process Refund" : "Process Payment"}
+                  </button>
                 </>
+              ) : (
+                <p className="text-sm font-inter text-[var(--text-muted)] bg-[var(--bg)] p-4 rounded-lg border border-[var(--border)] text-center">
+                  No pending payments for this user.
+                </p>
               )}
             </div>
           </div>
         </div>
       </div>
+
+      <PaymentModal 
+        isOpen={isModalOpen} 
+        onClose={() => { setIsModalOpen(false); setEditingTx(null); }} 
+        transaction={editingTx} 
+        onSuccess={() => mutate()} 
+      />
     </div>
   );
 }

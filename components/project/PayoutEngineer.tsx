@@ -1,19 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
-import { Eye, Loader2 } from "lucide-react";
-import Loader from "../common/Loading";
+import React from "react";
+import { Loader2 } from "lucide-react";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import PayoutHistory from "./PayoutHistory";
-type Payout = {
-  id: string;
-  amount: number;
-  source: string;
-  transactionId: string;
-  date: string;
-  proof?: string;
-};
 
 function SummaryCard({ title, value }: { title: string; value: string }) {
   return (
@@ -22,7 +13,7 @@ function SummaryCard({ title, value }: { title: string; value: string }) {
         {title}
       </p>
       <h2
-        className="text-2xl font-bold mt-1 font-id"
+        className="text-2xl font-bold mt-1"
         style={{ color: "var(--text-primary)" }}
       >
         {value}
@@ -34,34 +25,42 @@ function SummaryCard({ title, value }: { title: string; value: string }) {
 interface Props {
   projectId: string;
 }
-export default function PayoutEngineer({ projectId }: Props) {
 
+export default function PayoutEngineer({ projectId }: Props) {
+  const { data, isLoading } = useSWR(`/api/payout/${projectId}`, fetcher);
   
-  const { data , isLoading } = useSWR(
-    `/api/payout/${projectId}`,
-    fetcher
-  );
-  const loading = isLoading;
   const stats = data?.stats ?? {};
-  if (loading)
+  const transactions = data?.transactions ?? [];
+
+  // Filter so the engineer only sees their own payout transactions
+  const engineerTransactions = transactions.filter(
+    (t: any) => t.type === "PAYOUT_ENGINEER"
+  );
+
+  if (isLoading) {
     return (
       <div className="h-[60vh] flex justify-center items-center">
         <Loader2 color="var(--primary)" size={25} className="animate-spin" />
       </div>
     );
+  }
+
+  const budget = stats.budget ?? 0;
+  const amountPaid = stats.amountPaid ?? 0;
+  const amountPending = stats.amountPending ?? 0;
 
   return (
     <div className="space-y-6">
       {/* HEADER */}
       <div>
         <h2
-          className="text-2xl font-bold font-id"
+          className="text-2xl font-bold"
           style={{ color: "var(--text-primary)" }}
         >
           Payouts
         </h2>
         <p
-          className="text-sm font-inter mt-1"
+          className="text-sm mt-1 font-inter"
           style={{ color: "var(--text-muted)" }}
         >
           Track payments and transaction history.
@@ -70,14 +69,21 @@ export default function PayoutEngineer({ projectId }: Props) {
 
       {/* TOP BOXES */}
       <div className="grid md:grid-cols-2 gap-4">
-        <SummaryCard title="Total Project Amount" value={`₹${stats.budget ?? 0}`} />
+        <SummaryCard 
+          title="Total Payout Amount" 
+          value={`₹${budget.toLocaleString()}`} 
+        />
         <SummaryCard
-          title="Paid / Remaining"
-          value={`₹${stats.amountPaid} / ₹${stats.remaining}`}
+          title="Paid / Pending"
+          value={`₹${amountPaid.toLocaleString()} / ₹${amountPending.toLocaleString()}`}
         />
       </div>
 
-      <PayoutHistory projectId={projectId}/>
+      {/* PAYOUT HISTORY (Read Only Mode) */}
+      <PayoutHistory 
+        transactions={engineerTransactions} 
+        readOnly={true} 
+      />
     </div>
   );
 }

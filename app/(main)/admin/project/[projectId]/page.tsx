@@ -25,7 +25,7 @@ function TabBar({ tabs, active, setActive }: { tabs: string[]; active: string; s
           <button
             key={tab}
             onClick={() => setActive(tab)}
-            className={`relative px-4 py-4 text-sm font-inter whitespace-nowrap transition-all duration-150 shrink-0
+            className={`relative px-4 py-4 text-sm whitespace-nowrap transition-all duration-150 shrink-0
               ${isActive ? "text-[var(--primary)] font-semibold" : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"}`}
           >
             {tab}
@@ -88,8 +88,8 @@ export default function ProjectDetailPage() {
     return (
       <DashboardShell>
         <div className="flex flex-col items-center justify-center h-[60vh] gap-3">
-          <p className="text-sm font-inter text-red-500">{error || "Project not found"}</p>
-          <Link href="/admin/project" className="text-xs font-inter text-[var(--primary)] underline">
+          <p className="text-sm text-red-500">{error || "Project not found"}</p>
+          <Link href="/admin/project" className="text-xs  text-[var(--primary)] underline">
             ← Back to projects
           </Link>
         </div>
@@ -103,7 +103,7 @@ export default function ProjectDetailPage() {
     <DashboardShell>
       <div>
         {/* Project Header */}
-        <h1 className="text-lg font-bold font-id text-[var(--text-primary)] pb-4">{project.title}</h1>
+        <h1 className="text-lg font-bold text-[var(--text-primary)] pb-4">{project.title}</h1>
 
         <TabBar tabs={tabs} active={activeTab} setActive={setActiveTab} />
 

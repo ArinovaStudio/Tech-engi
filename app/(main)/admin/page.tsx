@@ -1,9 +1,9 @@
 "use client";
 
-import { Eye, ReceiptText, Activity, Calendar, Filter, Download, Briefcase, Users, CheckCircle, Clock } from "lucide-react";
+import { Eye, ReceiptText, Activity, Download, Briefcase, Users, CheckCircle, Clock } from "lucide-react";
 import StatCard from "@/components/dashboard/StatCard";
-import ProjectDistribution from "@/components/dashboard/ProjectDistribution"; // Renamed your Donut component
-import RevenueChart from "@/components/dashboard/RevenueChart"; // Renamed your Bar component
+import ProjectDistribution from "@/components/dashboard/ProjectDistribution";
+import RevenueChart from "@/components/dashboard/RevenueChart";
 import DashboardShell from "@/components/layout/DashboardShell";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
@@ -30,9 +30,9 @@ export default function DashboardPage() {
       {/* Page header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold font-id text-[var(--text-primary)]">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Dashboard</h1>
         </div>
-        <div className="flex items-center gap-2 font-inter ">
+        <div className="flex items-center gap-2 ">
           <button className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-secondary)] bg-white px-4 py-2 border border-[var(--border)] rounded-lg">
             <Download size={13} /> EXPORT
           </button>

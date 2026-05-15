@@ -5,7 +5,7 @@ import PayoutClient from './PayoutClient';
 import PayoutAdmin from './PayoutAdmin';
 interface Props{projectId: string};
 export default function Payout({projectId}:Props) {
-  const {role} = useAuth();
+  const {role} = useAuth(); 
   switch(role){
     case "ENGINEER":
         return <PayoutEngineer projectId={projectId}/>

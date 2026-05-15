@@ -56,11 +56,11 @@ export default function StatusTab({ projectId }: { projectId: string }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold font-id flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
+        <h2 className="text-2xl font-bold  flex items-center gap-2" style={{ color: "var(--text-primary)" }}>
           <BarChart3 size={22} /> Project Status
         </h2>
         {canEdit && !editing && (
-          <button onClick={() => setEditing(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm" style={{ background: "var(--primary)" }}>
+          <button onClick={() => setEditing(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm" style={{ background: "var(--primary)" }}>
             <Edit3 size={15} /> Update Status
           </button>
         )}
@@ -68,8 +68,8 @@ export default function StatusTab({ projectId }: { projectId: string }) {
 
       <div className="bg-white rounded-xl border border-[var(--border)] p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold font-inter" style={{ color: "var(--text-primary)" }}>Progress Overview</h3>
-          <span className="text-2xl font-bold font-id" style={{ color: "var(--text-primary)" }}>{status}%</span>
+          <h3 className="text-lg font-semibold " style={{ color: "var(--text-primary)" }}>Progress Overview</h3>
+          <span className="text-2xl font-bold " style={{ color: "var(--text-primary)" }}>{status}%</span>
         </div>
         <div className="mb-4">
           <div className="w-full bg-[var(--bg)] rounded-full h-4">
@@ -77,26 +77,26 @@ export default function StatusTab({ projectId }: { projectId: string }) {
           </div>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-sm font-inter" style={{ color: "var(--text-muted)" }}>Status: {getStatusText(status)}</span>
-          <span className="text-sm font-inter" style={{ color: "var(--text-muted)" }}>{100 - status}% remaining</span>
+          <span className="text-sm " style={{ color: "var(--text-muted)" }}>Status: {getStatusText(status)}</span>
+          <span className="text-sm " style={{ color: "var(--text-muted)" }}>{100 - status}% remaining</span>
         </div>
       </div>
 
       {editing && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg">
-            <h3 className="text-lg font-semibold font-inter mb-4" style={{ color: "var(--text-primary)" }}>Update Project Status</h3>
+            <h3 className="text-lg font-semibold  mb-4" style={{ color: "var(--text-primary)" }}>Update Project Status</h3>
             <div className="mb-4">
-              <label className="block text-sm font-medium font-inter mb-2" style={{ color: "var(--text-secondary)" }}>Progress Percentage</label>
+              <label className="block text-sm font-medium  mb-2" style={{ color: "var(--text-secondary)" }}>Progress Percentage</label>
               <div className="flex items-center gap-4 mb-3">
                 <input
                   type="number" min="0" max="100" value={newStatus}
                   onChange={(e) => setNewStatus(Math.max(0, Math.min(100, parseInt(e.target.value) || 0)))}
-                  className="w-20 px-3 py-2 border border-[var(--border)] rounded-lg bg-white font-inter text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                  className="w-20 px-3 py-2 border border-[var(--border)] rounded-lg bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
                   style={{ color: "var(--text-primary)" }}
                   disabled={updating}
                 />
-                <span className="font-inter text-sm" style={{ color: "var(--text-muted)" }}>%</span>
+                <span className=" text-sm" style={{ color: "var(--text-muted)" }}>%</span>
               </div>
               <input
                 type="range" min="0" max="100" value={newStatus}
@@ -104,9 +104,9 @@ export default function StatusTab({ projectId }: { projectId: string }) {
                 className="w-full h-2 bg-[var(--bg)] rounded-lg appearance-none cursor-pointer"
                 disabled={updating}
               />
-              <div className="flex justify-between text-xs font-inter mt-1" style={{ color: "var(--text-muted)" }}>
+              <div className="flex justify-between text-xs  mt-1" style={{ color: "var(--text-muted)" }}>
                 <span>0%</span>
-                <span className="font-bold text-base font-id" style={{ color: "var(--text-primary)" }}>{newStatus}%</span>
+                <span className="font-bold text-base " style={{ color: "var(--text-primary)" }}>{newStatus}%</span>
                 <span>100%</span>
               </div>
             </div>
@@ -114,13 +114,13 @@ export default function StatusTab({ projectId }: { projectId: string }) {
               <div className="w-full bg-[var(--bg)] rounded-full h-3">
                 <div className={`h-3 rounded-full transition-all duration-300 ${getBarColor(newStatus)}`} style={{ width: `${newStatus}%` }} />
               </div>
-              <p className="text-sm font-inter mt-2" style={{ color: "var(--text-muted)" }}>{getStatusText(newStatus)}</p>
+              <p className="text-sm  mt-2" style={{ color: "var(--text-muted)" }}>{getStatusText(newStatus)}</p>
             </div>
             <div className="flex justify-end gap-3">
-              <button onClick={() => { setEditing(false); setNewStatus(status); }} className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg font-inter text-sm flex items-center gap-2" style={{ color: "var(--text-secondary)" }} disabled={updating}>
+              <button onClick={() => { setEditing(false); setNewStatus(status); }} className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg  text-sm flex items-center gap-2" style={{ color: "var(--text-secondary)" }} disabled={updating}>
                 <X size={14} /> Cancel
               </button>
-              <button onClick={updateStatus} disabled={updating} className="px-4 py-2 text-white rounded-lg font-inter text-sm flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: "var(--primary)" }}>
+              <button onClick={updateStatus} disabled={updating} className="px-4 py-2 text-white rounded-lg  text-sm flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed" style={{ background: "var(--primary)" }}>
                 <Check size={14} /> {updating ? "Updating..." : "Update"}
               </button>
             </div>

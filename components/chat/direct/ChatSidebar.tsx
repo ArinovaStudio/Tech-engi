@@ -39,7 +39,7 @@ export default function ChatSidebar({
   return (
     <div className="w-[320px] shrink-0 border-r border-[var(--border)] flex flex-col bg-gray-50/30">
       <div className="p-4 border-b border-[var(--border)] bg-white">
-        <h2 className="font-bold font-id text-xl text-[var(--text-primary)] mb-3">Messages</h2>
+        <h2 className="font-bold  text-xl text-[var(--text-primary)] mb-3">Messages</h2>
         <div className="relative">
           <Search className="absolute left-3 top-2.5 text-gray-400" size={16} />
           <input
@@ -47,7 +47,7 @@ export default function ChatSidebar({
             placeholder="Search contacts..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-gray-100 border-none rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[var(--primary)] font-inter"
+            className="w-full pl-9 pr-4 py-2 bg-gray-100 border-none rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-[var(--primary)] "
           />
         </div>
       </div>
@@ -57,7 +57,7 @@ export default function ChatSidebar({
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`flex-1 py-1.5 text-xs font-bold rounded-md font-inter transition-colors ${
+            className={`flex-1 py-1.5 text-xs font-bold rounded-md  transition-colors ${
               activeTab === tab ? "bg-[#FFAE58] text-white" : "text-gray-500 hover:bg-gray-100"
             }`}
           >
@@ -70,7 +70,7 @@ export default function ChatSidebar({
         {isLoading ? (
           <div className="p-6 flex justify-center"><Loader2 className="animate-spin text-gray-400" size={24} /></div>
         ) : contacts.length === 0 ? (
-          <div className="p-6 text-center text-sm text-gray-400 font-inter">No contacts found.</div>
+          <div className="p-6 text-center text-sm text-gray-400 ">No contacts found.</div>
         ) : (
           contacts.map((contact: any) => {
             if (!contact || !contact.id) return null; // Safe guard against undefined objects
@@ -95,7 +95,7 @@ export default function ChatSidebar({
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-baseline mb-0.5">
-                    <span className="font-bold text-sm text-[var(--text-primary)] truncate font-inter">{contact.name}</span>
+                    <span className="font-bold text-sm text-[var(--text-primary)] truncate ">{contact.name}</span>
                   </div>
                   
                   {/* Displays Project Name under the User's Name! */}
@@ -105,7 +105,7 @@ export default function ChatSidebar({
                     </p>
                   )}
                   
-                  <p className="text-xs text-gray-500 truncate font-inter">
+                  <p className="text-xs text-gray-500 truncate ">
                     {contact.lastMessage || `Start a conversation...`}
                   </p>
                 </div>

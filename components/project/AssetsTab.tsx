@@ -111,15 +111,15 @@ function AssetsCard({ resource, onDelete, isAdmin }: {
       <div className="absolute bottom-0 w-full"
         style={{ background: "linear-gradient(to top, rgba(5,10,48,0.95) 60%, transparent)" }}>
         <div className="px-5 py-4">
-          <p className="flex items-center gap-1.5 text-xs font-inter mb-1" style={{ color: "var(--text-muted)" }}>
+          <p className="flex items-center gap-1.5 text-xs  mb-1" style={{ color: "var(--text-muted)" }}>
             {getIcon()} {resource.type}
           </p>
 
-          <p className="text-white font-semibold font-inter text-base line-clamp-2">
+          <p className="text-white font-semibold  text-base line-clamp-2">
             {resource.title}
           </p>
 
-          <p className="text-xs font-inter mt-0.5" style={{ color: "var(--text-muted)" }}>
+          <p className="text-xs  mt-0.5" style={{ color: "var(--text-muted)" }}>
             Uploaded: {new Date(resource.createdAt).toLocaleDateString()}
           </p>
 
@@ -141,7 +141,7 @@ function AssetsCard({ resource, onDelete, isAdmin }: {
                   </span>
                 )}
               </div>
-              <p className="text-xs font-inter text-white">{resource.addedBy.name}</p>
+              <p className="text-xs  text-white">{resource.addedBy.name}</p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -278,18 +278,18 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
     }
   };
 
-  const inputCls = "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)] font-inter text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
-  const labelCls = "block text-sm font-medium font-inter mb-1.5";
+  const inputCls = "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)]  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
+  const labelCls = "block text-sm font-medium  mb-1.5";
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold font-id" style={{ color: "var(--text-primary)" }}>Resources</h2>
+        <h2 className="text-2xl font-bold " style={{ color: "var(--text-primary)" }}>Resources</h2>
 
         {canUpload && (
           <button
             onClick={() => setOpen(true)}
-            className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm"
+            className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm"
             style={{ background: "var(--primary)" }}
           >
             <Plus size={16} /> Upload Resource
@@ -302,7 +302,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
           <Loader2 className="animate-spin" style={{ color: "var(--primary)" }} size={40} />
         </div>
       ) : resources.length === 0 ? (
-        <div className="text-center py-12 font-inter text-sm" style={{ color: "var(--text-muted)" }}>
+        <div className="text-center py-12  text-sm" style={{ color: "var(--text-muted)" }}>
           No resources uploaded yet.
         </div>
       ) : (
@@ -322,7 +322,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
       {open && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50 text-black">
           <div className="bg-white p-6 rounded-xl max-w-md w-full border border-[var(--border)] shadow-lg">
-            <h2 className="text-lg font-semibold font-inter mb-4">Upload Resource</h2>
+            <h2 className="text-lg font-semibold  mb-4">Upload Resource</h2>
 
             <input
               type="text"
@@ -352,7 +352,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
               <input
                 type="file"
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="mb-4 text-sm font-inter"
+                className="mb-4 text-sm "
               />
             ) : (
               <textarea
@@ -370,14 +370,14 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
             <div className="flex justify-end gap-3 mt-4">
               <button
                 onClick={() => setOpen(false)}
-                className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg font-inter text-sm"
+                className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg  text-sm"
               >
                 Cancel
               </button>
               <button
                 disabled={uploading}
                 onClick={uploadResource}
-                className="px-4 py-2 text-white rounded-lg flex items-center gap-2 font-inter text-sm disabled:opacity-40"
+                className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm disabled:opacity-40"
                 style={{ background: "var(--primary)" }}
               >
                 {uploading && <Loader2 className="animate-spin" size={14} />}

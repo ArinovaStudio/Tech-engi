@@ -189,14 +189,14 @@ export default function ChatTab({ projectId }: { projectId: string }) {
       <div className="flex-1 overflow-y-auto px-6 py-6 bg-[#f0f2f5] space-y-2">
         {nextCursor && (
           <div className="flex justify-center mb-4">
-            <button onClick={() => { setLoadingMore(true); loadMessages(nextCursor); }} disabled={loadingMore} className="flex items-center gap-1 text-xs font-inter text-[var(--text-muted)] bg-white px-3 py-1.5 rounded-full shadow-sm hover:text-[var(--primary)] transition-colors">
+            <button onClick={() => { setLoadingMore(true); loadMessages(nextCursor); }} disabled={loadingMore} className="flex items-center gap-1 text-xs  text-[var(--text-muted)] bg-white px-3 py-1.5 rounded-full shadow-sm hover:text-[var(--primary)] transition-colors">
               {loadingMore ? <Loader2 size={14} className="animate-spin" /> : <><ChevronUp size={14} /> Load older messages</>}
             </button>
           </div>
         )}
 
         {messages.length === 0 && (
-          <div className="flex items-center justify-center h-full"><p className="text-sm font-inter text-[var(--text-muted)]">No messages yet.</p></div>
+          <div className="flex items-center justify-center h-full"><p className="text-sm  text-[var(--text-muted)]">No messages yet.</p></div>
         )}
 
         {messages.map((msg, index) => {
@@ -231,7 +231,7 @@ export default function ChatTab({ projectId }: { projectId: string }) {
       {/* Error Banner Display */}
       {error && (
         <div className="mx-5 mb-2 mt-2 px-3 py-2 bg-red-50 border border-red-200 flex items-center justify-between rounded-md">
-          <p className="text-xs font-inter text-red-600 font-medium">{error}</p>
+          <p className="text-xs  text-red-600 font-medium">{error}</p>
           <button onClick={() => setError(null)}><X size={13} className="text-red-400 hover:text-red-600" /></button>
         </div>
       )}
@@ -239,7 +239,7 @@ export default function ChatTab({ projectId }: { projectId: string }) {
       {/* Input Area */}
       {isAdmin ? (
         <div className="p-4 bg-gray-50 border-t border-[var(--border)] flex justify-center">
-          <p className="text-xs font-inter text-gray-500 font-medium">You are viewing this project chat as an Admin (Read-Only).</p>
+          <p className="text-xs  text-gray-500 font-medium">You are viewing this project chat as an Admin (Read-Only).</p>
         </div>
       ) : (
         <div className={`p-4 bg-white border-t border-[var(--border)] transition-opacity ${isSelectMode ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
@@ -255,7 +255,7 @@ export default function ChatTab({ projectId }: { projectId: string }) {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               placeholder="Type a message..."
-              className="flex-1 bg-gray-100 border-none rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--primary)] font-inter text-gray-900"
+              className="flex-1 bg-gray-100 border-none rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--primary)]  text-gray-900"
             />
             <button type="submit" disabled={!inputMessage.trim()} className="w-11 h-11 shrink-0 bg-[#FFAE58] text-white rounded-full flex items-center justify-center hover:bg-[#e89b45] disabled:opacity-50">
               <Send size={18} className="ml-1" />

@@ -102,29 +102,9 @@ export default function PayoutAdmin({
         t.type === "PAYOUT_ENGINEER"
     );
 
-  const engineerPaid =
-    engineerTransactions
-      .filter(
-        (t: any) =>
-          t.status === "COMPLETED"
-      )
-      .reduce(
-        (acc: number, curr: any) =>
-          acc + curr.amount,
-        0
-      );
-
-  const engineerPending =
-    engineerTransactions
-      .filter(
-        (t: any) =>
-          t.status === "PENDING"
-      )
-      .reduce(
-        (acc: number, curr: any) =>
-          acc + curr.amount,
-        0
-      );
+  const engineerBudget = stats?.engineerBudget ?? 0;
+  const engineerPaid = stats?.engineerPaid ?? 0;
+  const engineerPending = stats?.engineerPending ?? 0;
 
   const pendingTx = userTransactions.find(
     (t: any) =>
@@ -240,9 +220,9 @@ export default function PayoutAdmin({
             </>
           ) : (
             <>
-              <SummaryCard
-                title="Total Engineer Paid"
-                value={`₹${engineerPaid.toLocaleString()}`}
+             <SummaryCard
+                title="Total Engineer Payout"
+                value={`₹${engineerBudget.toLocaleString()}`}
               />
 
               <SummaryCard

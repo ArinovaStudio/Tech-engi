@@ -93,10 +93,23 @@ export async function GET( req: NextRequest, { params }: { params: Promise<{ pro
         return acc + amount;
       }, 0);
 
+      let engineerPaid = 0;
+      let engineerPending = 0;
+      for (const t of transactions) {
+        if (t.type === "PAYOUT_ENGINEER") {
+          if (t.status === "SUCCESS") engineerPaid += t.amount;
+          if (t.status === "PENDING") engineerPending += t.amount;
+        }
+      }
+      const engineerBudget = project.budget * 0.7;
+
       stats = {
         users: users,
         budget: project.budget,
         totalReceived,
+        engineerBudget,
+        engineerPaid, 
+        engineerPending,
         progress: project.progress,
         approved: project.status === "COMPLETED",
       };

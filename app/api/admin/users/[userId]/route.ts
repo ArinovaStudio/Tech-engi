@@ -20,13 +20,33 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ user
       where: { id: userId },
       include: {
         engineerProfile: true,
-        clientProfile: true,
-        payoutDetail: true
+        payoutDetail: true,
+        clientProfile: {
+          include: { projects: { select: { id: true } } }
+        },
+        transactions: {
+          where: {
+            status: "SUCCESS",
+            type: { in: ["ADVANCE_PAYMENT", "FINAL_PAYMENT"] }
+          },
+          select: { amount: true }
+        }
       }
     });
 
     if (!userDetails){
         return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
+    }
+
+    if (userDetails.role === "CLIENT" && userDetails.clientProfile) {
+      const clientProjects = userDetails.clientProfile.projects || [];
+      const successfulPayments = userDetails.transactions || [];
+      
+      userDetails.clientProfile.totalProjects = clientProjects.length;
+      userDetails.clientProfile.totalBudget = successfulPayments.reduce((sum, tx) => sum + (tx.amount || 0), 0);
+
+      delete (userDetails.clientProfile as any).projects;
+      delete (userDetails as any).transactions;
     }
 
     return NextResponse.json({ success: true, user: userDetails }, { status: 200 });

@@ -193,13 +193,27 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
           className="hover:shadow-md transition-shadow"
         >
         <div style={{ position: "absolute", top: 12, right: 12, display: "flex", gap: 4, zIndex: 10 }}>
-          <button onClick={() => setSuspendingUser(u)} style={s.actionBtn()} title={u.isSuspended ? "Unsuspend" : "Suspend"}>
+          <button 
+            onClick={(e) => { e.stopPropagation(); setSuspendingUser(u); }} 
+            style={s.actionBtn()} 
+            title={u.isSuspended ? "Unsuspend" : "Suspend"}
+          >
             {u.isSuspended ? <CheckCircle size={14} color="#22c55e" /> : <Ban size={14} color="#f59e0b" />}
           </button>
-          <button onClick={() => setEditingUser(u)} style={s.actionBtn()} title="Edit">
+          
+          <button 
+            onClick={(e) => { e.stopPropagation(); setEditingUser(u); }} 
+            style={s.actionBtn()} 
+            title="Edit"
+          >
             <Edit2 size={14} color="#6F6F6F" />
           </button>
-          <button onClick={() => setDeletingUser(u)} style={s.actionBtn(true)} title="Delete">
+          
+          <button 
+            onClick={(e) => { e.stopPropagation(); setDeletingUser(u); }} 
+            style={s.actionBtn(true)} 
+            title="Delete"
+          >
             <Trash2 size={14} color="#e53e3e" />
           </button>
         </div>
@@ -228,17 +242,32 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
                   {u.status || "APPROVED"}
                 </span>
                 
-                {/* Pending Actions */}
+                {/* Pending Actions - ADDED e.stopPropagation() */}
                 {u.status === "PENDING" && (
                   <div style={{ display: "flex", gap: 6 }}>
-                    <button onClick={() => { setStatusModalUser(u); setTargetStatus("APPROVED"); }} style={{ padding: "2px 8px", fontSize: 11, fontWeight: 600, background: "#dcfce7", color: "#16a34a", border: "1px solid #bbf7d0", borderRadius: 6, cursor: "pointer" }}>Approve</button>
-                    <button onClick={() => { setStatusModalUser(u); setTargetStatus("REJECTED"); }} style={{ padding: "2px 8px", fontSize: 11, fontWeight: 600, background: "#fee2e2", color: "#ef4444", border: "1px solid #fecaca", borderRadius: 6, cursor: "pointer" }}>Reject</button>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); setStatusModalUser(u); setTargetStatus("APPROVED"); }} 
+                      style={{ padding: "2px 8px", fontSize: 11, fontWeight: 600, background: "#dcfce7", color: "#16a34a", border: "1px solid #bbf7d0", borderRadius: 6, cursor: "pointer" }}
+                    >
+                      Approve
+                    </button>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); setStatusModalUser(u); setTargetStatus("REJECTED"); }} 
+                      style={{ padding: "2px 8px", fontSize: 11, fontWeight: 600, background: "#fee2e2", color: "#ef4444", border: "1px solid #fecaca", borderRadius: 6, cursor: "pointer" }}
+                    >
+                      Reject
+                    </button>
                   </div>
                 )}
                 
-                {/* Rejected Actions */}
+                {/* Rejected Actions - ADDED e.stopPropagation() */}
                 {u.status === "REJECTED" && (
-                  <button onClick={() => { setStatusModalUser(u); setTargetStatus("APPROVED"); }} style={{ padding: "2px 8px", fontSize: 11, fontWeight: 600, background: "#dcfce7", color: "#16a34a", border: "1px solid #bbf7d0", borderRadius: 6, cursor: "pointer" }}>Approve</button>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); setStatusModalUser(u); setTargetStatus("APPROVED"); }} 
+                    style={{ padding: "2px 8px", fontSize: 11, fontWeight: 600, background: "#dcfce7", color: "#16a34a", border: "1px solid #bbf7d0", borderRadius: 6, cursor: "pointer" }}
+                  >
+                    Approve
+                  </button>
                 )}
               </div>
             )}

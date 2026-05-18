@@ -1007,6 +1007,8 @@ export default function MilestoneTab({ projectId }: any) {
                       content: "",
                       description: "",
                       status: "PENDING",
+                      startDate: "",
+                      endDate: "",
                     });
                   }}
                   className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg  text-sm"

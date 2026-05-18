@@ -8,7 +8,7 @@ import { Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 // Tab definitions
-const CLIENT_TABS = ["Overview", "Daily Taks", "Kanban", "Milestones", "Credentials", "Assets", "Report Issue", "Chat", "Payout"];
+const CLIENT_TABS = ["Overview", "Tasks", "Milestones", "Credentials", "Assets", "Report Issue", "Chat", "Payout"];
 
 function getTabsForRole() {
   return CLIENT_TABS;

@@ -28,7 +28,7 @@ export default function TabContent({ activeTab, project }: any) {
     case "Daily Taks":
       return <DailyTask projectId={project.id} />
 
-    case "Kanban":
+    case "Tasks":
       return <KanbanTab projectId={project.id} />;
 
     case "Credentials":

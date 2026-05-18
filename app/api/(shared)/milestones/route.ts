@@ -48,6 +48,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    console.log("called");
+    
     const { user, error } = await getUser();
     if (error || !user) {
       return NextResponse.json({ success: false, message: error || "Unauthorized" }, { status: 401 });
@@ -57,6 +59,10 @@ export async function POST(req: NextRequest) {
     const projectId = formData.get("projectId") as string;
     const title = formData.get("title") as string;
     const type = formData.get("type") as "IMAGE" | "ZIP" | "DOCUMENT" | "LINK";
+    const description = formData.get("description") as string;
+    const startDate = formData.get("startDate") as string;
+    const endDate = formData.get("endDate") as string;
+    
     
     const project = await prisma.project.findUnique({
       where: { id: projectId },
@@ -92,11 +98,13 @@ export async function POST(req: NextRequest) {
     }
 
     await prisma.milestone.create({
-      data: { projectId, addedById: user.id, title, type, content }
+      data: { projectId, addedById: user.id, title, type, content, description }
     });
 
     return NextResponse.json({ success: true, message: "Milestone added successfully" }, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.log(error);
+    
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }

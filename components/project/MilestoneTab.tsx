@@ -28,6 +28,15 @@ export default function MilestoneTab({ projectId }: any) {
   const [open, setOpen] = useState(false);
   const [fileUploadOpen, setFileUploadOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deleteModal, setDeleteModal] = useState<{
+    open: boolean;
+    id: string | null;
+    type: "milestone" | "file";
+  }>({
+    open: false,
+    id: null,
+    type: "milestone",
+  });
   const [editMode, setEditMode] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -40,8 +49,12 @@ export default function MilestoneTab({ projectId }: any) {
   const [fileTitle, setFileTitle] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [fileUrl, setFileUrl] = useState("");
+  const [dragActive, setDragActive] = useState(false);
   const [newMilestone, setNewMilestone] = useState({
     title: "",
+    description: "",
+    startDate: "",
+    endDate: "",
     type: "IMAGE",
     status: "PENDING",
     content: "",
@@ -60,7 +73,7 @@ export default function MilestoneTab({ projectId }: any) {
         await fetchMilestones();
       }
     } catch (error: any) {
-      console.log(error.message);
+      // console.log(error.message);
     } finally {
       setCompleting(false);
     }
@@ -86,6 +99,8 @@ export default function MilestoneTab({ projectId }: any) {
     try {
       const res = await fetch(`/api/milestones?projectId=${projectId}`);
       const data = await res.json();
+      // console.log(data, "milestone");
+
       if (data.success) setMilestones(data.milestones);
     } catch (err) {
       console.error("Milestone fetch error:", err);
@@ -186,7 +201,10 @@ export default function MilestoneTab({ projectId }: any) {
 
         setNewMilestone({
           title: "",
+          startDate: "",
+          endDate: "",
           type: "IMAGE",
+          description: "",
           content: "",
           status: "PENDING",
         });
@@ -202,24 +220,56 @@ export default function MilestoneTab({ projectId }: any) {
     }
   };
 
+  const openDeleteModal = (
+    id: string,
+    type: "milestone" | "file" = "milestone"
+  ) => {
+    setDeleteModal({
+      open: true,
+      id,
+      type,
+    });
+  };
+
+  // const deleteMilestone = async (id: string) => {
+  //   // if (!confirm("Delete this milestone?")) return;
+  //   try {
+  //     // setDeleting(true);
+  //     const res = await fetch(`/api/milestones/${id}`, {
+  //       method: "DELETE",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ id }),
+  //     });
+  //     const data = await res.json();
+  //     if (data.success) {
+  //       await fetchMilestones();
+  //       toast.success("Milestone deleted!");
+  //     } else toast.error(data.message || "Failed to delete");
+  //   } catch {
+  //     toast.error("Error deleting milestone");
+  //   } finally {
+  //     setDeleting(false);
+  //   }
+  // };
+
   const deleteMilestone = async (id: string) => {
-    if (!confirm("Delete this milestone?")) return;
     try {
-      setDeleting(true);
       const res = await fetch(`/api/milestones/${id}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
       });
+
       const data = await res.json();
+
       if (data.success) {
         await fetchMilestones();
         toast.success("Milestone deleted!");
-      } else toast.error(data.message || "Failed to delete");
+      } else {
+        toast.error(data.message || "Failed to delete");
+      }
     } catch {
       toast.error("Error deleting milestone");
-    } finally {
-      setDeleting(false);
     }
   };
 
@@ -244,6 +294,9 @@ export default function MilestoneTab({ projectId }: any) {
       formData.append("title", newMilestone.title);
       formData.append("type", newMilestone.type);
       formData.append("projectId", projectId);
+      formData.append("description", newMilestone.description);
+      formData.append("startDate", newMilestone.startDate);
+      formData.append("endDate", newMilestone.endDate);
 
       if (newMilestone.type === "LINK") {
         let url = newMilestone.content.trim();
@@ -273,7 +326,10 @@ export default function MilestoneTab({ projectId }: any) {
 
         setNewMilestone({
           title: "",
+          startDate: "",
+          endDate: "",
           type: "IMAGE",
+          description: "",
           content: "",
           status: "PENDING",
         });
@@ -308,6 +364,32 @@ export default function MilestoneTab({ projectId }: any) {
     }
   };
 
+  const confirmDelete = async () => {
+    if (!deleteModal.id) return;
+
+    try {
+      setDeleting(true);
+
+      if (deleteModal.type === "milestone") {
+        await deleteMilestone(deleteModal.id);
+      }
+
+      if (deleteModal.type === "file") {
+        await deleteMilestoneFile(deleteModal.id);
+      }
+
+      setDeleteModal({
+        open: false,
+        id: null,
+        type: "milestone",
+      });
+    } catch (error) {
+      // console.log(error);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const downloadFile = async (fileUrl: string, title: string) => {
     try {
       const response = await fetch(fileUrl, { mode: "cors" });
@@ -337,6 +419,9 @@ export default function MilestoneTab({ projectId }: any) {
     setEditingId(m.id);
     setNewMilestone({
       title: m.title,
+      startDate: m.startDate,
+      endDate: m.endDate,
+      description: m.description,
       type: m.type,
       status: m.completed ? "COMPLETED" : "PENDING",
       content: m.content,
@@ -466,6 +551,13 @@ export default function MilestoneTab({ projectId }: any) {
                     >
                       {m.title}
                     </h3>
+                    {/* description */}
+                    <h3
+                      className="text-sm"
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      {m.description}
+                    </h3>
 
                     {/* CONTENT BASED ON TYPE */}
                     <div
@@ -533,11 +625,10 @@ export default function MilestoneTab({ projectId }: any) {
 
                   {/* COMPLETION BADGE */}
                   <span
-                    className={`text-[10px] px-2 py-0.5 rounded-full  ${
-                      m.completed
-                        ? "bg-green-100 text-green-600"
-                        : "bg-gray-100 text-gray-500"
-                    }`}
+                    className={`text-[10px] px-2 py-0.5 rounded-full  ${m.completed
+                      ? "bg-green-100 text-green-600"
+                      : "bg-gray-100 text-gray-500"
+                      }`}
                   >
                     {m.completed ? "Completed" : "Pending"}
                   </span>
@@ -555,7 +646,7 @@ export default function MilestoneTab({ projectId }: any) {
                   </button>
                   <button
                     disabled={deleting}
-                    onClick={() => deleteMilestone(m.id)}
+                    onClick={() => openDeleteModal(m.id)}
                     className="bg-[var(--destructive)] rounded-lg px-4 py-2"
                   >
                     {deleting ? "Deleting..." : "Delete"}
@@ -630,6 +721,78 @@ export default function MilestoneTab({ projectId }: any) {
                 />
               </div>
 
+              {/* DESCRIPTION */}
+              <div>
+                <label className="block text-sm font-medium mb-1.5">
+                  Description
+                </label>
+
+                <textarea
+                  value={newMilestone.description || ""}
+                  onChange={(e) =>
+                    setNewMilestone({
+                      ...newMilestone,
+                      description: e.target.value,
+                    })
+                  }
+                  rows={4}
+                  className={`${inputCls} resize-none`}
+                  placeholder="Enter milestone description..."
+                  disabled={uploading || currentUser?.role === "CLIENT"}
+                />
+              </div>
+
+              {/* DEADLINE */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                {/* START DATE */}
+                <div>
+                  <label className="block text-sm font-medium mb-1.5">
+                    Start Date
+                  </label>
+
+                  <input
+                    type="date"
+                    value={newMilestone.startDate || ""}
+                    onChange={(e) =>
+                      setNewMilestone({
+                        ...newMilestone,
+                        startDate: e.target.value,
+                      })
+                    }
+                    className={inputCls}
+                    disabled={
+                      uploading ||
+                      currentUser?.role === "CLIENT"
+                    }
+                  />
+                </div>
+
+                {/* END DATE */}
+                <div>
+                  <label className="block text-sm font-medium mb-1.5">
+                    End Date
+                  </label>
+
+                  <input
+                    type="date"
+                    value={newMilestone.endDate || ""}
+                    min={newMilestone.startDate || ""}
+                    onChange={(e) =>
+                      setNewMilestone({
+                        ...newMilestone,
+                        endDate: e.target.value,
+                      })
+                    }
+                    className={inputCls}
+                    disabled={
+                      uploading ||
+                      currentUser?.role === "CLIENT"
+                    }
+                  />
+                </div>
+              </div>
+
               {/* TYPE */}
               <div>
                 <label className="block text-sm font-medium  mb-1.5">
@@ -644,7 +807,7 @@ export default function MilestoneTab({ projectId }: any) {
                   disabled={
                     uploading || currentUser?.role === "CLIENT" || editMode
                   }
-                  // 🔥 lock type in edit mode (important)
+                // 🔥 lock type in edit mode (important)
                 >
                   <option value="IMAGE">Image</option>
                   <option value="ZIP">Zip</option>
@@ -673,19 +836,145 @@ export default function MilestoneTab({ projectId }: any) {
                   />
                 </div>
               ) : (
+                // <div>
+                //   <label className="block text-sm font-medium  mb-1.5">
+                //     {editMode ? "Replace File (optional)" : "Upload File *"}
+                //   </label>
+
+                //   <input
+                //     type="file"
+                //     onChange={(e) => setFile(e.target.files?.[0] || null)}
+                //     className="w-full text-sm "
+                //     disabled={uploading || currentUser?.role === "CLIENT"}
+                //   />
+
+                //   {/* EXISTING FILE PREVIEW (EDIT MODE) */}
+                //   {editMode && !file && newMilestone.content && (
+                //     <div className="mt-2 text-xs text-[var(--text-muted)]">
+                //       Current file:
+                //       <button
+                //         onClick={() =>
+                //           window.open(newMilestone.content, "_blank")
+                //         }
+                //         className="ml-2 underline hover:text-[var(--primary)]"
+                //       >
+                //         View
+                //       </button>
+                //     </div>
+                //   )}
+                // </div>
+
                 <div>
-                  <label className="block text-sm font-medium  mb-1.5">
+                  <label className="block text-sm font-medium mb-1.5">
                     {editMode ? "Replace File (optional)" : "Upload File *"}
                   </label>
 
-                  <input
-                    type="file"
-                    onChange={(e) => setFile(e.target.files?.[0] || null)}
-                    className="w-full text-sm "
-                    disabled={uploading || currentUser?.role === "CLIENT"}
-                  />
+                  <div
+                    onDragEnter={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setDragActive(true);
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setDragActive(true);
+                    }}
+                    onDragLeave={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setDragActive(false);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
 
-                  {/* EXISTING FILE PREVIEW (EDIT MODE) */}
+                      setDragActive(false);
+
+                      const droppedFile = e.dataTransfer.files?.[0];
+
+                      if (droppedFile) {
+                        setFile(droppedFile);
+                      }
+                    }}
+                    className={`relative rounded-xl border-2 border-dashed p-6 transition-all duration-200 ${dragActive
+                      ? "border-[var(--primary)] bg-orange-50"
+                      : "border-gray-300 bg-gray-50"
+                      }`}
+                  >
+                    <input
+                      type="file"
+                      onChange={(e) => setFile(e.target.files?.[0] || null)}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                      disabled={uploading || currentUser?.role === "CLIENT"}
+                    />
+
+                    <div className="flex flex-col items-center justify-center text-center space-y-2">
+                      <Paperclip
+                        size={28}
+                        className="text-[var(--primary)]"
+                      />
+
+                      <div>
+                        <p className="text-sm font-medium text-black">
+                          Drag & drop file here
+                        </p>
+
+                        <p className="text-xs text-gray-500 mt-1">
+                          or click to browse
+                        </p>
+                      </div>
+
+                      {file && (
+                        <div className="relative mt-4 w-full rounded-xl border bg-white p-3">
+
+                          {/* REMOVE BUTTON */}
+                          <button
+                            type="button"
+                            onClick={() => setFile(null)}
+                            className="absolute top-2 right-2 rounded-full bg-gray-100 p-1 hover:bg-red-100 transition"
+                          >
+                            <X size={14} className="text-gray-600 hover:text-red-600" />
+                          </button>
+
+                          {/* IMAGE PREVIEW */}
+                          {file.type.startsWith("image/") ? (
+                            <div className="space-y-3">
+                              <img
+                                src={URL.createObjectURL(file)}
+                                alt="preview"
+                                className="max-h-52 w-full object-cover rounded-lg border"
+                              />
+
+                              <div className="text-xs text-gray-600 break-all">
+                                {file.name}
+                              </div>
+                            </div>
+                          ) : (
+                            /* FILE PREVIEW */
+                            <div className="flex items-center gap-3">
+
+                              <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                                <Paperclip size={18} className="text-gray-600" />
+                              </div>
+
+                              <div className="flex-1 overflow-hidden">
+                                <p className="text-sm font-medium text-black truncate">
+                                  {file.name}
+                                </p>
+
+                                <p className="text-xs text-gray-500">
+                                  {(file.size / 1024 / 1024).toFixed(2)} MB
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* EXISTING FILE PREVIEW */}
                   {editMode && !file && newMilestone.content && (
                     <div className="mt-2 text-xs text-[var(--text-muted)]">
                       Current file:
@@ -716,6 +1005,7 @@ export default function MilestoneTab({ projectId }: any) {
                       title: "",
                       type: "IMAGE",
                       content: "",
+                      description: "",
                       status: "PENDING",
                     });
                   }}
@@ -741,6 +1031,67 @@ export default function MilestoneTab({ projectId }: any) {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {deleteModal.open && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-gray-200">
+
+            {/* HEADER */}
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-black">
+                  Delete Confirmation
+                </h2>
+
+                <p className="mt-2 text-sm text-gray-500 leading-6">
+                  Are you sure you want to delete this{" "}
+                  {deleteModal.type}?
+                  This action cannot be undone.
+                </p>
+              </div>
+
+              <button
+                onClick={() =>
+                  setDeleteModal({
+                    open: false,
+                    id: null,
+                    type: "milestone",
+                  })
+                }
+                className="p-1 rounded-lg hover:bg-gray-100"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* ACTIONS */}
+            <div className="mt-6 flex justify-end gap-3">
+
+              <button
+                onClick={() =>
+                  setDeleteModal({
+                    open: false,
+                    id: null,
+                    type: "milestone",
+                  })
+                }
+                className="px-4 py-2 rounded-xl border border-gray-300 text-sm font-medium hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+
+              <button
+                disabled={deleting}
+                onClick={confirmDelete}
+                className="px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 disabled:opacity-50"
+              >
+                {deleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
           </div>
         </div>
       )}

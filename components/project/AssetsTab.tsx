@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import {
   FileArchive, FileText, Plus, Loader2, Download, Eye, Trash2,
-  Image as ImageIcon, Link as LinkIcon, ExternalLink, Copy, CopyCheck
+  Image as ImageIcon, Link as LinkIcon, ExternalLink, Copy, CopyCheck,
+  Paperclip,
+  X
 } from "lucide-react";
 import toast from "react-hot-toast";
 import Image from "next/image";
@@ -33,10 +35,10 @@ function AssetsCard({ resource, onDelete, isAdmin }: {
   const isLink = resource.type === "LINK";
 
   const displayUrl = resource.content;
-  const previewImage = resource.type === "IMAGE" 
-    ? resource.content 
-    : resource.type === "LINK" 
-      ? "/globe.svg" 
+  const previewImage = resource.type === "IMAGE"
+    ? resource.content
+    : resource.type === "LINK"
+      ? "/globe.svg"
       : "/placeholder-file.jpg";
 
   const handleDownload = async () => {
@@ -50,8 +52,8 @@ function AssetsCard({ resource, onDelete, isAdmin }: {
       const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = blobUrl;
-      link.download = resource.title.replace(/\s+/g, "_") + 
-                     (resource.type === "IMAGE" ? ".jpg" : ".zip");
+      link.download = resource.title.replace(/\s+/g, "_") +
+        (resource.type === "IMAGE" ? ".jpg" : ".zip");
 
       document.body.appendChild(link);
       link.click();
@@ -128,12 +130,12 @@ function AssetsCard({ resource, onDelete, isAdmin }: {
               <div className="w-6 h-6 rounded-full flex items-center justify-center overflow-hidden border"
                 style={{ background: "var(--primary-light)", borderColor: "#ffd9a8" }}>
                 {resource.addedBy.image ? (
-                  <Image 
-                    src={resource.addedBy.image} 
-                    alt="Avatar" 
-                    className="w-full h-full object-cover rounded-full" 
-                    width={24} 
-                    height={24} 
+                  <Image
+                    src={resource.addedBy.image}
+                    alt="Avatar"
+                    className="w-full h-full object-cover rounded-full"
+                    width={24}
+                    height={24}
                   />
                 ) : (
                   <span className="text-xs font-bold" style={{ color: "var(--primary)" }}>
@@ -184,11 +186,20 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [open, setOpen] = useState(false);
-
+  const [dragActive, setDragActive] = useState(false);
   const [title, setTitle] = useState("");
   const [type, setType] = useState<"FILE" | "IMAGE" | "LINK" | "TEXT" | "CREDENTIALS">("IMAGE");
   const [file, setFile] = useState<File | null>(null);
   const [content, setContent] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
+  const [deleteModal, setDeleteModal] = useState<{
+    open: boolean;
+    resourceId: string | null;
+  }>({
+    open: false,
+    resourceId: null,
+  });
 
   const { data: session } = useSession();
   const role = session?.user?.role?.toUpperCase()?.trim() || "";
@@ -260,11 +271,37 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
     }
   };
 
-  const deleteResource = async (resourceId: string) => {
-    if (!confirm("Delete this resource?")) return;
+  const openDeleteModal = (resourceId: string) => {
+    setDeleteModal({
+      open: true,
+      resourceId,
+    });
+  };
 
+  // const deleteResource = async (resourceId: string) => {
+  //   if (!confirm("Delete this resource?")) return;
+
+  //   try {
+  //     const res = await fetch(`/api/resources/${resourceId}`, { method: "DELETE" });
+  //     const data = await res.json();
+
+  //     if (data.success) {
+  //       await fetchResources();
+  //       toast.success("Resource deleted");
+  //     } else {
+  //       toast.error(data.message || "Delete failed");
+  //     }
+  //   } catch {
+  //     toast.error("Failed to delete");
+  //   }
+  // };
+
+  const deleteResource = async (resourceId: string) => {
     try {
-      const res = await fetch(`/api/resources/${resourceId}`, { method: "DELETE" });
+      const res = await fetch(`/api/resources/${resourceId}`, {
+        method: "DELETE",
+      });
+
       const data = await res.json();
 
       if (data.success) {
@@ -275,6 +312,25 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
       }
     } catch {
       toast.error("Failed to delete");
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteModal.resourceId) return;
+
+    try {
+      setDeleting(true);
+
+      await deleteResource(deleteModal.resourceId);
+
+      setDeleteModal({
+        open: false,
+        resourceId: null,
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -311,7 +367,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
             <AssetsCard
               key={res.id}
               resource={res}
-              onDelete={deleteResource}
+              onDelete={openDeleteModal}
               isAdmin={isAdmin}
             />
           ))}
@@ -349,17 +405,121 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
             </select>
 
             {(type === "FILE" || type === "IMAGE") ? (
-              <input
-                type="file"
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="mb-4 text-sm "
-              />
+              <div
+                onDragEnter={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setDragActive(true);
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setDragActive(true);
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setDragActive(false);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+
+                  setDragActive(false);
+
+                  const droppedFile = e.dataTransfer.files?.[0];
+
+                  if (droppedFile) {
+                    setFile(droppedFile);
+                  }
+                }}
+                className={`relative mb-4 rounded-xl border-2 border-dashed p-6 transition-all duration-200 ${dragActive
+                  ? "border-[var(--primary)] bg-orange-50"
+                  : "border-gray-300 bg-gray-50"
+                  }`}
+              >
+                {/* HIDDEN INPUT */}
+                <input
+                  type="file"
+                  onChange={(e) => setFile(e.target.files?.[0] || null)}
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                />
+
+                <div className="flex flex-col items-center justify-center text-center space-y-2">
+                  <Paperclip
+                    size={28}
+                    className="text-[var(--primary)]"
+                  />
+
+                  <div>
+                    <p className="text-sm font-medium text-black">
+                      Drag & drop file here
+                    </p>
+
+                    <p className="text-xs text-gray-500 mt-1">
+                      or click to browse
+                    </p>
+                  </div>
+
+                  {/* FILE PREVIEW */}
+                  {file && (
+                    <div className="relative mt-4 w-full rounded-xl border bg-white p-3">
+
+                      {/* REMOVE BUTTON */}
+                      <button
+                        type="button"
+                        onClick={() => setFile(null)}
+                        className="absolute top-2 right-2 rounded-full bg-gray-100 p-1 hover:bg-red-100 transition"
+                      >
+                        <X
+                          size={14}
+                          className="text-gray-600 hover:text-red-600"
+                        />
+                      </button>
+
+                      {file.type.startsWith("image/") ? (
+                        <div className="space-y-3">
+                          <img
+                            src={URL.createObjectURL(file)}
+                            alt="preview"
+                            className="max-h-52 w-full object-cover rounded-lg border"
+                          />
+
+                          <div className="text-xs text-gray-600 break-all">
+                            {file.name}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-3">
+
+                          <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                            <Paperclip
+                              size={18}
+                              className="text-gray-600"
+                            />
+                          </div>
+
+                          <div className="flex-1 overflow-hidden">
+                            <p className="text-sm font-medium text-black truncate">
+                              {file.name}
+                            </p>
+
+                            <p className="text-xs text-gray-500">
+                              {(file.size / 1024 / 1024).toFixed(2)} MB
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
             ) : (
               <textarea
                 placeholder={
                   type === "LINK" ? "Paste URL..." :
-                  type === "CREDENTIALS" ? "Username / Password / Notes..." :
-                  "Enter content..."
+                    type === "CREDENTIALS" ? "Username / Password / Notes..." :
+                      "Enter content..."
                 }
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
@@ -382,6 +542,64 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
               >
                 {uploading && <Loader2 className="animate-spin" size={14} />}
                 Upload
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteModal.open && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-gray-200">
+
+            {/* HEADER */}
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-black">
+                  Delete Resource
+                </h2>
+
+                <p className="mt-2 text-sm text-gray-500 leading-6">
+                  Are you sure you want to delete this resource?
+                  This action cannot be undone.
+                </p>
+              </div>
+
+              <button
+                onClick={() =>
+                  setDeleteModal({
+                    open: false,
+                    resourceId: null,
+                  })
+                }
+                className="p-1 rounded-lg hover:bg-gray-100"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* ACTIONS */}
+            <div className="mt-6 flex justify-end gap-3">
+
+              <button
+                onClick={() =>
+                  setDeleteModal({
+                    open: false,
+                    resourceId: null,
+                  })
+                }
+                className="px-4 py-2 rounded-xl border border-gray-300 text-sm font-medium hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+
+              <button
+                disabled={deleting}
+                onClick={confirmDelete}
+                className="px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 disabled:opacity-50"
+              >
+                {deleting ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>

@@ -4,6 +4,8 @@ import { getUser } from "@/lib/auth";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
   try {
+    console.log("called");
+    
     const { user, error } = await getUser();
     if (error || !user) return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
 
@@ -43,7 +45,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ proj
     }
 
     return NextResponse.json({ success: true, project: projectData }, { status: 200 });
-  } catch {
+  } catch (error) {
+    console.log("error", error);
+    
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }

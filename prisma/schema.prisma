@@ -466,17 +466,18 @@ enum MilestoneType {
 }
 
 model Milestone {
-  id        String        @id @default(uuid())
-  projectId String
-  addedById String
-  title     String
-  type      MilestoneType
-  content   String        @db.Text
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  completed Boolean       @default(false)
-  project   Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  addedBy   User          @relation(fields: [addedById], references: [id], onDelete: Cascade)
+  id          String        @id @default(uuid())
+  projectId   String
+  addedById   String
+  title       String
+  description String?
+  type        MilestoneType
+  content     String        @db.Text
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  completed   Boolean       @default(false)
+  project     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  addedBy     User          @relation(fields: [addedById], references: [id], onDelete: Cascade)
 }
 
 enum KanbanTaskPriority {

@@ -48,7 +48,7 @@ const HowItWorks = () => {
                         return (
                             <div key={index} className="relative gap-10 font-id">
                                 {/* Main Card */}
-                                <div className="relative z-10 h-92.25 w-97.5 bg-white rounded-3xl p-8 border border-slate-200">
+                                <div className="relative z-10 min-h-[370px] w-97.5 bg-white rounded-3xl p-8 border border-slate-200">
                                     {/* Icon */}
                                     <div className="mt-10 relative flex justify-center items-center">
                                         <div className="border-4 border-gray-200 rounded-2xl">
@@ -60,8 +60,8 @@ const HowItWorks = () => {
                                     </div>
 
                                     {/* Content */}
-                                    <div className='space-y-4 mt-18 flex flex-col items-center text-center'>
-                                        <h3 className="text-[32px] font-semibold text-slate-950 mb-3">
+                                    <div className='space-y-4 mt-12 flex flex-col items-center text-center'>
+                                        <h3 className="text-[17px] font-semibold text-slate-950 mb-3">
                                             {step.title}
                                         </h3>
                                         <p className="text-slate-500 text-[17px] font-medium">

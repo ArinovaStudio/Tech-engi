@@ -7,7 +7,7 @@ import TabContent from "@/components/project/TabContent";
 import { Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-const ADMIN_TABS = ["Overview", "Daily Taks", "Kanban", "Milestones", "Credentials", "Assets", "Report Issue", "Chat", "Payout"];
+const ADMIN_TABS = ["Overview", "Tasks", "Milestones", "Credentials", "Assets", "Report Issue", "Chat", "Payout"];
 
 function getTabsForRole() {
   return ADMIN_TABS;

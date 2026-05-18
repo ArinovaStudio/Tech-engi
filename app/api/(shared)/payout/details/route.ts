@@ -25,8 +25,17 @@ const payoutSchema = z.object({
   ifscCode: z.string().optional().nullable(),
   bankName: z.string().optional().nullable(),
   accountHolder: z.string().optional().nullable(),
-}).refine(data => data.upiId || (data.accountNumber && data.ifscCode), {
-  message: "You must provide either a valid UPI ID, or complete Bank Account details."
+  preferredMethod: z.enum(["UPI", "BANK"])
+}).refine(data => {
+  if (data.preferredMethod === "UPI") {
+    return !!data.upiId && data.upiId.length > 0;
+  }
+  if (data.preferredMethod === "BANK") {
+    return !!(data.accountNumber && data.ifscCode && data.bankName && data.accountHolder);
+  }
+  return false;
+}, {
+  message: "You must provide complete details for your chosen preferred payment method."
 });
 
 export async function POST(req: NextRequest) {
@@ -43,12 +52,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: validation.error.issues[0].message }, { status: 400 });
     }
 
-    const { upiId, accountNumber, ifscCode, bankName, accountHolder } = validation.data;
+    const { upiId, accountNumber, ifscCode, bankName, accountHolder, preferredMethod } = validation.data;
 
     await prisma.payoutDetail.upsert({
       where: { userId: user.id },
-      update: { upiId, accountNumber, ifscCode, bankName, accountHolder },
-      create: { userId: user.id, upiId, accountNumber, ifscCode, bankName, accountHolder }
+      update: { upiId, accountNumber, ifscCode, bankName, accountHolder, preferredMethod },
+      create: { userId: user.id, upiId, accountNumber, ifscCode, bankName, accountHolder, preferredMethod }
     });
 
     return NextResponse.json({ success: true, message: "Payment details saved successfully" }, { status: 200 });

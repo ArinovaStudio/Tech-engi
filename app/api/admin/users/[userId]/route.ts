@@ -20,7 +20,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ user
       where: { id: userId },
       include: {
         engineerProfile: true,
-        clientProfile: true
+        clientProfile: true,
+        payoutDetail: true
       }
     });
 
@@ -36,11 +37,25 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ user
 
 const updateUserSchema = z.object({
   name: z.string().optional(),
-  expertise: z.array(z.string()).optional(), //client only
-  skills: z.array(z.string()).optional(), //engineer only
-  qualification: z.enum(["UG", "EMPLOYED", "UNEMPLOYED"]).optional(), // engineer only
-  approvalStatus: z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(), //engineer only
-  rejectionReason: z.string().optional().nullable() //engineer only
+  phone: z.string().optional(),
+  bio: z.string().optional(),
+  expertise: z.array(z.string()).optional(), 
+  skills: z.array(z.string()).optional(), 
+  qualification: z.enum(["UG", "EMPLOYED", "UNEMPLOYED"]).optional(), 
+  idType: z.enum(["STUDENT_ID", "AADHAAR", "PAN", "PAY_SLIP"]).optional(),
+  idNumber: z.string().optional(),
+  certifications: z.array(z.string()).optional(),
+  approvalStatus: z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(), 
+  rejectionReason: z.string().optional().nullable(),
+  
+  payoutDetail: z.object({
+    preferredMethod: z.enum(["UPI", "BANK"]).optional(),
+    upiId: z.string().optional().nullable(),
+    accountNumber: z.string().optional().nullable(),
+    ifscCode: z.string().optional().nullable(),
+    bankName: z.string().optional().nullable(),
+    accountHolder: z.string().optional().nullable(),
+  }).optional()
 });
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
@@ -58,7 +73,12 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
       return NextResponse.json({ success: false, message: validation.error.issues[0].message }, { status: 400 });
     }
 
-    const { name, expertise, skills, qualification, approvalStatus, rejectionReason } = validation.data;
+    const { 
+      name, phone, bio, 
+      expertise, skills, qualification, idType, idNumber, certifications, 
+      approvalStatus, rejectionReason, 
+      payoutDetail 
+    } = validation.data;
 
     const existingUser = await prisma.user.findUnique({
       where: { id: userId },
@@ -69,15 +89,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
         return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
     }
 
-
-    const user = await prisma.user.update({ where: { id: userId }, data: { name } });
+    await prisma.user.update({ where: { id: userId }, data: { name, phone, bio } });
 
     if (existingUser.role === "CLIENT" && expertise) {
         await prisma.clientProfile.upsert({
             where: { userId: userId },
             update: { expertise },
-            create: { userId: userId, expertise 
-            }
+            create: { userId: userId, expertise }
         });
     }
 
@@ -87,6 +105,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
             update: { 
                 skills, 
                 qualification, 
+                idType,
+                idNumber,
+                certifications,
                 status: approvalStatus, 
                 rejectionReason 
             },
@@ -96,10 +117,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
                 qualification: qualification || "UG",
                 status: approvalStatus || "PENDING",
                 rejectionReason: rejectionReason || null,
-                idType: "AADHAAR", 
-                idNumber: "ADMIN_UPSERTED",
+                idType: idType || "PAN", 
+                idNumber: idNumber || "ADMIN_UPSERTED",
                 idFile: "ADMIN_UPSERTED",
-                certifications: []
+                certifications: certifications || []
             }
         });
 
@@ -113,7 +134,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
               WHERE "userId" = ${userId};
             `;
           })
-          .catch((err) => console.error("[embedding PUT]", err));
         }
 
         const previousStatus = existingUser.engineerProfile?.status;
@@ -125,16 +145,32 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
 
           if (approvalStatus === "APPROVED") {
             emailSubject = "Your Account is Approved!";
-            emailHtml = engineerApprovalTemplate(user.name || name || "Engineer");
+            emailHtml = engineerApprovalTemplate(existingUser.name || name || "Engineer");
           } else if (approvalStatus === "REJECTED") {
             emailSubject = "Update on your Engineer Application";
-            emailHtml = engineerRejectionTemplate(user.name || name || "Engineer", rejectionReason || "No reason provided");
+            emailHtml = engineerRejectionTemplate(existingUser.name || name || "Engineer", rejectionReason || "No reason provided");
           }
 
           if (emailHtml) {
-            sendEmail(user.email, emailSubject, emailHtml);
+            sendEmail(existingUser.email, emailSubject, emailHtml);
           }
         }
+    }
+
+    if (payoutDetail) {
+      await prisma.payoutDetail.upsert({
+        where: { userId: userId },
+        update: { ...payoutDetail },
+        create: { 
+          userId: userId, 
+          preferredMethod: payoutDetail.preferredMethod || "UPI",
+          upiId: payoutDetail.upiId,
+          accountNumber: payoutDetail.accountNumber,
+          ifscCode: payoutDetail.ifscCode,
+          bankName: payoutDetail.bankName,
+          accountHolder: payoutDetail.accountHolder
+        }
+      });
     }
 
     return NextResponse.json({ success: true, message: "User updated successfully" }, { status: 200 });

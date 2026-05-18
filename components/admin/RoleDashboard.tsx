@@ -21,6 +21,7 @@ import { io } from "socket.io-client";
 import ConfirmModal from "../ConfirmModal";
 import EditUserModal from "./EditUserModal";
 import useSWRInfinite from "swr/infinite";
+import { useRouter } from "next/navigation";
 
 const socket = io();
 
@@ -50,6 +51,8 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
   
   const [isProcessing, setIsProcessing] = useState(false);
   const [liveUsers, setLiveUsers] = useState<Record<string, boolean>>({});
+
+  const router = useRouter();
 
   useEffect(() => {
     const handler = setTimeout(() => { setDebouncedSearch(search); }, 500);
@@ -176,8 +179,19 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
     const isDbActive = new Date().getTime() - new Date(u.lastActive).getTime() < 15 * 60 * 1000;
     const isActive = liveUsers[u.id] !== undefined ? liveUsers[u.id] : isDbActive;
 
+    const handleRedirect = (role: string) => {
+      if (role === "ENGINEER") router.push(`/admin/engineer-management/${u.id}`);
+      else if (role === "ADMIN") router.push(`/admin/admin-management/${u.id}`);
+      else if (role === "CLIENT") router.push(`/admin/client-management/${u.id}`);
+    }
+
     return (
-      <div key={u.id} style={s.card}>
+      <div 
+          key={u.id} 
+          style={{ ...s.card, cursor: "pointer" }} 
+          onClick={() => handleRedirect(u.role)}
+          className="hover:shadow-md transition-shadow"
+        >
         <div style={{ position: "absolute", top: 12, right: 12, display: "flex", gap: 4, zIndex: 10 }}>
           <button onClick={() => setSuspendingUser(u)} style={s.actionBtn()} title={u.isSuspended ? "Unsuspend" : "Suspend"}>
             {u.isSuspended ? <CheckCircle size={14} color="#22c55e" /> : <Ban size={14} color="#f59e0b" />}

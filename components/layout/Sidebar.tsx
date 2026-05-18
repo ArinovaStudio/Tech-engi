@@ -44,6 +44,7 @@ const ENGINEER_NAV: NavItem[] = [
   { label: "Projects", icon: <FolderKanban size={20} />, href: "/engineer/project" },
   { label: "Message", icon: <MessageSquare size={20} />, href: "/engineer/message" },
   { label: "Payout", icon: <CreditCard size={20} />, href: "/engineer/payout" },
+  { label: "Profile", icon: <User size={20} />, href: "/engineer/profile" },
 ];
 
 const NavLink = ({ item, collapsed }: { item: NavItem; collapsed: boolean }) => {

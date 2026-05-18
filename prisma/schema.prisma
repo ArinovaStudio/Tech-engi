@@ -25,6 +25,9 @@ model User {
   isSuspended   Boolean   @default(false)
   lastActiveAt  DateTime  @default(now())
 
+  phone         String?
+  bio           String?   @db.Text
+
   accounts             Account[]
   clientProfile        ClientProfile?
   engineerProfile      EngineerProfile?
@@ -124,6 +127,7 @@ model PayoutDetail {
   ifscCode      String?
   bankName      String?
   accountHolder String?
+  preferredMethod String @default("UPI")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

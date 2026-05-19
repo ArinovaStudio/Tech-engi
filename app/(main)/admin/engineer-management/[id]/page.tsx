@@ -10,10 +10,10 @@ import AdminEngMetaCard from "@/components/admin/engineer-profile/AdminEngMetaCa
 import AdminEngInfoCard from "@/components/admin/engineer-profile/AdminEngInfoCard";
 import AdminEngDetailsCard from "@/components/admin/engineer-profile/AdminEngDetailsCard";
 import AdminEngAccountCard from "@/components/admin/engineer-profile/AdminEngAccountCard";
-import EngineerModal from "@/components/engineer/profile/modals/EngineerModal"; 
 import ConfirmModal from "@/components/ConfirmModal";
 import DashboardShell from "@/components/layout/DashboardShell";
 import SuspendUserModal from "@/components/admin/SuspendUserModal";
+import EngineerStatusModal from "@/components/admin/EngineerStatusModal";
 
 export default function AdminEngineerProfile({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -24,9 +24,6 @@ export default function AdminEngineerProfile({ params }: { params: Promise<{ id:
   const [showDelete, setShowDelete] = useState(false);
   const [showSuspend, setShowSuspend] = useState(false);
   const [showStatus, setShowStatus] = useState(false);
-  
-  const [targetStatus, setTargetStatus] = useState<"PENDING" | "APPROVED" | "REJECTED">("PENDING");
-  const [rejectionReason, setRejectionReason] = useState("");
 
    if (isLoading) {
     return (
@@ -56,23 +53,6 @@ export default function AdminEngineerProfile({ params }: { params: Promise<{ id:
     finally { setIsProcessing(false); }
   };
 
-  const handleStatusChange = async () => {
-    setIsProcessing(true);
-    try {
-      const res = await fetch(`/api/admin/users/${user.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          approvalStatus: targetStatus, 
-          rejectionReason: targetStatus === "REJECTED" ? rejectionReason : null 
-        }),
-      });
-      if (res.ok) { mutate(); setShowStatus(false); }
-      else toast.error("Failed to update status");
-    } catch { toast.error("Error occurred"); } 
-    finally { setIsProcessing(false); }
-  };
-
   return (
     <DashboardShell>
     <div className="space-y-6 pb-10 max-w-6xl mx-auto">
@@ -90,7 +70,7 @@ export default function AdminEngineerProfile({ params }: { params: Promise<{ id:
 
         <div className="flex items-center gap-3">
           <button 
-            onClick={() => { setTargetStatus(profile?.status || "PENDING"); setRejectionReason(profile?.rejectionReason || ""); setShowStatus(true); }} 
+            onClick={() => { setShowStatus(true); }} 
             className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[var(--border)] text-sm font-semibold hover:bg-gray-50"
           >
             <ShieldAlert size={16} /> Approval Status
@@ -129,29 +109,16 @@ export default function AdminEngineerProfile({ params }: { params: Promise<{ id:
         onSuccess={() => { mutate(); toast.success(`User status updated.`); }} 
       />
 
-      <EngineerModal isOpen={showStatus} onClose={() => setShowStatus(false)} className="max-w-[450px]">
-        <div className="p-8">
-          <h4 className="text-2xl font-bold font-inter text-[var(--text-primary)] mb-2">Change Status</h4>
-          <div className="space-y-4 mt-6">
-            <select value={targetStatus} onChange={e => setTargetStatus(e.target.value as any)} className="w-full border border-[var(--border)] rounded-lg p-3 outline-none focus:border-[var(--primary)] bg-gray-50">
-              <option value="PENDING">Pending</option>
-              <option value="APPROVED">Approved</option>
-              <option value="REJECTED">Rejected</option>
-            </select>
-
-            {targetStatus === "REJECTED" && (
-              <textarea value={rejectionReason} onChange={e => setRejectionReason(e.target.value)} placeholder="Reason for rejection..." rows={3} className="w-full border border-[var(--border)] rounded-lg p-3 outline-none focus:border-[var(--primary)] bg-gray-50 resize-none" />
-            )}
-
-            <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border)]">
-              <button onClick={() => setShowStatus(false)} className="px-5 py-2.5 rounded-lg border border-[var(--border)] font-semibold hover:bg-gray-50">Cancel</button>
-              <button onClick={handleStatusChange} disabled={isProcessing || (targetStatus === "REJECTED" && !rejectionReason)} className="px-5 py-2.5 rounded-lg bg-[var(--primary)] text-white font-semibold disabled:opacity-50">
-                {isProcessing ? "Saving..." : "Update Status"}
-              </button>
-            </div>
-          </div>
-        </div>
-      </EngineerModal>
+      <EngineerStatusModal 
+        isOpen={showStatus} 
+        user={user} 
+        onClose={() => setShowStatus(false)} 
+        onSuccess={() => {
+          toast.success(`Status updated successfully`);
+          mutate();
+          setShowStatus(false);
+        }} 
+      />
     </div>
     </DashboardShell>
   );

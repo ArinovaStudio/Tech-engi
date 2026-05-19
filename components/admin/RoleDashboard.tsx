@@ -23,6 +23,7 @@ import EditUserModal from "./EditUserModal";
 import useSWRInfinite from "swr/infinite";
 import { useRouter } from "next/navigation";
 import SuspendUserModal from "./SuspendUserModal";
+import EngineerStatusModal from "./EngineerStatusModal";
 
 const socket = io();
 
@@ -388,47 +389,21 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
         }}
       />
 
-      {/* NEW: CUSTOM STATUS CHANGE MODAL (APPROVE/REJECT) */}
-      {statusModalUser && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(5,10,48,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}>
-          <div style={{ background: "#fff", borderRadius: 12, padding: 24, width: "100%", maxWidth: 400, border: "1px solid #e5e5e5" }}>
-            <h3 style={{ fontSize: 18, fontWeight: 600, color: "#050A30", marginBottom: 8 }}>
-              {targetStatus === "APPROVED" ? "Approve Engineer" : "Reject Engineer"}
-            </h3>
-            <p style={{ fontSize: 14, color: "#4B4B4B", marginBottom: 16 }}>
-              {targetStatus === "APPROVED" 
-                ? `Are you sure you want to approve ${statusModalUser.name}? They will receive an email and gain full platform access.`
-                : `Are you sure you want to reject ${statusModalUser.name}? Please provide a reason to include in the email.`}
-            </p>
-
-            {targetStatus === "REJECTED" && (
-              <textarea 
-                value={rejectionReason}
-                onChange={(e) => setRejectionReason(e.target.value)}
-                placeholder="Reason for rejection (e.g., Missing documents, incomplete profile...)"
-                style={{ width: "100%", padding: 12, borderRadius: 8, border: "1px solid #e5e5e5", outline: "none", minHeight: 80, marginBottom: 16, fontSize: 14, fontFamily: "inherit" }}
-              />
-            )}
-
-            <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
-              <button 
-                onClick={() => { setStatusModalUser(null); setTargetStatus(null); setRejectionReason(""); }}
-                style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #e5e5e5", background: "#fff", color: "#4B4B4B", fontWeight: 500, cursor: "pointer" }}
-                disabled={isProcessing}
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={handleStatusUpdate}
-                disabled={isProcessing || (targetStatus === "REJECTED" && !rejectionReason.trim())}
-                style={{ padding: "8px 16px", borderRadius: 8, border: "none", background: targetStatus === "APPROVED" ? "#16a34a" : "#ef4444", color: "#fff", fontWeight: 600, cursor: "pointer", opacity: isProcessing || (targetStatus === "REJECTED" && !rejectionReason.trim()) ? 0.6 : 1 }}
-              >
-                {isProcessing ? "Processing..." : targetStatus === "APPROVED" ? "Approve" : "Reject"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EngineerStatusModal
+        isOpen={!!statusModalUser}
+        user={statusModalUser}
+        initialStatus={targetStatus || undefined}
+        onClose={() => {
+          setStatusModalUser(null);
+          setTargetStatus(null);
+        }}
+        onSuccess={() => {
+          toast.success(`Engineer updated successfully`);
+          mutate();
+          setStatusModalUser(null);
+          setTargetStatus(null);
+        }}
+      />
     </div>
   );
 }

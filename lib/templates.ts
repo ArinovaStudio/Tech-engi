@@ -12,36 +12,26 @@ export const otpTemplate = (otp: string) => {
   `;
 };
 
-export const engineerApprovalTemplate = (name: string) => {
-  return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px;">
-      <h2 style="color: #2e7d32;">Congratulations, ${name}!</h2>
-      <p style="color: #555; font-size: 16px;">Your engineer profile has been <strong>Approved</strong> by the Admin team.</p>
-      <p style="color: #555; font-size: 16px;">You can now log in to your dashboard to view and accept project opportunities.</p>
-      <div style="margin: 30px 0; text-align: center;">
-        <a href="${process.env.NEXTAUTH_URL}/dashboard" style="background-color: #f0b31e; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Go to Dashboard</a>
-      </div>
-      <p style="color: #777; font-size: 14px;">Welcome to the team!</p>
-    </div>
-  `;
-};
+export const engineerApprovalTemplate = (name: string, customMessage: string) => `
+<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e5e5; border-radius: 8px; overflow: hidden;">
+  <div style="background-color: #22c55e; padding: 20px; text-align: center;"><h2 style="color: white; margin: 0;">Application Approved</h2></div>
+  <div style="padding: 20px;">
+    <p>Hello ${name},</p>
+    <p style="white-space: pre-wrap;">${customMessage}</p>
+    <p>Regards,<br>The Admin Team</p>
+  </div>
+</div>`;
 
-export const engineerRejectionTemplate = (name: string, reason: string) => {
-  return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 10px;">
-      <h2 style="color: #d32f2f;">Update regarding your application</h2>
-      <p style="color: #555; font-size: 16px;">Hi ${name}, your engineer profile was not approved at this time.</p>
-      <div style="background-color: #fff4f4; padding: 15px; border-left: 4px solid #d32f2f; margin: 20px 0;">
-        <p style="color: #d32f2f; margin: 0; font-weight: bold;">Reason for Rejection:</p>
-        <p style="color: #333; margin-top: 5px;">${reason || "Information provided was incomplete or invalid."}</p>
-      </div>
-      <p style="color: #555; font-size: 16px;">You can update your profile and re-submit your documents for another review.</p>
-      <div style="margin: 30px 0; text-align: center;">
-        <a href="${process.env.NEXTAUTH_URL}/profile" style="background-color: #0f172a; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Update Profile</a>
-      </div>
-    </div>
-  `;
-};
+export const engineerRejectionTemplate = (name: string, customMessage: string) => `
+<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e5e5; border-radius: 8px; overflow: hidden;">
+  <div style="background-color: #ef4444; padding: 20px; text-align: center;"><h2 style="color: white; margin: 0;">Application Update</h2></div>
+  <div style="padding: 20px;">
+    <p>Hello ${name},</p>
+    <p>Thank you for applying. Unfortunately, your application status has been updated:</p>
+    <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0; color: #991b1b;">${customMessage}</div>
+    <p>Regards,<br>The Admin Team</p>
+  </div>
+</div>`;
 
 export const projectInvitationTemplate = (
   name: string,

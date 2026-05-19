@@ -294,3 +294,38 @@ export const invitationDeclinedAdminTemplate = (
     </div>
   `;
 };
+
+export const userSuspendedTemplate = (name: string, customMessage: string) => `
+<div style="font-family: sans-serif; max-w: 600px; margin: 0 auto; border: 1px solid #e5e5e5; border-radius: 8px; overflow: hidden;">
+  <div style="background-color: #ef4444; padding: 20px; text-align: center;">
+    <h2 style="color: white; margin: 0;">Account Suspended</h2>
+  </div>
+  <div style="padding: 20px; color: #333;">
+    <p>Hello ${name},</p>
+    <p>This email is to notify you that your account on our platform has been <strong>suspended</strong>.</p>
+    <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0; color: #991b1b;">
+      <p style="margin: 0;"><strong>Reason for Suspension:</strong></p>
+      <p style="margin: 10px 0 0 0; white-space: pre-wrap;">${customMessage}</p>
+    </div>
+    <p>While your account is suspended, you will not be able to log in or access our services. If you believe this is a mistake or wish to appeal, please reply to this email or contact support.</p>
+    <p>Regards,<br>The Admin Team</p>
+  </div>
+</div>
+`;
+
+export const userUnsuspendedTemplate = (name: string, customMessage: string) => `
+<div style="font-family: sans-serif; max-w: 600px; margin: 0 auto; border: 1px solid #e5e5e5; border-radius: 8px; overflow: hidden;">
+  <div style="background-color: #22c55e; padding: 20px; text-align: center;">
+    <h2 style="color: white; margin: 0;">Account Restored</h2>
+  </div>
+  <div style="padding: 20px; color: #333;">
+    <p>Hello ${name},</p>
+    <p>Good news! Your account suspension has been lifted.</p>
+    <div style="background-color: #f0fdf4; border-left: 4px solid #22c55e; padding: 15px; margin: 20px 0; color: #166534;">
+      <p style="margin: 0; white-space: pre-wrap;">${customMessage}</p>
+    </div>
+    <p>You can now log in and continue using our services as usual.</p>
+    <p>Regards,<br>The Admin Team</p>
+  </div>
+</div>
+`;

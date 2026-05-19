@@ -13,6 +13,7 @@ import AdminEngAccountCard from "@/components/admin/engineer-profile/AdminEngAcc
 import EngineerModal from "@/components/engineer/profile/modals/EngineerModal"; 
 import ConfirmModal from "@/components/ConfirmModal";
 import DashboardShell from "@/components/layout/DashboardShell";
+import SuspendUserModal from "@/components/admin/SuspendUserModal";
 
 export default function AdminEngineerProfile({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -44,20 +45,6 @@ export default function AdminEngineerProfile({ params }: { params: Promise<{ id:
   const profile = user?.engineerProfile;
 
   if (!user) return <p className="text-center mt-10">User not found</p>;
-
-  const handleSuspend = async () => {
-    setIsProcessing(true);
-    try {
-      const res = await fetch(`/api/admin/users/suspend`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.id, isSuspended: !user.isSuspended }),
-      });
-      if (res.ok) { mutate(); setShowSuspend(false); }
-      else toast.error("Failed to update status");
-    } catch { toast.error("Error occurred"); } 
-    finally { setIsProcessing(false); }
-  };
 
   const handleDelete = async () => {
     setIsProcessing(true);
@@ -134,7 +121,13 @@ export default function AdminEngineerProfile({ params }: { params: Promise<{ id:
 
       {/* MODALS */}
       <ConfirmModal isOpen={showDelete} title="Delete Engineer" message={`Permanently delete ${user.name}? This removes all their data.`} confirmText="Delete" isDanger={true} isLoading={isProcessing} onCancel={() => setShowDelete(false)} onConfirm={handleDelete} />
-      <ConfirmModal isOpen={showSuspend} title={user.isSuspended ? "Unsuspend Engineer" : "Suspend Engineer"} message={user.isSuspended ? `Restore access for ${user.name}?` : `Revoke platform access for ${user.name}?`} confirmText={user.isSuspended ? "Unsuspend" : "Suspend"} isDanger={!user.isSuspended} isLoading={isProcessing} onCancel={() => setShowSuspend(false)} onConfirm={handleSuspend} />
+      
+      <SuspendUserModal 
+        isOpen={showSuspend} 
+        user={user} 
+        onClose={() => setShowSuspend(false)} 
+        onSuccess={() => { mutate(); toast.success(`User status updated.`); }} 
+      />
 
       <EngineerModal isOpen={showStatus} onClose={() => setShowStatus(false)} className="max-w-[450px]">
         <div className="p-8">

@@ -26,8 +26,8 @@ const ADMIN_NAV: NavItem[] = [
   { label: "Client Management", icon: <User size={20} />, href: "/admin/client-management" },
   { label: "Engineer Management", icon: <UserKeyIcon size={20} />, href: "/admin/engineer-management" },
   { label: "Invitations Management", icon: <UserKeyIcon size={20} />, href: "/admin/invitations-management" },
-  { label: "Payment", icon: <CreditCard size={20} />, href: "/admin/payment" },
-  { label: "Customers", icon: <Users size={20} />, href: "/admin/customers" },
+  // { label: "Payment", icon: <CreditCard size={20} />, href: "/admin/payment" },
+  // { label: "Customers", icon: <Users size={20} />, href: "/admin/customers" },
   { label: "Message", icon: <MessageSquare size={20} />, href: "/admin/message" },
 ];
 

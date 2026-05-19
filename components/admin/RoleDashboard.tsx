@@ -22,6 +22,7 @@ import ConfirmModal from "../ConfirmModal";
 import EditUserModal from "./EditUserModal";
 import useSWRInfinite from "swr/infinite";
 import { useRouter } from "next/navigation";
+import SuspendUserModal from "./SuspendUserModal";
 
 const socket = io();
 
@@ -124,24 +125,6 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
       }
     } catch { toast.error("Internal Server Error"); } 
     finally { setIsProcessing(false); setDeletingUser(null); }
-  };
-
-  const handleSuspend = async () => {
-    if (!suspendingUser) return;
-    setIsProcessing(true);
-    try {
-      const res = await fetch(`/api/admin/users/suspend`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: suspendingUser.id, isSuspended: !suspendingUser.isSuspended }),
-      });
-      const result = await res.json();
-      if (result.success) {
-        toast.success(result.message);
-        mutate();
-      } else { toast.error(result.message || "Failed to update status"); }
-    } catch { toast.error("Internal Server Error"); } 
-    finally { setIsProcessing(false); setSuspendingUser(null); }
   };
 
   const handleStatusUpdate = async () => {
@@ -395,19 +378,14 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
         onConfirm={handleDelete}
       />
 
-      <ConfirmModal
+      <SuspendUserModal
         isOpen={!!suspendingUser}
-        title={suspendingUser?.isSuspended ? "Unsuspend User" : "Suspend User"}
-        message={
-          suspendingUser?.isSuspended
-            ? `Are you sure you want to unsuspend ${suspendingUser.name} and restore their access?`
-            : `Are you sure you want to suspend ${suspendingUser?.name}? They will not be able to log in to the platform.`
-        }
-        confirmText={suspendingUser?.isSuspended ? "Unsuspend" : "Suspend"}
-        isDanger={!suspendingUser?.isSuspended}
-        isLoading={isProcessing}
-        onCancel={() => setSuspendingUser(null)}
-        onConfirm={handleSuspend}
+        user={suspendingUser}
+        onClose={() => setSuspendingUser(null)}
+        onSuccess={() => {
+          toast.success(`User state successfully updated.`);
+          mutate();
+        }}
       />
 
       {/* NEW: CUSTOM STATUS CHANGE MODAL (APPROVE/REJECT) */}

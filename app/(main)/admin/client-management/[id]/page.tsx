@@ -12,6 +12,7 @@ import AdminClientDetailsCard from "@/components/admin/client-profile/AdminClien
 import AdminClientAccountCard from "@/components/admin/client-profile/AdminClientAccountCard";
 import ConfirmModal from "@/components/ConfirmModal";
 import DashboardShell from "@/components/layout/DashboardShell";
+import SuspendUserModal from "@/components/admin/SuspendUserModal";
 
 export default function AdminClientProfile({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -36,20 +37,6 @@ export default function AdminClientProfile({ params }: { params: Promise<{ id: s
   const profile = user?.clientProfile;
 
   if (!user) return <p className="text-center mt-10">User not found</p>;
-
-  const handleSuspend = async () => {
-    setIsProcessing(true);
-    try {
-      const res = await fetch(`/api/admin/users/suspend`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: user.id, isSuspended: !user.isSuspended }),
-      });
-      if (res.ok) { mutate(); setShowSuspend(false); toast.success("Status updated"); }
-      else toast.error("Failed to update status");
-    } catch { toast.error("Error occurred"); } 
-    finally { setIsProcessing(false); }
-  };
 
   const handleDelete = async () => {
     setIsProcessing(true);
@@ -103,7 +90,15 @@ export default function AdminClientProfile({ params }: { params: Promise<{ id: s
 
         {/* MODALS */}
         <ConfirmModal isOpen={showDelete} title="Delete Client" message={`Permanently delete ${user.name}? This removes all their projects and data.`} confirmText="Delete" isDanger={true} isLoading={isProcessing} onCancel={() => setShowDelete(false)} onConfirm={handleDelete} />
-        <ConfirmModal isOpen={showSuspend} title={user.isSuspended ? "Unsuspend Client" : "Suspend Client"} message={user.isSuspended ? `Restore access for ${user.name}?` : `Revoke platform access for ${user.name}?`} confirmText={user.isSuspended ? "Unsuspend" : "Suspend"} isDanger={!user.isSuspended} isLoading={isProcessing} onCancel={() => setShowSuspend(false)} onConfirm={handleSuspend} />
+        <SuspendUserModal 
+          isOpen={showSuspend}
+          user={user}
+          onClose={() => setShowSuspend(false)}
+          onSuccess={() => {
+            toast.success(`User account has been successfully ${user.isSuspended ? "unsuspended" : "suspended"}.`);
+            mutate();
+          }}
+        />
       </div>
     </DashboardShell>
   );

@@ -8,7 +8,7 @@ import MessageItem from "../chat/direct/MessageItem";
 
 export default function ChatTab({ projectId }: { projectId: string }) {
   const { user } = useAuth();
-  const isAdmin = user?.role === "ADMIN";
+  const isAdmin = user?.role === "ADMIN"; 
 
   const [messages, setMessages] = useState<any[]>([]);
   const [inputMessage, setInputMessage] = useState("");
@@ -23,6 +23,7 @@ export default function ChatTab({ projectId }: { projectId: string }) {
   const [loadingInitial, setLoadingInitial] = useState(true);
   
   const [roomParticipants, setRoomParticipants] = useState<{ clientId: string, engineerId: string } | null>(null);
+  const [conversationId, setConversationId] = useState<string | null>(null);
   
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -34,6 +35,8 @@ export default function ChatTab({ projectId }: { projectId: string }) {
       const data = await res.json();
       
       if (data.success) {
+        const idFromMsg = data.messages?.length > 0 ? data.messages[0].conversationId : null;
+        setConversationId(data.conversationId || idFromMsg);
         if (cursor) {
           setMessages((prev) => [...data.messages, ...prev]);
         } else {
@@ -70,12 +73,9 @@ export default function ChatTab({ projectId }: { projectId: string }) {
 
   // Join Socket Room & Listen to Events
   useEffect(() => {
-    if (!roomParticipants || !user) return;
+    if (!conversationId || !user) return;
 
-    globalSocket.emit("join_dm", { 
-      currentUserId: roomParticipants.clientId, 
-      targetUserId: roomParticipants.engineerId 
-    });
+    globalSocket.emit("join_project_chat", { conversationId });
 
     const handleReceiveMessage = (msg: any) => {
       setMessages((prev) => {
@@ -126,14 +126,19 @@ export default function ChatTab({ projectId }: { projectId: string }) {
       globalSocket.off("dm_read_receipt", handleReadReceipt);
       globalSocket.off("dm_error", handleDmError);
     };
-  }, [roomParticipants, user, isAdmin]);
+  }, [conversationId, user, isAdmin]);
 
-  const receiverId = user?.id === roomParticipants?.clientId ? roomParticipants?.engineerId : roomParticipants?.clientId;
+  const receiverId = isAdmin ? roomParticipants?.engineerId 
+  : (user?.id === roomParticipants?.clientId ? roomParticipants?.engineerId : roomParticipants?.clientId);
 
   // Action Handlers
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!inputMessage.trim() || !user || !receiverId || isAdmin) return;
+    
+    if (!inputMessage.trim() || !user || !conversationId) {
+      console.error("Chat Error: Missing User or Conversation ID", { user, conversationId });
+      return;
+    }
     setError(null);
 
     if (editingMessage) {
@@ -143,10 +148,24 @@ export default function ChatTab({ projectId }: { projectId: string }) {
     } else {
       const tempMessage = { id: `temp_${Date.now()}`, senderId: user.id, content: inputMessage.trim(), createdAt: new Date().toISOString(), isPending: true };
       setMessages(prev => [...prev, tempMessage]);
-      globalSocket.emit("send_dm", { senderId: user.id, receiverId, content: inputMessage.trim() });
-      setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+      
+      if (isAdmin) {
+        globalSocket.emit("send_project_message", { 
+          senderId: user.id, 
+          conversationId: conversationId, 
+          content: inputMessage.trim() 
+        });
+      } else {
+        globalSocket.emit("send_dm", { 
+          senderId: user.id, 
+          receiverId: receiverId, 
+          content: inputMessage.trim(), 
+          conversationId: conversationId 
+        });
+      }
     }
     setInputMessage("");
+    setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
 
   const handleMassDelete = () => {
@@ -200,29 +219,21 @@ export default function ChatTab({ projectId }: { projectId: string }) {
         )}
 
         {messages.map((msg, index) => {
-          const isMine = isAdmin ? msg.sender?.role === "ENGINEER" : msg.senderId === user?.id; 
-
-          const showAdminLabel = isAdmin && (index === 0 || messages[index - 1].senderId !== msg.senderId);
+          const isMine = msg.senderId === user?.id;
 
           return (
-            <div key={msg.id} className="flex flex-col w-full">
-              {/* Admin UI Labels */}
-              {showAdminLabel && (
-                <span className={`text-[10px] font-semibold text-gray-400 mb-1 px-3 ${isMine ? 'text-right' : 'text-left'}`}>
-                  {msg.sender?.name} ({msg.sender?.role === "ENGINEER" ? "Engineer" : "Client"})
-                </span>
-              )}
-              
-              <MessageItem 
-                msg={msg} 
-                isMine={isMine}
-                onEdit={(m: any) => { setEditingMessage(m); setInputMessage(m.content); }}
-                onDelete={(id: string) => globalSocket.emit("delete_dm", { messageId: id, senderId: user?.id })}
-                isSelectMode={isSelectMode && isMine && !isAdmin} 
-                isSelected={selectedMessageIds.includes(msg.id)}
-                onToggleSelect={toggleSelectMessage}
-              />
-            </div>
+            <MessageItem 
+              key={msg.id} 
+              msg={msg} 
+              isMine={isMine}
+              isAdmin={isAdmin}
+              showDetails={true} 
+              onEdit={(m: any) => { setEditingMessage(m); setInputMessage(m.content); }}
+              onDelete={(id: string) => globalSocket.emit("delete_dm", { messageId: id, senderId: user?.id })}
+              isSelectMode={isSelectMode && isMine && !isAdmin} 
+              isSelected={selectedMessageIds.includes(msg.id)}
+              onToggleSelect={toggleSelectMessage}
+            />
           );
         })}
         <div ref={bottomRef} />
@@ -237,32 +248,26 @@ export default function ChatTab({ projectId }: { projectId: string }) {
       )}
 
       {/* Input Area */}
-      {isAdmin ? (
-        <div className="p-4 bg-gray-50 border-t border-[var(--border)] flex justify-center">
-          <p className="text-xs  text-gray-500 font-medium">You are viewing this project chat as an Admin (Read-Only).</p>
-        </div>
-      ) : (
-        <div className={`p-4 bg-white border-t border-[var(--border)] transition-opacity ${isSelectMode ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
-          {editingMessage && (
-            <div className="flex items-center justify-between bg-orange-50 px-4 py-2 rounded-t-lg border-b border-orange-100 text-sm text-orange-800">
-              <span>Editing message...</span>
-              <button onClick={() => { setEditingMessage(null); setInputMessage(""); }}><X size={16} /></button>
-            </div>
-          )}
-          <form onSubmit={handleSubmit} className="flex gap-2 mt-2">
-            <input
-              type="text"
-              value={inputMessage}
-              onChange={(e) => setInputMessage(e.target.value)}
-              placeholder="Type a message..."
-              className="flex-1 bg-gray-100 border-none rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--primary)]  text-gray-900"
-            />
-            <button type="submit" disabled={!inputMessage.trim()} className="w-11 h-11 shrink-0 bg-[#FFAE58] text-white rounded-full flex items-center justify-center hover:bg-[#e89b45] disabled:opacity-50">
-              <Send size={18} className="ml-1" />
-            </button>
-          </form>
-        </div>
-      )}
+      <div className={`p-4 bg-white border-t border-[var(--border)] transition-opacity ${isSelectMode ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+        {editingMessage && (
+          <div className="flex items-center justify-between bg-orange-50 px-4 py-2 rounded-t-lg border-b border-orange-100 text-sm text-orange-800">
+            <span>Editing message...</span>
+            <button onClick={() => { setEditingMessage(null); setInputMessage(""); }}><X size={16} /></button>
+          </div>
+        )}
+        <form onSubmit={handleSubmit} className="flex gap-2 mt-2">
+          <input
+            type="text"
+            value={inputMessage}
+            onChange={(e) => setInputMessage(e.target.value)}
+            placeholder="Type a message..."
+            className="flex-1 bg-gray-100 border-none rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--primary)] text-gray-900"
+          />
+          <button type="submit" disabled={!inputMessage.trim()} className="w-11 h-11 shrink-0 bg-[#FFAE58] text-white rounded-full flex items-center justify-center hover:bg-[#e89b45] disabled:opacity-50">
+            <Send size={18} className="ml-1" />
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

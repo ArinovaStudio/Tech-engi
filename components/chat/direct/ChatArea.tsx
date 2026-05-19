@@ -277,7 +277,9 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
             <MessageItem 
               key={msg.id} 
               msg={msg} 
-              isMine={isMine}
+              isMine={msg.senderId === currentUser?.id}
+              isAdmin={currentUser?.role === 'ADMIN'}
+              showDetails={false}
               onEdit={(m: any) => { setEditingMessage(m); setInputMessage(m.content); }}
               onDelete={(id: string) => globalSocket.emit("delete_dm", { messageId: id, senderId: currentUser.id })}
               isSelectMode={isSelectMode && isMine} 

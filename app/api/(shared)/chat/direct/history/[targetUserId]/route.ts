@@ -29,7 +29,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ targ
       cursor: cursor ? { id: cursor } : undefined,
       where: { conversationId: conversation.id },
       orderBy: { createdAt: 'desc' },
-      include: { sender: { select: { id: true, name: true, image: true } } }
+      include: { sender: { select: { id: true, name: true, image: true, role: true } } }
     });
 
     const sortedMessages = messages.reverse();

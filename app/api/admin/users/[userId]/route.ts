@@ -165,7 +165,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
 
           if (approvalStatus === "APPROVED") {
             emailSubject = "Your Account is Approved!";
-            emailHtml = engineerApprovalTemplate(existingUser.name || name || "Engineer");
+            emailHtml = engineerApprovalTemplate(existingUser.name || name || "Engineer", "Your account has been approved by an administrator");
           } else if (approvalStatus === "REJECTED") {
             emailSubject = "Update on your Engineer Application";
             emailHtml = engineerRejectionTemplate(existingUser.name || name || "Engineer", rejectionReason || "No reason provided");

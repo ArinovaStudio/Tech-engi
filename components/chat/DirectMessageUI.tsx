@@ -14,7 +14,7 @@ export default function DirectMessageUI() {
   const [selectedContact, setSelectedContact] = useState<any>(null);
   const [liveUsers, setLiveUsers] = useState<Record<string, boolean>>({});
 
-  // Sidebar filtering states lifted up to feed the API
+  // Sidebar filtering states
   const [activeTab, setActiveTab] = useState<string>("ALL");
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -32,15 +32,12 @@ export default function DirectMessageUI() {
 
   const { data, size, setSize, isValidating, mutate } = useSWRInfinite(getKey, fetcher, { keepPreviousData: true });
 
-  // Safely flatten the paginated contacts
   const contacts = data ? data.flatMap(page => page.contacts || []) : [];
   const isLoadingInitialData = !data && isValidating;
   const isReachingEnd = data && data[data.length - 1]?.hasMore === false;
 
   useEffect(() => {
     if (contacts.length === 0) return;
-
-    // Filter out undefined/null ids just in case
     const userIds = contacts.map((c: any) => c.id).filter(Boolean); 
     
     if (userIds.length > 0) {
@@ -73,7 +70,7 @@ export default function DirectMessageUI() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-100px)] bg-white border border-[var(--border)] rounded-xl overflow-hidden shadow-sm">
+    <div className="flex h-[85vh] w-full bg-white border border-[var(--border)] rounded-2xl overflow-hidden shadow-sm">
       <ChatSidebar 
         currentUser={currentUser} 
         contacts={contacts} 

@@ -233,8 +233,9 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
               )}
             </div>
             <div className="flex items-center gap-1.5">
-              <span className={`w-2 h-2 rounded-full ${isOnline ? "bg-green-500" : "bg-gray-300"}`} />
-              <span className="text-xs text-gray-500 ">{isOnline ? "Online" : "Offline"}</span>
+              <span className={`text-xs font-medium ${isOnline ? "text-green-500" : "text-gray-400"}`}>
+                {isOnline ? "Online" : "Offline"}
+              </span>
             </div>
           </div>
         </div>
@@ -291,7 +292,6 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
         <div ref={messagesEndRef} />
       </div>
 
-      {/* NEW: Error Banner */}
       {error && (
         <div className="mx-6 mb-2 mt-2 px-3 py-2 bg-red-50 border border-red-200 flex items-center justify-between rounded-md">
           <p className="text-xs  text-red-600 font-medium">{error}</p>
@@ -302,21 +302,27 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
       {/* Input Area */}
       <div className={`p-4 bg-white border-t border-[var(--border)] transition-opacity ${isSelectMode ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
         {editingMessage && (
-          <div className="flex items-center justify-between bg-orange-50 px-4 py-2 rounded-t-lg border-b border-orange-100 text-sm text-orange-800">
+          <div className="flex items-center justify-between bg-orange-50 px-4 py-2 rounded-t-lg border-b border-orange-100 text-sm text-orange-800 mb-2">
             <span>Editing message...</span>
             <button onClick={() => { setEditingMessage(null); setInputMessage(""); }}><X size={16} /></button>
           </div>
         )}
-        <form onSubmit={handleSubmit} className="flex gap-2 mt-2">
+
+        <form onSubmit={handleSubmit} className="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2 focus-within:ring-1 focus-within:ring-[#FFAE58]">
+          
           <input
             type="text"
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            placeholder="Type a message..."
-            className="flex-1 bg-gray-100 border-none rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--primary)] "
+            placeholder="Message........"
+            className="flex-1 bg-transparent border-none px-2 py-1 text-sm focus:outline-none placeholder:text-gray-400 text-gray-800"
           />
-          <button type="submit" disabled={!inputMessage.trim()} className="w-11 h-11 shrink-0 bg-[#FFAE58] text-white rounded-full flex items-center justify-center hover:bg-[#e89b45] disabled:opacity-50">
-            <Send size={18} className="ml-1" />
+          <button 
+            type="submit" 
+            disabled={!inputMessage.trim()} 
+            className="w-9 h-9 shrink-0 bg-[#FFAE58] text-white rounded-full flex items-center justify-center hover:bg-[#e89b45] disabled:opacity-50 transition-colors"
+          >
+            <Send size={16} />
           </button>
         </form>
       </div>

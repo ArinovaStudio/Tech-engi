@@ -42,40 +42,184 @@ const HowItWorks = () => {
                 </div>
 
                 {/* Cards Grid */}
-                <div ref={cardsRef} className="flex justify-between gap-20 px-15">
-                    {steps.map((step, index) => {
-                        const Icon = step.icon
-                        return (
-                            <div key={index} className="relative gap-10 font-id">
-                                {/* Main Card */}
-                                <div className="relative z-10 min-h-[370px] w-97.5 bg-white rounded-3xl p-8 border border-slate-200">
-                                    {/* Icon */}
-                                    <div className="mt-10 relative flex justify-center items-center">
-                                        <div className="border-4 border-gray-200 rounded-2xl">
-                                            <div className="absolute inset-0 left-28 bottom-18 w-25 h-25 bg-gradient-to-b from-[#FFB05F] to-[#FF8400] rounded-2xl blur-lg opacity-40"></div>
-                                            <div className="relative w-20 h-20 bg-gradient-to-b from-[#FFB05F] to-[#FF8400] rounded-2xl flex items-center justify-center">
-                                                <Icon size={40} className="text-white" strokeWidth={1.5} />
-                                            </div>
-                                        </div>
-                                    </div>
+                <div
+  ref={cardsRef}
+  className="
+    grid
+    grid-cols-1
+    sm:grid-cols-2
+    xl:grid-cols-3
 
-                                    {/* Content */}
-                                    <div className='space-y-4 mt-12 flex flex-col items-center text-center'>
-                                        <h3 className="text-[17px] font-semibold text-slate-950 mb-3">
-                                            {step.title}
-                                        </h3>
-                                        <p className="text-slate-500 text-[17px] font-medium">
-                                            {step.description}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className='gap-10'>
-                                    <div className="absolute inset-0 top-40 -right-7 -left-7 h-50 rounded-3xl bg-[#FFAE58] scale-x-100 h-60"></div>
-                                </div>
-                            </div>
-                        )
-                    })}
-                </div>
+    gap-y-16
+    gap-x-8
+    lg:gap-x-12
+    xl:gap-x-20
+
+    px-4
+    sm:px-6
+    lg:px-10
+    xl:px-15
+  "
+>
+  {steps.map((step, index) => {
+    const Icon = step.icon
+
+    return (
+      <div
+        key={index}
+        className="
+          relative
+          w-full
+          max-w-[390px]
+          mx-auto
+          font-id
+        "
+      >
+        {/* ORANGE BACKGROUND */}
+        <div
+          className="
+            absolute
+
+            left-[-16px]
+            right-[-16px]
+
+            sm:left-[-20px]
+            sm:right-[-20px]
+
+            top-[140px]
+
+            h-[220px]
+
+            rounded-3xl
+            bg-[#FFAE58]
+
+            z-0
+          "
+        />
+
+        {/* MAIN CARD */}
+        <div
+          className="
+            relative
+            z-10
+
+            min-h-[340px]
+            sm:min-h-[360px]
+            lg:min-h-[370px]
+
+            w-full
+
+            bg-white
+            rounded-3xl
+
+            p-6
+            sm:p-8
+
+            border
+            border-slate-200
+          "
+        >
+          {/* ICON */}
+          <div className="mt-8 sm:mt-10 flex justify-center">
+            <div className="relative border-4 border-gray-200 rounded-2xl">
+              
+              {/* GLOW */}
+              <div
+                className="
+                  absolute
+
+                  left-1/2
+                  top-1/2
+
+                  -translate-x-1/2
+                  -translate-y-1/2
+
+                  w-24
+                  h-24
+
+                  bg-gradient-to-b
+                  from-[#FFB05F]
+                  to-[#FF8400]
+
+                  rounded-2xl
+                  blur-lg
+                  opacity-40
+                "
+              />
+
+              {/* ICON BOX */}
+              <div
+                className="
+                  relative
+
+                  w-20
+                  h-20
+
+                  bg-gradient-to-b
+                  from-[#FFB05F]
+                  to-[#FF8400]
+
+                  rounded-2xl
+
+                  flex
+                  items-center
+                  justify-center
+                "
+              >
+                <Icon
+                  size={40}
+                  className="text-white"
+                  strokeWidth={1.5}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* CONTENT */}
+          <div
+            className="
+              mt-10
+              sm:mt-12
+
+              flex
+              flex-col
+              items-center
+              text-center
+
+              space-y-4
+            "
+          >
+            <h3
+              className="
+                text-[18px]
+                sm:text-[20px]
+
+                font-semibold
+                text-slate-950
+              "
+            >
+              {step.title}
+            </h3>
+
+            <p
+              className="
+                text-slate-500
+
+                text-[15px]
+                sm:text-[17px]
+
+                font-medium
+                leading-relaxed
+              "
+            >
+              {step.description}
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  })}
+</div>
             </div>
         </section>
     )

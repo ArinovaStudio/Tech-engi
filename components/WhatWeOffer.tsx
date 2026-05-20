@@ -39,61 +39,203 @@ const WhatWeOffer = () => {
         </h2>
 
         {/* Main Content */}
-        <div className="flex justify-between font-id gap-8 items-start">
+       <div
+  className="
+    flex
+    flex-col
+    lg:flex-row
 
-          {/* Left Column - For Engineers */}
-          <div ref={leftRef} className="flex items-stretch gap-0">
-            {/* Vertical Label */}
-            <div className="flex items-center pr-4">
-              <p
-                className="text-[#6F6F6F] font-medium text-[34px] border border-slate-300 py-5 px-2 h-full flex items-center justify-center"
-                style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
-              >
-                For Engineers
-              </p>
-            </div>
+    justify-between
+    items-stretch
+    lg:items-start
 
-            {/* Card */}
-            <div className="border border-slate-300 p-8 ">
-              <div className="space-y-6">
-                {engineersOffers.map((offer, index) => (
-                  <div key={index} className="pb-4 border-b border-slate-200 last:border-0">
-                    <p className="text-[18px] text-black">
-                      <span className="font-semibold">{index + 1}.</span> {offer}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
+    gap-10
+    lg:gap-8
+
+    font-id
+  "
+>
+  {/* LEFT COLUMN - FOR ENGINEERS */}
+  <div
+    ref={leftRef}
+    className="
+      flex
+      flex-row
+
+      items-stretch
+      gap-0
+
+      w-full
+    "
+  >
+    {/* VERTICAL LABEL */}
+    <div className="flex items-stretch shrink-0 pr-3 sm:pr-4">
+      <p
+        className="
+          text-[#6F6F6F]
+          font-medium
+
+          text-[20px]
+          sm:text-[26px]
+          lg:text-[34px]
+
+          border
+          border-slate-300
+
+          py-4
+          sm:py-5
+
+          px-2
+
+          flex
+          items-center
+          justify-center
+        "
+        style={{
+          writingMode: "vertical-rl",
+          transform: "rotate(180deg)",
+        }}
+      >
+        For Engineers
+      </p>
+    </div>
+
+    {/* CARD */}
+    <div
+      className="
+        border
+        border-slate-300
+
+        p-5
+        sm:p-8
+
+        w-full
+      "
+    >
+      <div className="space-y-5 sm:space-y-6">
+        {engineersOffers.map((offer, index) => (
+          <div
+            key={index}
+            className="
+              pb-4
+              border-b
+              border-slate-200
+              last:border-0
+            "
+          >
+            <p
+              className="
+                text-[15px]
+                sm:text-[18px]
+
+                leading-relaxed
+                text-black
+              "
+            >
+              <span className="font-semibold">
+                {index + 1}.
+              </span>{" "}
+              {offer}
+            </p>
           </div>
+        ))}
+      </div>
+    </div>
+  </div>
 
-          {/* Right Column - For Clients (offset to start at 2nd item) */}
-          <div ref={rightRef} className="flex items-stretch gap-0 ">
-            {/* Card */}
-            <div className="border border-b-0 mt-40 border-slate-300 p-8 -mb-10">
-              <div className="space-y-6">
-                {clientsOffers.map((offer, index) => (
-                  <div key={index} className="pb-4 border-b border-slate-200 last:border-0">
-                    <p className="text-[18px] text-black">
-                      <span className="font-semibold">{index + 1}.</span> {offer}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
+  {/* RIGHT COLUMN - FOR CLIENTS */}
+  <div
+    ref={rightRef}
+    className="
+      flex
+      flex-row
 
-            {/* Vertical Label */}
-            <div className="flex items-center pl-4">
-              <p
-                className="text-[#6F6F6F] font-medium text-[34px] border border-slate-300 py-5 px-2 h-full flex items-center justify-center"
-                style={{ writingMode: 'vertical-rl' }}
-              >
-                For Clients
-              </p>
-            </div>
+      items-stretch
+      gap-0
+
+      w-full
+
+      lg:mt-40
+    "
+  >
+    {/* CARD */}
+    <div
+      className="
+        border
+        border-slate-300
+
+        lg:border-b-0
+
+        p-5
+        sm:p-8
+
+        w-full
+
+        lg:-mb-10
+      "
+    >
+      <div className="space-y-5 sm:space-y-6">
+        {clientsOffers.map((offer, index) => (
+          <div
+            key={index}
+            className="
+              pb-4
+              border-b
+              border-slate-200
+              last:border-0
+            "
+          >
+            <p
+              className="
+                text-[15px]
+                sm:text-[18px]
+
+                leading-relaxed
+                text-black
+              "
+            >
+              <span className="font-semibold">
+                {index + 1}.
+              </span>{" "}
+              {offer}
+            </p>
           </div>
+        ))}
+      </div>
+    </div>
 
-        </div>
+    {/* VERTICAL LABEL */}
+    <div className="flex items-stretch shrink-0 pl-3 sm:pl-4">
+      <p
+        className="
+          text-[#6F6F6F]
+          font-medium
+
+          text-[20px]
+          sm:text-[26px]
+          lg:text-[34px]
+
+          border
+          border-slate-300
+
+          py-4
+          sm:py-5
+
+          px-2
+
+          flex
+          items-center
+          justify-center
+        "
+        style={{
+          writingMode: "vertical-rl",
+        }}
+      >
+        For Clients
+      </p>
+    </div>
+  </div>
+</div>
       </div>
     </section>
   )

@@ -119,7 +119,7 @@ export default function ClientAccountPage() {
 
   return (
     <div className="space-y-6 p-1">
-      <h1 className="text-2xl font-bold " style={{ color: "var(--text-primary)" }}>Account Overview</h1>
+      {/* <h1 className="text-2xl font-bold " style={{ color: "var(--text-primary)" }}>Account Overview</h1> */}
 
       {/* 5 Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">

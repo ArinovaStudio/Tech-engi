@@ -48,7 +48,6 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    console.log("called");
     
     const { user, error } = await getUser();
     if (error || !user) {
@@ -62,7 +61,6 @@ export async function POST(req: NextRequest) {
     const description = formData.get("description") as string;
     const startDate = formData.get("startDate") as string;
     const endDate = formData.get("endDate") as string;
-    
     
     const project = await prisma.project.findUnique({
       where: { id: projectId },

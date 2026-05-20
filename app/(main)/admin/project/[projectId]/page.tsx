@@ -66,7 +66,6 @@ export default function ProjectDetailPage() {
           return;
         }
         setProject(data.project);
-        console.log("Project data loaded:", data.project);
         const tabs = getTabsForRole();
         setActiveTab(tabs[0]);
       })

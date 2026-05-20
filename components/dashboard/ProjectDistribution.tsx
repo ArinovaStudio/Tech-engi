@@ -1,62 +1,177 @@
 "use client";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
 
 const COLORS: Record<string, string> = {
-  "In Progress": "#FFAE58", 
-  "Completed": "#22c55e",
-  "Searching": "#050A30",
-  "Awaiting Final Payment": "#8b5cf6",
-  "Canceled": "#ef4444" 
+  Completed: "#238B57",
+  "In Progress": "#0B5D3B",
+  Pending: "#C8CEC8",
 };
 
-export default function ProjectDistribution({ data = [] }: { data: any[] }) {
-  const total = data.reduce((acc, curr) => acc + curr.value, 0);
+export default function ProjectDistribution({
+  data = [],
+}: {
+  data: any[];
+}) {
+
+  // VALUES
+  const completed =
+    data.find((d) => d.name === "Completed")
+      ?.value || 0;
+
+  const inProgress =
+    data.find((d) => d.name === "In Progress")
+      ?.value || 0;
+
+  const pending =
+    data.find((d) => d.name === "Searching")
+      ?.value || 0;
+
+  const total =
+    completed + inProgress + pending;
+
+  const percentage = Math.round(
+    (completed / total) * 100
+  );
+
+  // EXACT UI DATA
+  const chartData = [
+    {
+      name: "Completed",
+      value: completed,
+      fill: COLORS.Completed,
+    },
+    {
+      name: "In Progress",
+      value: inProgress,
+      fill: COLORS["In Progress"],
+    },
+    {
+      name: "Pending",
+      value: pending,
+      fill: "url(#pendingPattern)",
+    },
+  ];
 
   return (
-    <div className="bg-white p-5 border border-[var(--border)] rounded-lg">
-      <div className="flex items-center justify-between mb-5">
-        <h3 className="text-sm font-bold text-[var(--text-primary)]">Project Distribution</h3>
-      </div>
+    <div className="bg-white p-5 rounded-[28px] border border-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.03)]">
 
-      <div className="flex flex-wrap items-center gap-4 mb-5">
-        {data.map((d: any) => (
-          <div key={d.name} className="flex-1 min-w-[30%]">
-            <div className="flex items-center gap-1.5 mb-1">
-              <span className="w-2 h-2 shrink-0 rounded-full" style={{ background: COLORS[d.name] || "#e5e5e5" }} />
-              <p className="text-[11px] text-[var(--text-muted)] truncate">{d.name}</p>
-            </div>
-            <p className="text-sm font-bold text-[var(--text-primary)]">{d.value}</p>
-          </div>
-        ))}
-      </div>
+      {/* TITLE */}
+      <h3 className="text-[15px] font-semibold text-black mb-2">
+        Project Progress
+      </h3>
 
-      <div className="h-48 relative">
-        <ResponsiveContainer width="100%" height="100%">
+      {/* CHART */}
+      <div className="relative h-[250px] w-full">
+
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+        >
           <PieChart>
+
+            {/* STRIPED PATTERN */}
+            <defs>
+              <pattern
+                id="pendingPattern"
+                patternUnits="userSpaceOnUse"
+                width="8"
+                height="8"
+                patternTransform="rotate(45)"
+              >
+                <line
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="8"
+                  stroke="#C9CEC9"
+                  strokeWidth="4"
+                />
+              </pattern>
+            </defs>
+
             <Pie
-              data={data}
-              cx="50%" cy="50%"
-              innerRadius={55} outerRadius={85}
-              paddingAngle={3} dataKey="value"
-              startAngle={90} endAngle={-270}
-              strokeWidth={0}
-            >
-              {data.map((entry: any, index: number) => (
-                <Cell key={index} fill={COLORS[entry.name] || "#e5e5e5"} />
-              ))}
+  data={chartData}
+  dataKey="value"
+  startAngle={210}
+  endAngle={-30}
+  innerRadius={82}
+  outerRadius={122}
+  paddingAngle={-2}
+  cornerRadius={999}
+  strokeWidth={0}
+>
+              {chartData.map(
+                (entry, index) => (
+                  <Cell
+                    key={index}
+                    fill={entry.fill}
+                  />
+                )
+              )}
             </Pie>
-            <Tooltip
-              contentStyle={{ borderRadius: 8, border: "1px solid #e5e5e5", fontSize: 12 }}
-            />
+
           </PieChart>
         </ResponsiveContainer>
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="text-center">
-            <p className="text-xl font-bold text-[var(--text-primary)]">{total}</p>
-            <p className="text-[10px] text-[var(--text-muted)]">Total</p>
-          </div>
+
+        {/* CENTER CONTENT */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+
+          <h1 className="text-[58px] leading-none font-bold tracking-[-3px] text-black">
+            {percentage}%
+          </h1>
+
+          <p className="text-[15px] text-[#7D7D7D] mt-2">
+            Project Ended
+          </p>
+
+        </div>
+      </div>
+
+      {/* LEGEND */}
+      <div className="flex items-center justify-center gap-8 mt-[-8px] flex-wrap">
+
+        {/* COMPLETED */}
+        <div className="flex items-center gap-2">
+          <span className="w-[15px] h-[15px] rounded-full bg-[#238B57]" />
+
+          <p className="text-[14px] text-[#648067]">
+            Completed
+          </p>
+        </div>
+
+        {/* IN PROGRESS */}
+        <div className="flex items-center gap-2">
+          <span className="w-[15px] h-[15px] rounded-full bg-[#0B5D3B]" />
+
+          <p className="text-[14px] text-[#648067]">
+            In Progress
+          </p>
+        </div>
+
+        {/* PENDING */}
+        <div className="flex items-center gap-2">
+
+          <span
+            className="w-[15px] h-[15px] rounded-full"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(135deg,#BFC5BF 0px,#BFC5BF 2px,transparent 2px,transparent 5px)",
+            }}
+          />
+
+          <p className="text-[14px] text-[#648067]">
+            Pending
+          </p>
+
         </div>
       </div>
     </div>
   );
 }
+

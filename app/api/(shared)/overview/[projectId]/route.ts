@@ -4,8 +4,6 @@ import { getUser } from "@/lib/auth";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
   try {
-    console.log("called");
-    
     const { user, error } = await getUser();
     if (error || !user) return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
 

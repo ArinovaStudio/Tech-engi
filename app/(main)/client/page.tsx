@@ -65,7 +65,7 @@ const ClientAnalyticsDashboard = () => {
       .then(r => r.json())
       .then(res => {
         if (res.success) {
-          if (projectId && !showProjects) {f
+          if (projectId && !showProjects) {
             
             setProjectAnalytics(res.data);
           } else {

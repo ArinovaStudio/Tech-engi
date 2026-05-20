@@ -1,82 +1,35 @@
 "use client";
 
-import { useAuth } from "@/hooks/useAuth";
-import UserAddressCard from "@/components/user-profile/UserAddressCard";
-import UserInfoCard from "@/components/user-profile/UserInfoCard";
-import UserMetaCard from "@/components/user-profile/UserMetaCard";
-import { LucideLoader } from "lucide-react";
-import { useEffect, useState } from "react";
+import useSWR from "swr";
+import { fetcher } from "@/lib/fetcher";
+import ClientInfoCard from "@/components/clients/profile/ClientInfoCard";
+import ClientDetailsCard from "@/components/clients/profile/ClientDetailsCard";
+import EngineerAccountCard from "@/components/engineer/profile/EngineerAccountCard";
+import ClientMetaCard from "@/components/clients/profile/ClientMetaCard";
 
-interface User {
-  name: string;
-  email: string;
-}
+export default function ClientProfile() {
+  const { data, isLoading, mutate } = useSWR("/api/client/profile", fetcher);
 
-export default function Profile() {
-  const { user } = useAuth() as { user: User };
-  const [loading, setLoading] = useState(true);
+  if (isLoading) return <div className="flex items-center justify-center h-[80vh]"><div className="animate-spin rounded-full h-10 w-10 border-b-2" style={{ borderColor: "var(--primary)" }} /></div>;
 
-  const fetchProfile = async () => {
-    try {
-      const res = localStorage.getItem("user");
+  const user = data?.user;
+  const profile = data?.profile;
 
-      // const res = await fetch("/api/user", {
-      //   credentials: "include"
-      // });
-
-      if (res) {
-        await JSON.parse(res);
-      }
-    } catch (err) {
-      console.error("Profile load error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateProfile = async (updatedData: Record<string, any>) => {
-    try {
-      const res = await fetch("/api/client/profile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(updatedData)
-      });
-
-      if (res.ok) {
-        await res.json();
-      }
-    } catch (err) {
-      console.error("Profile update error:", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  if (loading) return (
-    <div className="w-full h-[50vh] flex justify-center items-center">
-      <LucideLoader className='animate-spin text-[var(--primary)]' size={40} />
-    </div>
-  )
-  if (!user) return <p>No user found</p>;
+  if (!user) return <p className="text-center mt-10">No user found</p>;
 
   return (
-    <div>
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
-        <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-7">
-          Profile
-        </h3>
+      <div className="space-y-6 pb-10">
+        <div>
+          <h2 className="text-2xl font-bold font-inter text-[var(--text-primary)]">My Profile</h2>
+          <p className="text-sm font-inter text-[var(--text-muted)] mt-1">Manage your personal and business details.</p>
+        </div>
 
         <div className="space-y-6">
-          <UserMetaCard user={user} onUpdate={updateProfile} />
-
-          <UserInfoCard user={user} onUpdate={updateProfile} />
-
-          <UserAddressCard user={user} />
+          <ClientMetaCard user={user} />
+          <ClientInfoCard user={user} onUpdate={() => mutate()} />
+          <ClientDetailsCard profile={profile} user={user} onUpdate={() => mutate()} />
+          <EngineerAccountCard />
         </div>
       </div>
-    </div>
   );
 }

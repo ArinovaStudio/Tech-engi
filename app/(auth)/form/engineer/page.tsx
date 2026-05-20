@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Wrench, Loader2, X, Plus, Upload } from "lucide-react";
+import { Wrench, Loader2, X, Plus, Upload, FileText } from "lucide-react";
 
 const QUALIFICATIONS = [
   { value: "UG", label: "Under Graduate (Student)" },
@@ -23,23 +23,52 @@ const ID_LABELS: Record<string, string> = {
   PAY_SLIP: "Pay Slip",
 };
 
+interface CertificateData {
+  name: string;
+  file: File;
+}
+
 export default function EngineerFormPage() {
   const router = useRouter();
   const [qualification, setQualification] = useState("");
   const [idType, setIdType] = useState("");
   const [idNumber, setIdNumber] = useState("");
   const [idFile, setIdFile] = useState<File | null>(null);
+  
   const [skills, setSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState("");
-  const [certifications, setCertifications] = useState<string[]>([]);
+  
+  const [certifications, setCertifications] = useState<CertificateData[]>([]);
   const [certInput, setCertInput] = useState("");
+  const [certFile, setCertFile] = useState<File | null>(null);
+  
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const addTag = (list: string[], setList: (v: string[]) => void, input: string, setInput: (v: string) => void) => {
-    const val = input.trim();
-    if (val && !list.includes(val)) setList([...list, val]);
-    setInput("");
+  const addSkill = () => {
+    const val = skillInput.trim();
+    if (val && !skills.includes(val)) setSkills([...skills, val]);
+    setSkillInput("");
+  };
+
+  const addCertificate = () => {
+    const val = certInput.trim();
+    if (!val) {
+      setError("Please enter the certificate name.");
+      return;
+    }
+    if (!certFile) {
+      setError("Please upload the proof document for the certificate.");
+      return;
+    }
+    setError("");
+    setCertifications([...certifications, { name: val, file: certFile }]);
+    setCertInput("");
+    setCertFile(null);
+  };
+
+  const removeCertificate = (indexToRemove: number) => {
+    setCertifications(certifications.filter((_, idx) => idx !== indexToRemove));
   };
 
   const handleQualificationChange = (val: string) => {
@@ -81,7 +110,12 @@ export default function EngineerFormPage() {
       formData.append("idNumber", cleanedId);
       formData.append("file", idFile);
       formData.append("skills", JSON.stringify(skills));
-      formData.append("certifications", JSON.stringify(certifications));
+      
+      const mappedCertifications = certifications.map((cert, index) => {
+        formData.append(`certFile_${index}`, cert.file);
+        return { name: cert.name, fileIndex: index };
+      });
+      formData.append("certifications", JSON.stringify(mappedCertifications));
 
       const res = await fetch("/api/engineer/profile", {
         method: "POST",
@@ -198,13 +232,13 @@ export default function EngineerFormPage() {
                 type="text"
                 value={skillInput}
                 onChange={(e) => setSkillInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag(skills, setSkills, skillInput, setSkillInput); } }}
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addSkill(); } }}
                 placeholder="e.g. Arduino, PCB Design"
                 className="flex-1 px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
               />
               <button
                 type="button"
-                onClick={() => addTag(skills, setSkills, skillInput, setSkillInput)}
+                onClick={addSkill}
                 className="h-12 w-12 flex items-center justify-center rounded-xl bg-[#f0b31e] text-white hover:bg-[#e0a61a] transition-colors"
               >
                 <Plus className="h-5 w-5" />
@@ -222,33 +256,53 @@ export default function EngineerFormPage() {
             )}
           </div>
 
-          {/* Certifications */}
+          {/* Certifications & Proofs */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-gray-700 ml-1">Certifications <span className="text-gray-400 font-normal">(URL)</span></label>
-            <div className="flex gap-2">
+            <label className="text-sm font-medium text-gray-700 ml-1">Certifications & Proofs</label>
+            <div className="flex flex-col gap-2">
               <input
                 type="text"
                 value={certInput}
                 onChange={(e) => setCertInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag(certifications, setCertifications, certInput, setCertInput); } }}
-                placeholder="e.g. AWS Certified, CCNA"
-                className="flex-1 px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
+                placeholder="e.g. AWS Certified Developer"
+                className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
               />
-              <button
-                type="button"
-                onClick={() => addTag(certifications, setCertifications, certInput, setCertInput)}
-                className="h-12 w-12 flex items-center justify-center rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
-              >
-                <Plus className="h-5 w-5" />
-              </button>
-            </div>
-            {certifications.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {certifications.map((tag) => (
-                  <span key={tag} className="flex items-center gap-1 px-3 py-1 bg-gray-50 border border-gray-200 text-gray-700 text-xs font-medium rounded-full">
-                    {tag}
-                    <button type="button" onClick={() => setCertifications(certifications.filter(t => t !== tag))}><X className="h-3 w-3" /></button>
+              <div className="flex gap-2">
+                <label className="flex-1 flex items-center justify-center gap-2 h-12 rounded-xl border border-dashed border-gray-300 bg-gray-50 hover:border-[#f0b31e] hover:bg-yellow-50 cursor-pointer transition-all px-4 overflow-hidden">
+                  <FileText className="h-4 w-4 text-gray-400 shrink-0" />
+                  <span className="text-sm text-gray-500 truncate">
+                    {certFile ? certFile.name : "Upload Proof (PDF/JPG)"}
                   </span>
+                  <input
+                    type="file"
+                    accept="image/*,.pdf"
+                    className="hidden"
+                    onChange={(e) => setCertFile(e.target.files?.[0] || null)}
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={addCertificate}
+                  className="h-12 w-12 shrink-0 flex items-center justify-center rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                >
+                  <Plus className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Display Added Certifications */}
+            {certifications.length > 0 && (
+              <div className="flex flex-col gap-2 mt-3">
+                {certifications.map((cert, idx) => (
+                  <div key={idx} className="flex items-center justify-between px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg">
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs font-semibold text-gray-700 truncate">{cert.name}</span>
+                      <span className="text-[10px] text-gray-400 truncate">{cert.file.name}</span>
+                    </div>
+                    <button type="button" onClick={() => removeCertificate(idx)} className="p-1 text-gray-400 hover:text-red-500 transition-colors shrink-0">
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
                 ))}
               </div>
             )}

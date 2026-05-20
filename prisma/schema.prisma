@@ -89,7 +89,7 @@ model EngineerProfile {
   idNumber        String
   idFile          String
 
-  certifications    String[]
+  certifications    Json        @default("[]")
   skills            String[]
   embedding         Unsupported("vector(768)")?
   completedProjects Int                         @default(0)

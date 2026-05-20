@@ -20,12 +20,18 @@ export async function GET() {
   }
 }
 
+const certificateSchema = z.object({
+  name: z.string(),
+  fileUrl: z.string().optional(),
+  fileIndex: z.number().optional()
+});
+
 const engineerProfileSchema = z.object({
   qualification: z.enum(["UG", "EMPLOYED", "UNEMPLOYED"]),
   idType: z.enum(["STUDENT_ID", "AADHAAR", "PAN", "PAY_SLIP"]),
   idNumber: z.string().min(5, "Valid ID number is required"),
   skills: z.array(z.string()).min(1, "At least one skill is required"),
-  certifications: z.array(z.string()).optional(),
+  certifications: z.array(certificateSchema).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -61,6 +67,19 @@ export async function POST(req: NextRequest) {
 
     const idFileUrl = await uploadFile(idFile, "kyc");
 
+    const finalCertifications = [];
+    if (validation.data.certifications) {
+      for (const cert of validation.data.certifications) {
+        if (cert.fileIndex !== undefined && cert.fileIndex !== null) {
+          const certFile = formData.get(`certFile_${cert.fileIndex}`) as File;
+          if (certFile && certFile.size > 0) {
+            const fileUrl = await uploadFile(certFile, "certificates");
+            finalCertifications.push({ name: cert.name, fileUrl });
+          }
+        }
+      }
+    }
+
     const newProfile = await prisma.engineerProfile.create({
       data: {
         userId: user.id,
@@ -70,7 +89,7 @@ export async function POST(req: NextRequest) {
         idNumber: validation.data.idNumber,
         idFile: idFileUrl,
         skills: validation.data.skills,
-        certifications: validation.data.certifications || [],
+        certifications: finalCertifications,
       }
     });
 
@@ -82,8 +101,7 @@ export async function POST(req: NextRequest) {
           SET embedding = ${vectorString}::vector
           WHERE id = ${newProfile.id}
         `;
-      })
-      .catch((err) => console.error("[embedding POST]", err));
+      });
 
     return NextResponse.json({ success: true, message: "Profile created successfully" }, { status: 201 });
 
@@ -131,9 +149,9 @@ export async function PUT(req: NextRequest) {
 
     if (qualification && idType && idNumber) {
       let skills: string[] = [];
-      let certifications: string[] = [];
+      let parsedCerts: any[] = [];
       try { skills = JSON.parse(skillsRaw || "[]"); } catch {}
-      try { certifications = JSON.parse(certsRaw || "[]"); } catch {}
+      try { parsedCerts = JSON.parse(certsRaw || "[]"); } catch {}
 
       const existingProfile = await prisma.engineerProfile.findUnique({ where: { userId: user.id } });
       let idFileUrl = existingProfile?.idFile || "";
@@ -143,18 +161,46 @@ export async function PUT(req: NextRequest) {
         idFileUrl = await uploadFile(idFile, "kyc");
       }
 
+      const finalCertifications = [];
+      for (const cert of parsedCerts) {
+        if (cert.fileIndex !== undefined && cert.fileIndex !== null) {
+          const certFile = formData.get(`certFile_${cert.fileIndex}`) as File;
+          if (certFile && certFile.size > 0) {
+            const fileUrl = await uploadFile(certFile, "certificates");
+            finalCertifications.push({ name: cert.name, fileUrl });
+          }
+        } else if (cert.fileUrl) {
+          finalCertifications.push({ name: cert.name, fileUrl: cert.fileUrl });
+        }
+      }
+
+      if (existingProfile?.certifications) {
+        const oldCerts = (existingProfile.certifications as any[]) || [];
+        const newUrls = finalCertifications.map(c => c.fileUrl);
+
+        for (const oldCert of oldCerts) {
+          if (oldCert.fileUrl && !newUrls.includes(oldCert.fileUrl)) {
+             await deleteFile(oldCert.fileUrl);
+          }
+        }
+      }
+
       const newProfile = await prisma.engineerProfile.upsert({
         where: { userId: user.id },
-        update: { qualification, idType, idNumber, skills, certifications, idFile: idFileUrl },
-        create: { userId: user.id, qualification, idType, idNumber, skills, certifications, idFile: idFileUrl, status: "PENDING" }
+        update: { qualification, idType, idNumber, skills, certifications: finalCertifications, idFile: idFileUrl },
+        create: { userId: user.id, qualification, idType, idNumber, skills, certifications: finalCertifications, idFile: idFileUrl, status: "PENDING" }
       });
 
       if (skills.length > 0) {
         generateEmbedding(`Skills: ${skills.join(", ")}`)
-          .then((vector) => {
-            const vectorString = JSON.stringify(vector);
-            return prisma.$executeRaw`UPDATE "EngineerProfile" SET embedding = ${vectorString}::vector WHERE id = ${newProfile.id}`;
-          }).catch(console.error);
+        .then((embeddingVector) => {
+          const vectorString = JSON.stringify(embeddingVector);
+          return prisma.$executeRaw`
+            UPDATE "EngineerProfile"
+            SET embedding = ${vectorString}::vector
+            WHERE id = ${newProfile.id}
+          `;
+        });
       }
     }
 

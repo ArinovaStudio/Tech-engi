@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAdmin } from "@/lib/auth";
-import { deleteFile } from "@/lib/uploads";
+import { deleteFile, uploadFile } from "@/lib/uploads";
 import { z } from "zod";
 import { generateEmbedding } from "@/lib/embeddings";
 import { engineerApprovalTemplate, engineerRejectionTemplate } from "@/lib/templates";
@@ -55,6 +55,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ user
   }
 }
 
+const certificateSchema = z.object({
+  name: z.string(),
+  fileUrl: z.string().optional(),
+  fileIndex: z.number().optional()
+});
+
 const updateUserSchema = z.object({
   name: z.string().optional(),
   phone: z.string().optional(),
@@ -64,7 +70,7 @@ const updateUserSchema = z.object({
   qualification: z.enum(["UG", "EMPLOYED", "UNEMPLOYED"]).optional(), 
   idType: z.enum(["STUDENT_ID", "AADHAAR", "PAN", "PAY_SLIP"]).optional(),
   idNumber: z.string().optional(),
-  certifications: z.array(z.string()).optional(),
+  certifications: z.array(certificateSchema).optional(),
   approvalStatus: z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(), 
   rejectionReason: z.string().optional().nullable(),
   
@@ -86,7 +92,37 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
     }
 
     const { userId } = await params;
-    const body = await req.json();
+    
+    const contentType = req.headers.get("content-type") || "";
+    let body: any = {};
+    let formData: FormData | null = null;
+
+    if (contentType.includes("application/json")) {
+      body = await req.json();
+    } else if (contentType.includes("multipart/form-data")) {
+      formData = await req.formData();
+      
+      const getJson = (key: string) => {
+        const val = formData?.get(key);
+        if (!val) return undefined;
+        try { return JSON.parse(val as string); } catch { return undefined; }
+      };
+
+      body = {
+        name: formData.get("name") || undefined,
+        phone: formData.get("phone") || undefined,
+        bio: formData.get("bio") || undefined,
+        expertise: getJson("expertise"),
+        skills: getJson("skills"),
+        qualification: formData.get("qualification") || undefined,
+        idType: formData.get("idType") || undefined,
+        idNumber: formData.get("idNumber") || undefined,
+        certifications: getJson("certifications"),
+        approvalStatus: formData.get("approvalStatus") || undefined,
+        rejectionReason: formData.get("rejectionReason") || undefined,
+        payoutDetail: getJson("payoutDetail"),
+      };
+    }
 
     const validation = updateUserSchema.safeParse(body);
     if (!validation.success) {
@@ -120,6 +156,45 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
     }
 
     if (existingUser.role === "ENGINEER") {
+        
+        let finalCertifications: any[] | undefined = undefined;
+        let finalIdFileUrl: string | undefined = undefined;
+
+        if (formData) {
+          const idFile = formData.get("idFile") as File;
+          if (idFile && idFile.size > 0) {
+            if (existingUser.engineerProfile?.idFile) await deleteFile(existingUser.engineerProfile.idFile);
+            finalIdFileUrl = await uploadFile(idFile, "kyc");
+          }
+
+          if (certifications) {
+            finalCertifications = [];
+            for (const cert of certifications) {
+              if (cert.fileIndex !== undefined && cert.fileIndex !== null) {
+                const certFile = formData.get(`certFile_${cert.fileIndex}`) as File;
+                if (certFile && certFile.size > 0) {
+                  const fileUrl = await uploadFile(certFile, "certificates");
+                  finalCertifications.push({ name: cert.name, fileUrl });
+                }
+              } else if (cert.fileUrl) {
+                finalCertifications.push({ name: cert.name, fileUrl: cert.fileUrl });
+              }
+            }
+          }
+        } else if (certifications) {
+           finalCertifications = certifications.map(c => ({ name: c.name, fileUrl: c.fileUrl }));
+        }
+
+        if (finalCertifications && existingUser.engineerProfile?.certifications) {
+          const oldCerts = (existingUser.engineerProfile.certifications as any[]) || [];
+          const newUrls = finalCertifications.map(c => c.fileUrl);
+          for (const oldCert of oldCerts) {
+            if (oldCert.fileUrl && !newUrls.includes(oldCert.fileUrl)) {
+              await deleteFile(oldCert.fileUrl);
+            }
+          }
+        }
+
         await prisma.engineerProfile.upsert({
             where: { userId: userId },
             update: { 
@@ -127,7 +202,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
                 qualification, 
                 idType,
                 idNumber,
-                certifications,
+                certifications: finalCertifications !== undefined ? finalCertifications : undefined,
+                idFile: finalIdFileUrl !== undefined ? finalIdFileUrl : undefined,
                 status: approvalStatus, 
                 rejectionReason 
             },
@@ -139,8 +215,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
                 rejectionReason: rejectionReason || null,
                 idType: idType || "PAN", 
                 idNumber: idNumber || "ADMIN_UPSERTED",
-                idFile: "ADMIN_UPSERTED",
-                certifications: certifications || []
+                idFile: finalIdFileUrl || "ADMIN_UPSERTED",
+                certifications: finalCertifications || []
             }
         });
 
@@ -171,9 +247,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
             emailHtml = engineerRejectionTemplate(existingUser.name || name || "Engineer", rejectionReason || "No reason provided");
           }
 
-          if (emailHtml) {
-            sendEmail(existingUser.email, emailSubject, emailHtml);
-          }
+          if (emailHtml) sendEmail(existingUser.email, emailSubject, emailHtml);
         }
     }
 
@@ -218,13 +292,21 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ u
       return NextResponse.json({ success: false, message: "User not found" }, { status: 404 });
     }
 
-    // delete all associated files
     const filesToDelete: string[] = [];
 
     if (userToDelete.image) filesToDelete.push(userToDelete.image);
 
-    if (userToDelete.role === "ENGINEER" && userToDelete.engineerProfile?.idFile) {
-      filesToDelete.push(userToDelete.engineerProfile.idFile);
+    if (userToDelete.role === "ENGINEER" && userToDelete.engineerProfile) {
+      if (userToDelete.engineerProfile.idFile) {
+        filesToDelete.push(userToDelete.engineerProfile.idFile);
+      }
+      
+      if (userToDelete.engineerProfile.certifications) {
+        const certs = (userToDelete.engineerProfile.certifications as any[]) || [];
+        certs.forEach((cert) => {
+          if (cert.fileUrl) filesToDelete.push(cert.fileUrl);
+        });
+      }
     }
 
     if (userToDelete.addedResources.length > 0) {

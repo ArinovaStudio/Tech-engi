@@ -36,9 +36,11 @@ export default function PayoutFormPage() {
     if (method === "BANK") {
       const accTrimmed = accountNumber.trim();
       const ifscTrimmed = ifscCode.trim().toUpperCase();
+      const bankTrimmed = bankName.trim();
+      const holderTrimmed = accountHolder.trim();
 
-      if (!accTrimmed || !ifscTrimmed) {
-        setError("Account number and IFSC code are required");
+      if (!accTrimmed || !ifscTrimmed || !bankTrimmed || !holderTrimmed) {
+        setError("All bank details (Account Number, IFSC, Bank Name, Account Holder) are required");
         return;
       }
 
@@ -57,15 +59,16 @@ export default function PayoutFormPage() {
 
     setIsLoading(true);
     try {
-      const res = await fetch("/api/payout", {
+      const res = await fetch("/api/payout/details", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          preferredMethod: method,
           upiId: method === "UPI" ? upiId.trim() : null,
           accountNumber: method === "BANK" ? accountNumber.trim() : null,
           ifscCode: method === "BANK" ? ifscCode.trim().toUpperCase() : null,
-          bankName: method === "BANK" ? bankName.trim() || null : null,
-          accountHolder: method === "BANK" ? accountHolder.trim() || null : null,
+          bankName: method === "BANK" ? bankName.trim() : null,
+          accountHolder: method === "BANK" ? accountHolder.trim() : null,
         }),
       });
 
@@ -142,6 +145,7 @@ export default function PayoutFormPage() {
                 <label className="text-sm font-medium text-gray-700 ml-1">Account Holder Name</label>
                 <input
                   type="text"
+                  required
                   value={accountHolder}
                   onChange={(e) => setAccountHolder(e.target.value)}
                   placeholder="Full name as on bank account"
@@ -171,9 +175,10 @@ export default function PayoutFormPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700 ml-1">Bank Name <span className="text-gray-400 font-normal">(optional)</span></label>
+                <label className="text-sm font-medium text-gray-700 ml-1">Bank Name</label>
                 <input
                   type="text"
+                  required
                   value={bankName}
                   onChange={(e) => setBankName(e.target.value)}
                   placeholder="e.g. State Bank of India"

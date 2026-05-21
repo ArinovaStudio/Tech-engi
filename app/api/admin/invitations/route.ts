@@ -12,6 +12,8 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const projectId = searchParams.get("projectId");
     const status = searchParams.get("status");
+    console.log(projectId, status, "params");
+    
 
     const whereClause: any = {};
     if (projectId) {

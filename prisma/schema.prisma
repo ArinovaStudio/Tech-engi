@@ -78,7 +78,7 @@ enum IdType {
   PAY_SLIP
 }
 
-model EngineerProfile {
+model  EngineerProfile {
   id     String @id @default(uuid())
   userId String @unique
 

@@ -36,7 +36,14 @@ export async function GET(req: NextRequest) {
 
     const users = await prisma.user.findMany({
       where: whereClause,
-      include: { engineerProfile: true, clientProfile: true },
+      include: { 
+        engineerProfile: true, 
+        clientProfile: {
+          include: {
+            _count: { select: { projects: { where: { advancePaid: true } } } }
+          }
+        } 
+      },
       orderBy: { lastActiveAt: "desc" },
       skip,
       take: limit,
@@ -67,7 +74,7 @@ export async function GET(req: NextRequest) {
       if (u.role === "CLIENT" && u.clientProfile) {
         return {
           ...baseData,
-          totalProjects: u.clientProfile.totalProjects,
+          totalProjects: u.clientProfile._count?.projects || 0,
           expertise: u.clientProfile.expertise,
         };
       }
@@ -99,11 +106,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      users: formattedUsers, 
-      pendingCount 
-    }, { status: 200 });
+    return NextResponse.json({ success: true, users: formattedUsers, pendingCount }, { status: 200 });
 
   } catch {
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });

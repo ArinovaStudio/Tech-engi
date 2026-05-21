@@ -10,7 +10,7 @@ import {
   LucideLoader,
   Loader2,
 } from "lucide-react";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { format } from "date-fns";
 const statusColors: Record<string, string> = {
@@ -244,6 +244,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
 
   return (
     <div className="space-y-6">
+      <Toaster position="top-right" />
       <div className="flex items-center justify-between">
         <h2
           className="text-2xl font-bold  flex items-center gap-2"

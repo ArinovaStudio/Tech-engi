@@ -7,47 +7,23 @@ const getRoomId = (userId1: string, userId2: string) => {
 };
 
 export default function registerDirectChatHandlers(io: Server, socket: Socket) {
-  socket.on("join_project_chat", (data: { conversationId: string }) => {
-    socket.join(`project_${data.conversationId}`);
-  });
-
+  
   socket.on("join_dm", (data: { currentUserId: string; targetUserId: string }) => {
-    try {
-      const roomName = `dm_${getRoomId(data.currentUserId, data.targetUserId)}`;
-      socket.join(roomName);
-    } catch {
-      socket.emit("dm_error", { message: "Failed to join direct message chat" });
-    }
+    const roomName = `dm_${getRoomId(data.currentUserId, data.targetUserId)}`;
+    socket.join(roomName);
   });
 
   socket.on("send_dm", async (data: { senderId: string; receiverId: string; content: string }) => {
     try {
       const validation = validateChatMessage(data.content);
-      if (!validation.isValid) {
-        return socket.emit("dm_error", { message: validation.reason });
-      }
-
-      const receiver = await prisma.user.findUnique({ where: { id: data.receiverId } });
-      if (!receiver) {
-        return socket.emit("dm_error", { message: "User not found." });
-      }
+      if (!validation.isValid) return socket.emit("dm_error", { message: validation.reason });
 
       const [user1Id, user2Id] = [data.senderId, data.receiverId].sort();
 
       const conversation = await prisma.conversation.upsert({
-        where: {
-          user1Id_user2Id: { user1Id, user2Id }
-        },
-        update: {
-          lastMessage: data.content,
-          lastMessageAt: new Date()
-        },
-        create: {
-          user1Id,
-          user2Id,
-          lastMessage: data.content,
-          lastMessageAt: new Date()
-        }
+        where: { user1Id_user2Id: { user1Id, user2Id } },
+        update: { lastMessage: data.content, lastMessageAt: new Date() },
+        create: { user1Id, user2Id, lastMessage: data.content, lastMessageAt: new Date() }
       });
 
       const savedMessage = await prisma.directMessage.create({
@@ -56,96 +32,38 @@ export default function registerDirectChatHandlers(io: Server, socket: Socket) {
           senderId: data.senderId,
           content: data.content
         },
-        include: { 
-          sender: { select: { id: true, name: true, role: true, image: true } } 
-        }
+        include: { sender: { select: { id: true, name: true, role: true, image: true } } }
       });
 
       const roomName = `dm_${getRoomId(data.senderId, data.receiverId)}`;
       io.to(roomName).emit("receive_dm", savedMessage);
-      io.to(`project_${getRoomId(data.senderId, data.receiverId)}`).emit("receive_dm", savedMessage);
-      
-      io.emit("new_dm_notification", { 
-        receiverId: data.receiverId, 
-        senderId: data.senderId,
-        message: savedMessage,
-        conversationId: conversation.id
-      });
+      io.emit("new_dm_notification", { receiverId: data.receiverId, senderId: data.senderId, message: savedMessage });
 
     } catch {
       socket.emit("dm_error", { message: "Failed to send message" });
     }
   });
 
-  socket.on("send_project_message", async (data: { senderId: string; conversationId: string; content: string }) => {
+  socket.on("edit_dm", async (data: { messageId: string; senderId: string; content: string }) => {
     try {
       const validation = validateChatMessage(data.content);
       if (!validation.isValid) return socket.emit("dm_error", { message: validation.reason });
 
-      await prisma.conversation.update({
-        where: { id: data.conversationId },
-        data: { lastMessage: data.content, lastMessageAt: new Date() }
-      });
-
-      console.log(data);
-
-      const savedMessage = await prisma.directMessage.create({
-        data: {
-          conversationId: data.conversationId,
-          senderId: data.senderId,
-          content: data.content
-        },
-        include: { 
-          sender: { select: { id: true, name: true, role: true, image: true } } 
-        }
-      });
-
-      io.to(`project_${data.conversationId}`).emit("receive_dm", savedMessage);
-      
-    } catch {
-      socket.emit("dm_error", { message: "Failed to send project message" });
-    }
-  });
-
-  socket.on("edit_dm", async (data: { messageId: string; senderId: string; content: string }) => {
-    try {
-      const existingMessage = await prisma.directMessage.findUnique({ 
-        where: { id: data.messageId },
-        include: { conversation: true } 
-      });
-      
-      if (!existingMessage){
-        return socket.emit("dm_error", { message: "Message not found" });
-      }
-
-      if (existingMessage.senderId !== data.senderId) {
-        return socket.emit("dm_error", { message: "You can only edit your own messages" });
-      }
-
-      const validation = validateChatMessage(data.content);
-      if (!validation.isValid) {
-        return socket.emit("dm_error", { message: validation.reason });
-      }
+      const msg = await prisma.directMessage.findUnique({ where: { id: data.messageId }, include: { conversation: true } });
+      if (!msg || msg.senderId !== data.senderId) return socket.emit("dm_error", { message: "Unauthorized" });
 
       const updatedMessage = await prisma.directMessage.update({
         where: { id: data.messageId },
-        data: { 
-          content: data.content,
-          isEdited: true 
-        },
+        data: { content: data.content, isEdited: true },
         include: { sender: { select: { id: true, name: true, role: true, image: true } } }
       });
 
-      if (existingMessage.conversation.lastMessage === existingMessage.content) {
-        await prisma.conversation.update({
-          where: { id: existingMessage.conversationId },
-          data: { lastMessage: data.content }
-        });
+      if (msg.conversation.lastMessage === msg.content) {
+        await prisma.conversation.update({ where: { id: msg.conversationId }, data: { lastMessage: data.content } });
       }
 
-      const roomName = `dm_${getRoomId(existingMessage.conversation.user1Id, existingMessage.conversation.user2Id)}`;
+      const roomName = `dm_${getRoomId(msg.conversation.user1Id, msg.conversation.user2Id)}`;
       io.to(roomName).emit("dm_edited", updatedMessage);
-      io.to(`project_${getRoomId(existingMessage.conversation.user1Id, existingMessage.conversation.user2Id)}`).emit("receive_dm", updatedMessage);
     } catch {
       socket.emit("dm_error", { message: "Failed to edit message" });
     }
@@ -153,31 +71,19 @@ export default function registerDirectChatHandlers(io: Server, socket: Socket) {
 
   socket.on("delete_dm", async (data: { messageId: string; senderId: string }) => {
     try {
-      const existingMessage = await prisma.directMessage.findUnique({ 
+      const msg = await prisma.directMessage.findUnique({ where: { id: data.messageId }, include: { conversation: true } });
+      const sender = await prisma.user.findUnique({ where: { id: data.senderId } });
+      
+      if (!msg) return;
+      if (msg.senderId !== data.senderId && sender?.role !== "ADMIN") return socket.emit("dm_error", { message: "Unauthorized" });
+
+      await prisma.directMessage.update({
         where: { id: data.messageId },
-        include: { conversation: true }
+        data: { isDeleted: true, content: "" }
       });
-      
-      if (!existingMessage){
-        return socket.emit("dm_error", { message: "Message not found" });
-      }
 
-      const sender = await prisma.user.findUnique({ 
-        where: { id: data.senderId },
-        select: { role: true }
-      });
-      
-      const isAdmin = sender?.role === "ADMIN";
-
-      if (existingMessage.senderId !== data.senderId && !isAdmin) {
-        return socket.emit("dm_error", { message: "You can only delete your own messages" });
-      }
-
-      await prisma.directMessage.delete({ where: { id: data.messageId } });
-
-      const roomName = `dm_${getRoomId(existingMessage.conversation.user1Id, existingMessage.conversation.user2Id)}`;
+      const roomName = `dm_${getRoomId(msg.conversation.user1Id, msg.conversation.user2Id)}`;
       io.to(roomName).emit("dm_deleted", { messageId: data.messageId });
-      io.to(`project_${existingMessage.conversationId}`).emit("dm_deleted", { messageId: data.messageId });
     } catch {
       socket.emit("dm_error", { message: "Failed to delete message" });
     }
@@ -185,48 +91,31 @@ export default function registerDirectChatHandlers(io: Server, socket: Socket) {
 
   socket.on("mark_dm_read", async (data: { messageId: string; readerId: string }) => {
     try {
-      const existingMessage = await prisma.directMessage.findUnique({ 
-        where: { id: data.messageId },
-        include: { conversation: true }
-      });
-
-      if (existingMessage && existingMessage.senderId !== data.readerId && !existingMessage.isRead) {
-        
-        await prisma.directMessage.update({
-          where: { id: data.messageId },
-          data: { isRead: true }
-        });
-
-        const roomName = `dm_${getRoomId(existingMessage.conversation.user1Id, existingMessage.conversation.user2Id)}`;
+      const msg = await prisma.directMessage.findUnique({ where: { id: data.messageId }, include: { conversation: true } });
+      if (msg && msg.senderId !== data.readerId && !msg.isRead) {
+        await prisma.directMessage.update({ where: { id: data.messageId }, data: { isRead: true } });
+        const roomName = `dm_${getRoomId(msg.conversation.user1Id, msg.conversation.user2Id)}`;
         io.to(roomName).emit("dm_read_receipt", { messageId: data.messageId });
       }
-    } catch {
-      
-    }
+    } catch {}
   });
 
   socket.on("mass_delete_dm", async (data: { messageIds: string[]; senderId: string; receiverId: string }) => {
     try {
-      if (!data.messageIds || data.messageIds.length === 0) return;
-
-      const initiator = await prisma.user.findUnique({ 
-        where: { id: data.senderId },
-        select: { role: true }
-      });
-
+      if (!data.messageIds?.length) return;
+      const initiator = await prisma.user.findUnique({ where: { id: data.senderId } });
       const isAdmin = initiator?.role === "ADMIN";
 
       const deleteWhere: any = { id: { in: data.messageIds } };
+      if (!isAdmin) deleteWhere.senderId = data.senderId;
 
-      if (!isAdmin) {
-        deleteWhere.senderId = data.senderId;
-      }
-
-      await prisma.directMessage.deleteMany({ where: deleteWhere });
+      await prisma.directMessage.updateMany({
+        where: deleteWhere,
+        data: { isDeleted: true, content: "" }
+      });
 
       const roomName = `dm_${getRoomId(data.senderId, data.receiverId)}`;
       io.to(roomName).emit("mass_dm_deleted", { messageIds: data.messageIds });
-      
     } catch {
       socket.emit("dm_error", { message: "Failed to delete messages" });
     }

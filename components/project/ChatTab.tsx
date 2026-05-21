@@ -22,12 +22,8 @@ export default function ChatTab({ projectId }: { projectId: string }) {
   const [loadingMore, setLoadingMore] = useState(false);
   const [loadingInitial, setLoadingInitial] = useState(true);
   
-  const [roomParticipants, setRoomParticipants] = useState<{ clientId: string, engineerId: string } | null>(null);
-  const [conversationId, setConversationId] = useState<string | null>(null);
-  
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Fetch Chat History & Participants
   const loadMessages = useCallback(async (cursor?: string) => {
     try {
       const url = `/api/chat/${projectId}${cursor ? `?cursor=${cursor}` : ""}`;
@@ -35,23 +31,19 @@ export default function ChatTab({ projectId }: { projectId: string }) {
       const data = await res.json();
       
       if (data.success) {
-        const idFromMsg = data.messages?.length > 0 ? data.messages[0].conversationId : null;
-        setConversationId(data.conversationId || idFromMsg);
         if (cursor) {
           setMessages((prev) => [...data.messages, ...prev]);
         } else {
           setMessages(data.messages);
-          if (data.clientUserId && data.engineerUserId) {
-            setRoomParticipants({ clientId: data.clientUserId, engineerId: data.engineerUserId });
-          }
           setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
         }
         setNextCursor(data.nextCursor);
 
-        if (!isAdmin && user) {
+        // Mark unread messages as read
+        if (user) {
           data.messages.forEach((msg: any) => {
             if (msg.senderId !== user.id && !msg.isRead) {
-              globalSocket.emit("mark_dm_read", { messageId: msg.id, readerId: user.id });
+              globalSocket.emit("mark_project_message_read", { messageId: msg.id, readerId: user.id, projectId });
             }
           });
         }
@@ -62,20 +54,16 @@ export default function ChatTab({ projectId }: { projectId: string }) {
       setLoadingInitial(false);
       setLoadingMore(false);
     }
-  }, [projectId, user, isAdmin]);
+  }, [projectId, user]);
 
-  // Initial Load
   useEffect(() => {
-    if (user && projectId) {
-      loadMessages();
-    }
+    if (user && projectId) loadMessages();
   }, [user, projectId, loadMessages]);
 
-  // Join Socket Room & Listen to Events
   useEffect(() => {
-    if (!conversationId || !user) return;
+    if (!user || !projectId) return;
 
-    globalSocket.emit("join_project_chat", { conversationId });
+    globalSocket.emit("join_project_chat", { projectId });
 
     const handleReceiveMessage = (msg: any) => {
       setMessages((prev) => {
@@ -91,8 +79,8 @@ export default function ChatTab({ projectId }: { projectId: string }) {
       });
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
 
-      if (!isAdmin && msg.senderId !== user.id) {
-        globalSocket.emit("mark_dm_read", { messageId: msg.id, readerId: user.id });
+      if (msg.senderId !== user.id) {
+        globalSocket.emit("mark_project_message_read", { messageId: msg.id, readerId: user.id, projectId });
       }
     };
 
@@ -105,74 +93,57 @@ export default function ChatTab({ projectId }: { projectId: string }) {
     const handleReadReceipt = ({ messageId }: { messageId: string }) => {
       setMessages((prev) => prev.map((m) => (m.id === messageId ? { ...m, isRead: true } : m)));
     };
-    
-    const handleDmError = ({ message }: { message: string }) => {
+    const handleError = ({ message }: { message: string }) => {
       setError(message);
       setTimeout(() => setError(null), 4000);
     };
 
-    globalSocket.on("receive_dm", handleReceiveMessage);
-    globalSocket.on("dm_edited", handleMessageEdited);
-    globalSocket.on("dm_deleted", handleMessageDeleted);
-    globalSocket.on("mass_dm_deleted", handleMassDeleted);
-    globalSocket.on("dm_read_receipt", handleReadReceipt);
-    globalSocket.on("dm_error", handleDmError);
+    globalSocket.on("receive_project_message", handleReceiveMessage);
+    globalSocket.on("project_message_edited", handleMessageEdited);
+    globalSocket.on("project_message_deleted", handleMessageDeleted);
+    globalSocket.on("mass_project_deleted", handleMassDeleted);
+    globalSocket.on("project_read_receipt", handleReadReceipt);
+    globalSocket.on("project_error", handleError);
 
     return () => {
-      globalSocket.off("receive_dm", handleReceiveMessage);
-      globalSocket.off("dm_edited", handleMessageEdited);
-      globalSocket.off("dm_deleted", handleMessageDeleted);
-      globalSocket.off("mass_dm_deleted", handleMassDeleted);
-      globalSocket.off("dm_read_receipt", handleReadReceipt);
-      globalSocket.off("dm_error", handleDmError);
+      globalSocket.off("receive_project_message", handleReceiveMessage);
+      globalSocket.off("project_message_edited", handleMessageEdited);
+      globalSocket.off("project_message_deleted", handleMessageDeleted);
+      globalSocket.off("mass_project_deleted", handleMassDeleted);
+      globalSocket.off("project_read_receipt", handleReadReceipt);
+      globalSocket.off("project_error", handleError);
     };
-  }, [conversationId, user, isAdmin]);
+  }, [projectId, user]);
 
-  const receiverId = isAdmin ? roomParticipants?.engineerId 
-  : (user?.id === roomParticipants?.clientId ? roomParticipants?.engineerId : roomParticipants?.clientId);
-
-  // Action Handlers
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
-    
-    if (!inputMessage.trim() || !user || !conversationId) {
-      console.error("Chat Error: Missing User or Conversation ID", { user, conversationId });
-      return;
-    }
+    if (!inputMessage.trim() || !user) return;
     setError(null);
 
     if (editingMessage) {
-      globalSocket.emit("edit_dm", { messageId: editingMessage.id, senderId: user.id, content: inputMessage.trim() });
+      globalSocket.emit("edit_project_message", { messageId: editingMessage.id, senderId: user.id, content: inputMessage.trim(), projectId });
       setMessages(prev => prev.map(m => m.id === editingMessage.id ? { ...m, content: inputMessage.trim(), isEdited: true } : m));
       setEditingMessage(null);
     } else {
       const tempMessage = { id: `temp_${Date.now()}`, senderId: user.id, content: inputMessage.trim(), createdAt: new Date().toISOString(), isPending: true };
       setMessages(prev => [...prev, tempMessage]);
       
-      if (isAdmin) {
-        globalSocket.emit("send_project_message", { 
-          senderId: user.id, 
-          conversationId: conversationId, 
-          content: inputMessage.trim() 
-        });
-      } else {
-        globalSocket.emit("send_dm", { 
-          senderId: user.id, 
-          receiverId: receiverId, 
-          content: inputMessage.trim(), 
-          conversationId: conversationId 
-        });
-      }
+      globalSocket.emit("send_project_message", { 
+        senderId: user.id, 
+        projectId: projectId,
+        content: inputMessage.trim() 
+      });
     }
     setInputMessage("");
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
 
   const handleMassDelete = () => {
-    if (selectedMessageIds.length === 0 || !user || !receiverId) return;
+    if (selectedMessageIds.length === 0 || !user) return;
     setError(null);
     setMessages(prev => prev.map(m => selectedMessageIds.includes(m.id) ? { ...m, isDeleted: true, content: "" } : m));
-    globalSocket.emit("mass_delete_dm", { messageIds: selectedMessageIds, senderId: user.id, receiverId });
+    
+    globalSocket.emit("mass_delete_project_message", { messageIds: selectedMessageIds, senderId: user.id, projectId });
     setIsSelectMode(false);
     setSelectedMessageIds([]);
   };
@@ -185,8 +156,6 @@ export default function ChatTab({ projectId }: { projectId: string }) {
 
   return (
     <div className="flex flex-col bg-white border border-[var(--border)] relative" style={{ height: "calc(100vh - 220px)" }}>
-      
-      {/* Header Actions (For Mass Delete) - Hidden from Admin */}
       {!isAdmin && (
         <div className="absolute top-4 right-6 z-10">
           {isSelectMode ? (
@@ -204,23 +173,21 @@ export default function ChatTab({ projectId }: { projectId: string }) {
         </div>
       )}
 
-      {/* Messages Area */}
       <div className="flex-1 overflow-y-auto px-6 py-6 bg-[#f0f2f5] space-y-2">
         {nextCursor && (
           <div className="flex justify-center mb-4">
-            <button onClick={() => { setLoadingMore(true); loadMessages(nextCursor); }} disabled={loadingMore} className="flex items-center gap-1 text-xs  text-[var(--text-muted)] bg-white px-3 py-1.5 rounded-full shadow-sm hover:text-[var(--primary)] transition-colors">
+            <button onClick={() => { setLoadingMore(true); loadMessages(nextCursor); }} disabled={loadingMore} className="flex items-center gap-1 text-xs text-[var(--text-muted)] bg-white px-3 py-1.5 rounded-full shadow-sm hover:text-[var(--primary)] transition-colors">
               {loadingMore ? <Loader2 size={14} className="animate-spin" /> : <><ChevronUp size={14} /> Load older messages</>}
             </button>
           </div>
         )}
 
         {messages.length === 0 && (
-          <div className="flex items-center justify-center h-full"><p className="text-sm  text-[var(--text-muted)]">No messages yet.</p></div>
+          <div className="flex items-center justify-center h-full"><p className="text-sm text-[var(--text-muted)]">No messages yet.</p></div>
         )}
 
-        {messages.map((msg, index) => {
+        {messages.map((msg) => {
           const isMine = msg.senderId === user?.id;
-
           return (
             <MessageItem 
               key={msg.id} 
@@ -229,8 +196,8 @@ export default function ChatTab({ projectId }: { projectId: string }) {
               isAdmin={isAdmin}
               showDetails={true} 
               onEdit={(m: any) => { setEditingMessage(m); setInputMessage(m.content); }}
-              onDelete={(id: string) => globalSocket.emit("delete_dm", { messageId: id, senderId: user?.id })}
-              isSelectMode={isSelectMode && isMine && !isAdmin} 
+              onDelete={(id: string) => globalSocket.emit("delete_project_message", { messageId: id, senderId: user?.id, projectId })}
+              isSelectMode={isSelectMode && (isMine || isAdmin)} 
               isSelected={selectedMessageIds.includes(msg.id)}
               onToggleSelect={toggleSelectMessage}
             />
@@ -239,15 +206,13 @@ export default function ChatTab({ projectId }: { projectId: string }) {
         <div ref={bottomRef} />
       </div>
 
-      {/* Error Banner Display */}
       {error && (
         <div className="mx-5 mb-2 mt-2 px-3 py-2 bg-red-50 border border-red-200 flex items-center justify-between rounded-md">
-          <p className="text-xs  text-red-600 font-medium">{error}</p>
+          <p className="text-xs text-red-600 font-medium">{error}</p>
           <button onClick={() => setError(null)}><X size={13} className="text-red-400 hover:text-red-600" /></button>
         </div>
       )}
 
-      {/* Input Area */}
       <div className={`p-4 bg-white border-t border-[var(--border)] transition-opacity ${isSelectMode ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
         {editingMessage && (
           <div className="flex items-center justify-between bg-orange-50 px-4 py-2 rounded-t-lg border-b border-orange-100 text-sm text-orange-800">

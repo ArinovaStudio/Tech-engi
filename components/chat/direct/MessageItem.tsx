@@ -8,10 +8,8 @@ export default function MessageItem({
   msg, isMine, onEdit, onDelete, isSelectMode = false, isSelected = false, onToggleSelect, isAdmin, showDetails = false 
 }: any) {
   const [showMenu, setShowMenu] = useState(false);
-  const isSenderAdmin = msg.sender?.role === "ADMIN";
   const canModify = isMine || isAdmin;
-
-  const showLabel = showDetails ? !isMine : (isSenderAdmin && !isMine);
+  const showLabel = showDetails && !isMine;
 
   return (
     <div 
@@ -20,7 +18,6 @@ export default function MessageItem({
       }}
       className={`flex w-full mb-4 gap-2 group ${isSelectMode && !msg.isDeleted ? "cursor-pointer" : ""} ${isMine ? "justify-end" : "justify-start"}`}
     >
-      {/* Selection Checkbox */}
       {isSelectMode && !msg.isDeleted && (
         <div className="flex flex-col justify-center">
           <input type="checkbox" checked={isSelected} readOnly className="w-5 h-5 accent-[#FFAE58] shrink-0" />
@@ -54,9 +51,8 @@ export default function MessageItem({
           </span>
         )}
 
-        {/* Action Button Row */}
+        {/* Bubble & Action Button Row */}
         <div className={`flex items-center gap-2.5 ${isMine ? "flex-row-reverse" : "flex-row"}`}>
-          
           <div className={`rounded-3xl px-5 py-2.5 text-[15px] shadow-sm transition-all ${
             isMine 
               ? "bg-[#FFAE58] text-white" 
@@ -68,6 +64,7 @@ export default function MessageItem({
             </div>
           </div>
 
+          {/* Action Button */}
           {canModify && !msg.isPending && !msg.isDeleted && !isSelectMode && (
             <div className="relative opacity-0 group-hover:opacity-100 transition-opacity">
               <button 
@@ -77,6 +74,7 @@ export default function MessageItem({
                 <ChevronDown size={14} />
               </button>
               
+              {/* Dropdown Menu */}
               {showMenu && (
                 <div className={`absolute top-full mt-2 ${isMine ? "right-0" : "left-0"} bg-white shadow-[0_4px_20px_rgb(0,0,0,0.08)] border border-gray-100 rounded-2xl py-2 w-32 z-50 flex flex-col overflow-hidden`}>
                   {isMine && (
@@ -93,6 +91,7 @@ export default function MessageItem({
           )}
         </div>
 
+        {/* Timestamps & Ticks */}
         <div className={`text-[11px] mt-1.5 flex items-center gap-1.5 px-2 font-medium ${isMine ? "justify-end text-gray-500" : "justify-start text-gray-500"}`}>
           {msg.isEdited && <span className="italic mr-1 opacity-70">edited</span>}
           {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

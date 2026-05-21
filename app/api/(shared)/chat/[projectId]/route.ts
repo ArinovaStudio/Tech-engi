@@ -38,28 +38,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ proj
       return NextResponse.json({ success: false, message: "You don't have permission to view this project" }, { status: 403 });
     }
 
-    if (!engineerUserId || !clientUserId) {
-      return NextResponse.json({ success: true, messages: [], nextCursor: null }, { status: 200 });
-    }
-
-    const conversation = await prisma.conversation.findFirst({
-      where: {
-        OR: [
-          { user1Id: clientUserId, user2Id: engineerUserId },
-          { user1Id: engineerUserId, user2Id: clientUserId }
-        ]
-      }
-    });
-
-    if (!conversation) {
-      return NextResponse.json({ success: true, messages: [], nextCursor: null }, { status: 200 });
-    }
-
-    const messages = await prisma.directMessage.findMany({
+    const messages = await prisma.projectMessage.findMany({
       take: MESSAGES_PER_PAGE,
       skip: cursor ? 1 : 0,
       cursor: cursor ? { id: cursor } : undefined,
-      where: { conversationId: conversation.id },
+      where: { projectId: projectId },
       orderBy: { createdAt: "desc" },
       include: {
         sender: { select: { id: true, name: true, role: true, image: true } }
@@ -67,10 +50,15 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ proj
     });
 
     const sortedMessages = messages.reverse();
-
     const nextCursor = messages.length === MESSAGES_PER_PAGE ? sortedMessages[0].id : null;
 
-    return NextResponse.json({ success: true, messages: sortedMessages, nextCursor, clientUserId, engineerUserId }, { status: 200 });
+    return NextResponse.json({ 
+      success: true, 
+      messages: sortedMessages, 
+      nextCursor, 
+      clientUserId, 
+      engineerUserId 
+    }, { status: 200 });
 
   } catch {
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });

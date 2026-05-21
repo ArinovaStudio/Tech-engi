@@ -4,6 +4,7 @@ import { parse } from "url";
 import next from "next";
 import { Server } from "socket.io";
 import registerDirectChatHandlers from "./socket/directChatHandler";
+import registerProjectChatHandlers from "./socket/projectChatHandler";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
@@ -56,6 +57,7 @@ app.prepare().then(() => {
     });
 
     registerDirectChatHandlers(io, socket);
+    registerProjectChatHandlers(io, socket);
 
     socket.on("disconnect", () => {
       for (const [userId, socketIds] of onlineUsers.entries()) {

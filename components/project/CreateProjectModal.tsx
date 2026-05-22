@@ -139,7 +139,7 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
                 <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Start Date</label>
                 <DatePicker
                   selected={form.startDate ? new Date(form.startDate) : null}
-                  onChange={(date) => setForm({ ...form, startDate: date ? date.toISOString().split('T')[0] : "" })}
+                  onChange={(date: any) => setForm({ ...form, startDate: date ? date.toISOString().split('T')[0] : "" })}
                   dateFormat="dd/MM/yy"
                   className={inputCls}
                   placeholderText="dd/mm/yy"
@@ -150,7 +150,7 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
                 <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">End Date</label>
                 <DatePicker
                   selected={form.endDate ? new Date(form.endDate) : null}
-                  onChange={(date) => setForm({ ...form, endDate: date ? date.toISOString().split('T')[0] : "" })}
+                  onChange={(date: any) => setForm({ ...form, endDate: date ? date.toISOString().split('T')[0] : "" })}
                   dateFormat="dd/MM/yy"
                   minDate={form.startDate ? new Date(form.startDate) : new Date()}
                   className={inputCls}

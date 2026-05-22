@@ -2,12 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAdmin } from "@/lib/auth";
 
-interface Params {
-  params: Promise<{
-    id: string;
-  }>;
-}
-
 export async function GET(req: NextRequest) {
   try {
     const { user, error } = await getAdmin();
@@ -136,7 +130,7 @@ export async function POST(
   }
 }
 
-export async function PATCH(req: NextRequest,{ params }: Params) {
+export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
 

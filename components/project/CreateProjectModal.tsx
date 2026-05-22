@@ -73,8 +73,7 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
         user: { name: user?.name, email: user?.email },
         description: "Advance Payment (40%)",
         onSuccess: async () => {
-          toast.success("Payment successful! Project created.");
-          await handleStartMatching(projectId);
+          handleStartMatching(projectId);
           onCreated();
           onClose();
           router.push(`/client/project/${projectId}`);

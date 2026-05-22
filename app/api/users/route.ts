@@ -24,7 +24,12 @@ export async function GET(
                     engineerProfile: {
                         select: {
                             id: true,
+
+                            qualification: true,
+
                             skills: true,
+
+                            completedProjects: true,
                         },
                     },
                 },
@@ -33,7 +38,7 @@ export async function GET(
                     lastActiveAt: "desc",
                 },
             });
-console.log(engineers);
+        // console.log(engineers);
 
         return NextResponse.json(
             {

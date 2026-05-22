@@ -1,5 +1,11 @@
 "use client";
-import { TrendingUp, TrendingDown, ChevronDown } from "lucide-react";
+
+import {
+  TrendingUp,
+  TrendingDown,
+  ChevronDown,
+  ArrowUpRight,
+} from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
 export type Period = "weekly" | "monthly" | "yearly";
@@ -7,75 +13,191 @@ export type Period = "weekly" | "monthly" | "yearly";
 interface StatCardProps {
   title: string;
   value: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   change?: string;
   changeType?: "up" | "down";
+  subtitle?: string;
+  highlighted?: boolean;
   period?: Period;
   onPeriodChange?: (p: Period) => void;
 }
 
 const PERIODS: Period[] = ["weekly", "monthly", "yearly"];
 
-export default function StatCard({ title, value, change, changeType, icon, period, onPeriodChange }: StatCardProps) {
+export default function StatCard({
+  title,
+  value,
+  change,
+  changeType,
+  subtitle,
+  highlighted,
+  period,
+  onPeriodChange,
+}: StatCardProps) {
   const isUp = changeType === "up";
+
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
     }
+
     document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+
+    return () => {
+      document.removeEventListener("mousedown", handler);
+    };
   }, []);
 
   return (
-    <div className="bg-white p-5 border border-[var(--border)] rounded-lg">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-gray-50 flex items-center justify-center text-gray-400 rounded-lg">
-            {icon}
-          </div>
-          <span className="text-sm font-bold text-[var(--text-secondary)]">{title}</span>
+    <div
+      className={`
+        relative
+        overflow-hidden
+        rounded-[24px]
+        border
+        p-6
+        min-w-62.5
+        h-47.5
+        transition-all
+        duration-300
+       
+        ${
+          highlighted
+            ? "bg-gradient-to-br from-[#FF7A00] via-[#FFAE58] to-[#FFE0B8] border-transparent text-white"
+            : "bg-[#ffffff] border-[#E7E7E7] text-black"
+        }
+      `}
+    >
+      {/* Top */}
+      <div className="flex items-start justify-between">
+        <div>
+          <p
+            className={`text-[1.4rem] font-medium ${
+              highlighted ? "text-white/90" : "text-[#111]"
+            }`}
+          >
+            {title}
+          </p>
         </div>
 
-        {onPeriodChange && period ? (
+        {/* Arrow Button */}
+        <div
+          className={`
+            w-10 h-10
+            rounded-full
+            flex items-center justify-center
+            border
+            ${
+              highlighted
+                ? "bg-white text-black border-white/20"
+                : "bg-white text-black border-[#DADADA]"
+            }
+          `}
+        >
+          <ArrowUpRight size={18} strokeWidth={2.2} />
+        </div>
+      </div>
+
+      {/* Value */}
+      <div className="mt-2 mb-8">
+        <h2
+          className={`text-[58px] leading-none font-medium tracking-tight ${
+            highlighted ? "text-white" : "text-black"
+          }`}
+        >
+          {value || "0"}
+        </h2>
+      </div>
+
+      {/* Bottom */}
+      <div className="absolute bottom-3 left-6 right-6 flex items-center justify-between">
+        {change && changeType ? (
+          <div
+            className={`
+              flex items-center gap-1.5
+              rounded-full
+              px-2.5 py-1
+              text-[12px]
+              font-medium
+              border
+              ${
+                highlighted
+                  ? "bg-white/10 border-white/20 text-white"
+                  : isUp
+                  ? "bg-[#EEF9F1] border-[#D7F0DD] text-[#238B57]"
+                  : "bg-red-50 border-red-100 text-red-500"
+              }
+            `}
+          >
+            {isUp ? (
+              <TrendingUp size={12} />
+            ) : (
+              <TrendingDown size={12} />
+            )}
+
+            <span>{change}</span>
+          </div>
+        ) : (
+          <span
+            className={`text-[13px] ${
+              highlighted ? "text-white/80" : "text-[#6B6B6B]"
+            }`}
+          >
+            {subtitle}
+          </span>
+        )}
+
+        {/* Optional Period Dropdown */}
+        {onPeriodChange && period && (
           <div className="relative" ref={ref}>
             <button
-              onClick={() => setOpen(o => !o)}
-              className="flex items-center gap-1 text-[11px] font-semibold text-[var(--text-muted)] border border-[var(--border)] rounded-md px-2 py-1 hover:bg-gray-50 capitalize"
+              onClick={() => setOpen((o) => !o)}
+              className={`
+                flex items-center gap-1
+                rounded-lg
+                px-2 py-1
+                text-xs
+                capitalize
+                ${
+                  highlighted
+                    ? "bg-white/10 text-white"
+                    : "bg-white text-[#444]"
+                }
+              `}
             >
-              {period} <ChevronDown size={10} />
+              {period}
+              <ChevronDown size={12} />
             </button>
+
             {open && (
-              <div className="absolute right-0 top-full mt-1 bg-white border border-[var(--border)] rounded-lg shadow-md z-20 min-w-[90px]">
-                {PERIODS.map(p => (
+              <div className="absolute right-0 bottom-12 w-[110px] overflow-hidden rounded-xl border border-[#E5E5E5] bg-white z-50">
+                {PERIODS.map((p) => (
                   <button
                     key={p}
-                    onClick={() => { onPeriodChange(p); setOpen(false); }}
-                    className={`w-full text-left px-3 py-1.5 text-xs capitalize hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${p === period ? "text-[var(--primary)] font-bold" : "text-[var(--text-secondary)]"}`}
+                    onClick={() => {
+                      onPeriodChange(p);
+                      setOpen(false);
+                    }}
+                    className={`
+                      w-full px-3 py-2 text-left text-sm capitalize transition-colors
+                      hover:bg-[#F5F5F5]
+                      ${
+                        p === period
+                          ? "font-semibold text-[#177A47]"
+                          : "text-[#444]"
+                      }
+                    `}
                   >
                     {p}
                   </button>
                 ))}
               </div>
             )}
-          </div>
-        ) : (
-          <button className="text-gray-300 hover:text-gray-500 transition-colors">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
-            </svg>
-          </button>
-        )}
-      </div>
-
-      <div className="flex items-end gap-3">
-        <h2 className="text-3xl font-bold text-[var(--text-primary)]">{value || "0"}</h2>
-        {change && changeType && (
-          <div className={`flex items-center gap-1 text-xs font-bold px-2 py-0.5 mb-0.5 border border-gray-200 rounded-lg ${isUp ? "text-green-500 bg-green-50/50" : "text-red-500 bg-red-50"}`}>
-            {change}
-            {isUp ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
           </div>
         )}
       </div>

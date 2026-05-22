@@ -57,7 +57,7 @@ export async function GET(
           },
         },
       });
-console.log(invitations, "invitation");
+// console.log(invitations, "invitation");
 
     return NextResponse.json({
       success: true,

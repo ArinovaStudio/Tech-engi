@@ -12,9 +12,18 @@ interface CertData {
   file?: File;
 }
 
+const EXP_LEVELS = [
+  { value: "FRESHER", label: "Fresher" },
+  { value: "ONE_TO_TWO_YEARS", label: "1-2 Years" },
+  { value: "THREE_TO_FIVE_YEARS", label: "3-5 Years" },
+  { value: "FIVE_TO_EIGHT_YEARS", label: "5-8 Years" },
+  { value: "EIGHT_PLUS_YEARS", label: "8+ Years" },
+];
+
 export default function EngineerDetailsModal({ isOpen, onClose, profile, onUpdate }: { isOpen: boolean, onClose: () => void, profile: any, onUpdate: () => void }) {
   const [isSaving, setIsSaving] = useState(false);
   const [qualification, setQualification] = useState("UG");
+  const [yearsOfExperience, setYearsOfExperience] = useState("");
   const [idType, setIdType] = useState("AADHAAR");
   const [idNumber, setIdNumber] = useState("");
   
@@ -34,6 +43,7 @@ export default function EngineerDetailsModal({ isOpen, onClose, profile, onUpdat
       setIdType(profile?.idType || "AADHAAR");
       setIdNumber(profile?.idNumber || "");
       setSkills(profile?.skills || []);
+      setYearsOfExperience(profile?.yearsOfExperience || "");
       
       setCerts(profile?.certifications || []);
       
@@ -99,6 +109,7 @@ export default function EngineerDetailsModal({ isOpen, onClose, profile, onUpdat
     setIsSaving(true);
     const formData = new FormData();
     formData.append("qualification", qualification);
+    formData.append("yearsOfExperience", yearsOfExperience);
     formData.append("idType", idType);
     formData.append("idNumber", idNumber);
     formData.append("skills", JSON.stringify(skills));
@@ -150,6 +161,20 @@ export default function EngineerDetailsModal({ isOpen, onClose, profile, onUpdat
                 <option value="UNEMPLOYED">Unemployed</option>
               </select>
             </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-1.5">Years of Experience *</label>
+              <select 
+                value={yearsOfExperience} 
+                onChange={e => setYearsOfExperience(e.target.value)} 
+                className="w-full border border-[var(--border)] rounded-lg p-3 outline-none focus:border-[var(--primary)] bg-gray-50/50"
+              >
+                <option value="" disabled>Select experience</option>
+                {EXP_LEVELS.map(exp => (
+                  <option key={exp.value} value={exp.value}>{exp.label}</option>
+                ))}
+              </select>
+            </div>
             
             <div>
               <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-1.5">ID Type *</label>
@@ -195,7 +220,7 @@ export default function EngineerDetailsModal({ isOpen, onClose, profile, onUpdat
                     <X size={14} />
                   </button>
                 </span>
-              ))}
+              ))} 
               <input 
                 value={skillInput} 
                 onChange={e => setSkillInput(e.target.value)} 

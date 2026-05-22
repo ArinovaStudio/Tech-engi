@@ -5,6 +5,8 @@ import { Plus, AlertCircle, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { User } from "./ProjectUI";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { useRazorpay } from "@/hooks/useRazorpay";
 
 export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void; onCreated: () => void, user: User }) {
@@ -134,12 +136,27 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium  text-[var(--text-secondary)] mb-1">Start Date</label>
-                <input type="date" className={inputCls} value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} disabled={loading || isPaying} />
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Start Date</label>
+                <DatePicker
+                  selected={form.startDate ? new Date(form.startDate) : null}
+                  onChange={(date) => setForm({ ...form, startDate: date ? date.toISOString().split('T')[0] : "" })}
+                  dateFormat="dd/MM/yy"
+                  className={inputCls}
+                  placeholderText="dd/mm/yy"
+                  disabled={loading || isPaying}
+                />
               </div>
               <div>
-                <label className="block text-xs font-medium  text-[var(--text-secondary)] mb-1">End Date</label>
-                <input type="date" className={inputCls} value={form.endDate} min={form.startDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} disabled={loading || isPaying} />
+                <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">End Date</label>
+                <DatePicker
+                  selected={form.endDate ? new Date(form.endDate) : null}
+                  onChange={(date) => setForm({ ...form, endDate: date ? date.toISOString().split('T')[0] : "" })}
+                  dateFormat="dd/MM/yy"
+                  minDate={form.startDate ? new Date(form.startDate) : new Date()}
+                  className={inputCls}
+                  placeholderText="dd/mm/yy"
+                  disabled={loading || isPaying}
+                />
               </div>
             </div>
 

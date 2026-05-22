@@ -79,7 +79,7 @@ export default function registerDirectChatHandlers(io: Server, socket: Socket) {
 
       await prisma.directMessage.update({
         where: { id: data.messageId },
-        data: { isDeleted: true, content: "" }
+        data: { isDeleted: true, content: "", isEdited: false }
       });
 
       const roomName = `dm_${getRoomId(msg.conversation.user1Id, msg.conversation.user2Id)}`;
@@ -111,7 +111,7 @@ export default function registerDirectChatHandlers(io: Server, socket: Socket) {
 
       await prisma.directMessage.updateMany({
         where: deleteWhere,
-        data: { isDeleted: true, content: "" }
+        data: { isDeleted: true, content: "", isEdited: false }
       });
 
       const roomName = `dm_${getRoomId(data.senderId, data.receiverId)}`;

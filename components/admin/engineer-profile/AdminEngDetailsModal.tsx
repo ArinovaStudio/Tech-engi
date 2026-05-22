@@ -12,6 +12,14 @@ interface CertData {
   file?: File;
 }
 
+const EXP_LEVELS = [
+  { value: "FRESHER", label: "Fresher" },
+  { value: "ONE_TO_TWO_YEARS", label: "1-2 Years" },
+  { value: "THREE_TO_FIVE_YEARS", label: "3-5 Years" },
+  { value: "FIVE_TO_EIGHT_YEARS", label: "5-8 Years" },
+  { value: "EIGHT_PLUS_YEARS", label: "8+ Years" },
+];
+
 export default function AdminEngineerDetailsModal({ 
   isOpen, onClose, user, profile, onUpdate 
 }: { 
@@ -25,6 +33,7 @@ export default function AdminEngineerDetailsModal({
   const [qualification, setQualification] = useState("UG");
   const [idType, setIdType] = useState("AADHAAR");
   const [idNumber, setIdNumber] = useState("");
+  const [yearsOfExperience, setYearsOfExperience] = useState("");
   
   const [skills, setSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState("");
@@ -45,6 +54,7 @@ export default function AdminEngineerDetailsModal({
       setCerts(profile.certifications || []);
       setIdPreview(profile.idFile || "");
       setFile(null);
+      setYearsOfExperience(profile.yearsOfExperience || "");
       setSkillInput("");
       setCertInput("");
       setCertFile(null);
@@ -86,6 +96,7 @@ export default function AdminEngineerDetailsModal({
     setIsSaving(true);
     const formData = new FormData();
     formData.append("qualification", qualification);
+    formData.append("yearsOfExperience", yearsOfExperience);
     formData.append("idType", idType);
     formData.append("idNumber", idNumber);
     formData.append("skills", JSON.stringify(skills));
@@ -105,7 +116,7 @@ export default function AdminEngineerDetailsModal({
       const res = await fetch(`/api/admin/users/${user.id}`, { method: "PUT", body: formData });
       const data = await res.json();
       if (data.success) { 
-        toast.success("Saved"); 
+        toast.success("Updated successfully"); 
         onUpdate(); 
         onClose(); 
       } else toast.error(data.message);
@@ -126,6 +137,13 @@ export default function AdminEngineerDetailsModal({
               <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-1.5">Qualification</label>
               <select value={qualification} onChange={e => setQualification(e.target.value)} className="w-full border border-[var(--border)] rounded-lg p-3 outline-none focus:border-[var(--primary)] bg-gray-50/50">
                 <option value="UG">Undergraduate (UG)</option><option value="EMPLOYED">Employed</option><option value="UNEMPLOYED">Unemployed</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-1.5">Years of Experience</label>
+              <select value={yearsOfExperience} onChange={e => setYearsOfExperience(e.target.value)} className="w-full border border-[var(--border)] rounded-lg p-3 outline-none focus:border-[var(--primary)] bg-gray-50/50">
+                <option value="">Select experience</option>
+                {EXP_LEVELS.map(exp => <option key={exp.value} value={exp.value}>{exp.label}</option>)}
               </select>
             </div>
             <div>

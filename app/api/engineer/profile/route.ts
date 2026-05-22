@@ -32,6 +32,13 @@ const engineerProfileSchema = z.object({
   idNumber: z.string().min(5, "Valid ID number is required"),
   skills: z.array(z.string()).min(1, "At least one skill is required"),
   certifications: z.array(certificateSchema).optional(),
+  yearsOfExperience: z.enum([
+    "FRESHER", 
+    "ONE_TO_TWO_YEARS", 
+    "THREE_TO_FIVE_YEARS", 
+    "FIVE_TO_EIGHT_YEARS", 
+    "EIGHT_PLUS_YEARS"
+  ]).optional().nullable(),
 });
 
 export async function POST(req: NextRequest) {
@@ -58,6 +65,7 @@ export async function POST(req: NextRequest) {
       idNumber: formData.get("idNumber"),
       skills: JSON.parse(formData.get("skills") as string || "[]"),
       certifications: JSON.parse(formData.get("certifications") as string || "[]"),
+      yearsOfExperience: formData.get("yearsOfExperience") || null,
     };
 
     const validation = engineerProfileSchema.safeParse(data);
@@ -90,6 +98,7 @@ export async function POST(req: NextRequest) {
         idFile: idFileUrl,
         skills: validation.data.skills,
         certifications: finalCertifications,
+        yearsOfExperience: validation.data.yearsOfExperience || null,
       }
     });
 
@@ -146,6 +155,7 @@ export async function PUT(req: NextRequest) {
     const skillsRaw = formData.get("skills") as string;
     const certsRaw = formData.get("certifications") as string;
     const idFile = formData.get("idFile") as File | null;
+    const yearsOfExperience = formData.get("yearsOfExperience") as any || null;
 
     if (qualification && idType && idNumber) {
       let skills: string[] = [];
@@ -187,8 +197,8 @@ export async function PUT(req: NextRequest) {
 
       const newProfile = await prisma.engineerProfile.upsert({
         where: { userId: user.id },
-        update: { qualification, idType, idNumber, skills, certifications: finalCertifications, idFile: idFileUrl },
-        create: { userId: user.id, qualification, idType, idNumber, skills, certifications: finalCertifications, idFile: idFileUrl, status: "PENDING" }
+        update: { qualification, idType, idNumber, skills, certifications: finalCertifications, idFile: idFileUrl, yearsOfExperience },
+        create: { userId: user.id, qualification, idType, idNumber, skills, certifications: finalCertifications, idFile: idFileUrl, status: "PENDING", yearsOfExperience }
       });
 
       if (skills.length > 0) {

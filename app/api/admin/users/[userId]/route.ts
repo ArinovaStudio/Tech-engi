@@ -73,6 +73,7 @@ const updateUserSchema = z.object({
   certifications: z.array(certificateSchema).optional(),
   approvalStatus: z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(), 
   rejectionReason: z.string().optional().nullable(),
+  yearsOfExperience: z.enum(["FRESHER", "ONE_TO_TWO_YEARS", "THREE_TO_FIVE_YEARS", "FIVE_TO_EIGHT_YEARS", "EIGHT_PLUS_YEARS"]).optional().nullable(),
   
   payoutDetail: z.object({
     preferredMethod: z.enum(["UPI", "BANK"]).optional(),
@@ -115,6 +116,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
         expertise: getJson("expertise"),
         skills: getJson("skills"),
         qualification: formData.get("qualification") || undefined,
+        yearsOfExperience: formData.get("yearsOfExperience") || undefined,
         idType: formData.get("idType") || undefined,
         idNumber: formData.get("idNumber") || undefined,
         certifications: getJson("certifications"),
@@ -132,7 +134,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
     const { 
       name, phone, bio, 
       expertise, skills, qualification, idType, idNumber, certifications, 
-      approvalStatus, rejectionReason, 
+      approvalStatus, rejectionReason, yearsOfExperience,
       payoutDetail 
     } = validation.data;
 
@@ -202,6 +204,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
                 qualification, 
                 idType,
                 idNumber,
+                yearsOfExperience,
                 certifications: finalCertifications !== undefined ? finalCertifications : undefined,
                 idFile: finalIdFileUrl !== undefined ? finalIdFileUrl : undefined,
                 status: approvalStatus, 
@@ -215,6 +218,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
                 rejectionReason: rejectionReason || null,
                 idType: idType || "PAN", 
                 idNumber: idNumber || "ADMIN_UPSERTED",
+                yearsOfExperience,
                 idFile: finalIdFileUrl || "ADMIN_UPSERTED",
                 certifications: finalCertifications || []
             }

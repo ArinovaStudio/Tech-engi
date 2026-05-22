@@ -13,7 +13,7 @@ export async function getTopMatches(projectId: string) {
   const vectorString = JSON.stringify(projectVector); 
 
   const candidatePool: any[] = await prisma.$queryRaw`
-    SELECT e.id, e.skills, e."completedProjects", e.qualification, e."createdAt"
+    SELECT e.id, e.skills, e."completedProjects", e.qualification, e."yearsOfExperience", e."createdAt"
     FROM "EngineerProfile" e
     JOIN "User" u ON e."userId" = u.id
     WHERE e.status = 'APPROVED'
@@ -59,13 +59,14 @@ export async function getTopMatches(projectId: string) {
 
     Evaluate these ${finalCandidates.length} highly relevant engineers and pick the top 5 absolute best matches:
     ${finalCandidates.map(e => 
-      `ID: ${e.id} | Skills: ${e.skills.join(", ")} | Qualification: ${e.qualification} | Completed Projects: ${e.completedProjects}`
+      `ID: ${e.id} | Skills: ${e.skills.join(", ")} | Qualification: ${e.qualification} | Experience: ${e.yearsOfExperience || 'Not Specified'} | Completed Projects: ${e.completedProjects}`
     ).join("\n")}
 
     Task Guidelines:
     1. Primary match is based on 'Skills' aligning with project 'Needs'.
     2. Consider their 'Qualification' level.
-    3. BALANCE EXPERIENCE: Try to select a mix of proven engineers (Completed Projects > 0) and highly-skilled newcomers (Completed Projects = 0) to give new talent a chance.
+    3. Consider 'Years of Experience' to gauge seniority.
+    4. BALANCE EXPERIENCE: Try to select a mix of proven engineers (Completed Projects > 0) and highly-skilled newcomers (Completed Projects = 0) to give new talent a chance.
 
     Task: Return a JSON object with a single key called "ids" containing an array of the 5 selected engineer IDs.
     Example: { "ids": ["id1", "id2", "id3"] }
@@ -79,14 +80,12 @@ export async function getTopMatches(projectId: string) {
     });
 
     const rawText = response.message.content;
-    
     const jsonMatch = rawText.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
     if (!jsonMatch) throw new Error("No JSON found in response");
 
     const result = JSON.parse(jsonMatch[0]);
     
     let matchedIds: string[] = [];
-    
     if (Array.isArray(result)) matchedIds = result;
     else if (result.ids && Array.isArray(result.ids)) matchedIds = result.ids;
     else {

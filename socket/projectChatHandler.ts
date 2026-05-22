@@ -69,7 +69,7 @@ export default function registerProjectChatHandlers(io: Server, socket: Socket) 
 
       await prisma.projectMessage.update({
         where: { id: data.messageId },
-        data: { isDeleted: true, content: "" }
+        data: { isDeleted: true, content: "", isEdited: false }
       });
 
       io.to(`project_${data.projectId}`).emit("project_message_deleted", { messageId: data.messageId });
@@ -107,7 +107,7 @@ export default function registerProjectChatHandlers(io: Server, socket: Socket) 
 
       await prisma.projectMessage.updateMany({
         where: deleteWhere,
-        data: { isDeleted: true, content: "" }
+        data: { isDeleted: true, content: "", isEdited: false }
       });
 
       io.to(`project_${data.projectId}`).emit("mass_project_deleted", { messageIds: data.messageIds });

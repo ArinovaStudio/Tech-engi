@@ -23,6 +23,14 @@ const ID_LABELS: Record<string, string> = {
   PAY_SLIP: "Pay Slip",
 };
 
+const EXPERIENCE_LEVELS = [
+  { value: "FRESHER", label: "Fresher" },
+  { value: "ONE_TO_TWO_YEARS", label: "1-2 Years" },
+  { value: "THREE_TO_FIVE_YEARS", label: "3-5 Years" },
+  { value: "FIVE_TO_EIGHT_YEARS", label: "5-8 Years" },
+  { value: "EIGHT_PLUS_YEARS", label: "8+ Years" },
+];
+
 interface CertificateData {
   name: string;
   file: File;
@@ -34,6 +42,7 @@ export default function EngineerFormPage() {
   const [idType, setIdType] = useState("");
   const [idNumber, setIdNumber] = useState("");
   const [idFile, setIdFile] = useState<File | null>(null);
+  const [yearsOfExperience, setYearsOfExperience] = useState("");
   
   const [skills, setSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState("");
@@ -106,6 +115,7 @@ export default function EngineerFormPage() {
     try {
       const formData = new FormData();
       formData.append("qualification", qualification);
+      formData.append("yearsOfExperience", yearsOfExperience);
       formData.append("idType", idType);
       formData.append("idNumber", cleanedId);
       formData.append("file", idFile);
@@ -169,6 +179,23 @@ export default function EngineerFormPage() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Years of Experience Dropdown */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-gray-700 ml-1">Years of Experience</label>
+            <select
+              value={yearsOfExperience}
+              onChange={(e) => setYearsOfExperience(e.target.value)}
+              className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
+            >
+              <option value="" disabled>Select experience level</option>
+              {EXPERIENCE_LEVELS.map((exp) => (
+                <option key={exp.value} value={exp.value}>
+                  {exp.label}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* ID Type */}

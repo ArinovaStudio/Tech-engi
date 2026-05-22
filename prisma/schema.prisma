@@ -79,6 +79,14 @@ enum IdType {
   PAY_SLIP
 }
 
+enum ExperienceLevel {
+  FRESHER
+  ONE_TO_TWO_YEARS
+  THREE_TO_FIVE_YEARS
+  FIVE_TO_EIGHT_YEARS
+  EIGHT_PLUS_YEARS
+}
+
 model  EngineerProfile {
   id     String @id @default(uuid())
   userId String @unique
@@ -89,6 +97,7 @@ model  EngineerProfile {
   idType          IdType
   idNumber        String
   idFile          String
+  yearsOfExperience ExperienceLevel?
 
   certifications    Json        @default("[]")
   skills            String[]

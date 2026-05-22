@@ -8,9 +8,18 @@ import DashboardShell from "@/components/layout/DashboardShell";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import { Loader2 } from "lucide-react";
+import TicketIssuesCard from "@/components/dashboard/TicketIssuesCard";
 
 export default function DashboardPage() {
   const { data, isLoading } = useSWR("/api/admin/dashboard", fetcher);
+  const {
+    data: projectTicketsData,
+    isLoading: ticketsLoading,
+  } = useSWR(
+    "/api/admin/project-tickets",
+    fetcher
+  );
+
 
   if (isLoading) {
     return (
@@ -24,6 +33,7 @@ export default function DashboardPage() {
 
   const stats = data?.stats || {};
   const charts = data?.charts || {};
+
 
   return (
     <DashboardShell>
@@ -40,7 +50,7 @@ export default function DashboardPage() {
       </div>
 
       {/* 6 Stat Cards */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      {/* <div className="flex gap-4 mb-6">
         <StatCard title="Total Projects" value={stats.totalProjects?.toString()} icon={<Briefcase size={16} />} />
         <StatCard title="Total Revenue" value={`₹${stats.totalRevenue?.toLocaleString()}`} icon={<ReceiptText size={16} />} />
         <StatCard title="Total Clients" value={stats.totalClients?.toString()} icon={<Users size={16} />} />
@@ -48,12 +58,64 @@ export default function DashboardPage() {
         <StatCard title="Ongoing Projects" value={stats.ongoingProjects?.toString()} icon={<Activity size={16} />} />
         <StatCard title="Completed Projects" value={stats.completedProjects?.toString()} icon={<CheckCircle size={16} />} />
         <StatCard title="Pending Revenue" value={`₹${stats.pendingRevenue?.toLocaleString()}`} icon={<Clock size={16} />} />
-      </div>
+      </div> */}
 
-      {/* Charts */}
-      <div className="grid grid-cols-2 gap-4">
-        <ProjectDistribution data={charts.projectDistribution} />
-        <RevenueChart data={charts.revenue} totalRevenue={stats.totalRevenue} />
+      <div className="flex flex-col">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-3">
+          <StatCard
+            title="Total Projects"
+            value="24"
+            highlighted
+            change="5%"
+            changeType="up"
+          />
+
+          <StatCard
+            title="Ended Projects"
+            value="10"
+            change="6%"
+            changeType="up"
+          />
+
+          <StatCard
+            title="Running Projects"
+            value="12"
+            change="2%"
+            changeType="up"
+          />
+
+          <StatCard
+            title="Pending Project"
+            value="2"
+            subtitle="On Discuss"
+          />
+        </div>
+
+        {/* Charts */}
+        <div className="flex py-2 pr-2">
+          <div className="w-[75%]">
+            <div className="flex justify-between  p-2 w-full h-[46%] gap-3 pr-4">
+              <RevenueChart data={charts.revenue} totalRevenue={stats.totalRevenue} />
+              <div className="bg-white w-[64%] rounded-2xl flex items-center justify-center">
+                <p className="text-bold text-2xl">hello</p>
+              </div>
+            </div>
+            <div className="flex justify-between px-2 w-full h-fit p-2">
+              <div className="bg-white w-[54%] rounded-2xl flex items-center justify-center">
+                <p className="text-bold text-2xl">hello</p>
+              </div>
+              <ProjectDistribution data={charts.projectDistribution} />
+            </div>
+          </div>
+
+          <div className="w-[25%] m-1 rounded-2xl flex items-center justify-center">
+            <TicketIssuesCard
+              projects={
+                projectTicketsData?.data || []
+              }
+            />
+          </div>
+        </div>
       </div>
     </DashboardShell>
   );

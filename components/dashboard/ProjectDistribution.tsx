@@ -6,8 +6,8 @@ import React from "react";
 // COLORS
 // ─────────────────────────────────────────────────────────
 const COLORS = {
-  completed: "#2d7d45",
-  progress: "#5cb86b",
+  completed: "#FFAE58",
+  progress: "#FFCB92",
   pending: "#c8c8c8",
 };
 
@@ -26,12 +26,13 @@ interface ProjectProgressGaugeProps {
 
 // ─────────────────────────────────────────────────────────
 // SVG CONFIG
+// BIGGER + CLEANER SCALE
 // ─────────────────────────────────────────────────────────
 const CONFIG = {
-  cx: 200,
-  cy: 170,
-  radius: 120,
-  strokeWidth: 38,
+  cx: 145,
+  cy: 125,
+  radius: 95,
+  strokeWidth: 32,
   startDeg: 180,
   totalArc: 180,
 };
@@ -88,16 +89,16 @@ function LegendItem({
   return (
     <>
       {!striped ? (
-        <circle cx={x} cy={y} r="6" fill={color} />
+        <circle cx={x} cy={y} r="5" fill={color} />
       ) : (
         <>
-          <circle cx={x} cy={y} r="6" fill="#e8e8e8" />
+          <circle cx={x} cy={y} r="5" fill="#e8e8e8" />
 
           <rect
-            x={x - 6}
-            y={y - 6}
-            width="12"
-            height="12"
+            x={x - 5}
+            y={y - 5}
+            width="10"
+            height="10"
             fill="url(#legendHatch)"
             clipPath="url(#legendClip)"
           />
@@ -105,18 +106,18 @@ function LegendItem({
           <circle
             cx={x}
             cy={y}
-            r="6"
+            r="5"
             fill="none"
             stroke="#c0c0c0"
-            strokeWidth="0.8"
+            strokeWidth="0.7"
           />
         </>
       )}
 
       <text
         x={x + 12}
-        y={y + 5}
-        fontSize="12"
+        y={y + 4}
+        fontSize="11"
         fill="#444"
         fontFamily="-apple-system,BlinkMacSystemFont,sans-serif"
       >
@@ -135,9 +136,9 @@ const ProjectProgressGauge: React.FC<
   label = "Project Ended",
 
   data = [
-    { name: "Completed", value: 62 },
-    { name: "In Progress", value: 10 },
-    { name: "Searching", value: 28 },
+    { name: "Completed", value: 0 },
+    { name: "In Progress", value: 0 },
+    { name: "Searching", value: 100 },
   ],
 }) => {
   // ───────────────────────────────────────────────────────
@@ -190,12 +191,12 @@ const ProjectProgressGauge: React.FC<
 
   return (
     <div className="gauge-card">
-      <p className="gauge-title">
+      <p className="gauge-title ">
         Project Progress
       </p>
 
       <svg
-        viewBox="0 0 400 230"
+        viewBox="0 0 290 205"
         className="gauge-svg"
       >
         {/* DEFINITIONS */}
@@ -204,17 +205,17 @@ const ProjectProgressGauge: React.FC<
           <pattern
             id="hatch"
             patternUnits="userSpaceOnUse"
-            width="8"
-            height="8"
+            width="6"
+            height="6"
             patternTransform="rotate(45)"
           >
             <line
               x1="0"
               y1="0"
               x2="0"
-              y2="8"
+              y2="6"
               stroke="#b0b0b0"
-              strokeWidth="3"
+              strokeWidth="2"
             />
           </pattern>
 
@@ -222,26 +223,26 @@ const ProjectProgressGauge: React.FC<
           <pattern
             id="legendHatch"
             patternUnits="userSpaceOnUse"
-            width="4"
-            height="4"
+            width="3"
+            height="3"
             patternTransform="rotate(45)"
           >
             <line
               x1="0"
               y1="0"
               x2="0"
-              y2="4"
+              y2="3"
               stroke="#aaa"
-              strokeWidth="1.5"
+              strokeWidth="1"
             />
           </pattern>
 
           {/* Legend Clip */}
           <clipPath id="legendClip">
             <circle
-              cx="298"
-              cy="220"
-              r="6"
+              cx="220"
+              cy="185"
+              r="5"
             />
           </clipPath>
         </defs>
@@ -259,7 +260,7 @@ const ProjectProgressGauge: React.FC<
         <path
           d={createArc(progressEnd, finalEnd)}
           fill="none"
-          stroke="#e0e0e0"
+          stroke="#ffffff"
           strokeWidth={CONFIG.strokeWidth}
           strokeLinecap="round"
         />
@@ -268,7 +269,7 @@ const ProjectProgressGauge: React.FC<
           d={createArc(progressEnd, finalEnd)}
           fill="none"
           stroke="url(#hatch)"
-          strokeWidth={CONFIG.strokeWidth + 3}
+          strokeWidth={CONFIG.strokeWidth + 2}
           strokeLinecap="round"
         />
 
@@ -312,10 +313,10 @@ const ProjectProgressGauge: React.FC<
         {/* PERCENTAGE */}
         <text
           x={CONFIG.cx}
-          y={CONFIG.cy - 10}
+          y={CONFIG.cy - 2}
           textAnchor="middle"
-          fontSize="42"
-          fontWeight="700"
+          fontSize="40"
+          fontWeight="400"
           fill="#1a1a1a"
           fontFamily="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
         >
@@ -325,7 +326,7 @@ const ProjectProgressGauge: React.FC<
         {/* LABEL */}
         <text
           x={CONFIG.cx}
-          y={CONFIG.cy + 18}
+          y={CONFIG.cy + 28}
           textAnchor="middle"
           fontSize="13"
           fill="#999"
@@ -336,22 +337,22 @@ const ProjectProgressGauge: React.FC<
 
         {/* LEGENDS */}
         <LegendItem
-          x={40}
-          y={220}
+          x={28}
+          y={185}
           label="Completed"
           color={COLORS.completed}
         />
 
         <LegendItem
-          x={158}
-          y={220}
+          x={118}
+          y={185}
           label="In Progress"
           color={COLORS.progress}
         />
 
         <LegendItem
-          x={298}
-          y={220}
+          x={220}
+          y={185}
           label="Pending"
           color={COLORS.pending}
           striped
@@ -362,12 +363,17 @@ const ProjectProgressGauge: React.FC<
         .gauge-card {
           display: flex;
           flex-direction: column;
+          align-items: center;
+          justify-content: center;
+
           background: #ffffff;
           border-radius: 14px;
-          padding: 22px 24px 18px;
-          box-shadow: 0 2px 14px rgba(0, 0, 0, 0.08);
-          width: 100%;
-          height: 100%;
+
+          padding: 12px;
+
+          width: 45%;
+          height: 40%;
+
           font-family:
             -apple-system,
             BlinkMacSystemFont,
@@ -376,14 +382,16 @@ const ProjectProgressGauge: React.FC<
         }
 
         .gauge-title {
-          margin: 0 0 4px;
-          font-size: 16px;
+          width: 100%;
+          margin: 0 0 6px;
+          font-size: 1.5rem;
           font-weight: 600;
           color: #1a1a1a;
         }
 
         .gauge-svg {
           width: 100%;
+          max-width: 460px;
           height: auto;
           display: block;
         }

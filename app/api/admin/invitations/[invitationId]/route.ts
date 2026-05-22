@@ -55,6 +55,7 @@ const adminActionSchema = z.object({
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ invitationId: string }> }) {
   try {
+    
     const { user, error } = await getAdmin();
     if (error || !user) {
       return NextResponse.json({ success: false, message: error || "Unauthorized" }, { status: 401 });

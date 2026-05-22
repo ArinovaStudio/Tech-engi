@@ -68,23 +68,23 @@ export default function RevenueChart({
   };
 
   return (
-    <div className="bg-white p-6 rounded-[28px] border border-[#EAEAEA] w-full shadow-[0_8px_30px_rgba(0,0,0,0.03)]">
+    <div className="bg-white p-6 rounded-[28px] border border-[#EAEAEA] w-full">
 
       {/* HEADER */}
-      <div className="flex items-start justify-between mb-6">
+      <div className="flex items-start justify-between mb-2">
 
         <div>
-          <h3 className="text-[15px] font-semibold text-black">
+          <h3 className="text-[1.3rem] font-semibold text-black">
             Revenue Overview
           </h3>
 
-          <h1 className="text-[42px] font-bold leading-none mt-3 text-black tracking-[-1.5px]">
+          <h1 className="text-[42px] font-medium leading-none mt-3 text-black tracking-[-1.5px] mb-5">
             ₹{totalRevenue?.toLocaleString() || "0"}
           </h1>
 
-          <p className="text-[13px] text-[#9F9F9F] mt-2 font-medium">
+          {/* <p className="text-[13px] text-[#9F9F9F] mt-2 font-medium">
             Total All Time
-          </p>
+          </p> */}
         </div>
 
         {/* FILTER */}
@@ -98,7 +98,7 @@ export default function RevenueChart({
 
             setStartIndex(0);
           }}
-          className="h-[42px] px-4 rounded-xl border border-[#E5E5E5] bg-white flex items-center gap-2 text-[14px] font-semibold capitalize shadow-[0_2px_10px_rgba(0,0,0,0.03)]"
+          className="h-[42px] px-4 rounded-xl border border-[#E5E5E5] bg-white flex items-center gap-2 text-[14px] font-semibold capitalize"
         >
           {period}
           <ChevronDown size={15} />
@@ -107,7 +107,7 @@ export default function RevenueChart({
       </div>
 
       {/* GRAPH */}
-      <div className="flex items-end gap-4 h-[240px] mt-10">
+      <div className="flex items-end gap-4 h-50">
 
         {/* LEFT BUTTON */}
         {period === "monthly" && (
@@ -142,7 +142,7 @@ export default function RevenueChart({
 
                 {/* TOOLTIP */}
                 {hoveredIndex === index && (
-                  <div className="absolute -top-16 z-20 bg-white border border-[#ECECEC] shadow-[0_10px_30px_rgba(0,0,0,0.08)] rounded-2xl px-4 py-3 min-w-[120px]">
+                  <div className="absolute -top-16 z-20 bg-white border border-[#ECECEC] rounded-2xl px-4 py-3 min-w-[120px]">
 
                     <p className="text-[13px] font-semibold text-black">
                       {item?.name}
@@ -191,7 +191,6 @@ export default function RevenueChart({
                       rounded-full
                       transition-all
                       duration-500
-                      shadow-[0_8px_20px_rgba(255,174,88,0.35)]
                     "
                     style={{
                       height: `${fillHeight}%`,

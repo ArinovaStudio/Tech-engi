@@ -21,7 +21,7 @@ export default function ProjectDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState("ALL_USERS");
   const [engineers, setEngineers] = useState<any[]>([]);
-  const [draggedInvitation, setDraggedInvitation] =
+  const [draggedItem, setDraggedItem] =
     useState<any | null>(null);
 
   const columns = [
@@ -106,8 +106,16 @@ export default function ProjectDetailsPage() {
     }
   };
 
-  const handleDragStart = (invitation: any) => {
-    setDraggedInvitation(invitation);
+  const handleDragStart = (
+    type: "ENGINEER" | "INVITATION",
+    data: any,
+    fromColumn: string
+  ) => {
+    setDraggedItem({
+      type,
+      data,
+      fromColumn,
+    });
   };
 
   const handleDragOver = (
@@ -116,69 +124,32 @@ export default function ProjectDetailsPage() {
     e.preventDefault();
   };
 
-  const handleDrop = async (
-    newColumn: string
+  const handleSendInvitation = async (
+    engineerId: string
   ) => {
-    if (!draggedInvitation) return;
-
-    const prevInvitations = [...invitations];
-
-    // UI UPDATE
-    setInvitations((prev) =>
-      prev.map((inv) => {
-        if (inv.id !== draggedInvitation.id)
-          return inv;
-
-        let updatedStatus = inv.status;
-
-        if (newColumn === "APPROVED") {
-          updatedStatus = "ACCEPTED";
-        }
-
-        if (newColumn === "REJECTED") {
-          updatedStatus = "REJECTED";
-        }
-
-        if (newColumn === "WAITING") {
-          updatedStatus = "PENDING_ADMIN";
-        }
-
-        return {
-          ...inv,
-          status: updatedStatus,
-        };
-      })
-    );
-
     try {
       await fetch(
-        `/api/admin/invitations/${draggedInvitation.id}`,
+        "/api/admin/invitations",
         {
-          method: "PATCH",
+          method: "POST",
+
           headers: {
             "Content-Type":
               "application/json",
           },
 
           body: JSON.stringify({
-            status: newColumn,
+            projectId,
+            engineerId,
           }),
         }
       );
-    } catch (err) {
-      console.error(err);
 
-      // ROLLBACK
-      setInvitations(prevInvitations);
+      fetchData();
+    } catch (error) {
+      console.error(error);
     }
-
-    setDraggedInvitation(null);
   };
-
-  useEffect(() => {
-    fetchData();
-    fetchEngineers();
-  }, []);
 
   const handleAction = async (
     invitationId: string,
@@ -195,6 +166,148 @@ export default function ProjectDetailsPage() {
       console.error(err);
     }
   };
+
+  const handleDrop = async (
+    newColumn: string
+  ) => {
+    if (!draggedItem) return;
+
+    const {
+      type,
+      data,
+      fromColumn,
+    } = draggedItem;
+    console.log(fromColumn);
+    console.log(newColumn);
+    try {
+
+      /*
+      =====================================
+      ENGINEER
+      =====================================
+      */
+
+      if (type === "ENGINEER") {
+
+        // ALL_USERS -> WAITING
+        // ALL_USERS -> APPROVED
+        // ALL_USERS -> REJECTED
+
+        if (
+          newColumn === "ALL_USERS"
+        ) {
+          return;
+        }
+
+        let status = "SENT";
+
+        if (
+          newColumn === "APPROVED"
+        ) {
+          status = "ACCEPTED";
+        }
+
+        if (
+          newColumn === "REJECTED"
+        ) {
+          status = "REJECTED";
+        }
+
+        await fetch(
+          "/api/admin/invitations",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+              projectId,
+
+              engineerId:
+                data.engineerProfile.id,
+
+              status,
+            }),
+          }
+        );
+
+        fetchData();
+      }
+
+      /*
+      =====================================
+      INVITATION
+      =====================================
+      */
+
+      if (
+        type === "INVITATION"
+      ) {
+
+        // WAITING -> ANYWHERE DISABLED
+        if (
+          fromColumn === "WAITING"
+        ) {
+          return;
+        }
+
+        // APPROVED -> ANYWHERE DISABLED
+        if (
+          fromColumn === "APPROVED"
+        ) {
+          return;
+        }
+
+        // REJECTED RULES
+        if (
+          fromColumn === "REJECTED"
+        ) {
+
+          // ONLY REJECTED -> WAITING
+          if (
+            newColumn !== "WAITING"
+          ) {
+            return;
+          }
+          console.log(data.id, "called from patch");
+
+          const res = await fetch(
+            `/api/admin/invitations/`,
+            {
+              method: "PATCH",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+
+              body: JSON.stringify({
+                status: "SENT",
+                id: data.id
+              }),
+            }
+          );
+          console.log(res, "response in patch");
+          
+          fetchData();
+
+          return;
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+    setDraggedItem(null);
+  };
+
+  useEffect(() => {
+    fetchData();
+    fetchEngineers();
+  }, []);
 
   if (loading) return <p className="p-6">Loading...</p>;
   if (!project) return <p className="p-6">Project not found</p>;
@@ -279,15 +392,27 @@ export default function ProjectDetailsPage() {
 
     //   </div>
     // </DashboardShell>
-    <div className="p-6">
-      <div className="grid grid-cols-4 gap-6">
+    <div className="p-6 h-screen overflow-hidden">
+      <div className="grid grid-cols-4 gap-6 h-full">
         {columns.map((column) => (
           <div
             key={column.id}
-            className="flex flex-col h-full"
+            className="flex flex-col h-full overflow-hidden"
           >
             {/* HEADER */}
-            <div className="flex items-center justify-between mb-4 pb-3 border-b border-[var(--border)]">
+            <div className="
+              sticky
+              top-0
+              z-10
+              flex
+              items-center
+              justify-between
+              mb-4
+              pb-3
+              bg-white
+              border-b
+              border-[var(--border)]
+            ">
               <div className="flex items-center gap-2">
                 <div
                   className={`
@@ -342,31 +467,51 @@ export default function ProjectDetailsPage() {
               onDragOver={handleDragOver}
               onDrop={() => handleDrop(column.id)}
               className={`
-    flex-1
-    min-h-[500px]
-    rounded-2xl
-    border-2
-    border-dashed
-    border-[var(--border)]
-    bg-[var(--bg)]
-    p-2
-    transition-colors
-    overflow-y-auto
-    ${draggedInvitation
+                flex-1
+                h-full
+                min-h-0
+                rounded-2xl
+                border-2
+                border-dashed
+                border-[var(--border)]
+                bg-[var(--bg)]
+                p-2
+                transition-colors
+                overflow-y-auto
+                ${draggedItem
                   ? "bg-white"
                   : ""
                 }
-  `}
+            `}
             >
               {column.id === "ALL_USERS" &&
-                engineers.map((engineer) => (
-                  <div
-                    key={engineer.id}
-                    draggable
-                    onDragStart={() =>
-                      handleDragStart(engineer)
-                    }
-                    className="
+                engineers
+                  .filter(
+                    (engineer) =>
+                      engineer.engineerProfile
+                  )
+                  .filter((engineer) => {
+                    const alreadyInvited =
+                      invitations.some(
+                        (invitation) =>
+                          invitation.engineerId ===
+                          engineer.engineerProfile.id
+                      );
+
+                    return !alreadyInvited;
+                  })
+                  .map((engineer) => (
+                    <div
+                      key={engineer.id}
+                      draggable
+                      onDragStart={() =>
+                        handleDragStart(
+                          "ENGINEER",
+                          engineer,
+                          "ALL_USERS"
+                        )
+                      }
+                      className="
           bg-white
           border
           border-[var(--border)]
@@ -378,72 +523,195 @@ export default function ProjectDetailsPage() {
           transition-all
           hover:shadow-sm
         "
-                  >
-                    {/* USER */}
-                    <div className="flex items-center gap-3">
+                    >
+                      {/* USER */}
+                      <div className="flex items-center gap-3">
 
-                      {/* IMAGE */}
-                      {engineer.image ? (
-                        <img
-                          src={engineer.image}
-                          alt={engineer.name}
-                          className="
+                        {/* IMAGE */}
+                        {engineer.image ? (
+                          <img
+                            src={engineer.image}
+                            alt={engineer.name}
+                            className="
                 w-12
                 h-12
                 rounded-full
                 object-cover
               "
+                          />
+                        ) : (
+                          <div
+                            className="
+                w-12
+                h-12
+                rounded-full
+                flex
+                items-center
+                justify-center
+                text-white
+                font-semibold
+                text-sm
+              "
+                            style={{
+                              background:
+                                "var(--primary)",
+                            }}
+                          >
+                            {engineer.name?.charAt(0)}
+                          </div>
+                        )}
+
+                        {/* INFO */}
+                        <div className="min-w-0 flex-1">
+                          <h3
+                            className="
+                font-semibold
+                text-[15px]
+                truncate
+                mb-1
+              "
+                            style={{
+                              color:
+                                "var(--text-primary)",
+                            }}
+                          >
+                            {engineer.name}
+                          </h3>
+
+                          <p
+                            className="
+                text-[11px]
+                font-medium
+              "
+                            style={{
+                              color:
+                                "var(--text-muted)",
+                            }}
+                          >
+                            {
+                              engineer
+                                .engineerProfile
+                                ?.qualification
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+              {column.id !== "ALL_USERS" &&
+                getInvitationsByStatus(
+                  column.id
+                ).map((invitation) => (
+                  <div
+                    key={invitation.id}
+
+                    draggable={
+                      column.id ===
+                      "REJECTED"
+                    }
+
+                    onDragStart={() =>
+                      handleDragStart(
+                        "INVITATION",
+                        invitation,
+                        column.id
+                      )
+                    }
+
+                    className="
+        bg-white
+        border
+        border-[var(--border)]
+        rounded-2xl
+        p-4
+        mb-3
+        transition-all
+      "
+                  >
+
+                    <div className="flex items-center gap-3">
+
+                      {/* IMAGE */}
+                      {invitation.engineer.user
+                        .image ? (
+                        <img
+                          src={
+                            invitation.engineer
+                              .user.image
+                          }
+                          alt={
+                            invitation.engineer
+                              .user.name
+                          }
+                          className="
+              w-12
+              h-12
+              rounded-full
+              object-cover
+            "
                         />
                       ) : (
                         <div
                           className="
-                          w-12
-                          h-12
-                          rounded-full
-                          flex
-                          items-center
-                          justify-center
-                        text-white
-                          font-semibold
-                          text-sm
-                            "
+              w-12
+              h-12
+              rounded-full
+              flex
+              items-center
+              justify-center
+              text-white
+              font-semibold
+              text-sm
+            "
                           style={{
                             background:
                               "var(--primary)",
                           }}
                         >
-                          {engineer.name?.charAt(0)}
+                          {invitation.engineer.user.name?.charAt(
+                            0
+                          )}
                         </div>
                       )}
 
                       {/* INFO */}
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
+
                         <h3
                           className="
-                            font-semibold
-                            text-sm
-                            truncate
-                            "
+              font-semibold
+              text-[15px]
+              truncate
+              mb-1
+            "
                           style={{
                             color:
                               "var(--text-primary)",
                           }}
                         >
-                          {engineer.name}
+                          {
+                            invitation.engineer
+                              .user.name
+                          }
                         </h3>
 
                         <p
                           className="
-                            text-xs
-                            truncate
-                            "
+              text-[11px]
+              font-medium
+            "
                           style={{
                             color:
                               "var(--text-muted)",
                           }}
                         >
-                          {engineer.email}
+                          {
+                            invitation.engineer
+                              .qualification
+                          }
                         </p>
+
                       </div>
                     </div>
                   </div>

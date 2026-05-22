@@ -3,15 +3,24 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Briefcase, Loader2, X, Plus } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
 
 export default function ClientFormPage() {
   const router = useRouter();
+  const { status } = useSession();
   const [totalProjects, setTotalProjects] = useState("");
   const [totalBudget, setTotalBudget] = useState("");
   const [expertise, setExpertise] = useState<string[]>([]);
   const [expertiseInput, setExpertiseInput] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/register/client");
+    }
+  }, [status, router]);
 
   const addExpertise = () => {
     const val = expertiseInput.trim();
@@ -51,6 +60,18 @@ export default function ClientFormPage() {
       setIsLoading(false);
     }
   };
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-[#f8fafd] flex items-center justify-center">
+        <Loader2 className="animate-spin h-8 w-8 text-[#f0b31e]" />
+      </div>
+    );
+  }
+
+  if (status === "unauthenticated") {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-[#f8fafd] flex flex-col justify-center items-center p-4 font-sans">

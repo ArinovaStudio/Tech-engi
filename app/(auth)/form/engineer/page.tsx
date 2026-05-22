@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Wrench, Loader2, X, Plus, Upload, FileText } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 const QUALIFICATIONS = [
   { value: "UG", label: "Under Graduate (Student)" },
@@ -38,6 +39,7 @@ interface CertificateData {
 
 export default function EngineerFormPage() {
   const router = useRouter();
+  const { status } = useSession();
   const [qualification, setQualification] = useState("");
   const [idType, setIdType] = useState("");
   const [idNumber, setIdNumber] = useState("");
@@ -53,6 +55,12 @@ export default function EngineerFormPage() {
   
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/register/engineer");
+    }
+  }, [status, router]);
 
   const addSkill = () => {
     const val = skillInput.trim();
@@ -141,6 +149,18 @@ export default function EngineerFormPage() {
       setIsLoading(false);
     }
   };
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-[#f8fafd] flex items-center justify-center">
+        <Loader2 className="animate-spin h-8 w-8 text-[#f0b31e]" />
+      </div>
+    );
+  }
+
+  if (status === "unauthenticated") {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-[#f8fafd] flex flex-col justify-center items-center p-4 font-sans">

@@ -11,20 +11,19 @@ import {
   EyeOff,
   User,
   Loader2,
-  Briefcase,
+  Wrench,
   KeyRound,
   ArrowLeft
 } from "lucide-react";
 
-export default function RegisterPage() {
+export default function EngineerRegisterPage() {
   const router = useRouter();
   const [step, setStep] = useState<1 | 2>(1);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState(""); 
-  const [role, setRole] = useState<"CLIENT" | "ENGINEER">("CLIENT");
+  const [confirmPassword, setConfirmPassword] = useState("");
   
   const [otpCode, setOtpCode] = useState("");
 
@@ -52,11 +51,10 @@ export default function RegisterPage() {
     }
 
     try {
-      // Register the user
       const registerRes = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, role }),
+        body: JSON.stringify({ name, email, password, role: "ENGINEER" }),
       });
 
       const registerData = await registerRes.json();
@@ -123,13 +121,7 @@ export default function RegisterPage() {
         throw new Error("Verified, but failed to log in automatically.");
       }
 
-      // Redirect based on role
-      if (role === "ENGINEER") {
-        router.push("/form/engineer");
-      } else {
-        router.push("/form/client");
-      }
-      router.refresh();
+      window.location.href = "/api/auth/role-redirect";
 
     } catch (err: any) {
       setError(err.message);
@@ -140,10 +132,9 @@ export default function RegisterPage() {
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);
-      document.cookie = `oauth_role=${role}; path=/; max-age=120`;
+      document.cookie = `oauth_role=ENGINEER; path=/; max-age=120`;
       
-      const callbackUrl = role === "ENGINEER" ? "/form/engineer" : "/form/client";
-      await signIn("google", { callbackUrl });
+      await signIn("google", { callbackUrl: "/api/auth/role-redirect" });
       
     } catch (err: any) {
       setError("Google sign in failed");
@@ -178,43 +169,16 @@ export default function RegisterPage() {
         {/* Step 1: Registration Form */}
         {step === 1 && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            {/* Logo & Header */}
             <div className="text-center mb-8">
               <div className="flex h-14 w-14 items-center justify-center rounded-[1rem] bg-[#f0b31e] shadow-lg shadow-yellow-500/30 mx-auto mb-4">
-                <Briefcase className="h-7 w-7 text-white" />
+                <Wrench className="h-7 w-7 text-white" />
               </div>
               <h1 className="text-2xl font-bold text-[#0f172a] tracking-tight">
-                Create Account
+                Engineer Registration
               </h1>
               <p className="text-gray-500 mt-2 text-sm">
-                Join our platform to get started
+                Join to find projects and showcase your skills
               </p>
-            </div>
-
-            {/* Role Tabs */}
-            <div className="flex p-1 mb-6 bg-gray-50 rounded-xl border border-gray-100">
-              <button
-                type="button"
-                onClick={() => setRole("CLIENT")}
-                className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
-                  role === "CLIENT"
-                    ? "bg-white text-[#f0b31e] shadow-sm border border-gray-100"
-                    : "text-gray-400 hover:text-gray-600"
-                }`}
-              >
-                Client
-              </button>
-              <button
-                type="button"
-                onClick={() => setRole("ENGINEER")}
-                className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
-                  role === "ENGINEER"
-                    ? "bg-white text-[#f0b31e] shadow-sm border border-gray-100"
-                    : "text-gray-400 hover:text-gray-600"
-                }`}
-              >
-                Engineer
-              </button>
             </div>
 
             {error && (
@@ -224,7 +188,6 @@ export default function RegisterPage() {
             )}
 
             <form onSubmit={handleRegister} className="space-y-4">
-              {/* Name */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700 ml-1">Full Name</label>
                 <div className="relative">
@@ -242,7 +205,6 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {/* Email */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700 ml-1">Email Address</label>
                 <div className="relative">
@@ -260,7 +222,6 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {/* Password */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700 ml-1">Password</label>
                 <div className="relative">
@@ -285,7 +246,6 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {/* Confirm Password */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700 ml-1">Confirm Password</label>
                 <div className="relative">
@@ -319,7 +279,6 @@ export default function RegisterPage() {
               </button>
             </form>
 
-            {/* Divider */}
             <div className="relative my-7">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-100"></div>
@@ -331,7 +290,6 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Google Sign In Button */}
             <button
               onClick={handleGoogleSignIn}
               disabled={isLoading}
@@ -368,7 +326,6 @@ export default function RegisterPage() {
             </button>
 
             <div className="text-center mb-8 mt-4">
-              {/* UPDATED UI: Aligned with primary brand colors */}
               <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#f0b31e]/10 mx-auto mb-6">
                 <KeyRound className="h-8 w-8 text-[#f0b31e]" />
               </div>
@@ -424,7 +381,6 @@ export default function RegisterPage() {
             </div>
           </div>
         )}
-
       </div>
     </div>
   );

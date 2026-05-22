@@ -32,29 +32,16 @@ export default function LoginPage() {
         return;
       }
 
-      const session = await getSession();
+      window.location.href = "/api/auth/role-redirect";
       
-      if (session?.user?.role === "ADMIN") {
-        router.push("/admin");
-      } 
-      else if (session?.user?.role === "ENGINEER") {
-        router.push("/engineer");
-      } 
-      else if (session?.user?.role === "CLIENT") {
-        router.push("/client"); 
-      }
-      else {
-        router.push("/");
-      }
-      
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred. Please try again.");
       setLoading(false);
     }
   };
 
   const handleGoogleLogin = () => {
-    signIn("google", { callbackUrl: "/" });
+    signIn("google", { callbackUrl: "/api/auth/role-redirect" });
   };
 
   return (

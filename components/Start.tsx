@@ -271,10 +271,10 @@ const Start = () => {
               Tech-ENGI connects students with skilled builders who turns your ideas, assignments and projects into ready-to-submit work fast!
             </p>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center font-inter gap-3 w-full sm:w-auto">
-              <Link href={'form/engineer'} className="px-6 py-4 text-[16px] font-bold text-gray-900 bg-[#F4F4F4] whitespace-nowrap text-center">
+              <Link href={'register/engineer'} className="px-6 py-4 text-[16px] font-bold text-gray-900 bg-[#F4F4F4] whitespace-nowrap text-center">
                 BECOME BUILDER
               </Link>
-              <Link href={'form/client'} className="px-6 py-4 text-[16px] font-bold bg-black text-white flex items-center justify-center gap-2 hover:bg-gray-800 whitespace-nowrap">
+              <Link href={'register/client'} className="px-6 py-4 text-[16px] font-bold bg-black text-white flex items-center justify-center gap-2 hover:bg-gray-800 whitespace-nowrap">
                 START MY PROJECT <span>↗</span>
               </Link>
             </div>

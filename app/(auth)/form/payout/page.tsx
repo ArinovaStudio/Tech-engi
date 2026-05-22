@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Wallet, Loader2 } from "lucide-react";
 
 export default function PayoutFormPage() {
-  const router = useRouter();
   const [method, setMethod] = useState<"UPI" | "BANK">("UPI");
   const [upiId, setUpiId] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
@@ -75,8 +73,7 @@ export default function PayoutFormPage() {
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.message);
 
-      router.push("/");
-      router.refresh();
+      window.location.href = "/api/auth/role-redirect";
     } catch (err: any) {
       setError(err.message);
       setIsLoading(false);
@@ -198,7 +195,7 @@ export default function PayoutFormPage() {
 
           <button
             type="button"
-            onClick={() => { router.push("/"); router.refresh(); }}
+            onClick={() => { window.location.href = "/api/auth/role-redirect"; }}
             className="w-full h-10 text-sm text-gray-400 hover:text-gray-600 transition-colors"
           >
             Skip for now

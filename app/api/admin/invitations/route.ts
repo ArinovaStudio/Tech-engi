@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAdmin } from "@/lib/auth";
 
+interface Params {
+  params: Promise<{
+    id: string;
+  }>;
+}
+
+
 export async function GET(req: NextRequest) {
   try {
     const { user, error } = await getAdmin();
@@ -226,6 +233,56 @@ export async function PATCH(req: NextRequest) {
       {
         status: 500,
       }
+    );
+  }
+}
+
+/*
+=====================================
+DELETE INVITATION
+=====================================
+*/
+
+export async function DELETE(req: NextRequest) {
+
+  try {
+    const body = await req.json();
+
+    const { id } = body;
+
+    if (!id) {
+      return NextResponse.json({ success: false, message: "Invitation id required", }, { status: 400, });
+    }
+
+    const invitation =
+      await prisma.projectInvitation.findUnique({
+        where: {
+          id,
+        },
+      });
+
+    if (!invitation) {
+
+      return NextResponse.json(
+        { success: false, message: "Invitation not found", }, { status: 404, });
+    }
+
+    await prisma.projectInvitation.delete({
+      where: {
+        id,
+      },
+    });
+
+    return NextResponse.json(
+      { success: true, message: "Invitation deleted successfully", }, { status: 200, }
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    return NextResponse.json(
+      { success: false, message: "Internal server error", }, { status: 500, }
     );
   }
 }

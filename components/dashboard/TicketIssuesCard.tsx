@@ -93,7 +93,7 @@ export default function TicketIssuesCard({
     );
 
     return (
-        <div className="bg-white w-full self-start rounded-[28px] border border-[#ECECEC] p-5 h-full overflow-hidden flex flex-col">
+        <div className="bg-white w-full  self-start rounded-[28px] border border-[#ECECEC] p-5 h-screen overflow-hidden flex flex-col">
             {/* HEADER */}
             <div className="flex items-center justify-between mb-6">
                 <div>
@@ -102,7 +102,7 @@ export default function TicketIssuesCard({
                     </h2>
 
                     <p className="text-[13px] text-[#8B8B8B] mt-1">
-                        Projects with active tickets
+                    active tickets {allTickets.length}
                     </p>
                 </div>
 

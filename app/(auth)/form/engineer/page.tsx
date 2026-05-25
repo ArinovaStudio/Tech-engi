@@ -12,7 +12,7 @@ const QUALIFICATIONS = [
 ];
 
 const ID_TYPES: Record<string, string[]> = {
-  UG: ["STUDENT_ID","AADHAAR", "PAN"],
+  UG: ["STUDENT_ID", "AADHAAR", "PAN"],
   EMPLOYED: ["AADHAAR", "PAN", "PAY_SLIP"],
   UNEMPLOYED: ["AADHAAR", "PAN"],
 };
@@ -45,14 +45,14 @@ export default function EngineerFormPage() {
   const [idNumber, setIdNumber] = useState("");
   const [idFile, setIdFile] = useState<File | null>(null);
   const [yearsOfExperience, setYearsOfExperience] = useState("");
-  
+
   const [skills, setSkills] = useState<string[]>([]);
   const [skillInput, setSkillInput] = useState("");
-  
+
   const [certifications, setCertifications] = useState<CertificateData[]>([]);
   const [certInput, setCertInput] = useState("");
   const [certFile, setCertFile] = useState<File | null>(null);
-  
+
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -128,7 +128,7 @@ export default function EngineerFormPage() {
       formData.append("idNumber", cleanedId);
       formData.append("file", idFile);
       formData.append("skills", JSON.stringify(skills));
-      
+
       const mappedCertifications = certifications.map((cert, index) => {
         formData.append(`certFile_${index}`, cert.file);
         return { name: cert.name, fileIndex: index };
@@ -163,206 +163,379 @@ export default function EngineerFormPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafd] flex flex-col justify-center items-center p-4 font-sans">
-      <div className="w-full max-w-[480px] bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8 sm:p-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="text-center mb-8">
-          <div className="flex h-14 w-14 items-center justify-center rounded-[1rem] bg-[#f0b31e] shadow-lg shadow-yellow-500/30 mx-auto mb-4">
-            <Wrench className="h-7 w-7 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-[#0f172a] tracking-tight">Complete Your Profile</h1>
-          <p className="text-gray-500 mt-2 text-sm">We need a few details to verify your account</p>
-        </div>
+    <div className="flex w-full h-screen">
+      <div className="w-[50%] h-screen">
+        <div className=" flex items-center justify-center px-4 py-8 font-sans w-full">
 
-        {error && (
-          <div className="mb-6 text-red-500 text-sm font-medium text-center bg-red-50 p-3 rounded-xl border border-red-100">
-            {error}
-          </div>
-        )}
+          {/* Increased around 30% from previous small version */}
+          <div className="w-full max-w-[430px] scale-[0.95] origin-top">
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Qualification */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-gray-700 ml-1">Qualification</label>
-            <div className="flex gap-2">
-              {QUALIFICATIONS.map((q) => (
-                <button
-                  key={q.value}
-                  type="button"
-                  onClick={() => handleQualificationChange(q.value)}
-                  className={`flex-1 py-2 px-2 text-xs font-semibold rounded-xl border transition-all ${
-                    qualification === q.value
-                      ? "bg-[#f0b31e] text-white border-[#f0b31e] shadow-sm"
-                      : "bg-gray-50 text-gray-500 border-gray-200 hover:border-[#f0b31e]"
-                  }`}
+            {/* Header */}
+            <div className="mb-10">
+              <h1 className="text-[42px] leading-[1] font-black tracking-[-1.8px] text-[#0F172A] flex items-center gap-2">
+                Hey, Join us Today!
+                <span className="text-2xl">👀</span>
+              </h1>
+
+              <p className="text-[#7B6A42] text-[15px] leading-[1.5] mt-4 max-w-[360px] font-medium">
+                Today is a new day. It's your day. You shape it.
+                Sign in to start connection with other business.
+              </p>
+            </div>
+
+            {/* Progress */}
+            <div className="relative mb-10 px-1">
+
+              {/* Line */}
+              <div className="absolute top-3.5 left-0 right-0 h-[2px] bg-[#F0B31E]" />
+
+              <div className="relative flex justify-between items-center">
+
+                {/* Step 1 */}
+                <div className="flex flex-col items-start">
+                  <div className="w-7 h-7 rounded-full bg-[#F0B31E] text-white flex items-center justify-center text-[12px] font-semibold shadow-md shadow-yellow-500/30">
+                    1
+                  </div>
+
+                  <p className="text-[10px] text-[#C98F00] mt-2 font-medium">
+                    Basic Credentials
+                  </p>
+                </div>
+
+                {/* Step 2 */}
+                <div className="flex flex-col items-end">
+                  <div className="w-7 h-7 rounded-full bg-[#F0B31E] text-white flex items-center justify-center text-[12px] font-semibold shadow-md shadow-yellow-500/30">
+                    2
+                  </div>
+
+                  <p className="text-[10px] text-[#C98F00] mt-2 font-medium">
+                    Company Details
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Form */}
+            <form className="space-y-6">
+
+              {/* Qualification */}
+              <div className="space-y-2">
+                <label className="text-[15px] font-semibold text-[#111827]">
+                  Qualification
+                </label>
+
+                <div className="flex gap-3">
+                  {QUALIFICATIONS.map((q) => (
+                    <button
+                      key={q.value}
+                      type="button"
+                      onClick={() => handleQualificationChange(q.value)}
+                      className={`flex-1 h-[52px] rounded-[16px] border text-[13px] font-semibold transition-all ${qualification === q.value
+                        ? "bg-[#F0B31E] text-white border-[#F0B31E] shadow-lg shadow-yellow-500/20"
+                        : "bg-[#FFF9EA] border-[#F4E4B3] text-[#8A7440]"
+                        }`}
+                    >
+                      {q.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Experience */}
+              <div className="space-y-2">
+                <label className="text-[15px] font-semibold text-[#111827]">
+                  Years of Experience
+                </label>
+
+                <select
+                  value={yearsOfExperience}
+                  onChange={(e) => setYearsOfExperience(e.target.value)}
+                  className="w-full h-[56px] px-5 rounded-[16px] border border-[#F1E2B0] bg-[#FFF9EA] text-[#8A7440] text-[14px] outline-none focus:border-[#F0B31E]"
                 >
-                  {q.label}
-                </button>
-              ))}
-            </div>
-          </div>
+                  <option value="" disabled>
+                    Select experience level
+                  </option>
 
-          {/* Years of Experience Dropdown */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-gray-700 ml-1">Years of Experience</label>
-            <select
-              value={yearsOfExperience}
-              onChange={(e) => setYearsOfExperience(e.target.value)}
-              className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
-            >
-              <option value="" disabled>Select experience level</option>
-              {EXPERIENCE_LEVELS.map((exp) => (
-                <option key={exp.value} value={exp.value}>
-                  {exp.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* ID Type */}
-          {qualification && (
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium text-gray-700 ml-1">ID Type</label>
-              <div className="flex flex-wrap gap-2">
-                {ID_TYPES[qualification].map((type) => (
-                  <button
-                    key={type}
-                    type="button"
-                    onClick={() => { setIdType(type); setIdNumber(""); setError(""); }}
-                    className={`py-2 px-4 text-xs font-semibold rounded-xl border transition-all ${
-                      idType === type
-                        ? "bg-[#f0b31e] text-white border-[#f0b31e] shadow-sm"
-                        : "bg-gray-50 text-gray-500 border-gray-200 hover:border-[#f0b31e]"
-                    }`}
-                  >
-                    {ID_LABELS[type]}
-                  </button>
-                ))}
+                  {EXPERIENCE_LEVELS.map((exp) => (
+                    <option key={exp.value} value={exp.value}>
+                      {exp.label}
+                    </option>
+                  ))}
+                </select>
               </div>
-            </div>
-          )}
 
-          {/* ID Number */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-gray-700 ml-1">ID Number</label>
-            <input
-              type="text"
-              required
-              value={idNumber}
-              onChange={(e) => setIdNumber(e.target.value.toUpperCase())}
-              placeholder={idType === "PAN" ? "ABCDE1234F" : idType === "AADHAAR" ? "12 Digit Number" : "Enter your ID number"}
-              className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black uppercase"
-            />
-          </div>
+              {/* ID Type */}
+              {qualification && (
+                <div className="space-y-2">
+                  <label className="text-[15px] font-semibold text-[#111827]">
+                    ID Type
+                  </label>
 
-          {/* ID File Upload */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-gray-700 ml-1">Upload ID Document</label>
-            <label className="flex items-center gap-3 w-full h-12 px-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 hover:border-[#f0b31e] hover:bg-yellow-50 cursor-pointer transition-all">
-              <Upload className="h-4 w-4 text-gray-400 shrink-0" />
-              <span className="text-sm text-gray-500 truncate">
-                {idFile ? idFile.name : "Click to upload (JPG, PNG, PDF)"}
-              </span>
-              <input
-                type="file"
-                accept="image/*,.pdf"
-                className="hidden"
-                onChange={(e) => setIdFile(e.target.files?.[0] || null)}
-              />
-            </label>
-          </div>
+                  <div className="flex flex-wrap gap-3">
+                    {ID_TYPES[qualification].map((type) => (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => {
+                          setIdType(type);
+                          setIdNumber("");
+                          setError("");
+                        }}
+                        className={`px-5 h-[46px] rounded-[16px] border text-[12px] font-semibold transition-all ${idType === type
+                          ? "bg-[#F0B31E] text-white border-[#F0B31E] shadow-lg shadow-yellow-500/20"
+                          : "bg-[#FFF9EA] border-[#F4E4B3] text-[#8A7440]"
+                          }`}
+                      >
+                        {ID_LABELS[type]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-          {/* Skills */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-gray-700 ml-1">Skills</label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={skillInput}
-                onChange={(e) => setSkillInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addSkill(); } }}
-                placeholder="e.g. Arduino, PCB Design"
-                className="flex-1 px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
-              />
-              <button
-                type="button"
-                onClick={addSkill}
-                className="h-12 w-12 flex items-center justify-center rounded-xl bg-[#f0b31e] text-white hover:bg-[#e0a61a] transition-colors"
-              >
-                <Plus className="h-5 w-5" />
-              </button>
-            </div>
-            {skills.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
-                {skills.map((tag) => (
-                  <span key={tag} className="flex items-center gap-1 px-3 py-1 bg-yellow-50 border border-yellow-200 text-yellow-800 text-xs font-medium rounded-full">
-                    {tag}
-                    <button type="button" onClick={() => setSkills(skills.filter(t => t !== tag))}><X className="h-3 w-3" /></button>
-                  </span>
-                ))}
+              {/* ID Number */}
+              <div className="space-y-2">
+                <label className="text-[15px] font-semibold text-[#111827]">
+                  ID Number
+                </label>
+
+                <input
+                  type="text"
+                  required
+                  value={idNumber}
+                  onChange={(e) => setIdNumber(e.target.value.toUpperCase())}
+                  placeholder={
+                    idType === "PAN"
+                      ? "ABCDE1234F"
+                      : idType === "AADHAAR"
+                        ? "12 Digit Number"
+                        : "Enter your ID number"
+                  }
+                  className="w-full h-[56px] px-5 rounded-[16px] border border-[#F1E2B0] bg-[#FFF9EA] text-[#8A7440] text-[14px] outline-none focus:border-[#F0B31E]"
+                />
               </div>
-            )}
-          </div>
 
-          {/* Certifications & Proofs */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-gray-700 ml-1">Certifications & Proofs</label>
-            <div className="flex flex-col gap-2">
-              <input
-                type="text"
-                value={certInput}
-                onChange={(e) => setCertInput(e.target.value)}
-                placeholder="e.g. AWS Certified Developer"
-                className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
-              />
-              <div className="flex gap-2">
-                <label className="flex-1 flex items-center justify-center gap-2 h-12 rounded-xl border border-dashed border-gray-300 bg-gray-50 hover:border-[#f0b31e] hover:bg-yellow-50 cursor-pointer transition-all px-4 overflow-hidden">
-                  <FileText className="h-4 w-4 text-gray-400 shrink-0" />
-                  <span className="text-sm text-gray-500 truncate">
-                    {certFile ? certFile.name : "Upload Proof (PDF/JPG)"}
+              {/* Upload */}
+              <div className="space-y-2">
+                <label className="text-[15px] font-semibold text-[#111827]">
+                  Upload ID Document
+                </label>
+
+                <label className="w-full h-[56px] rounded-[16px] border border-[#F1E2B0] bg-[#FFF9EA] flex items-center px-5 cursor-pointer">
+
+                  <Upload className="h-4 w-4 text-[#B08D32]" />
+
+                  <span className="ml-3 text-[#8A7440] text-[13px] truncate">
+                    {idFile ? idFile.name : "Click to upload (JPG, PNG, PDF)"}
                   </span>
+
                   <input
                     type="file"
                     accept="image/*,.pdf"
                     className="hidden"
-                    onChange={(e) => setCertFile(e.target.files?.[0] || null)}
+                    onChange={(e) => setIdFile(e.target.files?.[0] || null)}
                   />
                 </label>
-                <button
-                  type="button"
-                  onClick={addCertificate}
-                  className="h-12 w-12 shrink-0 flex items-center justify-center rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
-                >
-                  <Plus className="h-5 w-5" />
-                </button>
               </div>
-            </div>
 
-            {/* Display Added Certifications */}
-            {certifications.length > 0 && (
-              <div className="flex flex-col gap-2 mt-3">
-                {certifications.map((cert, idx) => (
-                  <div key={idx} className="flex items-center justify-between px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg">
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-xs font-semibold text-gray-700 truncate">{cert.name}</span>
-                      <span className="text-[10px] text-gray-400 truncate">{cert.file.name}</span>
-                    </div>
-                    <button type="button" onClick={() => removeCertificate(idx)} className="p-1 text-gray-400 hover:text-red-500 transition-colors shrink-0">
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
+              {/* Skills */}
+              <div className="space-y-2">
+                <label className="text-[15px] font-semibold text-[#111827]">
+                  Skills
+                </label>
+
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    value={skillInput}
+                    onChange={(e) => setSkillInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addSkill();
+                      }
+                    }}
+                    placeholder="e.g. Arduino, PCB Design"
+                    className="flex-1 h-[56px] px-5 rounded-[16px] border border-[#F1E2B0] bg-[#FFF9EA] text-[#8A7440] text-[14px] outline-none focus:border-[#F0B31E]"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={addSkill}
+                    className="w-[56px] h-[56px] rounded-[16px] bg-[#F0B31E] text-white flex items-center justify-center shadow-lg shadow-yellow-500/25"
+                  >
+                    <Plus className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
-            )}
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={isLoading || !qualification || !idType}
+                className="
+    w-full
+    h-[62px]
+    mt-7
+    rounded-[18px]
+    bg-[#F0B31E]
+    hover:bg-[#DE9F08]
+    text-white
+    text-[19px]
+    font-semibold
+    transition-all
+    shadow-[0_10px_30px_rgba(240,179,30,0.35)]
+    disabled:opacity-60
+    disabled:cursor-not-allowed
+  "
+              >
+                {isLoading ? (
+                  <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+                ) : (
+                  "Sign in"
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div className="w-full rounded-[40px] relative overflow-hidden p-10 flex flex-col justify-between m-6">
+
+        {/* MAIN YELLOW GRADIENT LIKE REFERENCE IMAGE */}
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,#FFF6D6_0%,#F8D978_18%,#F0B31E_45%,#E8A400_65%,#FFF1C2_100%)]" />
+
+        {/* Soft White Glow Top Left */}
+        <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-white/10 blur-[140px] rounded-full" />
+        <div className="absolute -top-32 -right-32 w-[600px] h-[600px] bg-white/50 blur-[140px] rounded-full" />
+
+        {/* Warm Golden Glow Center */}
+        <div className="absolute top-[20%] left-[20%] w-[500px] h-[500px] bg-[#FFD65C]/40 blur-[120px] rounded-full" />
+
+        {/* Light Cream Glow Right */}
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#FFF3CF]/60 blur-[140px] rounded-full" />
+
+        {/* Grain Texture */}
+        <div className="absolute inset-0 opacity-[0.12] mix-blend-soft-light bg-[url('https://www.transparenttextures.com/patterns/noise.png')]" />
+
+        {/* Overlay Fade */}
+        <div className="absolute inset-0 bg-white/[0.08]" />
+
+        {/* Content */}
+        <div className="relative z-10 flex flex-col h-full ">
+
+         <div className="mt-20">
+           {/* Logo */}
+          <div className="w-24 h-24 bg-white rounded-sm flex items-center justify-center text-black font-bold text-sm shadow-xl">
+            LOGO
           </div>
 
-          <button
-            type="submit"
-            disabled={isLoading || !qualification || !idType}
-            className="w-full h-12 mt-2 bg-[#f0b31e] hover:bg-[#e0a61a] text-white rounded-xl text-base font-semibold shadow-md shadow-yellow-500/20 transition-all flex justify-center items-center disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Submit for Review"}
-          </button>
-        </form>
+          {/* Hero */}
+          <div className="mt-12">
+            <h1 className="text-white text-7xl font-extrabold tracking-tight leading-none">
+              TECH ENGI
+            </h1>
+
+            <p className="text-white/85 text-lg max-w-xl mt-4 leading-relaxed">
+              Lorem ipsum dolor sit amet consectetur. Suscipit sed amet commodo vel
+              ultrices tortor orci. Enim lectus turpis augue donec. Gravida non
+            </p>
+          </div>
+         </div>
+
+          {/* Bottom */}
+          {/* Bottom Section */}
+<div className="mt-auto pt-28">
+
+  {/* Testimonials */}
+  <div className="flex gap-6 overflow-hidden">
+
+    {/* Card 1 */}
+    <div
+      className="
+        min-w-[420px]
+        rounded-3xl
+        border
+        border-white/20
+        bg-white/[0.12]
+        backdrop-blur-2xl
+        p-6
+        shadow-[0_10px_40px_rgba(255,190,40,0.15)]
+      "
+    >
+      <p className="text-white/90 text-sm leading-relaxed font-medium">
+        Dude, your stuff is the bomb! House rent is the real deal! I
+        STRONGLY recommend house rent to EVERYONE interested in running a
+        successful online business!
+      </p>
+
+      <div className="flex items-center gap-3 mt-6">
+        <img
+          src="https://i.pravatar.cc/100?img=32"
+          alt=""
+          className="w-10 h-10 rounded-full object-cover border border-white/30"
+        />
+
+        <div>
+          <h4 className="text-white font-semibold text-sm">
+            Lana Bernier
+          </h4>
+
+          <p className="text-white/70 text-xs">
+            Senior Paradigm Strategist
+          </p>
+        </div>
+      </div>
+    </div>
+
+    {/* Card 2 */}
+    <div
+      className="
+        min-w-[420px]
+        rounded-3xl
+        border
+        border-white/20
+        bg-white/[0.12]
+        backdrop-blur-2xl
+        p-6
+        shadow-[0_10px_40px_rgba(255,190,40,0.15)]
+      "
+    >
+      <p className="text-white/90 text-sm leading-relaxed font-medium">
+        Dude, your stuff is the bomb! House rent is the real deal! I
+        STRONGLY recommend house rent to EVERYONE interested in running a
+        successful online business!
+      </p>
+
+      <div className="flex items-center gap-3 mt-6">
+        <img
+          src="https://i.pravatar.cc/100?img=12"
+          alt=""
+          className="w-10 h-10 rounded-full object-cover border border-white/30"
+        />
+
+        <div>
+          <h4 className="text-white font-semibold text-sm">
+            Lana Bernier
+          </h4>
+
+          <p className="text-white/70 text-xs">
+            Senior Paradigm Strategist
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Footer */}
+  <div className="flex items-center justify-end mt-16 gap-4 pr-2">
+    <div className="w-32 h-[2px] bg-white/70" />
+
+    <p className="text-white text-3xl font-light tracking-tight">
+      Build for connectivity
+    </p>
+  </div>
+</div>
+        </div>
       </div>
     </div>
   );

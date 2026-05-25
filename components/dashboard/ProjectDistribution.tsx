@@ -190,7 +190,7 @@ const ProjectProgressGauge: React.FC<
   `;
 
   return (
-    <div className="gauge-card">
+    <div className="gauge-card ">
       <p className="gauge-title ">
         Project Progress
       </p>
@@ -371,8 +371,7 @@ const ProjectProgressGauge: React.FC<
 
           padding: 12px;
 
-          width: 45%;
-          height: 40%;
+          width: 100%;
 
           font-family:
             -apple-system,

@@ -167,9 +167,147 @@ export default function ProjectDetailsPage() {
     }
   };
 
+  // const handleDrop = async (
+  //   newColumn: string
+  // ) => {
+  //   if (!draggedItem) return;
+
+  //   const {
+  //     type,
+  //     data,
+  //     fromColumn,
+  //   } = draggedItem;
+  //   console.log(fromColumn);
+  //   console.log(newColumn);
+  //   try {
+
+  //     /*
+  //     =====================================
+  //     ENGINEER
+  //     =====================================
+  //     */
+
+  //     if (type === "ENGINEER") {
+
+  //       // ALL_USERS -> WAITING
+  //       // ALL_USERS -> APPROVED
+  //       // ALL_USERS -> REJECTED
+
+  //       if (
+  //         newColumn === "ALL_USERS"
+  //       ) {
+  //         return;
+  //       }
+
+  //       let status = "SENT";
+
+  //       if (
+  //         newColumn === "APPROVED"
+  //       ) {
+  //         status = "ACCEPTED";
+  //       }
+
+  //       if (
+  //         newColumn === "REJECTED"
+  //       ) {
+  //         status = "REJECTED";
+  //       }
+
+  //       await fetch(
+  //         "/api/admin/invitations",
+  //         {
+  //           method: "POST",
+
+  //           headers: {
+  //             "Content-Type":
+  //               "application/json",
+  //           },
+
+  //           body: JSON.stringify({
+  //             projectId,
+
+  //             engineerId:
+  //               data.engineerProfile.id,
+
+  //             status,
+  //           }),
+  //         }
+  //       );
+
+  //       fetchData();
+  //     }
+
+  //     /*
+  //     =====================================
+  //     INVITATION
+  //     =====================================
+  //     */
+
+  //     if (
+  //       type === "INVITATION"
+  //     ) {
+
+  //       // WAITING -> ANYWHERE DISABLED
+  //       if (
+  //         fromColumn === "WAITING"
+  //       ) {
+  //         return;
+  //       }
+
+  //       // APPROVED -> ANYWHERE DISABLED
+  //       if (
+  //         fromColumn === "APPROVED"
+  //       ) {
+  //         return;
+  //       }
+
+  //       // REJECTED RULES
+  //       if (
+  //         fromColumn === "REJECTED"
+  //       ) {
+
+  //         // ONLY REJECTED -> WAITING
+  //         if (
+  //           newColumn !== "WAITING"
+  //         ) {
+  //           return;
+  //         }
+  //         console.log(data.id, "called from patch");
+
+  //         const res = await fetch(
+  //           `/api/admin/invitations/`,
+  //           {
+  //             method: "PATCH",
+
+  //             headers: {
+  //               "Content-Type":
+  //                 "application/json",
+  //             },
+
+  //             body: JSON.stringify({
+  //               status: "SENT",
+  //               id: data.id
+  //             }),
+  //           }
+  //         );
+  //         console.log(res, "response in patch");
+
+  //         fetchData();
+
+  //         return;
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+
+  //   setDraggedItem(null);
+  // };
+
   const handleDrop = async (
     newColumn: string
   ) => {
+
     if (!draggedItem) return;
 
     const {
@@ -177,8 +315,10 @@ export default function ProjectDetailsPage() {
       data,
       fromColumn,
     } = draggedItem;
+
     console.log(fromColumn);
     console.log(newColumn);
+
     try {
 
       /*
@@ -247,32 +387,82 @@ export default function ProjectDetailsPage() {
         type === "INVITATION"
       ) {
 
-        // WAITING -> ANYWHERE DISABLED
+        /*
+        =====================================
+        MOVE BACK TO ALL USERS
+        =====================================
+        */
+
+        if (
+          newColumn === "ALL_USERS"
+        ) {
+
+          await fetch(
+            `/api/admin/invitations`,
+            {
+              method: "DELETE",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+
+              body: JSON.stringify({
+                id: data.id,
+              }),
+            }
+          );
+          fetchData();
+
+          return;
+        }
+
+        /*
+        =====================================
+        WAITING RULES
+        =====================================
+        */
+
         if (
           fromColumn === "WAITING"
         ) {
           return;
         }
 
-        // APPROVED -> ANYWHERE DISABLED
+        /*
+        =====================================
+        APPROVED RULES
+        =====================================
+        */
+
         if (
           fromColumn === "APPROVED"
         ) {
           return;
         }
 
-        // REJECTED RULES
+        /*
+        =====================================
+        REJECTED RULES
+        =====================================
+        */
+
         if (
           fromColumn === "REJECTED"
         ) {
 
           // ONLY REJECTED -> WAITING
+
           if (
             newColumn !== "WAITING"
           ) {
             return;
           }
-          console.log(data.id, "called from patch");
+
+          console.log(
+            data.id,
+            "called from patch"
+          );
 
           const res = await fetch(
             `/api/admin/invitations/`,
@@ -286,19 +476,26 @@ export default function ProjectDetailsPage() {
 
               body: JSON.stringify({
                 status: "SENT",
-                id: data.id
+                id: data.id,
               }),
             }
           );
-          console.log(res, "response in patch");
-          
+
+          console.log(
+            res,
+            "response in patch"
+          );
+
           fetchData();
 
           return;
         }
       }
+
     } catch (error) {
+
       console.error(error);
+
     }
 
     setDraggedItem(null);
@@ -607,8 +804,7 @@ export default function ProjectDetailsPage() {
                     key={invitation.id}
 
                     draggable={
-                      column.id ===
-                      "REJECTED"
+                      column.id === "REJECTED" || column.id === "WAITING" || column.id === "APPROVED"
                     }
 
                     onDragStart={() =>

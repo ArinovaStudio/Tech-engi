@@ -9,17 +9,13 @@ import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import { Loader2 } from "lucide-react";
 import TicketIssuesCard from "@/components/dashboard/TicketIssuesCard";
+import ProjectCollaborationCard from "@/components/dashboard/ProjectCollaborationCard";
 
 export default function DashboardPage() {
   const { data, isLoading } = useSWR("/api/admin/dashboard", fetcher);
-  const {
-    data: projectTicketsData,
-    isLoading: ticketsLoading,
-  } = useSWR(
-    "/api/admin/project-tickets",
-    fetcher
-  );
-
+  const { data: projectTicketsData, isLoading: ticketsLoading, } = useSWR("/api/admin/project-tickets", fetcher);
+  const { data: projectsData, isLoading: projectsLoading, } = useSWR("/api/admin/project/all-projects", fetcher);
+  console.log(projectsData?.projects, "projectsData");
 
   if (isLoading) {
     return (
@@ -92,29 +88,128 @@ export default function DashboardPage() {
         </div>
 
         {/* Charts */}
-        <div className="flex py-2 pr-2">
-          <div className="w-[75%]">
-            <div className="flex justify-between  p-2 w-full h-[46%] gap-3 pr-4">
-              <RevenueChart data={charts.revenue} totalRevenue={stats.totalRevenue} />
-              <div className="bg-white w-[64%] rounded-2xl flex items-center justify-center">
-                <p className="text-bold text-2xl">hello</p>
+        <div className="flex flex-col xl:flex-row py-2 pr-2 gap-3">
+
+          {/* LEFT SIDE */}
+
+          <div className="w-full xl:w-[75%] flex flex-col gap-3">
+
+            {/* TOP SECTION */}
+
+            <div
+              className="
+        flex
+        flex-col
+        lg:flex-row
+        gap-3
+        h-auto
+        xl:h-[46vh]
+      "
+            >
+
+              {/* REVENUE CHART */}
+
+              <div className="w-full lg:w-[64%] min-h-[360px]">
+
+                <RevenueChart
+                  data={charts.revenue}
+                  totalRevenue={stats.totalRevenue}
+                />
+
               </div>
-            </div>
-            <div className="flex justify-between px-2 w-full h-fit p-2">
-              <div className="bg-white w-[54%] rounded-2xl flex items-center justify-center">
-                <p className="text-bold text-2xl">hello</p>
+
+              {/* RIGHT CARD */}
+
+              <div
+                className="
+          bg-white
+          w-full
+          lg:w-[36%]
+          rounded-2xl
+          min-h-[320px]
+          flex
+          items-center
+          justify-center
+          border border-[#ECECEC]
+        "
+              >
+                <p className="font-bold text-2xl">
+                  hello
+                </p>
               </div>
-              <ProjectDistribution data={charts.projectDistribution} />
+
             </div>
+
+            {/* BOTTOM SECTION */}
+
+            <div
+              className="
+        flex
+        flex-col
+        lg:flex-row
+        gap-3
+        h-auto
+        xl:h-[55vh]
+      "
+            >
+
+              {/* PROJECT CARD */}
+
+              <div
+                className="
+          bg-white
+          w-full
+          lg:w-[59%]
+          rounded-2xl
+          overflow-hidden
+          border border-[#ECECEC]
+        "
+              >
+                <ProjectCollaborationCard
+                  projects={projectsData?.projects || []}
+                />
+              </div>
+
+              {/* DISTRIBUTION */}
+
+              <div
+                className="
+          bg-white
+          w-full
+          lg:w-[41%]
+          rounded-2xl
+          overflow-hidden
+          border border-[#ECECEC]
+        "
+              >
+                <ProjectDistribution
+                  data={charts.projectDistribution}
+                />
+              </div>
+
+            </div>
+
           </div>
 
-          <div className="w-[25%] m-1 rounded-2xl flex items-center justify-center">
+          {/* RIGHT SIDE */}
+
+          <div
+            className="
+      w-full
+      xl:w-[25%]
+      min-h-[400px]
+      xl:h-screen
+      rounded-2xl
+      overflow-hidden
+    "
+          >
+
             <TicketIssuesCard
-              projects={
-                projectTicketsData?.data || []
-              }
+              projects={projectTicketsData?.data || []}
             />
+
           </div>
+
         </div>
       </div>
     </DashboardShell>

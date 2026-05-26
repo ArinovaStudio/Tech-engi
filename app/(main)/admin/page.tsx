@@ -15,7 +15,7 @@ export default function DashboardPage() {
   const { data, isLoading } = useSWR("/api/admin/dashboard", fetcher);
   const { data: projectTicketsData, isLoading: ticketsLoading, } = useSWR("/api/admin/project-tickets", fetcher);
   const { data: projectsData, isLoading: projectsLoading, } = useSWR("/api/admin/project/all-projects", fetcher);
-  console.log(projectsData?.projects, "projectsData");
+  // console.log(projectsData?.projects, "projectsData");
 
   if (isLoading) {
     return (

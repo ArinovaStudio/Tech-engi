@@ -316,8 +316,8 @@ export default function ProjectDetailsPage() {
       fromColumn,
     } = draggedItem;
 
-    console.log(fromColumn);
-    console.log(newColumn);
+    // console.log(fromColumn);
+    // console.log(newColumn);
 
     try {
 
@@ -459,10 +459,10 @@ export default function ProjectDetailsPage() {
             return;
           }
 
-          console.log(
-            data.id,
-            "called from patch"
-          );
+          // console.log(
+          //   data.id,
+          //   "called from patch"
+          // );
 
           const res = await fetch(
             `/api/admin/invitations/`,
@@ -481,10 +481,10 @@ export default function ProjectDetailsPage() {
             }
           );
 
-          console.log(
-            res,
-            "response in patch"
-          );
+          // console.log(
+          //   res,
+          //   "response in patch"
+          // );
 
           fetchData();
 

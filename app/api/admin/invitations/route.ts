@@ -86,7 +86,7 @@ export async function POST(
     }
     );
 
-    console.log(existingInvitation);
+    // console.log(existingInvitation);
 
 
     if (existingInvitation) {

@@ -38,7 +38,6 @@ export async function GET(
                     lastActiveAt: "desc",
                 },
             });
-        // console.log(engineers);
 
         return NextResponse.json(
             {

@@ -48,7 +48,7 @@ export default function LoginPage() {
     <div className="flex w-full h-screen">
       <div className="w-[50%] h-screen">
         <div className="min-h-screen flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-white h-full  p-8">
+          <div className="w-130 bg-white h-full  p-8">
             <div className="text-center mb-8">
               <h1 className="text-2xl font-bold text-[#0f172a] tracking-tight">Welcome Back <span>👋</span></h1>
               <p className="text-sm text-gray-500 mt-2">Log in to your Arinova account</p>
@@ -153,16 +153,16 @@ export default function LoginPage() {
               <span>Sign up with Google</span>
             </button>
 
-            <p className="mt-8 text-center text-sm text-gray-500">
+            {/* <p className="mt-8 text-center text-sm text-gray-500">
               Don&apos;t have an account?{" "}
               <Link href="/register" className="text-[#f0b31e] hover:underline font-semibold">
                 Register here
               </Link>
-            </p>
+            </p> */}
           </div>
         </div>
       </div>
-      <div className="w-full rounded-[40px] relative overflow-hidden p-10 flex flex-col justify-between m-6">
+      <div className="w-[50%] rounded-[40px] relative overflow-hidden p-10 flex flex-col justify-between m-6">
 
         {/* MAIN YELLOW GRADIENT LIKE REFERENCE IMAGE */}
         <div className="absolute inset-0 bg-[linear-gradient(135deg,#FFF6D6_0%,#F8D978_18%,#F0B31E_45%,#E8A400_65%,#FFF1C2_100%)]" />

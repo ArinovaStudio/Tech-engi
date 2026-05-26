@@ -100,8 +100,10 @@ function CredentialCard({ cred }: { cred: Credential }) {
       </div>
 
       <div className="font-mono text-sm bg-gray-50 border border-gray-200 rounded-lg p-4 break-all min-h-[60px]">
-        {visible ? cred.content : "••••••••••••••••••••••••••••••••"}
-      </div>
+  {visible
+    ? cred.content
+    : `${cred.content.slice(0, 12)}***************${cred.content.slice(-8)}`}
+</div>
     </div>
   );
 }

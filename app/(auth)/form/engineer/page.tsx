@@ -165,13 +165,13 @@ export default function EngineerFormPage() {
   return (
     <div className="flex w-full h-screen">
       <div className="w-[50%] h-screen">
-        <div className=" flex items-center justify-center px-4 py-8 font-sans w-full">
+        <div className="flex items-center justify-center px-4 py-8 font-sans w-full">
 
           {/* Increased around 30% from previous small version */}
-          <div className="w-full max-w-[430px] scale-[0.95] origin-top">
+          <div className="w-160 scale-[0.95] origin-top">
 
             {/* Header */}
-            <div className="mb-10">
+            <div className="mb-10 flex flex-col items-center justify-center">
               <h1 className="text-[42px] leading-[1] font-black tracking-[-1.8px] text-[#0F172A] flex items-center gap-2">
                 Hey, Join us Today!
                 <span className="text-2xl">👀</span>
@@ -232,7 +232,7 @@ export default function EngineerFormPage() {
                       onClick={() => handleQualificationChange(q.value)}
                       className={`flex-1 h-[52px] rounded-[16px] border text-[13px] font-semibold transition-all ${qualification === q.value
                         ? "bg-[#F0B31E] text-white border-[#F0B31E] shadow-lg shadow-yellow-500/20"
-                        : "bg-[#FFF9EA] border-[#F4E4B3] text-[#8A7440]"
+                        : "text-[#8A7440]"
                         }`}
                     >
                       {q.label}
@@ -250,7 +250,7 @@ export default function EngineerFormPage() {
                 <select
                   value={yearsOfExperience}
                   onChange={(e) => setYearsOfExperience(e.target.value)}
-                  className="w-full h-[56px] px-5 rounded-[16px] border border-[#F1E2B0] bg-[#FFF9EA] text-[#8A7440] text-[14px] outline-none focus:border-[#F0B31E]"
+                  className="w-full h-[56px] px-5 rounded-[16px] border text-[#8A7440] text-[14px] outline-none focus:border-[#F0B31E]"
                 >
                   <option value="" disabled>
                     Select experience level
@@ -283,7 +283,7 @@ export default function EngineerFormPage() {
                         }}
                         className={`px-5 h-[46px] rounded-[16px] border text-[12px] font-semibold transition-all ${idType === type
                           ? "bg-[#F0B31E] text-white border-[#F0B31E] shadow-lg shadow-yellow-500/20"
-                          : "bg-[#FFF9EA] border-[#F4E4B3] text-[#8A7440]"
+                          : " text-[#8A7440]"
                           }`}
                       >
                         {ID_LABELS[type]}
@@ -311,7 +311,7 @@ export default function EngineerFormPage() {
                         ? "12 Digit Number"
                         : "Enter your ID number"
                   }
-                  className="w-full h-[56px] px-5 rounded-[16px] border border-[#F1E2B0] bg-[#FFF9EA] text-[#8A7440] text-[14px] outline-none focus:border-[#F0B31E]"
+                  className="w-full h-[56px] px-5 rounded-[16px] border text-[#8A7440] text-[14px] outline-none"
                 />
               </div>
 
@@ -321,7 +321,7 @@ export default function EngineerFormPage() {
                   Upload ID Document
                 </label>
 
-                <label className="w-full h-[56px] rounded-[16px] border border-[#F1E2B0] bg-[#FFF9EA] flex items-center px-5 cursor-pointer">
+                <label className="w-full h-[56px] rounded-[16px] border flex items-center px-5 cursor-pointer">
 
                   <Upload className="h-4 w-4 text-[#B08D32]" />
 
@@ -356,7 +356,7 @@ export default function EngineerFormPage() {
                       }
                     }}
                     placeholder="e.g. Arduino, PCB Design"
-                    className="flex-1 h-[56px] px-5 rounded-[16px] border border-[#F1E2B0] bg-[#FFF9EA] text-[#8A7440] text-[14px] outline-none focus:border-[#F0B31E]"
+                    className="flex-1 h-[56px] px-5 rounded-[16px] border text-[#8A7440] text-[14px] outline-none"
                   />
 
                   <button
@@ -399,7 +399,7 @@ export default function EngineerFormPage() {
           </div>
         </div>
       </div>
-      <div className="w-full rounded-[40px] relative overflow-hidden p-10 flex flex-col justify-between m-6">
+      <div className="w-[50%] rounded-[40px] relative overflow-hidden p-10 flex flex-col justify-between mt-6 mr-6">
 
         {/* MAIN YELLOW GRADIENT LIKE REFERENCE IMAGE */}
         <div className="absolute inset-0 bg-[linear-gradient(135deg,#FFF6D6_0%,#F8D978_18%,#F0B31E_45%,#E8A400_65%,#FFF1C2_100%)]" />
@@ -423,35 +423,35 @@ export default function EngineerFormPage() {
         {/* Content */}
         <div className="relative z-10 flex flex-col h-full ">
 
-         <div className="mt-20">
-           {/* Logo */}
-          <div className="w-24 h-24 bg-white rounded-sm flex items-center justify-center text-black font-bold text-sm shadow-xl">
-            LOGO
-          </div>
+          <div className="mt-20">
+            {/* Logo */}
+            <div className="w-24 h-24 bg-white rounded-sm flex items-center justify-center text-black font-bold text-sm shadow-xl">
+              LOGO
+            </div>
 
-          {/* Hero */}
-          <div className="mt-12">
-            <h1 className="text-white text-7xl font-extrabold tracking-tight leading-none">
-              TECH ENGI
-            </h1>
+            {/* Hero */}
+            <div className="mt-12">
+              <h1 className="text-white text-7xl font-extrabold tracking-tight leading-none">
+                TECH ENGI
+              </h1>
 
-            <p className="text-white/85 text-lg max-w-xl mt-4 leading-relaxed">
-              Lorem ipsum dolor sit amet consectetur. Suscipit sed amet commodo vel
-              ultrices tortor orci. Enim lectus turpis augue donec. Gravida non
-            </p>
+              <p className="text-white/85 text-lg max-w-xl mt-4 leading-relaxed">
+                Lorem ipsum dolor sit amet consectetur. Suscipit sed amet commodo vel
+                ultrices tortor orci. Enim lectus turpis augue donec. Gravida non
+              </p>
+            </div>
           </div>
-         </div>
 
           {/* Bottom */}
           {/* Bottom Section */}
-<div className="mt-auto pt-28">
+          <div className="mt-auto pt-28">
 
-  {/* Testimonials */}
-  <div className="flex gap-6 overflow-hidden">
+            {/* Testimonials */}
+            <div className="flex gap-6 overflow-hidden">
 
-    {/* Card 1 */}
-    <div
-      className="
+              {/* Card 1 */}
+              <div
+                className="
         min-w-[420px]
         rounded-3xl
         border
@@ -461,35 +461,35 @@ export default function EngineerFormPage() {
         p-6
         shadow-[0_10px_40px_rgba(255,190,40,0.15)]
       "
-    >
-      <p className="text-white/90 text-sm leading-relaxed font-medium">
-        Dude, your stuff is the bomb! House rent is the real deal! I
-        STRONGLY recommend house rent to EVERYONE interested in running a
-        successful online business!
-      </p>
+              >
+                <p className="text-white/90 text-sm leading-relaxed font-medium">
+                  Dude, your stuff is the bomb! House rent is the real deal! I
+                  STRONGLY recommend house rent to EVERYONE interested in running a
+                  successful online business!
+                </p>
 
-      <div className="flex items-center gap-3 mt-6">
-        <img
-          src="https://i.pravatar.cc/100?img=32"
-          alt=""
-          className="w-10 h-10 rounded-full object-cover border border-white/30"
-        />
+                <div className="flex items-center gap-3 mt-6">
+                  <img
+                    src="https://i.pravatar.cc/100?img=32"
+                    alt=""
+                    className="w-10 h-10 rounded-full object-cover border border-white/30"
+                  />
 
-        <div>
-          <h4 className="text-white font-semibold text-sm">
-            Lana Bernier
-          </h4>
+                  <div>
+                    <h4 className="text-white font-semibold text-sm">
+                      Lana Bernier
+                    </h4>
 
-          <p className="text-white/70 text-xs">
-            Senior Paradigm Strategist
-          </p>
-        </div>
-      </div>
-    </div>
+                    <p className="text-white/70 text-xs">
+                      Senior Paradigm Strategist
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-    {/* Card 2 */}
-    <div
-      className="
+              {/* Card 2 */}
+              <div
+                className="
         min-w-[420px]
         rounded-3xl
         border
@@ -499,42 +499,42 @@ export default function EngineerFormPage() {
         p-6
         shadow-[0_10px_40px_rgba(255,190,40,0.15)]
       "
-    >
-      <p className="text-white/90 text-sm leading-relaxed font-medium">
-        Dude, your stuff is the bomb! House rent is the real deal! I
-        STRONGLY recommend house rent to EVERYONE interested in running a
-        successful online business!
-      </p>
+              >
+                <p className="text-white/90 text-sm leading-relaxed font-medium">
+                  Dude, your stuff is the bomb! House rent is the real deal! I
+                  STRONGLY recommend house rent to EVERYONE interested in running a
+                  successful online business!
+                </p>
 
-      <div className="flex items-center gap-3 mt-6">
-        <img
-          src="https://i.pravatar.cc/100?img=12"
-          alt=""
-          className="w-10 h-10 rounded-full object-cover border border-white/30"
-        />
+                <div className="flex items-center gap-3 mt-6">
+                  <img
+                    src="https://i.pravatar.cc/100?img=12"
+                    alt=""
+                    className="w-10 h-10 rounded-full object-cover border border-white/30"
+                  />
 
-        <div>
-          <h4 className="text-white font-semibold text-sm">
-            Lana Bernier
-          </h4>
+                  <div>
+                    <h4 className="text-white font-semibold text-sm">
+                      Lana Bernier
+                    </h4>
 
-          <p className="text-white/70 text-xs">
-            Senior Paradigm Strategist
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
+                    <p className="text-white/70 text-xs">
+                      Senior Paradigm Strategist
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-  {/* Footer */}
-  <div className="flex items-center justify-end mt-16 gap-4 pr-2">
-    <div className="w-32 h-[2px] bg-white/70" />
+            {/* Footer */}
+            <div className="flex items-center justify-end mt-16 gap-4 pr-2">
+              <div className="w-32 h-[2px] bg-white/70" />
 
-    <p className="text-white text-3xl font-light tracking-tight">
-      Build for connectivity
-    </p>
-  </div>
-</div>
+              <p className="text-white text-3xl font-light tracking-tight">
+                Build for connectivity
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

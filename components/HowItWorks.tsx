@@ -29,14 +29,14 @@ const HowItWorks = () => {
         <section className="w-full bg-white py-20 px-6">
             <div className="w-full">
                 {/* Header */}
-                <div ref={headerRef} className="text-center space-y-6 mb-16">
+                <div ref={headerRef} className="text-center space-y-1 mb-16">
                     <div className="inline-flex items-center gap-2 justify-center text-[#FFAE58] ">
                         <span className="text-lg">•</span>
                         <p className="font-medium font-id text-[22px] tracking-wide">How it works</p>
                         <span className="text-lg">•</span>
                     </div>
 
-                    <h2 className="text-5xl lg:text-7xl font-id font-semibold text-slate-950">
+                    <h2 className="text-[2.5rem] lg:text-7xl font-id font-semibold text-slate-950">
                         How we make everything<br />easy for you?
                     </h2>
                 </div>

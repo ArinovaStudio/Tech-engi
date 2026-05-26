@@ -1,8 +1,9 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import Link from "next/link";
+import { Menu, X } from "lucide-react";
 
 const Start = () => {
   const navRef = useRef<HTMLElement>(null);
@@ -10,6 +11,7 @@ const Start = () => {
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const rightRef = useRef<HTMLDivElement>(null);
   const bannerRef = useRef<HTMLDivElement>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
@@ -22,73 +24,51 @@ const Start = () => {
   return (
     <div className="min-h-screen p-5 bg-white font-sans">
       {/* Navbar */}
-      <header
-        ref={navRef}
-        className="border-2 border-gray-200 overflow-hidden"
-      >
+      <header className="border-2 border-gray-200 overflow-hidden">
         <div
           className="
-      max-w-full
-      mx-auto
-      px-4
-      sm:px-6
-      py-4
-      lg:py-0
-      lg:h-[64px]
+          max-w-full
+          mx-auto
+          px-4
+          sm:px-6
+          h-[64px]
 
-      flex
-      flex-col
-      lg:flex-row
-      lg:items-center
-      lg:justify-between
-
-      gap-5
-      lg:gap-0
-    "
+          flex
+          items-center
+          justify-between
+        "
         >
-          {/* LEFT SIDE */}
-          <div
-            className="
-        flex
-        flex-col
-        md:flex-row
-        md:items-center
-        gap-4
-        md:gap-0
-      "
-          >
+          {/* LEFT */}
+          <div className="flex items-center">
             {/* LOGO */}
             <span
               className="
-          text-[22px]
-          font-benz
-          tracking-tight
-          text-black
+              text-[22px]
+              font-benz
+              tracking-tight
+              text-black
 
-          md:mr-4
-          md:border-r-2
-          md:border-gray-300
-          md:pr-4
-        "
+              lg:mr-4
+              lg:border-r-2
+              lg:border-gray-300
+              lg:pr-4
+            "
             >
               TECH ENGI
             </span>
 
-            {/* NAV LINKS */}
+            {/* DESKTOP NAV */}
             <nav
               className="
-          flex
-          flex-wrap
-          items-center
-          gap-x-6
-          gap-y-2
+              hidden
+              lg:flex
+              items-center
+              gap-8
 
-          md:gap-8
-
-          font-id
-          text-[14px]
-          text-black
-        "
+              font-id
+              text-[14px]
+              text-black
+            "
             >
               <a href="#">How it works?</a>
               <a href="#">Explore Projects</a>
@@ -96,33 +76,30 @@ const Start = () => {
             </nav>
           </div>
 
-          {/* RIGHT SIDE */}
+          {/* DESKTOP RIGHT */}
           <div
             className="
-        flex
-        flex-col
-        sm:flex-row
-        sm:items-center
+            hidden
+            lg:flex
+            items-center
+            gap-5
 
-        gap-4
-        sm:gap-5
-
-        lg:border-l-2
-        lg:border-gray-300
-        lg:pl-5
-      "
+            border-l-2
+            border-gray-300
+            pl-5
+          "
           >
-            {/* SOCIAL ICONS */}
+            {/* SOCIAL */}
             <div
               className="
-          flex
-          items-center
-          gap-4
+              flex
+              items-center
+              gap-4
 
-          sm:border-r
-          sm:border-gray-200
-          sm:pr-5
-        "
+              border-r
+              border-gray-200
+              pr-5
+            "
             >
               {/* LinkedIn */}
               <a href="#" aria-label="LinkedIn">
@@ -180,36 +157,27 @@ const Start = () => {
             </div>
 
             {/* BUTTONS */}
-            <div
-              className="
-          flex
-          flex-col
-          sm:flex-row
-          gap-3
-        "
-            >
+            <div className="flex items-center gap-3">
               <Link
                 href="/login"
                 className="
-            inline-flex
-            items-center
-            justify-center
+                inline-flex
+                items-center
+                justify-center
 
-            px-4
-            py-2
-            sm:py-1
+                px-4
+                py-1
 
-            text-[15px]
-            sm:text-[16px]
+                text-[16px]
 
-            font-spacegrotesk
-            border-2
-            border-gray-300
-            text-[#050A30]
-            hover:bg-gray-50
+                font-spacegrotesk
+                border-2
+                border-gray-300
+                text-[#050A30]
+                hover:bg-gray-50
 
-            whitespace-nowrap
-          "
+                whitespace-nowrap
+              "
               >
                 BECOME BUILDER
               </Link>
@@ -217,28 +185,168 @@ const Start = () => {
               <Link
                 href="/login"
                 className="
-            inline-flex
-            items-center
-            justify-center
-            gap-2
+                inline-flex
+                items-center
+                justify-center
+                gap-2
 
-            px-4
-            py-2
-            sm:py-1
+                px-4
+                py-1
 
-            text-[15px]
-            sm:text-[16px]
+                text-[16px]
 
-            font-inter
-            bg-black
-            text-white
-            hover:bg-gray-800
+                font-inter
+                bg-black
+                text-white
+                hover:bg-gray-800
 
-            whitespace-nowrap
-          "
+                whitespace-nowrap
+              "
               >
                 GOT A PROJECT
                 <span className="text-base">↗</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* MOBILE MENU BUTTON */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="
+            lg:hidden
+            flex
+            items-center
+            justify-center
+          "
+          >
+            {mobileMenuOpen ? (
+              <X className="w-7 h-7 text-black" />
+            ) : (
+              <Menu className="w-7 h-7 text-black" />
+            )}
+          </button>
+        </div>
+
+        {/* MOBILE MENU */}
+        <div
+          className={`
+          lg:hidden
+          overflow-hidden
+          transition-all
+          duration-300
+
+          ${mobileMenuOpen
+              ? "max-h-[500px] border-t border-gray-200"
+              : "max-h-0"
+            }
+        `}
+        >
+          <div className="px-4 py-5 flex flex-col gap-5 bg-white">
+            {/* NAV LINKS */}
+            <nav className="flex flex-col gap-4 text-[15px] font-id text-black">
+              <a href="#">How it works?</a>
+              <a href="#">Explore Projects</a>
+              <a href="#">Blogs</a>
+            </nav>
+
+            {/* SOCIAL */}
+            <div className="flex items-center gap-4">
+              {/* LinkedIn */}
+              <a href="#" aria-label="LinkedIn">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-black"
+                >
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                  <rect x="2" y="9" width="4" height="12" />
+                  <circle cx="4" cy="4" r="2" />
+                </svg>
+              </a>
+
+              {/* Instagram */}
+              <a href="#" aria-label="Instagram">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-black"
+                >
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                </svg>
+              </a>
+
+              {/* Facebook */}
+              <a href="#" aria-label="Facebook">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-black"
+                >
+                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                </svg>
+              </a>
+            </div>
+
+            {/* BUTTONS */}
+            <div className="flex flex-col gap-3">
+              <Link
+                href="/login"
+                className="
+                flex
+                items-center
+                justify-center
+
+                px-4
+                py-3
+
+                text-[15px]
+
+                border-2
+                border-gray-300
+                text-[#050A30]
+              "
+              >
+                BECOME BUILDER
+              </Link>
+
+              <Link
+                href="/login"
+                className="
+                flex
+                items-center
+                justify-center
+                gap-2
+
+                px-4
+                py-3
+
+                text-[15px]
+
+                bg-black
+                text-white
+              "
+              >
+                GOT A PROJECT
+                <span>↗</span>
               </Link>
             </div>
           </div>
@@ -246,7 +354,7 @@ const Start = () => {
       </header>
 
       {/* Hero Section */}
-      <main className="max-w-full mx-auto px-6 pt-25 pb-0">
+      <main className="max-w-full mx-auto px-6 pt-6 pb-0">
         {/* Top row */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 mb-8">
           {/* Left */}
@@ -282,7 +390,7 @@ const Start = () => {
         </div>
 
         {/* Orange Banner */}
-        <div className="relative " style={{ minHeight: "418px" }}>
+        <div className="relative min-h-[320px] lg:min-h-[418px]">
 
           {/* Background rounded layer */}
           <div className="absolute inset-0 rounded-2xl bg-[#FFAE58]" />
@@ -302,19 +410,20 @@ const Start = () => {
               alt="Student and builder shaking hands"
               width={560}
               height={480}
-              className="w-full h-auto object-contain"
+              className="w-full h-auto object-contain "
               priority
             />
           </div>
 
           {/* Mobile/tablet image */}
-          <div className="lg:hidden relative mix-w-110 max-h-110">
+          {/* Mobile/tablet image */}
+          <div className="lg:hidden relative flex justify-center">
             <Image
               src="/two-guys.png"
               alt="Student and builder shaking hands"
-              width={900}
-              height={900}
-              className="w-full max-w-225 h-95 object-contain"
+              width={1200}
+              height={1200}
+              className="w-full max-w-[340px] h-auto scale-125 object-contain"
               priority
             />
           </div>

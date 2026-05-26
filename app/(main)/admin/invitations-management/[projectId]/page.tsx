@@ -86,6 +86,8 @@ export default function ProjectDetailsPage() {
       const res = await fetch(`/api/admin/project/${projectId}/invitations`);
       const json = await res.json();
       setProject(json.project);
+      console.log(json.invitations, "log invitation");
+      
       setInvitations(json.invitations || []);
     } catch (err) {
       console.error(err);
@@ -709,17 +711,17 @@ export default function ProjectDetailsPage() {
                         )
                       }
                       className="
-          bg-white
-          border
-          border-[var(--border)]
-          rounded-2xl
-          p-4
-          mb-3
-          cursor-grab
-          active:cursor-grabbing
-          transition-all
-          hover:shadow-sm
-        "
+                      bg-white
+                      border
+                      border-[var(--border)]
+                      rounded-2xl
+                      p-4
+                      mb-3
+                      cursor-grab
+                      active:cursor-grabbing
+                      transition-all
+                      hover:shadow-sm
+                      "
                     >
                       {/* USER */}
                       <div className="flex items-center gap-3">
@@ -730,25 +732,25 @@ export default function ProjectDetailsPage() {
                             src={engineer.image}
                             alt={engineer.name}
                             className="
-                w-12
-                h-12
-                rounded-full
-                object-cover
-              "
+                              w-12
+                              h-12
+                              rounded-full
+                              object-cover
+                              "
                           />
                         ) : (
                           <div
                             className="
-                w-12
-                h-12
-                rounded-full
-                flex
-                items-center
-                justify-center
-                text-white
-                font-semibold
-                text-sm
-              "
+                              w-12
+                              h-12
+                              rounded-full
+                              flex
+                              items-center
+                              justify-center
+                              text-white
+                              font-semibold
+                              text-sm
+                              "
                             style={{
                               background:
                                 "var(--primary)",
@@ -760,37 +762,83 @@ export default function ProjectDetailsPage() {
 
                         {/* INFO */}
                         <div className="min-w-0 flex-1">
-                          <h3
-                            className="
-                font-semibold
-                text-[15px]
-                truncate
-                mb-1
-              "
-                            style={{
-                              color:
-                                "var(--text-primary)",
-                            }}
-                          >
-                            {engineer.name}
-                          </h3>
+                          <div className="flex items-center justify-between">
+                            <h3
+                              className="
+                              font-semibold
+                              text-[18px]
+                              truncate
+                              leading-tight
+                              tracking-[-0.02em]
+                              "
+                              style={{
+                                color: "var(--text-primary)",
+                              }}
+                            >
+                              {engineer.name}
+                            </h3>
 
-                          <p
+                            <span className="px-2.5py-1 rounded-full text-[12px] font-semibold bg-[#F5F5F5] border border-[#E8E8E8]"
+                              style={{
+                                color: "var(--text-secondary)",
+                              }}
+                            >
+                              {engineer.engineerProfile?.qualification}
+                            </span>
+                          </div>
+
+                          <div
                             className="
-                text-[11px]
-                font-medium
-              "
-                            style={{
-                              color:
-                                "var(--text-muted)",
-                            }}
+                              flex
+                              flex-wrap
+                              items-center
+                              gap-3
+                              mt-2
+                              "
                           >
-                            {
-                              engineer
-                                .engineerProfile
-                                ?.qualification
-                            }
-                          </p>
+
+                            {engineer.engineerProfile?.skills?.length > 0 && (
+                              <span
+                                className="
+                                  px-2.5
+                                  py-1
+                                  rounded-full
+                                  text-[12px]
+                                  font-medium
+                                  bg-[#FFF7ED]
+                                  border
+                                  border-[#FED7AA]
+                                  truncate
+                                  max-w-[180px]
+                                  "
+                                style={{
+                                  color: "#C2410C",
+                                }}
+                              >
+                                {engineer.engineerProfile.skills
+                                  .slice(0, 2)
+                                  .join(" • ")}
+                              </span>
+                            )}
+
+                            <span
+                              className="
+                                px-2.5
+                                py-1
+                                rounded-full
+                                text-[12px]
+                                font-semibold
+                                bg-[#F8FAFC]
+                                border
+                                border-[#E2E8F0]
+                                "
+                              style={{
+                                color: "#475569",
+                              }}
+                            >
+                              {engineer.engineerProfile?.completedProjects || 0} Projects
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -841,25 +889,25 @@ export default function ProjectDetailsPage() {
                               .user.name
                           }
                           className="
-              w-12
-              h-12
-              rounded-full
-              object-cover
+                            w-12
+                            h-12
+                            rounded-full
+                            object-cover
             "
                         />
                       ) : (
                         <div
                           className="
-              w-12
-              h-12
-              rounded-full
-              flex
-              items-center
-              justify-center
-              text-white
-              font-semibold
-              text-sm
-            "
+                            w-12
+                            h-12
+                            rounded-full
+                            flex
+                            items-center
+                            justify-center
+                            text-white
+                            font-semibold
+                            text-sm
+                          "
                           style={{
                             background:
                               "var(--primary)",
@@ -876,11 +924,11 @@ export default function ProjectDetailsPage() {
 
                         <h3
                           className="
-              font-semibold
-              text-[15px]
-              truncate
-              mb-1
-            "
+                            font-semibold
+                            text-[15px]
+                            truncate
+                            mb-1
+                          "
                           style={{
                             color:
                               "var(--text-primary)",
@@ -894,9 +942,9 @@ export default function ProjectDetailsPage() {
 
                         <p
                           className="
-              text-[11px]
-              font-medium
-            "
+                            text-[11px]
+                            font-medium
+                          "
                           style={{
                             color:
                               "var(--text-muted)",

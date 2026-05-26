@@ -34,13 +34,22 @@ const WhatWeOffer = () => {
     <section className="w-full bg-white py-20 px-6">
       <div className="w-full">
         {/* Title */}
-        <h2 ref={titleRef} className="text-[64px] font-semibold text-black font-id text-center mb-16">
-          What we <span className="text-[#FFAE58] font-dm italic ">offer?</span>
-        </h2>
+        <div className="flex flex-col items-center justify-center leading-none mb-8">
+          <h2
+            ref={titleRef}
+            className="text-[50px] lg:text-[85px] font-semibold text-black font-id text-center mb-2"
+          >
+            What we
+          </h2>
+
+          <span className="text-[#FFAE58] font-dm italic text-[3rem] lg:text-[5rem] leading-none">
+            offer?
+          </span>
+        </div>
 
         {/* Main Content */}
-       <div
-  className="
+        <div
+          className="
     flex
     flex-col
     lg:flex-row
@@ -54,11 +63,11 @@ const WhatWeOffer = () => {
 
     font-id
   "
->
-  {/* LEFT COLUMN - FOR ENGINEERS */}
-  <div
-    ref={leftRef}
-    className="
+        >
+          {/* LEFT COLUMN - FOR ENGINEERS */}
+          <div
+            ref={leftRef}
+            className="
       flex
       flex-row
 
@@ -67,11 +76,11 @@ const WhatWeOffer = () => {
 
       w-full
     "
-  >
-    {/* VERTICAL LABEL */}
-    <div className="flex items-stretch shrink-0 pr-3 sm:pr-4">
-      <p
-        className="
+          >
+            {/* VERTICAL LABEL */}
+            <div className="flex items-stretch shrink-0 pr-3 sm:pr-4">
+              <p
+                className="
           text-[#6F6F6F]
           font-medium
 
@@ -91,18 +100,18 @@ const WhatWeOffer = () => {
           items-center
           justify-center
         "
-        style={{
-          writingMode: "vertical-rl",
-          transform: "rotate(180deg)",
-        }}
-      >
-        For Engineers
-      </p>
-    </div>
+                style={{
+                  writingMode: "vertical-rl",
+                  transform: "rotate(180deg)",
+                }}
+              >
+                For Engineers
+              </p>
+            </div>
 
-    {/* CARD */}
-    <div
-      className="
+            {/* CARD */}
+            <div
+              className="
         border
         border-slate-300
 
@@ -111,42 +120,42 @@ const WhatWeOffer = () => {
 
         w-full
       "
-    >
-      <div className="space-y-5 sm:space-y-6">
-        {engineersOffers.map((offer, index) => (
-          <div
-            key={index}
-            className="
+            >
+              <div className="space-y-5 sm:space-y-6">
+                {engineersOffers.map((offer, index) => (
+                  <div
+                    key={index}
+                    className="
               pb-4
               border-b
               border-slate-200
               last:border-0
             "
-          >
-            <p
-              className="
+                  >
+                    <p
+                      className="
                 text-[15px]
                 sm:text-[18px]
 
                 leading-relaxed
                 text-black
               "
-            >
-              <span className="font-semibold">
-                {index + 1}.
-              </span>{" "}
-              {offer}
-            </p>
+                    >
+                      <span className="font-semibold">
+                        {index + 1}.
+                      </span>{" "}
+                      {offer}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        ))}
-      </div>
-    </div>
-  </div>
 
-  {/* RIGHT COLUMN - FOR CLIENTS */}
-  <div
-    ref={rightRef}
-    className="
+          {/* RIGHT COLUMN - FOR CLIENTS */}
+          <div
+            ref={rightRef}
+            className="
       flex
       flex-row
 
@@ -157,10 +166,10 @@ const WhatWeOffer = () => {
 
       lg:mt-40
     "
-  >
-    {/* CARD */}
-    <div
-      className="
+          >
+            {/* CARD */}
+            <div
+              className="
         border
         border-slate-300
 
@@ -173,41 +182,41 @@ const WhatWeOffer = () => {
 
         lg:-mb-10
       "
-    >
-      <div className="space-y-5 sm:space-y-6">
-        {clientsOffers.map((offer, index) => (
-          <div
-            key={index}
-            className="
+            >
+              <div className="space-y-5 sm:space-y-6">
+                {clientsOffers.map((offer, index) => (
+                  <div
+                    key={index}
+                    className="
               pb-4
               border-b
               border-slate-200
               last:border-0
             "
-          >
-            <p
-              className="
+                  >
+                    <p
+                      className="
                 text-[15px]
                 sm:text-[18px]
 
                 leading-relaxed
                 text-black
               "
-            >
-              <span className="font-semibold">
-                {index + 1}.
-              </span>{" "}
-              {offer}
-            </p>
-          </div>
-        ))}
-      </div>
-    </div>
+                    >
+                      <span className="font-semibold">
+                        {index + 1}.
+                      </span>{" "}
+                      {offer}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-    {/* VERTICAL LABEL */}
-    <div className="flex items-stretch shrink-0 pl-3 sm:pl-4">
-      <p
-        className="
+            {/* VERTICAL LABEL */}
+            <div className="flex items-stretch shrink-0 pl-3 sm:pl-4">
+              <p
+                className="
           text-[#6F6F6F]
           font-medium
 
@@ -227,15 +236,15 @@ const WhatWeOffer = () => {
           items-center
           justify-center
         "
-        style={{
-          writingMode: "vertical-rl",
-        }}
-      >
-        For Clients
-      </p>
-    </div>
-  </div>
-</div>
+                style={{
+                  writingMode: "vertical-rl",
+                }}
+              >
+                For Clients
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   )

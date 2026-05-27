@@ -6,21 +6,26 @@ import DashboardShell from "@/components/layout/DashboardShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useRouter } from "next/navigation";
 import {
   Users,
   CheckCircle2,
   XCircle,
   Clock3,
+  ArrowLeft,
+  FolderSearch,
+  ArrowRight,
 } from "lucide-react";
 
 export default function ProjectDetailsPage() {
   const { projectId } = useParams();
-
+  const router = useRouter();
   const [project, setProject] = useState<any>(null);
   const [invitations, setInvitations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState("ALL_USERS");
   const [engineers, setEngineers] = useState<any[]>([]);
+  const [sendingLoader, setSendingLoader] = useState<string | null>(null);
   const [draggedItem, setDraggedItem] =
     useState<any | null>(null);
 
@@ -32,10 +37,10 @@ export default function ProjectDetailsPage() {
       color: "blue",
     },
     {
-      id: "APPROVED",
-      title: "Approved",
-      icon: CheckCircle2,
-      color: "green",
+      id: "WAITING",
+      title: "Waiting",
+      icon: Clock3,
+      color: "yellow",
     },
     {
       id: "REJECTED",
@@ -44,11 +49,13 @@ export default function ProjectDetailsPage() {
       color: "red",
     },
     {
-      id: "WAITING",
-      title: "Waiting",
-      icon: Clock3,
-      color: "yellow",
+      id: "APPROVED",
+      title: "Approved",
+      icon: CheckCircle2,
+      color: "green",
     },
+
+
   ];
 
   const getInvitationsByStatus = (status: string) => {
@@ -85,9 +92,9 @@ export default function ProjectDetailsPage() {
     try {
       const res = await fetch(`/api/admin/project/${projectId}/invitations`);
       const json = await res.json();
+
       setProject(json.project);
-      console.log(json.invitations, "log invitation");
-      
+
       setInvitations(json.invitations || []);
     } catch (err) {
       console.error(err);
@@ -101,6 +108,7 @@ export default function ProjectDetailsPage() {
       const res = await fetch("/api/users");
 
       const json = await res.json();
+
 
       setEngineers(json.engineers || []);
     } catch (err) {
@@ -130,6 +138,7 @@ export default function ProjectDetailsPage() {
     engineerId: string
   ) => {
     try {
+      setSendingLoader(engineerId);
       await fetch(
         "/api/admin/invitations",
         {
@@ -150,6 +159,8 @@ export default function ProjectDetailsPage() {
       fetchData();
     } catch (error) {
       console.error(error);
+    } finally {
+      setSendingLoader(null);
     }
   };
 
@@ -508,8 +519,152 @@ export default function ProjectDetailsPage() {
     fetchEngineers();
   }, []);
 
-  if (loading) return <p className="p-6">Loading...</p>;
-  if (!project) return <p className="p-6">Project not found</p>;
+  if (loading) {
+    return (
+      <div className="h-screen w-full bg-[var(--bg)] p-6">
+
+        {/* TOP NAV SKELETON */}
+        <div className="flex items-center justify-between mb-6 bg-white border border-[var(--border)] rounded-2xl p-4 animate-pulse">
+
+          <div className="h-11 w-28 rounded-xl bg-gray-200" />
+
+          <div className="flex flex-col items-center gap-2">
+            <div className="h-6 w-48 rounded-lg bg-gray-200" />
+            <div className="h-4 w-36 rounded-lg bg-gray-100" />
+          </div>
+
+          <div className="w-28" />
+        </div>
+
+        {/* BOARD */}
+        <div className="grid grid-cols-4 gap-6 h-[calc(100vh-140px)]">
+
+          {[1, 2, 3, 4].map((col) => (
+            <div
+              key={col}
+              className="
+              rounded-3xl
+              border
+              border-[var(--border)]
+              bg-white
+              p-4
+              flex
+              flex-col
+              animate-pulse
+            "
+            >
+
+              {/* COLUMN HEADER */}
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gray-200" />
+                  <div className="h-5 w-24 rounded-lg bg-gray-200" />
+                </div>
+
+                <div className="h-5 w-6 rounded bg-gray-200" />
+              </div>
+
+              {/* CARDS */}
+              <div className="space-y-4">
+
+                {[1, 2, 3, 4].map((card) => (
+                  <div
+                    key={card}
+                    className="
+                    rounded-2xl
+                    border
+                    border-gray-100
+                    p-4
+                    bg-[#fafafa]
+                  "
+                  >
+
+                    <div className="flex items-center gap-3">
+
+                      <div className="w-12 h-12 rounded-full bg-gray-200" />
+
+                      <div className="flex-1">
+                        <div className="h-5 w-32 rounded bg-gray-200 mb-2" />
+                        <div className="h-4 w-20 rounded bg-gray-100" />
+                      </div>
+
+                    </div>
+
+                    <div className="flex gap-2 mt-4">
+                      <div className="h-7 w-24 rounded-full bg-gray-100" />
+                      <div className="h-7 w-20 rounded-full bg-gray-100" />
+                    </div>
+
+                  </div>
+                ))}
+
+              </div>
+            </div>
+          ))}
+
+        </div>
+      </div>
+    );
+  }
+
+  if (!project) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-[var(--bg)] p-6">
+
+        <div
+          className="w-full max-w-md bg-white border border-[var(--border)] rounded-3xl shadow-sm p-8 text-center">
+
+          {/* ICON */}
+          <div
+            className="w-20 h-20 mx-auto rounded-2xl flex items-center justify-center bg-red-50 border border-red-100 mb-6">
+            <FolderSearch className="w-10 h-10 text-red-500" />
+          </div>
+
+          {/* TITLE */}
+          <h1
+            className="text-2xl font-semibold tracking-tight"
+            style={{
+              color: "var(--text-primary)",
+            }}
+          >
+            Project Not Found
+          </h1>
+
+          {/* DESCRIPTION */}
+          <p
+            className="text-sm leading-6 mt-3"
+            style={{
+              color: "var(--text-muted)",
+            }}
+          >
+            The project you are trying to access
+            does not exist or may have been removed.
+          </p>
+
+          {/* ACTIONS */}
+          <div className="flex items-center justify-center gap-3 mt-8">
+
+            <button
+              onClick={() => router.back()}
+              className="h-11 px-5 rounded-xl border border-[var(--border)] bg-white hover:bg-gray-50 transition-all text-sm font-medium"
+              style={{
+                color: "var(--text-primary)",
+              }}
+            >
+              Go Back
+            </button>
+
+            <button
+              onClick={() => router.push('/admin/projects')}
+              className="h-11 px-5 rounded-xl bg-black hover:opacity-90 transition-all text-sm font-medium text-white">
+              View Projects
+            </button>
+
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     // <DashboardShell>
@@ -591,27 +746,62 @@ export default function ProjectDetailsPage() {
 
     //   </div>
     // </DashboardShell>
-    <div className="p-6 h-screen overflow-hidden">
-      <div className="grid grid-cols-4 gap-6 h-full">
+    <div className="p-6 h-full overflow-hidden">
+      <div className=" relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-[#f7f5f5] rounded-2xl p-4 md:p-5">
+
+        {/* PAGE TITLE */}
+        <div className="flex flex-col min-w-0">
+
+          <h1
+            className="text-xl sm:text-2xl font-semibold tracking-tight break-words"
+            style={{
+              color: "var(--text-primary)",
+            }}
+          >
+            Project Members
+          </h1>
+
+          <p
+            className="text-sm mt-1 leading-relaxed"
+            style={{
+              color: "var(--text-muted)",
+            }}
+          >
+            Manage engineers and invitations
+          </p>
+
+        </div>
+
+        {/* BACK BUTTON */}
+        <div
+          className="flex sm:block w-full sm:w-auto"
+        >
+          <button
+            onClick={() => router.back()}
+            className="flex items-center justify-center cursor-pointer gap-2 w-full sm:w-auto px-4 h-11 rounded-xl border border-[var(--border)] bg-white hover:bg-gray-50 transition-all shadow-sm text-sm font-medium"
+            style={{
+              color: "var(--text-primary)",
+            }}
+          >
+
+            <span>
+              Back
+            </span>
+
+            <ArrowRight className="w-4 h-4 shrink-0" />
+
+          </button>
+        </div>
+
+      </div>
+      <div className="grid grid-cols-4 gap-6 h-screen mt-2 p-4 bg-[#f8f6f6] rounded-2xl">
         {columns.map((column) => (
           <div
             key={column.id}
             className="flex flex-col h-full overflow-hidden"
           >
             {/* HEADER */}
-            <div className="
-              sticky
-              top-0
-              z-10
-              flex
-              items-center
-              justify-between
-              mb-4
-              pb-3
-              bg-white
-              border-b
-              border-[var(--border)]
-            ">
+            <div className="sticky top-0 z-10 flex items-center justify-between rounded-xl mb-4 p-3 bg-white border-b border-[var(--border)]">
               <div className="flex items-center gap-2">
                 <div
                   className={`
@@ -646,37 +836,29 @@ export default function ProjectDetailsPage() {
                   color: "var(--text-muted)",
                 }}
               >
-                0
+                {column.id === "ALL_USERS"
+                  ? engineers
+                    .filter(
+                      (engineer) => engineer.engineerProfile
+                    )
+                    .filter((engineer) => {
+                      const alreadyInvited =
+                        invitations.some(
+                          (invitation) =>
+                            invitation.engineerId ===
+                            engineer.engineerProfile.id
+                        );
+
+                      return !alreadyInvited;
+                    }).length
+                  : getInvitationsByStatus(column.id).length}
               </span>
             </div>
 
-            {/* EMPTY COLUMN */}
-            {/* <div
-              className="
-            flex-1
-            min-h-[500px]
-            rounded-2xl
-            border-2
-            border-dashed
-            border-[var(--border)]
-            bg-[var(--bg)]
-          "
-            /> */}
             <div
               onDragOver={handleDragOver}
               onDrop={() => handleDrop(column.id)}
-              className={`
-                flex-1
-                h-full
-                min-h-0
-                rounded-2xl
-                border-2
-                border-dashed
-                border-[var(--border)]
-                bg-[var(--bg)]
-                p-2
-                transition-colors
-                overflow-y-auto
+              className={`flex-1 h-full min-h-0 rounded-2xl border-2 border-dashed border-[var(--border)] bg-[var(--bg)] p-2 transition-colors overflow-y-auto
                 ${draggedItem
                   ? "bg-white"
                   : ""
@@ -710,19 +892,7 @@ export default function ProjectDetailsPage() {
                           "ALL_USERS"
                         )
                       }
-                      className="
-                      bg-white
-                      border
-                      border-[var(--border)]
-                      rounded-2xl
-                      p-4
-                      mb-3
-                      cursor-grab
-                      active:cursor-grabbing
-                      transition-all
-                      hover:shadow-sm
-                      "
-                    >
+                      className="bg-white border border-[var(--border)] rounded-2xl p-4 mb-3 cursor-grab active:cursor-grabbing transition-all hover:shadow-sm">
                       {/* USER */}
                       <div className="flex items-center gap-3">
 
@@ -740,17 +910,7 @@ export default function ProjectDetailsPage() {
                           />
                         ) : (
                           <div
-                            className="
-                              w-12
-                              h-12
-                              rounded-full
-                              flex
-                              items-center
-                              justify-center
-                              text-white
-                              font-semibold
-                              text-sm
-                              "
+                            className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                             style={{
                               background:
                                 "var(--primary)",
@@ -764,13 +924,7 @@ export default function ProjectDetailsPage() {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between">
                             <h3
-                              className="
-                              font-semibold
-                              text-[18px]
-                              truncate
-                              leading-tight
-                              tracking-[-0.02em]
-                              "
+                              className="font-semibold text-[18px] truncate leading-tight tracking-[-0.02em]"
                               style={{
                                 color: "var(--text-primary)",
                               }}
@@ -778,67 +932,63 @@ export default function ProjectDetailsPage() {
                               {engineer.name}
                             </h3>
 
-                            <span className="px-2.5py-1 rounded-full text-[12px] font-semibold bg-[#F5F5F5] border border-[#E8E8E8]"
+                            {/* <span className="px-2.5py-1 rounded-full text-[12px] font-semibold bg-[#F5F5F5] border border-[#E8E8E8]"
                               style={{
                                 color: "var(--text-secondary)",
                               }}
                             >
                               {engineer.engineerProfile?.qualification}
-                            </span>
+                            </span> */}
+                            {/* INVITE BUTTON */}
+                            <button
+                              disabled={sendingLoader === engineer.engineerProfile.id}
+                              onClick={() =>
+                                handleSendInvitation(
+                                  engineer.engineerProfile.id
+                                )
+                              }
+
+                              className={`cursor-pointer shrink-0 h-8 sm:h-9 px-3 sm:px-4 rounded-xl bg-[#FFAE58] hover:opacity-90 transition-all text-white text-[11px] sm:text-[12px] font-semibold shadow-sm  ${sendingLoader === engineer.engineerProfile.id
+                                ? "bg-[#FFC98F] cursor-not-allowed opacity-70"
+                                : "bg-[#FFAE58] hover:opacity-90 cursor-pointer"
+                                }`}>
+                              {sendingLoader === engineer.engineerProfile.id? "Inviting..." : "Invite"}
+                            </button>
                           </div>
 
                           <div
-                            className="
-                              flex
-                              flex-wrap
-                              items-center
-                              gap-3
-                              mt-2
-                              "
-                          >
+                            className="flex flex-wrap items-center gap-3 mt-3 mb-2">
 
                             {engineer.engineerProfile?.skills?.length > 0 && (
-                              <span
-                                className="
-                                  px-2.5
-                                  py-1
-                                  rounded-full
-                                  text-[12px]
-                                  font-medium
-                                  bg-[#FFF7ED]
-                                  border
-                                  border-[#FED7AA]
-                                  truncate
-                                  max-w-[180px]
-                                  "
-                                style={{
-                                  color: "#C2410C",
-                                }}
-                              >
-                                {engineer.engineerProfile.skills
-                                  .slice(0, 2)
-                                  .join(" • ")}
-                              </span>
-                            )}
+                              <div className="flex flex-wrap items-center gap-2">
 
-                            <span
-                              className="
-                                px-2.5
-                                py-1
-                                rounded-full
-                                text-[12px]
-                                font-semibold
-                                bg-[#F8FAFC]
-                                border
-                                border-[#E2E8F0]
-                                "
-                              style={{
-                                color: "#475569",
-                              }}
-                            >
-                              {engineer.engineerProfile?.completedProjects || 0} Projects
-                            </span>
+                                {engineer.engineerProfile.skills
+                                  ?.slice(0, 3)
+                                  .map((skill: string, index: number) => (
+
+                                    <span
+                                      key={index}
+                                      className="px-2.5 py-1 rounded-full text-[11px] sm:text-[12px] font-medium bg-[#FFF7ED] border border-[#FED7AA] whitespace-nowrap"
+                                      style={{
+                                        color: "#C2410C",
+                                      }}
+                                    >
+                                      {skill}
+                                    </span>
+
+                                  ))}
+
+                              </div>
+                            )}
                           </div>
+                          <span
+                            className="px-2.5 py-1 rounded-full text-[12px] font-semibold bg-[#F8FAFC] border border-[#E2E8F0]"
+                            style={{
+                              color: "#475569",
+                            }}
+                          >
+                            {engineer.engineerProfile?.yearsOfExperienceNumber || 0} years
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -863,16 +1013,7 @@ export default function ProjectDetailsPage() {
                       )
                     }
 
-                    className="
-        bg-white
-        border
-        border-[var(--border)]
-        rounded-2xl
-        p-4
-        mb-3
-        transition-all
-      "
-                  >
+                    className="bg-white border border-[var(--border)] rounded-2xl p-4 mb-3 transition-all">
 
                     <div className="flex items-center gap-3">
 
@@ -888,26 +1029,10 @@ export default function ProjectDetailsPage() {
                             invitation.engineer
                               .user.name
                           }
-                          className="
-                            w-12
-                            h-12
-                            rounded-full
-                            object-cover
-            "
-                        />
+                          className="w-12 h-12 rounded-full object-cover" />
                       ) : (
                         <div
-                          className="
-                            w-12
-                            h-12
-                            rounded-full
-                            flex
-                            items-center
-                            justify-center
-                            text-white
-                            font-semibold
-                            text-sm
-                          "
+                          className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                           style={{
                             background:
                               "var(--primary)",
@@ -923,39 +1048,57 @@ export default function ProjectDetailsPage() {
                       <div className="min-w-0 flex-1">
 
                         <h3
-                          className="
-                            font-semibold
-                            text-[15px]
-                            truncate
-                            mb-1
-                          "
+                          className="font-semibold text-[15px] truncate mb-1"
                           style={{
                             color:
                               "var(--text-primary)",
                           }}
                         >
                           {
-                            invitation.engineer
-                              .user.name
+                            invitation.engineer?.user?.name
                           }
                         </h3>
 
-                        <p
-                          className="
-                            text-[11px]
-                            font-medium
-                          "
+                        {/* <p
+                          className="text-[11px] font-medium"
                           style={{
                             color:
                               "var(--text-muted)",
                           }}
                         >
                           {
-                            invitation.engineer
-                              .qualification
+                            invitation.engineer?.qualification
                           }
-                        </p>
+                        </p> */}
 
+                        <div>
+                          <div className="mb-3">
+                            {invitation.engineer?.skills
+                              ?.slice(0, 3)
+                              .map((skill: string, index: number) => (
+
+                                <span
+                                  key={index}
+                                  className="px-2.5 mr-2 py-1 rounded-full text-[11px] sm:text-[12px] font-medium bg-[#FFF7ED] border border-[#FED7AA] whitespace-nowrap"
+                                  style={{
+                                    color: "#C2410C",
+                                  }}
+                                >
+                                  {skill}
+                                </span>
+
+                              ))}
+                          </div>
+
+                          <span
+                            className="px-2.5 py-1 rounded-full text-[12px] font-semibold bg-[#F8FAFC] border border-[#E2E8F0]"
+                            style={{
+                              color: "#475569",
+                            }}
+                          >
+                            {invitation.engineer?.yearsOfExperienceNumber || 0} years
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>

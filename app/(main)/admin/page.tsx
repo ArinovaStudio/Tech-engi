@@ -97,19 +97,11 @@ export default function DashboardPage() {
             {/* TOP SECTION */}
 
             <div
-              className="
-        flex
-        flex-col
-        lg:flex-row
-        gap-3
-        h-auto
-        xl:h-[46vh]
-      "
-            >
+              className="flex flex-col lg:flex-row gap-3 h-auto xl:h-[46vh]">
 
               {/* REVENUE CHART */}
 
-              <div className="w-full lg:w-[64%] min-h-[360px]">
+              <div className="w-full min-h-90">
 
                 <RevenueChart
                   data={charts.revenue}
@@ -120,51 +112,24 @@ export default function DashboardPage() {
 
               {/* RIGHT CARD */}
 
-              <div
-                className="
-          bg-white
-          w-full
-          lg:w-[36%]
-          rounded-2xl
-          min-h-[320px]
-          flex
-          items-center
-          justify-center
-          border border-[#ECECEC]
-        "
-              >
+              {/* <div
+                className="bg-white w-full lg:w-[36%] rounded-2xl min-h-[320px] flex items-center justify-center border border-[#ECECEC]">
                 <p className="font-bold text-2xl">
                   hello
                 </p>
-              </div>
+              </div> */}
 
             </div>
 
             {/* BOTTOM SECTION */}
 
             <div
-              className="
-        flex
-        flex-col
-        lg:flex-row
-        gap-3
-        h-auto
-        xl:h-[55vh]
-      "
-            >
+              className="flex flex-col lg:flex-row gap-3 h-auto xl:h-[55vh]">
 
               {/* PROJECT CARD */}
 
               <div
-                className="
-          bg-white
-          w-full
-          lg:w-[59%]
-          rounded-2xl
-          overflow-hidden
-          border border-[#ECECEC]
-        "
-              >
+                className="bg-white w-full lg:w-[59%] rounded-2xl overflow-hidden border border-[#ECECEC]">
                 <ProjectCollaborationCard
                   projects={projectsData?.projects || []}
                 />
@@ -173,15 +138,7 @@ export default function DashboardPage() {
               {/* DISTRIBUTION */}
 
               <div
-                className="
-          bg-white
-          w-full
-          lg:w-[41%]
-          rounded-2xl
-          overflow-hidden
-          border border-[#ECECEC]
-        "
-              >
+                className="bg-white w-full lg:w-[41%] rounded-2xl overflow-hidden border border-[#ECECEC]">
                 <ProjectDistribution
                   data={charts.projectDistribution}
                 />
@@ -194,15 +151,7 @@ export default function DashboardPage() {
           {/* RIGHT SIDE */}
 
           <div
-            className="
-      w-full
-      xl:w-[25%]
-      min-h-[400px]
-      xl:h-screen
-      rounded-2xl
-      overflow-hidden
-    "
-          >
+            className="w-full xl:w-[25%] min-h-[400px] xl:h-screen rounded-2xl overflow-hidden">
 
             <TicketIssuesCard
               projects={projectTicketsData?.data || []}

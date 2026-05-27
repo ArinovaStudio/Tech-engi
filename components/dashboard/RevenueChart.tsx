@@ -130,13 +130,16 @@ export default function RevenueChart({
 
   // RESPONSIVE VISIBLE DATA
 
+  // const visibleData = period === "monthly" ? activeData.slice(startIndex,startIndex + itemsPerView) : activeData;
   const visibleData =
-    period === "monthly"
-      ? activeData.slice(
+  period === "monthly"
+    ? itemsPerView >= 6
+      ? activeData
+      : activeData.slice(
           startIndex,
           startIndex + itemsPerView
         )
-      : activeData;
+    : activeData;
 
   // TOOLTIP
 
@@ -300,7 +303,7 @@ export default function RevenueChart({
 
         {/* LEFT BUTTON */}
 
-        {period === "monthly" && (
+        {period === "monthly" && itemsPerView < 6 && (
           <button
             onClick={handlePrev}
             disabled={startIndex === 0}
@@ -477,7 +480,7 @@ export default function RevenueChart({
 
         {/* RIGHT BUTTON */}
 
-        {period === "monthly" && (
+        {period === "monthly" && itemsPerView < 6 && (
           <button
             onClick={handleNext}
             disabled={
@@ -485,18 +488,7 @@ export default function RevenueChart({
                 itemsPerView >=
               activeData.length
             }
-            className="
-              min-w-[34px]
-              sm:min-w-[40px]
-              h-[34px]
-              sm:h-[40px]
-              rounded-full
-              border border-[#E5E5E5]
-              flex items-center justify-center
-              disabled:opacity-40
-              shrink-0
-            "
-          >
+            className="min-w-[34px] sm:min-w-[40px] h-[34px] sm:h-[40px] rounded-full border border-[#E5E5E5] flex items-center justify-center disabled:opacity-40 shrink-0">
             <ChevronRight size={18} />
           </button>
         )}

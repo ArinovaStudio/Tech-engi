@@ -13,7 +13,6 @@ export default function DirectMessageUI() {
   const { user: currentUser } = useAuth();
   const [selectedContact, setSelectedContact] = useState<any>(null);
   const [liveUsers, setLiveUsers] = useState<Record<string, boolean>>({});
-
   // Sidebar filtering states
   const [activeTab, setActiveTab] = useState<string>("ALL");
   const [search, setSearch] = useState("");

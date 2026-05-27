@@ -5,6 +5,9 @@ import StatCard, { Period } from "@/components/dashboard/StatCard";
 import ProjectDistribution from "@/components/dashboard/ProjectDistribution";
 import RevenueChart from "@/components/dashboard/RevenueChart";
 import DashboardShell from "@/components/layout/DashboardShell";
+import useSWR from "swr";
+import { fetcher } from "@/lib/fetcher";
+import ProjectProgress from "@/components/engineer/dashboard/ProjectProgress";
 
 interface AnalyticsData {
   overview: { totalAssigned: number; completedProjects: number; newInvitations: number };
@@ -27,6 +30,9 @@ export default function EngineerDashboardPage() {
   });
   // cache fetched data per period to avoid redundant calls
   const [cache, setCache] = useState<Record<string, AnalyticsData>>({});
+
+  const { data: projectsData, isLoading: projectsLoading, } = useSWR("/api/engineer/perengineer-projects", fetcher);
+  console.log(projectsData, "projectsData");
 
   const fetchAnalytics = useCallback(async (period: Period) => {
     if (cache[period]) {
@@ -83,6 +89,8 @@ export default function EngineerDashboardPage() {
     };
     init();
   }, []);
+
+
 
   function handlePeriodChange(card: CardKey, period: Period) {
     setPeriods(prev => ({ ...prev, [card]: period }));
@@ -151,11 +159,14 @@ export default function EngineerDashboardPage() {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <ProjectDistribution data={distribution} />
-        <RevenueChart
+        {/* <ProjectDistribution data={distribution} /> */}
+        <ProjectProgress
+          data={projectsData?.projects || []}
+        />
+        {/* <RevenueChart
           data={{ [revPeriod]: revData }}
           totalRevenue={totalRevenue}
-        />
+        /> */}
       </div>
     </DashboardShell>
   );

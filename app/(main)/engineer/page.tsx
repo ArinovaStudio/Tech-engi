@@ -8,6 +8,10 @@ import DashboardShell from "@/components/layout/DashboardShell";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import ProjectProgress from "@/components/engineer/dashboard/ProjectProgress";
+import ModernCalendar from "@/components/engineer/dashboard/ModernCalendar";
+import TicketCard from "@/components/engineer/dashboard/TicketCard";
+import InvitationCard from "@/components/engineer/dashboard/InvitationCard";
+import DailyScheduleCard from "@/components/engineer/dashboard/DailyScheduleCard";
 
 interface AnalyticsData {
   overview: { totalAssigned: number; completedProjects: number; newInvitations: number };
@@ -15,6 +19,18 @@ interface AnalyticsData {
   financials: { totalEarned: number; totalPending: number; totalPotentialEarnings: number };
   revenueChart: { monthly: any[]; yearly: any[]; weekly: any[] };
   projectDistribution: { name: string; value: number }[];
+}
+
+interface Ticket {
+  id: string;
+  issueType: string;
+  status: string;
+  description: string;
+  createdAt: string;
+}
+
+interface Project {
+  tickets: Ticket[];
 }
 
 type CardKey = "projects" | "revenue" | "received" | "pending";
@@ -33,6 +49,8 @@ export default function EngineerDashboardPage() {
 
   const { data: projectsData, isLoading: projectsLoading, } = useSWR("/api/engineer/perengineer-projects", fetcher);
   console.log(projectsData, "projectsData");
+  const { data: invitationsData } = useSWR("/api/engineer/invitation-engineer", fetcher);
+// console.log(invitationsData, "invitationsData");
 
   const fetchAnalytics = useCallback(async (period: Period) => {
     if (cache[period]) {
@@ -121,52 +139,81 @@ export default function EngineerDashboardPage() {
         <h1 className="text-2xl font-bold  text-[var(--text-primary)]">Dashboards</h1>
       </div>
 
-      {/* Stat cards — each with its own period dropdown */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard
-          title="Total Projects"
-          value={String(cardData.projects?.periodStats?.projects ?? cardData.projects?.overview?.totalAssigned ?? 0)}
-          icon={<Eye size={16} />}
-          period={periods.projects}
-          onPeriodChange={p => handlePeriodChange("projects", p)}
-          change={cardData.projects?.periodStats?.completed
-            ? `${cardData.projects.periodStats.completed} done`
-            : undefined}
-          changeType="up"
-        />
-        <StatCard
-          title="Total Earnings (Potential)"
-          value={fmt(cardData.revenue?.periodStats?.potential ?? 0)}
-          icon={<ReceiptText size={16} />}
-          period={periods.revenue}
-          onPeriodChange={p => handlePeriodChange("revenue", p)}
-        />
-        <StatCard
-          title="Amount Received"
-          value={fmt(cardData.received?.periodStats?.earnings ?? 0)}
-          icon={<Activity size={16} />}
-          period={periods.received}
-          onPeriodChange={p => handlePeriodChange("received", p)}
-        />
-        <StatCard
-          title="Amount Pending"
-          value={fmt(cardData.pending?.financials?.totalPending ?? 0)}
-          icon={<CheckCircle size={16} />}
-          period={periods.pending}
-          onPeriodChange={p => handlePeriodChange("pending", p)}
-        />
-      </div>
+      <div className="flex w-full p-1 ">
+        <div className="w-[70%]">
+          {/* Stat cards — each with its own period dropdown */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-2">
+            <StatCard
+              title="Total Projects"
+              value={String(cardData.projects?.periodStats?.projects ?? cardData.projects?.overview?.totalAssigned ?? 0)}
+              icon={<Eye size={16} />}
+              period={periods.projects}
+              onPeriodChange={p => handlePeriodChange("projects", p)}
+              change={cardData.projects?.periodStats?.completed
+                ? `${cardData.projects.periodStats.completed} done`
+                : undefined}
+              changeType="up"
+            />
+            <StatCard
+              title="Total Earnings (Potential)"
+              value={fmt(cardData.revenue?.periodStats?.potential ?? 0)}
+              icon={<ReceiptText size={16} />}
+              period={periods.revenue}
+              onPeriodChange={p => handlePeriodChange("revenue", p)}
+            />
+            <StatCard
+              title="Amount Received"
+              value={fmt(cardData.received?.periodStats?.earnings ?? 0)}
+              icon={<Activity size={16} />}
+              period={periods.received}
+              onPeriodChange={p => handlePeriodChange("received", p)}
+            />
+            <StatCard
+              title="Amount Pending"
+              value={fmt(cardData.pending?.financials?.totalPending ?? 0)}
+              icon={<CheckCircle size={16} />}
+              period={periods.pending}
+              onPeriodChange={p => handlePeriodChange("pending", p)}
+            />
+          </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* <ProjectDistribution data={distribution} /> */}
-        <ProjectProgress
-          data={projectsData?.projects || []}
-        />
-        {/* <RevenueChart
-          data={{ [revPeriod]: revData }}
-          totalRevenue={totalRevenue}
-        /> */}
+          {/* Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* <ProjectDistribution data={distribution} /> */}
+            <ProjectProgress data={projectsData?.projects || []} />
+
+            <DailyScheduleCard projectsData={projectsData}/>
+          </div>
+          <div className="p-1">
+            <div className="flex flex items-center">
+              <h3 className="mb-4 mt-4 flex items-center gap-3 text-3xl font-semibold">
+                Open Tickets
+              </h3>
+              <span className="text-[#898d94] text-xl px-2 rounded">
+                ({projectsData?.projects?.reduce(
+                  (acc: number, project: Project) =>
+                    acc + (project.tickets?.length || 0),
+                  0
+                ) || 0})
+              </span>
+            </div>
+            <div className="space-y-4">
+              {projectsData?.projects
+                ?.flatMap((project: Project) => project.tickets || [])
+                ?.slice(0, 3)
+                ?.map((ticket: Ticket) => (
+                  <TicketCard
+                    key={ticket.id}
+                    ticket={ticket}
+                  />
+                ))}
+            </div>
+          </div>
+        </div>
+        <div className=" w-[30%] flex flex-col gap-6 items-center p-1 ml-1">
+          <ModernCalendar projects={projectsData?.projects} />
+          <InvitationCard invitationsData={invitationsData} />
+        </div>
       </div>
     </DashboardShell>
   );

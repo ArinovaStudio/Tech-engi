@@ -5,9 +5,14 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const auth = useAuth();
   const router = useRouter();
+
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -15,19 +20,48 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, []);
 
   useEffect(() => {
-    if (mounted && !auth.isLoading) {
-      if (!auth.isAuthenticated) {
-        router.push("/login");
-      }
-    }
-  }, [mounted, auth.isLoading, auth.isAuthenticated, router]);
+    if (!mounted || auth.isLoading) return;
 
-  if (!mounted || auth.isLoading || !auth.isAdmin) {
+    // Not logged in
+    if (!auth.isAuthenticated) {
+      router.replace("/login");
+      return;
+    }
+
+    // Logged in but not admin
+    if (!auth.isAdmin) {
+      router.replace("/");
+      return;
+    }
+  }, [
+    mounted,
+    auth.isLoading,
+    auth.isAuthenticated,
+    auth.isAdmin,
+    router,
+  ]);
+
+  // Prevent hydration mismatch
+  if (!mounted) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <Loader2 className="h-10 w-10 animate-spin text-[#f0b31e]" />
       </div>
     );
+  }
+
+  // Auth still checking
+  if (auth.isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-[#f0b31e]" />
+      </div>
+    );
+  }
+
+  // Prevent flash before redirect
+  if (!auth.isAuthenticated || !auth.isAdmin) {
+    return null;
   }
 
   return <>{children}</>;

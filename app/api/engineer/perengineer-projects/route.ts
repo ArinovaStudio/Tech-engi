@@ -10,8 +10,15 @@ export async function GET(req: NextRequest) {
         const userId = user?.id;
 
         const projects = await prisma.project.findMany({
-            where: { engineerId: engineerId },
-        });
+  where: {
+    engineerId: engineerId,
+  },
+
+  include: {
+    tickets: true,
+    kanbanTasks: true,
+  },
+});
 
         return NextResponse.json({ success: true, projects }, { status: 200 });
     } catch (error) {

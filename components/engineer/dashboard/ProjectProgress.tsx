@@ -3,20 +3,13 @@
 import { ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
 
-export default function ProjectProgress({
-    data = [],
-}: {
-    data: any[];
-}) {
+export default function ProjectProgress({data = [],}: {data: any[];}) {
 
     // =====================================
     // PERIOD
     // =====================================
 
-    const [period, setPeriod] =
-        useState<"month" | "year">(
-            "month"
-        );
+    const [period, setPeriod] =useState<"month" | "year">("month");
 
     // =====================================
     // SAFE DATA
@@ -53,51 +46,30 @@ export default function ProjectProgress({
                 "Dec",
             ];
 
-            return months.map(
-                (month, index) => {
+            return months.map((month, index) => {
 
                     // count projects
                     // created in month
 
-                    const totalProjects =
-                        safeData.filter(
-                            (project: any) => {
-
-                                if (
-                                    !project?.createdAt
-                                ) {
-                                    return false;
-                                }
-
-                                const date =
-                                    new Date(
-                                        project.createdAt
-                                    );
-
-                                return (
-                                    date.getMonth() ===
-                                    index
-                                );
-                            }
-                        ).length;
-
-                    const monthProjects =
-                        safeData.filter(
-                            (project: any) => {
-
+                    const totalProjects =safeData.filter((project: any) => {
                                 if (!project?.createdAt) {
                                     return false;
                                 }
 
-                                const date = new Date(
-                                    project.createdAt
-                                );
+                                const date = new Date(project.createdAt);
 
-                                return (
-                                    date.getMonth() === index
-                                );
-                            }
-                        );
+                                return (date.getMonth() === index );
+                            }).length;
+
+                    const monthProjects = safeData.filter((project: any) => {
+                                if (!project?.createdAt) {
+                                    return false;
+                                }
+
+                                const date = new Date(project.createdAt);
+
+                                return (date.getMonth() === index);
+                            });
 
                     return {
                         label: month,
@@ -112,10 +84,7 @@ export default function ProjectProgress({
         // YEAR GRAPH
         // =====================================
 
-        const yearlyMap: Record<
-            string,
-            number
-        > = {};
+        const yearlyMap: Record<string,number> = {};
 
         safeData.forEach(
             (project: any) => {
@@ -136,33 +105,23 @@ export default function ProjectProgress({
             }
         );
 
-        const yearlyProjectsMap: Record<
-            string,
-            any[]
-        > = {};
+        const yearlyProjectsMap: Record<string,any[]> = {};
 
         safeData.forEach((project: any) => {
-
             if (!project?.createdAt) {
                 return;
             }
 
-            const year = new Date(
-                project.createdAt
-            ).getFullYear();
+            const year = new Date(project.createdAt).getFullYear();
 
             if (!yearlyProjectsMap[year]) {
                 yearlyProjectsMap[year] = [];
             }
 
-            yearlyProjectsMap[year].push(
-                project
-            );
+            yearlyProjectsMap[year].push(project);
         });
 
-        return Object.entries(
-            yearlyProjectsMap
-        ).map(([year, projects]) => ({
+        return Object.entries(yearlyProjectsMap).map(([year, projects]) => ({
             label: year,
             value: projects.length,
             projects,
@@ -183,22 +142,20 @@ export default function ProjectProgress({
 
     return (
         <div
-            className=" w-full bg-white rounded-[32px] border border-[#ECECEC] p-5 sm:p-6 overflow-hidden">
+            className="w-full h-90 rounded-[32px] border border-[#ECECEC] bg-white p-4 sm:p-5 overflow-hidden">
 
             {/* ================================= */}
             {/* HEADER */}
             {/* ================================= */}
 
-            <div
-                className=" flex items-start justify-between gap-4">
+            <div className=" flex items-start justify-between gap-4">
 
                 <div>
-
-                    <h2 className=" text-[24px] font-semibold tracking-[-0.03em] text-[#171725]">
+                    <h2 className=" text-[20px] font-semibold tracking-[-0.03em] text-[#171725]">
                         Project Activity
                     </h2>
 
-                    <div className=" flex items-center gap-3 mt-4">
+                    <div className=" flex items-center gap-3 mt-3">
 
                         <div className=" w-9 h-9 rounded-xl bg-[#F5F7FB] flex items-center justify-center">
                             ↗
@@ -206,7 +163,7 @@ export default function ProjectProgress({
 
                         <div className=" flex items-center gap-2 flex-wrap">
 
-                            <span className=" text-[#6BCB3D] font-semibold text-[24px]">
+                            <span className=" text-[#6BCB3D] font-semibold text-[20px]">
                                 {safeData.length}
                             </span>
 
@@ -232,7 +189,7 @@ export default function ProjectProgress({
                                 : "month"
                         )
                     }
-                    className=" h-11 px-5 rounded-full border border-[#EAEAEA] flex items-center gap-2 text-sm font-medium text-[#666] shrink-0">
+                    className="h-9 px-4 rounded-full border border-[#EAEAEA] flex items-center gap-2 text-sm font-medium text-[#666] shrink-0">
 
                     {period === "month"
                         ? "Monthly"
@@ -249,14 +206,14 @@ export default function ProjectProgress({
             {/* ================================= */}
 
             <div
-                className=" relative mt-12 h-[280px] w- ">
+                className="relative mt-8 h-[210px] w-full">
 
                 {/* ================================= */}
                 {/* GRID */}
                 {/* ================================= */}
 
                 <div
-                    className=" absolute inset-0 flex flex-col justify-between pb-8">
+                    className=" absolute inset-0 flex flex-col justify-between pb-6">
 
                     {[5, 4, 3, 2, 1].map(
                         (value) => (
@@ -279,7 +236,7 @@ export default function ProjectProgress({
                 {/* BARS */}
                 {/* ================================= */}
 
-                <div className=" relative z-10 h-full flex items-end justify-between gap-4 px-8 pb-8">
+                <div className=" relative z-10 h-full flex items-end justify-between gap-4 px-8 pb-6">
 
                     {graphData.map((item, index) => {
 
@@ -361,7 +318,7 @@ export default function ProjectProgress({
 
                                 {/* BAR */}
 
-                                <div className=" w-[12px] sm:w-[16px] rounded-full transition-all duration-500"
+                                <div className=" w-[10px] sm:w-[14px] rounded-full transition-all duration-500"
                                     style={{
                                         height: `${height}%`,
                                         background: isActive
@@ -376,7 +333,7 @@ export default function ProjectProgress({
 
                                 {/* LABEL */}
 
-                                <span className=" absolute -bottom-7 text-sm font-medium text-[#8A8A8A]">
+                                <span className=" absolute -bottom-6 text-sm font-medium text-[#8A8A8A]">
                                     {item.label}
                                 </span>
 

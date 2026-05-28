@@ -24,16 +24,7 @@ interface StatCardProps {
 
 const PERIODS: Period[] = ["weekly", "monthly", "yearly"];
 
-export default function StatCard({
-  title,
-  value,
-  change,
-  changeType,
-  subtitle,
-  highlighted,
-  period,
-  onPeriodChange,
-}: StatCardProps) {
+export default function StatCard({ title, value, change, changeType, subtitle, highlighted, period, onPeriodChange, }: StatCardProps) {
   const isUp = changeType === "up";
 
   const [open, setOpen] = useState(false);
@@ -54,48 +45,31 @@ export default function StatCard({
   }, []);
 
   return (
-    <div
-      className={`
-        relative
-        overflow-hidden
-        rounded-[24px]
-        border
-        p-6
-        min-w-62.5
-        h-47.5
-        transition-all
-        duration-300
+    <div className="">
+      <div className={`relative rounded-[24px] border p-6 w-64 m-2 h-43 transition-all duration-300 
        
-        ${
-          highlighted
-            ? "bg-gradient-to-br from-[#FF7A00] via-[#FFAE58] to-[#FFE0B8] border-transparent text-white"
-            : "bg-[#ffffff] border-[#E7E7E7] text-black"
+        ${highlighted
+          ? "bg-gradient-to-br from-[#FF7A00] via-[#FFAE58] to-[#FFE0B8] border-transparent text-white"
+          : "bg-[#ffffff] border-[#E7E7E7] text-black"
         }
       `}
     >
       {/* Top */}
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between ">
         <div>
           <p
-            className={`text-[1.4rem] font-medium ${
-              highlighted ? "text-white/90" : "text-[#111]"
-            }`}
+            className={`text-[1.1rem] font-medium ${highlighted ? "text-white/90" : "text-[#111]"
+              }`}
           >
             {title}
           </p>
         </div>
 
         {/* Arrow Button */}
-        <div
-          className={`
-            w-10 h-10
-            rounded-full
-            flex items-center justify-center
-            border
-            ${
-              highlighted
-                ? "bg-white text-black border-white/20"
-                : "bg-white text-black border-[#DADADA]"
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center border
+            ${highlighted
+              ? "bg-white text-black border-white/20"
+              : "bg-white text-black border-[#DADADA]"
             }
           `}
         >
@@ -105,10 +79,8 @@ export default function StatCard({
 
       {/* Value */}
       <div className="mt-2 mb-8">
-        <h2
-          className={`text-[58px] leading-none font-medium tracking-tight ${
-            highlighted ? "text-white" : "text-black"
-          }`}
+        <h2 className={`text-[36px] leading-none font-medium tracking-tight ${highlighted ? "text-white" : "text-black"
+            }`}
         >
           {value || "0"}
         </h2>
@@ -118,17 +90,10 @@ export default function StatCard({
       <div className="absolute bottom-3 left-6 right-6 flex items-center justify-between">
         {change && changeType ? (
           <div
-            className={`
-              flex items-center gap-1.5
-              rounded-full
-              px-2.5 py-1
-              text-[12px]
-              font-medium
-              border
-              ${
-                highlighted
-                  ? "bg-white/10 border-white/20 text-white"
-                  : isUp
+            className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-medium border
+              ${highlighted
+                ? "bg-white/10 border-white/20 text-white"
+                : isUp
                   ? "bg-[#EEF9F1] border-[#D7F0DD] text-[#238B57]"
                   : "bg-red-50 border-red-100 text-red-500"
               }
@@ -143,10 +108,8 @@ export default function StatCard({
             <span>{change}</span>
           </div>
         ) : (
-          <span
-            className={`text-[13px] ${
-              highlighted ? "text-white/80" : "text-[#6B6B6B]"
-            }`}
+          <span className={`text-[13px] ${highlighted ? "text-white/80" : "text-[#6B6B6B]"
+              }`}
           >
             {subtitle}
           </span>
@@ -157,16 +120,10 @@ export default function StatCard({
           <div className="relative" ref={ref}>
             <button
               onClick={() => setOpen((o) => !o)}
-              className={`
-                flex items-center gap-1
-                rounded-lg
-                px-2 py-1
-                text-xs
-                capitalize
-                ${
-                  highlighted
-                    ? "bg-white/10 text-white"
-                    : "bg-white text-[#444]"
+              className={`flex items-center gap-1 rounded-lg px-2 py-1 text-xs capitalize
+                ${highlighted
+                  ? "bg-white/10 text-white"
+                  : "bg-white text-[#444]"
                 }
               `}
             >
@@ -183,13 +140,10 @@ export default function StatCard({
                       onPeriodChange(p);
                       setOpen(false);
                     }}
-                    className={`
-                      w-full px-3 py-2 text-left text-sm capitalize transition-colors
-                      hover:bg-[#F5F5F5]
-                      ${
-                        p === period
-                          ? "font-semibold text-[#177A47]"
-                          : "text-[#444]"
+                    className={`w-full px-3 py-2 text-left text-sm capitalize transition-colors hover:bg-[#F5F5F5]
+                      ${p === period
+                        ? "font-semibold text-[#177A47]"
+                        : "text-[#444]"
                       }
                     `}
                   >
@@ -201,6 +155,7 @@ export default function StatCard({
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }

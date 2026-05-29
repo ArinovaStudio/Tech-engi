@@ -27,6 +27,8 @@ function PayoutRow({
   const borderColor = isSuccess ? "border-green-500" : isFailed ? "border-red-500" : "border-[var(--border)]";
   const badgeColor = isSuccess ? "bg-green-100 text-green-700" : isFailed ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700";
 
+  const isClient = payout.user?.role === "CLIENT";
+
   return (
     <div className={`flex items-center justify-between border ${borderColor} rounded-xl p-4 mb-3 bg-white`}>
       <div className="space-y-2">
@@ -76,14 +78,16 @@ function PayoutRow({
       </div>
 
       <div className="flex flex-col gap-2 min-w-[100px] items-end">
-        <button
-          onClick={() => onView(payout?.proof || "/two-guys.png")}
-          className="flex items-center justify-center w-full gap-1 text-sm  px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-[var(--bg)] transition-colors"
-          style={{ color: "var(--text-secondary)" }}
-        >
-          <Eye size={14} />
-          Proof
-        </button>
+        {!isClient && (
+          <button
+            onClick={() => onView(payout?.proof || "/two-guys.png")}
+            className="flex items-center justify-center w-full gap-1 text-sm px-3 py-1.5 rounded-lg border border-[var(--border)] hover:bg-[var(--bg)] transition-colors"
+            style={{ color: "var(--text-secondary)" }}
+          >
+            <Eye size={14} />
+            Proof
+          </button>
+        )}
 
         {!readOnly && (
           <div className="flex gap-2 w-full mt-1">
@@ -197,7 +201,7 @@ export default function PayoutHistory({
             <div className="flex justify-end mt-4">
               <button
                 onClick={() => setProofModal(null)}
-                className="px-5 py-2 rounded-lg text-white  text-sm transition-colors"
+                className="px-5 py-2 rounded-lg text-white text-sm transition-colors"
                 style={{ background: "var(--primary)" }}
               >
                 Close

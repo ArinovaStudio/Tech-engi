@@ -21,7 +21,7 @@ export async function GET( req: NextRequest, { params }: { params: Promise<{ pro
       orderBy: { createdAt: "desc" },
       include: { 
         project: { select: { title: true } },
-        user: { select: { name: true } }
+        user: { select: { name: true, role: true } }
       },
     });
 

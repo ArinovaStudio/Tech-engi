@@ -72,7 +72,7 @@ function PayoutRow({
             Payment ID:
           </span>{" "}
           <span className="font-mono text-xs px-2 py-1 rounded-md ml-1" style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text-muted)" }}>
-            {payout.razorpayPaymentId || "Id Not Found!"}
+            {payout.razorpayPaymentId || payout.payuPaymentId || "Id Not Found!"}
           </span>
         </p>
       </div>

@@ -7,11 +7,11 @@ import toast from "react-hot-toast";
 import { User } from "./ProjectUI";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useRazorpay } from "@/hooks/useRazorpay";
+import { usePayment } from "@/hooks/usePayment";
 
 export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void; onCreated: () => void, user: User }) {
   const router = useRouter();
-  const { initiatePayment, loading: isPaying } = useRazorpay();
+  const { processPayment, loading: isPaying } = usePayment();
   
   const [form, setForm] = useState({ title: "", description: "", budget: "", startDate: "", endDate: "" });
   const [instruments, setInstruments] = useState<string[]>([]);
@@ -67,12 +67,14 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
       const projectId = data.projectId;
       setLoading(false); 
 
-      // Trigger Razorpay Hook
-      initiatePayment({
+      // Trigger payment
+      processPayment({
         projectId,
+        redirectPath: `/client/project/${projectId}`,
         user: { name: user?.name, email: user?.email },
         description: "Advance Payment (40%)",
-        onSuccess: async () => {
+        
+        onSuccess: () => {
           handleStartMatching(projectId);
           onCreated();
           onClose();

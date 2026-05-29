@@ -4,7 +4,7 @@ import React from "react";
 import PayoutHistory from "./PayoutHistory";
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
-import { useRazorpay } from "@/hooks/useRazorpay";
+import { usePayment } from "@/hooks/usePayment";
 
 function SummaryCard({ title, value }: { title: string; value: string }) {
   return (
@@ -28,7 +28,7 @@ interface Props {
 
 export default function PayoutClient({ projectId }: Props) {
   const { data, isLoading, mutate } = useSWR(`/api/payout/${projectId}`, fetcher);
-  const { initiatePayment, loading: paymentLoading } = useRazorpay();
+  const { processPayment, loading: paymentLoading } = usePayment();
   
   const stats = data?.stats ?? {};
   const transactions = data?.transactions ?? []; 
@@ -50,8 +50,10 @@ export default function PayoutClient({ projectId }: Props) {
     : "No payments yet";
 
   const handlePayment = () => {
-    initiatePayment({
+    processPayment({
       projectId,
+      redirectPath: `/client/project/${projectId}`,
+      description: "Final Payment (60%)",
       onSuccess: () => {
         mutate(); 
       }

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { DollarSign, CreditCard, TrendingUp, Clock, CheckCircle, Wallet, AlertCircle, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth"; 
-import { useRazorpay } from "@/hooks/useRazorpay";
+import { usePayment } from "@/hooks/usePayment";
 
 interface Transaction {
   id: string;
@@ -32,7 +32,7 @@ interface PendingProject {
 
 export default function ClientAccountPage() {
   const { user } = useAuth();
-  const { initiatePayment, loading: isPaying } = useRazorpay();
+  const { processPayment, loading: isPaying } = usePayment();
   
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
@@ -70,8 +70,9 @@ export default function ClientAccountPage() {
     const isAdvance = project.status === "AWAITING_ADVANCE";
     const description = isAdvance ? "Advance Payment (40%)" : "Final Payment (60%)";
 
-    initiatePayment({
+    processPayment({
       projectId: project.id,
+      redirectPath: `/client/account`,
       user: { name: user?.name, email: user?.email },
       description,
       onSuccess: () => {

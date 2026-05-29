@@ -445,6 +445,10 @@ model Transaction {
   razorpayRefundId  String? @unique
   razorpayPayoutId  String? @unique
 
+  payuTransactionId String? @unique
+  payuPaymentId     String? @unique
+  payuHash          String? @db.Text
+
   proof       String?
   completedAt DateTime?
   createdAt   DateTime  @default(now())

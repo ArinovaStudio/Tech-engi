@@ -4,13 +4,13 @@ import React, { useState, useEffect } from "react";
 import { ArrowUp, CheckCheck, LucideCheckCheck, LucideCopy, LucideEdit3, Send, CreditCard } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { useRazorpay } from "@/hooks/useRazorpay";
+import { usePayment } from "@/hooks/usePayment";
 import { T, getApiBase, ProgressGauge, PriorityBadge, StatusBadge, TeamMemberCard } from "./OverviewUI";
 import { EditModal, SubmitReviewModal, ProgressModal } from "./OverviewModals";
 
 export default function OverviewTab({ project }: { project: any }) {
   const { user } = useAuth();
-  const { initiatePayment, loading: isPaying } = useRazorpay();
+  const { processPayment, loading: isPaying } = usePayment();
   
   const [showProgressModal, setShowProgressModal] = useState(false);
   const [currentProgress, setCurrentProgress] = useState(project?.progress || 0);
@@ -54,8 +54,9 @@ export default function OverviewTab({ project }: { project: any }) {
   };
 
   const triggerPayment = (isFromCompleteFlow = false) => {
-    initiatePayment({
+    processPayment({
       projectId: project.id,
+      redirectPath: `/client/project/${project.id}`,
       user: { name: user?.name, email: user?.email },
       description: `Project Payment - ${project.title}`,
       onSuccess: () => {

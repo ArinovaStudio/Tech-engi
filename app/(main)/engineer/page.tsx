@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
-import { Eye, ReceiptText, Activity, CheckCircle } from "lucide-react";
+import { Eye, ReceiptText, Activity, CheckCircle, Mail } from "lucide-react";
 import StatCard, { Period } from "@/components/dashboard/StatCard";
 import ProjectDistribution from "@/components/dashboard/ProjectDistribution";
 import RevenueChart from "@/components/dashboard/RevenueChart";
@@ -50,7 +50,7 @@ export default function EngineerDashboardPage() {
   const { data: projectsData, isLoading: projectsLoading, } = useSWR("/api/engineer/perengineer-projects", fetcher);
   console.log(projectsData, "projectsData");
   const { data: invitationsData } = useSWR("/api/engineer/invitation-engineer", fetcher);
-// console.log(invitationsData, "invitationsData");
+  // console.log(invitationsData, "invitationsData");
 
   const fetchAnalytics = useCallback(async (period: Period) => {
     if (cache[period]) {
@@ -108,8 +108,6 @@ export default function EngineerDashboardPage() {
     init();
   }, []);
 
-
-
   function handlePeriodChange(card: CardKey, period: Period) {
     setPeriods(prev => ({ ...prev, [card]: period }));
     fetchForCard(card, period);
@@ -123,6 +121,11 @@ export default function EngineerDashboardPage() {
   const totalRevenue = cardData.revenue?.financials?.totalPotentialEarnings || 0;
   const distribution = data?.projectDistribution || [];
 
+  const completedProjects = cardData.projects?.projectDistribution?.find((item) => item.name === "Completed")?.value ?? 0;
+  const totalProjects = cardData.projects?.overview?.totalAssigned ?? 0;
+  const completionRate = totalProjects > 0 ? Math.round((completedProjects / totalProjects) * 100)
+    : 0;
+  console.log(cardData.projects, "projects card data");
   if (loading) {
     return (
       <DashboardShell>
@@ -145,21 +148,25 @@ export default function EngineerDashboardPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-2">
             <StatCard
               title="Total Projects"
-              value={String(cardData.projects?.periodStats?.projects ?? cardData.projects?.overview?.totalAssigned ?? 0)}
+              value={String(cardData.projects?.overview?.totalAssigned ?? cardData.projects?.overview?.totalAssigned ?? 0)}
               icon={<Eye size={16} />}
               period={periods.projects}
               onPeriodChange={p => handlePeriodChange("projects", p)}
               change={cardData.projects?.periodStats?.completed
-                ? `${cardData.projects.periodStats.completed} done`
+                ? `${cardData.projects?.overview?.totalAssigned} done`
                 : undefined}
               changeType="up"
             />
             <StatCard
-              title="Total Earnings (Potential)"
-              value={fmt(cardData.revenue?.periodStats?.potential ?? 0)}
+              title="Completed Projects"
+              value={String(completedProjects)}
               icon={<ReceiptText size={16} />}
               period={periods.revenue}
-              onPeriodChange={p => handlePeriodChange("revenue", p)}
+              onPeriodChange={(p) =>
+                handlePeriodChange("revenue", p)
+              }
+              change={`${completionRate}%`}
+              changeType="up"
             />
             <StatCard
               title="Amount Received"
@@ -175,6 +182,14 @@ export default function EngineerDashboardPage() {
               period={periods.pending}
               onPeriodChange={p => handlePeriodChange("pending", p)}
             />
+
+            {/* <StatCard
+              title="New Invitations"
+              value={String(cardData.projects?.overview ?.newInvitations ?? 0 )}
+              icon={<Mail size={16} />}
+              period={periods.projects}
+              onPeriodChange={(p) => handlePeriodChange( "projects", p)}
+            /> */}
           </div>
 
           {/* Charts */}
@@ -182,7 +197,7 @@ export default function EngineerDashboardPage() {
             {/* <ProjectDistribution data={distribution} /> */}
             <ProjectProgress data={projectsData?.projects || []} />
 
-            <DailyScheduleCard projectsData={projectsData}/>
+            <DailyScheduleCard projectsData={projectsData} />
           </div>
           <div className="p-1">
             <div className="flex flex items-center">

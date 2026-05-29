@@ -1,12 +1,78 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAdmin } from "@/lib/auth";
+import sendEmail from "@/lib/email";
+
 
 interface Params {
   params: Promise<{
     id: string;
   }>;
 }
+
+const projectConfirm = `<h2>Project Assignment Confirmed</h2>
+
+<p>Hello {{engineerName}},</p>
+
+<p>
+Congratulations! You have been officially assigned to the following project.
+</p>
+
+<h3>Project Details</h3>
+
+<ul>
+  <li><strong>Project:</strong> {{projectTitle}}</li>
+  <li><strong>Description:</strong> {{projectDescription}}</li>
+  <li><strong>Required Skills:</strong> {{projectSkills}}</li>
+  <li><strong>Budget:</strong> ₹{{projectBudget}}</li>
+  <li><strong>Start Date:</strong> {{projectStartDate}}</li>
+</ul>
+
+<p>
+You can now begin preparing for project execution.
+Additional instructions and project resources will be shared through the platform.
+</p>
+
+<p>
+We look forward to your contribution and wish you success.
+</p>
+
+<p>
+Best Regards,<br/>
+Project Management Team
+</p>
+`;
+
+const projectInvitation = `<h2>Project Invitation</h2>
+
+<p>Hello {{engineerName}},</p>
+
+<p>You have been invited to participate in a new project.</p>
+
+<h3>Project Details</h3>
+
+<ul>
+  <li><strong>Project:</strong> {{projectTitle}}</li>
+  <li><strong>Description:</strong> {{projectDescription}}</li>
+  <li><strong>Required Skills:</strong> {{projectSkills}}</li>
+  <li><strong>Budget:</strong> ₹{{projectBudget}}</li>
+  <li><strong>Start Date:</strong> {{projectStartDate}}</li>
+</ul>
+
+<p>
+Please review the project and submit your response within
+<strong>24 hours</strong>.
+</p>
+
+<p>
+Failure to respond within the specified time may result in the invitation being withdrawn.
+</p>
+
+<p>
+Thank you,<br/>
+Project Management Team
+</p>
+`;
 
 
 export async function GET(req: NextRequest) {
@@ -58,9 +124,7 @@ export async function GET(req: NextRequest) {
 }
 
 
-export async function POST(
-  req: NextRequest
-) {
+export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
@@ -117,6 +181,56 @@ export async function POST(
         project: true,
       },
     }
+    );
+
+    const emailHtml = (
+      invitation.status === "ACCEPTED"
+        ? projectConfirm
+        : projectInvitation
+    )
+      .replace(
+        "{{engineerName}}",
+        invitation.engineer.user.name || "Engineer"
+      )
+      .replace(
+        "{{projectTitle}}",
+        invitation.project.title
+      )
+      .replace(
+        "{{projectDescription}}",
+        invitation.project.description
+      )
+      .replace(
+        "{{projectSkills}}",
+        invitation.project.instruments.join(", ")
+      )
+      .replace(
+        "{{projectBudget}}",
+        String(invitation.project.budget)
+      )
+      .replace(
+        "{{projectStartDate}}",
+        new Date(
+          invitation.project.createdAt
+        ).toLocaleDateString()
+      );
+
+    await sendEmail(
+      invitation.engineer.user.email,
+      invitation.status === "ACCEPTED"
+        ? "Congratulations! You Have Been Assigned To A Project"
+        : "Project Invitation - Response Required Within 24 Hours",
+      emailHtml
+    );
+
+    return NextResponse.json(
+      {
+        success: true,
+        invitation,
+      },
+      {
+        status: 201,
+      }
     );
 
     return NextResponse.json(

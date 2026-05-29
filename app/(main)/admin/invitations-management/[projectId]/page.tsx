@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import DashboardShell from "@/components/layout/DashboardShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +26,11 @@ export default function ProjectDetailsPage() {
   const [filterStatus, setFilterStatus] = useState("ALL_USERS");
   const [engineers, setEngineers] = useState<any[]>([]);
   const [sendingLoader, setSendingLoader] = useState<string | null>(null);
+  const [aiSuggestions, setAiSuggestions] = useState<any>([]);
+  const [aiLoading, setAiLoading] = useState(true);
+  const [dots, setDots] = useState("");
+  const [search, setSearch] = useState("");
+  const hasRunAi = useRef(false);
   const [draggedItem, setDraggedItem] =
     useState<any | null>(null);
 
@@ -109,7 +114,6 @@ export default function ProjectDetailsPage() {
 
       const json = await res.json();
 
-
       setEngineers(json.engineers || []);
     } catch (err) {
       console.error(err);
@@ -134,26 +138,20 @@ export default function ProjectDetailsPage() {
     e.preventDefault();
   };
 
-  const handleSendInvitation = async (
-    engineerId: string
-  ) => {
+  const handleSendInvitation = async (engineerId: string) => {
     try {
       setSendingLoader(engineerId);
-      await fetch(
-        "/api/admin/invitations",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-
-          body: JSON.stringify({
-            projectId,
-            engineerId,
-          }),
-        }
+      await fetch("/api/admin/invitations", {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify({
+          projectId,
+          engineerId,
+        }),
+      }
       );
 
       fetchData();
@@ -317,9 +315,7 @@ export default function ProjectDetailsPage() {
   //   setDraggedItem(null);
   // };
 
-  const handleDrop = async (
-    newColumn: string
-  ) => {
+  const handleDrop = async (newColumn: string) => {
 
     if (!draggedItem) return;
 
@@ -514,10 +510,131 @@ export default function ProjectDetailsPage() {
     setDraggedItem(null);
   };
 
+  const filteredEngineers = engineers.filter((engineer) => engineer.engineerProfile !== null);
+  // console.log(filteredEngineers, "filtered engineers");
+
+  const automation = async () => {
+    try {
+      setAiLoading(true);
+      const filteredEngineers = engineers.filter((engineer) => engineer.engineerProfile !== null);
+      if (filteredEngineers.length < 0) {
+        return;
+      }
+      const res = await fetch(`/api/admin/project-matcher`, {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify({
+          projectId,
+          engineers: filteredEngineers,
+        }),
+      });
+      const json = await res.json();
+      console.log(json, "data from matcher api", res);
+
+      const lead = setAiSuggestions(json.aiSuggestions || []);
+      console.log(lead);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      console.log("calledd false");
+
+      setAiLoading(false);
+    }
+  }
+
   useEffect(() => {
     fetchData();
     fetchEngineers();
   }, []);
+
+  useEffect(() => {
+    if (!projectId) return;
+
+    if (engineers.length === 0) return;
+
+    if (hasRunAi.current) return;
+
+    hasRunAi.current = true;
+
+    automation();
+  }, [projectId, engineers]);
+
+  useEffect(() => {
+    if (!aiLoading) return;
+
+    const interval = setInterval(() => {
+      setDots((prev) => {
+        if (prev.length >= 3) return "";
+        return prev + ".";
+      });
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, [aiLoading]);
+
+  const aiSuggestionIds = new Set(
+    aiSuggestions.map(
+      (engineer: any) => engineer.id
+    )
+  );
+
+  const remainingEngineers =
+    engineers.filter(
+      (engineer) =>
+        !aiSuggestionIds.has(
+          engineer.id
+        )
+    );
+
+  const allUsers = [
+    ...aiSuggestions,
+    ...remainingEngineers,
+  ];
+  console.log(allUsers, "alluserss");
+
+  const filteredUsers = allUsers.filter((engineer) => {
+    const query = search.toLowerCase().trim();
+
+    if (!query) return true;
+
+    const skills =
+      engineer?.engineerProfile?.skills ||
+      engineer?.skills ||
+      [];
+
+    const experience =
+      engineer?.engineerProfile?.yearsOfExperienceNumber ||
+      engineer?.yearsOfExperience ||
+      0;
+
+    const qualification =
+      engineer?.engineerProfile?.qualification ||
+      engineer?.qualification ||
+      "";
+
+    return (
+      engineer?.name
+        ?.toLowerCase()
+        .includes(query) ||
+
+      engineer?.email
+        ?.toLowerCase()
+        .includes(query) ||
+
+      qualification
+        ?.toLowerCase()
+        .includes(query) ||
+
+      String(experience).includes(query) ||
+
+      skills.some((skill: string) =>
+        skill.toLowerCase().includes(query)
+      )
+    );
+  });
 
   if (loading) {
     return (
@@ -746,6 +863,7 @@ export default function ProjectDetailsPage() {
 
     //   </div>
     // </DashboardShell>
+
     <div className="p-6 h-full overflow-hidden">
       <div className=" relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-[#f7f5f5] rounded-2xl p-4 md:p-5">
 
@@ -773,26 +891,52 @@ export default function ProjectDetailsPage() {
         </div>
 
         {/* BACK BUTTON */}
-        <div
-          className="flex sm:block w-full sm:w-auto"
-        >
-          <button
-            onClick={() => router.back()}
-            className="flex items-center justify-center cursor-pointer gap-2 w-full sm:w-auto px-4 h-11 rounded-xl border border-[var(--border)] bg-white hover:bg-gray-50 transition-all shadow-sm text-sm font-medium"
-            style={{
-              color: "var(--text-primary)",
-            }}
+        <div className="flex gap-5 items-center">
+          <div className="w-full max-w-md">
+
+            <input
+              type="text"
+              value={search}
+              onChange={(e) =>
+                setSearch(e.target.value)
+              }
+              placeholder="Search by name, skill, experience..."
+              className="
+      w-full
+      h-11
+      px-4
+      rounded-xl
+      border
+      border-gray-200
+      bg-white
+      text-sm
+      outline-none
+      focus:ring-2
+      focus:ring-cyan-500
+    "
+            />
+
+          </div>
+          <div
+            className="flex sm:block w-full sm:w-auto"
           >
+            <button
+              onClick={() => router.back()}
+              className="flex items-center justify-center cursor-pointer gap-2 w-full sm:w-auto px-4 h-11 rounded-xl border border-[var(--border)] bg-white hover:bg-gray-50 transition-all shadow-sm text-sm font-medium"
+              style={{
+                color: "var(--text-primary)",
+              }}
+            >
 
-            <span>
-              Back
-            </span>
+              <span>
+                Back
+              </span>
 
-            <ArrowRight className="w-4 h-4 shrink-0" />
+              <ArrowRight className="w-4 h-4 shrink-0" />
 
-          </button>
+            </button>
+          </div>
         </div>
-
       </div>
       <div className="grid grid-cols-4 gap-6 h-screen mt-2 p-4 bg-[#f8f6f6] rounded-2xl">
         {columns.map((column) => (
@@ -865,134 +1009,156 @@ export default function ProjectDetailsPage() {
                 }
             `}
             >
-              {column.id === "ALL_USERS" &&
-                engineers
-                  .filter(
-                    (engineer) =>
-                      engineer.engineerProfile
-                  )
-                  .filter((engineer) => {
-                    const alreadyInvited =
-                      invitations.some(
-                        (invitation) =>
-                          invitation.engineerId ===
-                          engineer.engineerProfile.id
-                      );
-
-                    return !alreadyInvited;
-                  })
-                  .map((engineer) => (
-                    <div
-                      key={engineer.id}
-                      draggable
-                      onDragStart={() =>
-                        handleDragStart(
-                          "ENGINEER",
-                          engineer,
-                          "ALL_USERS"
-                        )
-                      }
-                      className="bg-white border border-[var(--border)] rounded-2xl p-4 mb-3 cursor-grab active:cursor-grabbing transition-all hover:shadow-sm">
-                      {/* USER */}
-                      <div className="flex items-center gap-3">
-
-                        {/* IMAGE */}
-                        {engineer.image ? (
-                          <img
-                            src={engineer.image}
-                            alt={engineer.name}
-                            className="
-                              w-12
-                              h-12
-                              rounded-full
-                              object-cover
-                              "
-                          />
-                        ) : (
-                          <div
-                            className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-sm"
-                            style={{
-                              background:
-                                "var(--primary)",
-                            }}
-                          >
-                            {engineer.name?.charAt(0)}
-                          </div>
-                        )}
-
-                        {/* INFO */}
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between">
-                            <h3
-                              className="font-semibold text-[18px] truncate leading-tight tracking-[-0.02em]"
-                              style={{
-                                color: "var(--text-primary)",
-                              }}
-                            >
-                              {engineer.name}
-                            </h3>
-
-                            {/* <span className="px-2.5py-1 rounded-full text-[12px] font-semibold bg-[#F5F5F5] border border-[#E8E8E8]"
-                              style={{
-                                color: "var(--text-secondary)",
-                              }}
-                            >
-                              {engineer.engineerProfile?.qualification}
-                            </span> */}
-                            {/* INVITE BUTTON */}
-                            <button
-                              disabled={sendingLoader === engineer.engineerProfile.id}
-                              onClick={() =>
-                                handleSendInvitation(
-                                  engineer.engineerProfile.id
-                                )
-                              }
-
-                              className={`cursor-pointer shrink-0 h-8 sm:h-9 px-3 sm:px-4 rounded-xl bg-[#FFAE58] hover:opacity-90 transition-all text-white text-[11px] sm:text-[12px] font-semibold shadow-sm  ${sendingLoader === engineer.engineerProfile.id
-                                ? "bg-[#FFC98F] cursor-not-allowed opacity-70"
-                                : "bg-[#FFAE58] hover:opacity-90 cursor-pointer"
-                                }`}>
-                              {sendingLoader === engineer.engineerProfile.id? "Inviting..." : "Invite"}
-                            </button>
-                          </div>
-
-                          <div
-                            className="flex flex-wrap items-center gap-3 mt-3 mb-2">
-
-                            {engineer.engineerProfile?.skills?.length > 0 && (
-                              <div className="flex flex-wrap items-center gap-2">
-
-                                {engineer.engineerProfile.skills
-                                  ?.slice(0, 3)
-                                  .map((skill: string, index: number) => (
-
-                                    <span
-                                      key={index}
-                                      className="px-2.5 py-1 rounded-full text-[11px] sm:text-[12px] font-medium bg-[#FFF7ED] border border-[#FED7AA] whitespace-nowrap"
-                                      style={{
-                                        color: "#C2410C",
-                                      }}
-                                    >
-                                      {skill}
-                                    </span>
-
-                                  ))}
-
-                              </div>
-                            )}
-                          </div>
-                          <span
-                            className="px-2.5 py-1 rounded-full text-[12px] font-semibold bg-[#F8FAFC] border border-[#E2E8F0]"
-                            style={{
-                              color: "#475569",
-                            }}
-                          >
-                            {engineer.engineerProfile?.yearsOfExperienceNumber || 0} years
-                          </span>
-                        </div>
+              {column.id === "ALL_USERS" && (
+                <>
+                  {aiLoading && (
+                    <div className="mb-4 rounded-2xl border border-cyan-200 bg-cyan-50 p-4">
+                      <div className="flex items-center gap-2">
+                        <div className="h-3 w-3 rounded-full bg-cyan-500 animate-pulse" />
+                        <h3 className="font-semibold text-cyan-700">
+                          AI is finding the best engineers{dots}
+                        </h3>
                       </div>
                     </div>
-                  ))}
+                  )}
+
+                  {filteredUsers
+                    .filter((engineer) => {
+                      const alreadyInvited = invitations.some(
+                        (invitation) =>
+                          invitation.engineerId ===
+                          engineer?.engineerProfile?.id
+                      );
+
+                      return !alreadyInvited;
+                    }).filter(
+                      (engineer) => engineer?.engineerProfile
+                    )
+                    .map((engineer) => {
+                      const isAiRecommended =
+                        aiSuggestionIds.has(engineer.id);
+
+                      return (
+                        <div
+                          key={engineer.id}
+                          draggable
+                          onDragStart={() =>
+                            handleDragStart(
+                              "ENGINEER",
+                              engineer,
+                              "ALL_USERS"
+                            )
+                          }
+                          className="bg-white border border-[var(--border)] rounded-2xl p-4 mb-3 cursor-grab active:cursor-grabbing transition-all hover:shadow-sm"
+                        >
+                          <div className="flex items-center gap-3">
+
+                            {engineer.image ? (
+                              <img
+                                src={engineer.image}
+                                alt={engineer.name}
+                                className="w-12 h-12 rounded-full object-cover"
+                              />
+                            ) : (
+                              <div
+                                className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                                style={{
+                                  background: "var(--primary)",
+                                }}
+                              >
+                                {engineer.name?.charAt(0)}
+                              </div>
+                            )}
+
+                            <div className="min-w-0 flex-1">
+
+                              <div className="flex items-center justify-between">
+
+                                <div className="flex items-center gap-2">
+
+                                  <h3
+                                    className="font-semibold text-[18px] truncate leading-tight tracking-[-0.02em]"
+                                    style={{
+                                      color:
+                                        "var(--text-primary)",
+                                    }}
+                                  >
+                                    {engineer.name}
+                                  </h3>
+
+                                  {isAiRecommended && (
+                                    <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-cyan-100 text-cyan-700 border border-cyan-200">
+                                      AI PICK
+                                    </span>
+                                  )}
+
+                                </div>
+
+                                <button
+                                  disabled={
+                                    sendingLoader ===
+                                    engineer?.engineerProfile?.id
+                                  }
+                                  onClick={() =>
+                                    handleSendInvitation(
+                                      engineer?.engineerProfile?.id
+                                    )
+                                  }
+                                  className={`cursor-pointer shrink-0 h-8 sm:h-9 px-3 sm:px-4 rounded-xl text-white text-[11px] sm:text-[12px] font-semibold shadow-sm ${sendingLoader ===
+                                    engineer?.engineerProfile?.id
+                                    ? "bg-[#FFC98F] cursor-not-allowed opacity-70"
+                                    : "bg-[#FFAE58]"
+                                    }`}
+                                >
+                                  {sendingLoader ===
+                                    engineer?.engineerProfile?.id
+                                    ? "Inviting..."
+                                    : "Invite"}
+                                </button>
+                              </div>
+
+                              {(engineer?.engineerProfile?.skills || engineer?.skills)?.length > 0 && (
+                                <div className="flex flex-wrap items-center gap-2 mb-3 mt-1">
+
+                                  {(engineer?.engineerProfile?.skills || engineer?.skills).slice(0, 3).map(
+                                    (skill: string, index: number) => (
+                                      <span
+                                        key={index}
+                                        className="px-2.5 py-1 rounded-full text-[9px] sm:text-[10px] font-medium bg-[#FFF7ED] border border-[#FED7AA] whitespace-nowrap"
+                                        style={{
+                                          color: "#C2410C",
+                                        }}
+                                      >
+                                        {skill}
+                                      </span>
+                                    )
+                                  )}
+
+                                </div>
+                              )}
+
+                              <span
+                                className="px-2.5 py-1 rounded-full text-[12px] font-semibold bg-[#F8FAFC] border border-[#E2E8F0]"
+                                style={{
+                                  color: "#475569",
+                                }}
+                              >
+                                {
+                                  engineer
+                                    ?.engineerProfile
+                                    ?.yearsOfExperienceNumber ||
+                                  0
+                                }{" "}
+                                years
+                              </span>
+
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </>
+              )}
 
               {column.id !== "ALL_USERS" &&
                 getInvitationsByStatus(
@@ -1079,7 +1245,7 @@ export default function ProjectDetailsPage() {
 
                                 <span
                                   key={index}
-                                  className="px-2.5 mr-2 py-1 rounded-full text-[11px] sm:text-[12px] font-medium bg-[#FFF7ED] border border-[#FED7AA] whitespace-nowrap"
+                                  className="px-2.5 mr-2 py-1 rounded-full text-[9px] sm:text-[10px] font-medium bg-[#FFF7ED] border border-[#FED7AA] whitespace-nowrap"
                                   style={{
                                     color: "#C2410C",
                                   }}

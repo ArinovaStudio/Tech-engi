@@ -21,8 +21,7 @@ export default function DashboardPage() {
     return (
       <DashboardShell>
         <div className="flex h-[80vh] items-center justify-center">
-          {/* <Loader2 className="animate-spin" color="#FFAE58" size={32} /> */}
-          hello``
+          <Loader2 className="animate-spin" color="#FFAE58" size={32} />
         </div>
       </DashboardShell>
     );

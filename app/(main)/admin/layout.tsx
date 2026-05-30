@@ -59,10 +59,5 @@ export default function AdminLayout({
     );
   }
 
-  // Prevent flash before redirect
-  if (!auth.isAuthenticated || !auth.isAdmin) {
-    return null;
-  }
-
   return <>{children}</>;
 }

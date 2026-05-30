@@ -46,7 +46,7 @@ export default function StatCard({ title, value, change, changeType, subtitle, h
 
   return (
     <div className="">
-      <div className={`relative rounded-[24px] border p-6 w-64 m-2 h-43 transition-all duration-300 
+      <div className={`relative rounded-[24px] border p-6 m-2 h-43 transition-all duration-300 
        
         ${highlighted
           ? "bg-gradient-to-br from-[#FF7A00] via-[#FFAE58] to-[#FFE0B8] border-transparent text-white"

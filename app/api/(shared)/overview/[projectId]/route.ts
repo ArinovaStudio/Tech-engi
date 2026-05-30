@@ -44,7 +44,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ proj
 
     return NextResponse.json({ success: true, project: projectData }, { status: 200 });
   } catch (error) {
-    console.log("error", error);
     
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }

@@ -328,7 +328,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
         resourceId: null,
       });
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setDeleting(false);
     }

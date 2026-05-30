@@ -51,9 +51,6 @@ export default function EngineerRegisterPage() {
     }
 
     try {
-      console.log("calledd the try");
-
-
       const registerRes = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

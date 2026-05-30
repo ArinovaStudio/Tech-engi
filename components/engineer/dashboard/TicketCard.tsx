@@ -1,10 +1,8 @@
 "use client";
 
-import {
-    AlertCircle,
-    Clock3,
-    MessageSquareWarning,
-} from "lucide-react";
+import { AlertCircle, Clock3, MessageSquareWarning, } from "lucide-react";
+
+import { useState } from "react";
 
 interface Ticket {
     id: string;
@@ -15,10 +13,27 @@ interface Ticket {
 }
 
 interface TicketCardProps {
-    ticket: Ticket;
+  ticket: Ticket;
+  onStatusUpdated: () => Promise<any>;
 }
 
-export default function TicketCard({ ticket, }: TicketCardProps) {
+const actionConfig = {
+    OPEN: {
+        label: "Start Work",
+        nextStatus: "IN_PROGRESS",
+        className:
+            "bg-blue-600 hover:bg-blue-700 text-white",
+    },
+    IN_PROGRESS: {
+        label: "Resolve Issue",
+        nextStatus: "RESOLVED",
+        className:
+            "bg-green-600 hover:bg-green-700 text-white",
+    },
+};
+
+export default function TicketCard({ ticket, onStatusUpdated, }: TicketCardProps) {
+    const [loading, setLoading] = useState(false);
     const formattedDate = new Date(ticket.createdAt).toLocaleDateString("en-IN", {
         day: "2-digit",
         month: "short",
@@ -35,6 +50,30 @@ export default function TicketCard({ ticket, }: TicketCardProps) {
         CLOSED: "bg-[#EAFBF0] text-[#22C55E]",
         PENDING: "bg-[#EEF2FF] text-[#6366F1]",
     };
+
+    const updateTicketStatus = async ({ ticketId, status }: { ticketId: string; status: string; }) => {
+        try {
+            setLoading(true);
+            const response = await fetch("/api/tickets", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ ticketId, status }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to update ticket status");
+            }
+            await onStatusUpdated();
+        } catch (error) {
+            console.error("Error updating ticket status:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const action = actionConfig[ticket.status as keyof typeof actionConfig];
 
     return (
         <div className="flex items-center justify-between rounded-[26px] border border-[#F1F1F1] bg-white px-5 py-4 shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0_10px_40px_rgba(0,0,0,0.06)]">
@@ -87,9 +126,23 @@ export default function TicketCard({ ticket, }: TicketCardProps) {
             <div className="flex items-center gap-3">
 
                 {/* Resolve Button */}
-                <button className="rounded-full cursor-pointer bg-[#D7F266] px-5 py-2 text-[12px] font-semibold text-[#111111] transition-all hover:scale-[1.03] hover:bg-[#CBEF4E]">
+                {/* <button className="rounded-full cursor-pointer bg-[#D7F266] px-5 py-2 text-[12px] font-semibold text-[#111111] transition-all hover:scale-[1.03] hover:bg-[#CBEF4E]">
                     Resolve
-                </button>
+                </button> */}
+
+                {action && (
+                    <button
+                        disabled={loading}
+                        onClick={() =>
+                            updateTicketStatus({
+                                ticketId: ticket.id,
+                                status: action.nextStatus,
+                            })
+                        }
+                        className={` rounded-full px-5 py-2 text-[12px] font-semibold transition-all duration-200 shadow-sm ${loading ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:scale-[1.03] active:scale-[0.98]"} ${action.className}`}>
+                        {loading ? "Updating..." : action.label}
+                    </button>
+                )}
             </div>
         </div>
     );

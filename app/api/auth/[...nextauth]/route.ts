@@ -5,6 +5,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
+import { ApprovalStatus } from "@prisma/client";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
@@ -28,14 +29,24 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Missing email or password");
         }
 
-        const user = await prisma.user.findUnique({ where: { email: credentials.email } });
+        const user = await prisma.user.findUnique({
+          where: {
+            email: credentials.email,
+          },
+          include: {
+            engineerProfile: true,
+          },
+        });
 
-        if (!user) throw new Error("User not found");
+        if (!user) throw new Error("Invalid password or email");
         if (user.isSuspended) throw new Error("Your account has been suspended.");
         if (user.password === null) throw new Error("Password is not set, please login with Google");
+        // if (user.engineerProfile?.status !=="APPROVED") {
+        //   throw new Error("Only approved engineers can login with email and password");
+        // }
 
         const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
-        if (!isPasswordValid) throw new Error("Invalid password");
+        if (!isPasswordValid) throw new Error("Invalid password or email");
 
         return user;
       }
@@ -51,9 +62,9 @@ export const authOptions: NextAuthOptions = {
 
         if (existingUser) {
           if (existingUser.isSuspended) {
-            throw new Error("Your account has been suspended."); 
+            throw new Error("Your account has been suspended.");
           }
-        } 
+        }
         else {
           const cookieStore = await cookies();
           const intendedRole = cookieStore.get("oauth_role")?.value;

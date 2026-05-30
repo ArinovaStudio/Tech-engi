@@ -74,6 +74,74 @@ Project Management Team
 </p>
 `;
 
+const projectRejected = `
+<h2>Project Invitation Declined</h2>
+
+<p>Hello {{engineerName}},</p>
+
+<p>
+We have received your response regarding the project invitation.
+You have chosen not to participate in the project listed below.
+</p>
+
+<h3>Project Details</h3>
+
+<ul>
+  <li><strong>Project:</strong> {{projectTitle}}</li>
+  <li><strong>Description:</strong> {{projectDescription}}</li>
+  <li><strong>Required Skills:</strong> {{projectSkills}}</li>
+  <li><strong>Budget:</strong> ₹{{projectBudget}}</li>
+</ul>
+
+<p>
+Your decision has been recorded successfully.
+No further action is required from your side.
+</p>
+
+<p>
+Thank you for reviewing the opportunity.
+We hope to work with you on future projects.
+</p>
+
+<p>
+Best Regards,<br/>
+Project Management Team
+</p>
+`;
+
+const projectExpired = `
+<h2>Project Invitation Expired</h2>
+
+<p>Hello {{engineerName}},</p>
+
+<p>
+The invitation for the following project has expired because no response was received within the required 24-hour period.
+</p>
+
+<h3>Project Details</h3>
+
+<ul>
+  <li><strong>Project:</strong> {{projectTitle}}</li>
+  <li><strong>Description:</strong> {{projectDescription}}</li>
+  <li><strong>Required Skills:</strong> {{projectSkills}}</li>
+  <li><strong>Budget:</strong> ₹{{projectBudget}}</li>
+</ul>
+
+<p>
+As a result, this invitation is no longer available.
+Future opportunities may still be offered based on project requirements and availability.
+</p>
+
+<p>
+Thank you for your interest and participation on the platform.
+</p>
+
+<p>
+Best Regards,<br/>
+Project Management Team
+</p>
+`;
+
 
 export async function GET(req: NextRequest) {
   try {
@@ -255,24 +323,11 @@ export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const {
-      status,
-      action,
-      id
-    } = body;
+    const { status, action, id } = body;
 
     // VALIDATION
     if (!status) {
-      return NextResponse.json(
-        {
-          success: false,
-          message:
-            "Status is required",
-        },
-        {
-          status: 400,
-        }
-      );
+      return NextResponse.json({ success: false, message: "Status is required", }, { status: 400, });
     }
 
     // CHECK INVITATION
@@ -287,14 +342,7 @@ export async function PATCH(req: NextRequest) {
 
     if (!existingInvitation) {
       return NextResponse.json(
-        {
-          success: false,
-          message:
-            "Invitation not found",
-        },
-        {
-          status: 404,
-        }
+        { success: false, message: "Invitation not found", }, { status: 404, }
       );
     }
 
@@ -321,17 +369,46 @@ export async function PATCH(req: NextRequest) {
           },
         }
       );
+    let emailTemplate = "";
+    let subject = "";
+
+    const emailHtml = emailTemplate
+      .replace(
+        "{{engineerName}}",
+        updatedInvitation.engineer.user.name ||
+        "Engineer"
+      )
+      .replace(
+        "{{projectTitle}}",
+        updatedInvitation.project.title
+      )
+      .replace(
+        "{{projectDescription}}",
+        updatedInvitation.project.description
+      )
+      .replace(
+        "{{projectSkills}}",
+        updatedInvitation.project.instruments.join(", ")
+      )
+      .replace(
+        "{{projectBudget}}",
+        String(updatedInvitation.project.budget)
+      );
+
+    if (status === "ACCEPTED") {
+      emailTemplate = projectConfirm;
+
+      subject = "Congratulations! You Have Been Assigned To A Project";
+    } else if (status === "REJECTED") {
+      emailTemplate = projectRejected;
+
+      subject = "Project Invitation Declined";
+    }
+
+    await sendEmail(updatedInvitation.engineer.user.email, subject, emailHtml);
 
     return NextResponse.json(
-      {
-        success: true,
-        invitation:
-          updatedInvitation,
-      },
-      {
-        status: 200,
-      }
-    );
+      { success: true, invitation: updatedInvitation, }, { status: 200, });
   } catch (error) {
     console.error(
       "UPDATE_INVITATION_ERROR",
@@ -339,16 +416,9 @@ export async function PATCH(req: NextRequest) {
     );
 
     return NextResponse.json(
-      {
-        success: false,
-        message:
-          "Failed to update invitation",
-      },
-      {
-        status: 500,
-      }
+      { success: false, message: "Failed to update invitation", }, { status: 500, }
     );
-  }
+  } 
 }
 
 /*

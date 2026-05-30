@@ -30,20 +30,19 @@ export default function InvitationCard({ invitationsData, onAccept, onReject, }:
     const handleUpdate = async (invitationId: string, status: string) => {
         try {
             setLoadingId(invitationId);
-            const res = await fetch("/api/engineer/invitation",
+            const res = await fetch("/api/admin/invitations",
                 {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        invitationId,
+                        id: invitationId,
                         status,
                     }),
                 });
 
             const data = await res.json();
-            console.log(data);
             if (data.success) {
                 router.refresh();
             }

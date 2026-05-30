@@ -62,9 +62,6 @@ export default function ClientLayout({
   }
 
   // Prevent protected UI flash
-  if (!auth.isAuthenticated || !auth.isClient) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen">

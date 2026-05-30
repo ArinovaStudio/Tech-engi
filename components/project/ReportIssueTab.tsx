@@ -137,6 +137,10 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
     images: [] as File[],
   });
 
+  const [activeTab, setActiveTab] = useState("ME");
+
+  const roleTabs = role === "ADMIN" ? ["ME", "ENGINEER", "CLIENT"] : ["ME", "ENGINEER", "CLIENT", "ADMIN"];
+
   const fetchTickets = async () => {
     try {
       const res = await fetch(`/api/tickets?projectId=${projectId}`);
@@ -161,7 +165,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
     fetchData();
   }, [projectId]);
 
-  const handleCreateTicket = async ({}) => {
+  const handleCreateTicket = async ({ }) => {
     try {
       setCreating(true);
 
@@ -228,8 +232,34 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
   };
   // const handleUpdateTicket = async () => {};
   // const deleteTicket = async () => {};
-  const inputCls =
-    "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)]  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
+  const inputCls = "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)]  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
+
+  const currentUserId = session?.user?.id;
+
+  const filteredTickets = tickets.filter((ticket) => {
+    const raisedRole = ticket.raisedBy?.role?.toUpperCase()?.trim() || "";
+
+    switch (activeTab) {
+      case "ME":
+        return ticket?.raisedById === currentUserId;
+
+      case "ENGINEER":
+        if (ticket?.raisedById === currentUserId) {
+          return false;
+        } else {
+          return raisedRole === "ENGINEER";
+        }
+
+      case "CLIENT":
+        return raisedRole === "CLIENT";
+
+      case "ADMIN":
+        return raisedRole === "ADMIN";
+
+      default:
+        return true;
+    }
+  });
 
   if (sessionStatus === "loading")
     return (
@@ -294,154 +324,211 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
         </ul>
       </div>
 
-      {tickets.length === 0 ? (
-        loading ? (
-          <div className="min-h-full w-full flex justify-center items-center">
-            <Loader2 className="animate-spin" color="var(--primary)" />
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Sidebar */}
+        <div className="w-full shrink-0">
+          <div className="bg-white rounded-xl border border-[var(--border)] p-2">
+            <div className="flex gap-2 overflow-x-auto">
+              {roleTabs.map((tab) => {
+                const count = tickets.filter((ticket) => {
+                  const raisedRole = ticket.raisedBy?.role?.toUpperCase()?.trim() || "";
+
+                  if (tab === "ME") {
+                    return ticket?.raisedById === currentUserId;
+                  }
+
+                  if (ticket?.raisedById === currentUserId) {
+                    return false;
+                  } else {
+                    return raisedRole === tab;
+                  }
+
+                  return raisedRole === tab;
+                }).length;
+
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${activeTab === tab
+                      ? "text-white"
+                      : "hover:bg-gray-100 text-gray-700"
+                      }`}
+                    style={
+                      activeTab === tab
+                        ? { background: "var(--primary)" }
+                        : {}
+                    }
+                  >
+                    <span>{tab}</span>
+                    <span className="text-xs opacity-80 px-2">
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        ) : (
-          <div className="text-center py-12">
-            <AlertCircle
-              className="mx-auto h-10 w-10 mb-3"
-              style={{ color: "var(--border)" }}
-            />
-            <p
-              className=" text-sm"
-              style={{ color: "var(--text-muted)" }}
-            >
-              No issues reported yet.
-            </p>
-          </div>
-        )
-      ) : (
-        <div className="space-y-3">
-          {tickets.map((report: any) => {
-            return (
-              <div
-                key={report.id}
-                className="bg-white rounded-xl border border-[var(--border)] p-5"
-              >
-                <div className="flex items-start gap-3">
-                  <AlertCircle
-                    size={18}
-                    className="text-red-500"
-                    style={{ marginTop: 2 }}
-                  />
 
-                  <div className="flex-1">
-                    {/* Top Row */}
-                    <div className="flex items-center justify-between">
-                      {/* Type Badge */}
-                      <span className="text-xs uppercase font-semibold px-2.5 py-0.5 rounded-full border bg-gray-100 text-gray-700 border-gray-200">
-                        {report.issueType}
-                      </span>
+          {/* Tickets */}
+        <div className="flex-1">
+          {/* Ticket List Here */}
 
-                      {/* ✅ Status Dropdown */}
-                      <div className="relative">
-                        <button
-                          disabled={updating}
-                          onClick={() => {
-                            if (updating) return;
+          {filteredTickets.length === 0 ? (
+            loading ? (
+              <div className="min-h-full w-full flex justify-center items-center">
+                <Loader2 className="animate-spin" color="var(--primary)" />
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <AlertCircle
+                  className="mx-auto h-10 w-10 mb-3"
+                  style={{ color: "var(--border)" }}
+                />
+                <p
+                  className="text-sm"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  {activeTab === "ME"
+                    ? "You haven't reported any issues yet."
+                    : `No ${activeTab.toLowerCase()} issues found.`}
+                </p>
+              </div>
+            )
+          ) : (
+            <div className="space-y-3">
+              {filteredTickets.map((report: any) => {
+                return (
+                  <div
+                    key={report.id}
+                    className="bg-white rounded-xl border border-[var(--border)] p-5"
+                  >
+                    <div className="flex items-start gap-3">
+                      <AlertCircle
+                        size={18}
+                        className="text-red-500"
+                        style={{ marginTop: 2 }}
+                      />
 
-                            setOpenDropdownId((prev) =>
-                              prev === report.id ? null : report.id
-                            );
-                          }}
-                          className={`text-xs px-2.5 py-1 rounded-full border flex items-center gap-1 ${
-                            statusColors[report.status]
-                          } ${updating ? "opacity-60 cursor-not-allowed" : ""}`}
+                      <div className="flex-1">
+                        {/* Top Row */}
+                        <div className="flex items-center justify-between">
+                          {/* Type Badge */}
+                          <span className="text-xs uppercase font-semibold px-2.5 py-0.5 rounded-full border bg-gray-100 text-gray-700 border-gray-200">
+                            {report.issueType}
+                          </span>
+
+                          {/* ✅ Status Dropdown */}
+                          <div className="relative">
+                            <button
+                              disabled={updating}
+                              onClick={() => {
+                                if (updating) return;
+
+                                setOpenDropdownId((prev) =>
+                                  prev === report.id ? null : report.id
+                                );
+                              }}
+                              className={`text-xs px-2.5 py-1 rounded-full border flex items-center gap-1 ${statusColors[report.status]
+                                } ${updating ? "opacity-60 cursor-not-allowed" : ""}`}
+                            >
+                              {updating
+                                ? "Updating..."
+                                : report.status.replace("_", " ")}
+
+                              {role !== "ENGINEER" && !updating && (
+                                <span className="text-[10px]">▼</span>
+                              )}
+                            </button>
+
+                            {/* ✅ Controlled Dropdown */}
+                            {openDropdownId === report.id &&
+                              role !== "ENGINEER" &&
+                              !updating && (
+                                <div className="absolute right-0 mt-1 w-36 bg-white border rounded-lg shadow-md z-10">
+                                  {[
+                                    "OPEN",
+                                    "IN_PROGRESS",
+                                    "RESOLVED",
+                                    "CLOSED",
+                                  ].map((status) => (
+                                    <button
+                                      key={status}
+                                      onClick={async () => {
+                                        // ✅ Close dropdown immediately
+                                        setOpenDropdownId(null);
+
+                                        // ✅ Update status
+                                        await updateTicketStatus({
+                                          ticketId: report.id,
+                                          status,
+                                        });
+                                      }}
+                                      className="w-full text-black text-left px-3 py-2 text-xs hover:bg-gray-100"
+                                    >
+                                      {status.replace("_", " ")}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                          </div>
+                        </div>
+
+                        {/* Description */}
+                        <p
+                          className="text-sm mt-2"
+                          style={{ color: "var(--text-secondary)" }}
                         >
-                          {updating
-                            ? "Updating..."
-                            : report.status.replace("_", " ")}
+                          {report.description}
+                        </p>
 
-                          {role !== "ENGINEER" && !updating && (
-                            <span className="text-[10px]">▼</span>
-                          )}
-                        </button>
+                        {/* Images */}
+                        {report.images?.length > 0 && (
+                          <div className="flex gap-2 mt-3 flex-wrap">
+                            {report.images.map((img: string, i: number) => (
+                              <a
+                                key={i}
+                                href={img}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <img
+                                  src={img}
+                                  alt="ticket"
+                                  className="w-16 h-16 object-cover rounded-lg border cursor-pointer hover:opacity-80 transition"
+                                />
+                              </a>
+                            ))}
+                          </div>
+                        )}
 
-                        {/* ✅ Controlled Dropdown */}
-                        {openDropdownId === report.id &&
-                          role !== "ENGINEER" &&
-                          !updating && (
-                            <div className="absolute right-0 mt-1 w-36 bg-white border rounded-lg shadow-md z-10">
-                              {[
-                                "OPEN",
-                                "IN_PROGRESS",
-                                "RESOLVED",
-                                "CLOSED",
-                              ].map((status) => (
-                                <button
-                                  key={status}
-                                  onClick={async () => {
-                                    // ✅ Close dropdown immediately
-                                    setOpenDropdownId(null);
+                        {/* Footer */}
+                        <div
+                          className="flex items-center gap-4 mt-3 text-xs"
+                          style={{ color: "var(--text-muted)" }}
+                        >
+                          <span className="flex items-center gap-1">
+                            <User size={11} /> {report.raisedBy?.name || "User"}
+                          </span>
 
-                                    // ✅ Update status
-                                    await updateTicketStatus({
-                                      ticketId: report.id,
-                                      status,
-                                    });
-                                  }}
-                                  className="w-full text-black text-left px-3 py-2 text-xs hover:bg-gray-100"
-                                >
-                                  {status.replace("_", " ")}
-                                </button>
-                              ))}
-                            </div>
-                          )}
+                          <span className="flex items-center gap-1">
+                            <Calendar size={11} />
+                            {new Date(report.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-
-                    {/* Description */}
-                    <p
-                      className="text-sm mt-2"
-                      style={{ color: "var(--text-secondary)" }}
-                    >
-                      {report.description}
-                    </p>
-
-                    {/* Images */}
-                    {report.images?.length > 0 && (
-                      <div className="flex gap-2 mt-3 flex-wrap">
-                        {report.images.map((img: string, i: number) => (
-                          <a
-                            key={i}
-                            href={img}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <img
-                              src={img}
-                              alt="ticket"
-                              className="w-16 h-16 object-cover rounded-lg border cursor-pointer hover:opacity-80 transition"
-                            />
-                          </a>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Footer */}
-                    <div
-                      className="flex items-center gap-4 mt-3 text-xs"
-                      style={{ color: "var(--text-muted)" }}
-                    >
-                      <span className="flex items-center gap-1">
-                        <User size={11} /> {report.raisedBy?.name || "User"}
-                      </span>
-
-                      <span className="flex items-center gap-1">
-                        <Calendar size={11} />
-                        {new Date(report.createdAt).toLocaleDateString()}
-                      </span>
                     </div>
                   </div>
-                </div>
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+          )}
         </div>
-      )}
+        </div>
+
+        
+      </div>
+
 
       {/* {showClientIssueModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">

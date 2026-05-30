@@ -47,8 +47,7 @@ export default function EngineerDashboardPage() {
   // cache fetched data per period to avoid redundant calls
   const [cache, setCache] = useState<Record<string, AnalyticsData>>({});
 
-  const { data: projectsData, isLoading: projectsLoading, } = useSWR("/api/engineer/perengineer-projects", fetcher);
-  console.log(projectsData, "projectsData");
+  const { data: projectsData, isLoading: projectsLoading,mutate } = useSWR("/api/engineer/perengineer-projects", fetcher);
   const { data: invitationsData } = useSWR("/api/engineer/invitation-engineer", fetcher);
   // console.log(invitationsData, "invitationsData");
 
@@ -125,7 +124,7 @@ export default function EngineerDashboardPage() {
   const totalProjects = cardData.projects?.overview?.totalAssigned ?? 0;
   const completionRate = totalProjects > 0 ? Math.round((completedProjects / totalProjects) * 100)
     : 0;
-  console.log(cardData.projects, "projects card data");
+    
   if (loading) {
     return (
       <DashboardShell>
@@ -217,9 +216,7 @@ export default function EngineerDashboardPage() {
                 ?.flatMap((project: Project) => project.tickets || [])
                 ?.slice(0, 3)
                 ?.map((ticket: Ticket) => (
-                  <TicketCard
-                    key={ticket.id}
-                    ticket={ticket}
+                  <TicketCard key={ticket.id} ticket={ticket} onStatusUpdated={mutate}
                   />
                 ))}
             </div>

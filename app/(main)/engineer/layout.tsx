@@ -60,9 +60,6 @@ export default function EngineerLayout({
   }
 
   // Prevent protected UI flash
-  if (!auth.isAuthenticated || !auth.isEngineer) {
-    return null;
-  }
 
   return <>{children}</>;
 }

@@ -532,14 +532,11 @@ export default function ProjectDetailsPage() {
         }),
       });
       const json = await res.json();
-      console.log(json, "data from matcher api", res);
 
       const lead = setAiSuggestions(json.aiSuggestions || []);
-      console.log(lead);
     } catch (error) {
       console.error(error);
     } finally {
-      console.log("calledd false");
 
       setAiLoading(false);
     }
@@ -593,7 +590,6 @@ export default function ProjectDetailsPage() {
     ...aiSuggestions,
     ...remainingEngineers,
   ];
-  console.log(allUsers, "alluserss");
 
   const filteredUsers = allUsers.filter((engineer) => {
     const query = search.toLowerCase().trim();

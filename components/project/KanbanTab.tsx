@@ -916,7 +916,7 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
   );
 
   const getTasksByStatus = (status: Task["status"]) => filteredTasks.filter((task) => task.status === status);
-  console.log(filteredTasks);
+  
   if (loading) {
     return (
       <div className="w-full h-[50vh] flex justify-center items-center">

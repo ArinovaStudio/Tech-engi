@@ -1,23 +1,11 @@
 "use client";
 
 import { fetcher } from "@/lib/fetcher";
-import {
-  Mail,
-  Calendar,
-  User,
-  Edit2,
-  Trash2,
-  Loader2,
-  Ban,
-  CheckCircle,
-  Bell,
-  Search,
-  Filter,
-} from "lucide-react";
+import { Mail, Calendar, User, Edit2, Trash2, Loader2, Ban, CheckCircle, Bell, Search, Filter, } from "lucide-react";
 import Image from "next/image";
 import React, { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
-import { io } from "socket.io-client"; 
+import { io } from "socket.io-client";
 import ConfirmModal from "../ConfirmModal";
 import EditUserModal from "./EditUserModal";
 import useSWRInfinite from "swr/infinite";
@@ -25,7 +13,12 @@ import { useRouter } from "next/navigation";
 import SuspendUserModal from "./SuspendUserModal";
 import EngineerStatusModal from "./EngineerStatusModal";
 
-const socket = io();
+const socket = io({
+  reconnection: true,
+  reconnectionAttempts: 5,
+  reconnectionDelay: 1000,
+  timeout: 5000,
+});
 
 const s = {
   page: { minHeight: "100vh", background: "#f9fafb", padding: 32, fontFamily: "inherit" } as React.CSSProperties,
@@ -46,15 +39,17 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
   const [editingUser, setEditingUser] = useState<any>(null);
   const [deletingUser, setDeletingUser] = useState<any>(null);
   const [suspendingUser, setSuspendingUser] = useState<any>(null);
-  
+
   const [statusModalUser, setStatusModalUser] = useState<any>(null);
   const [targetStatus, setTargetStatus] = useState<"APPROVED" | "REJECTED" | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
-  
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [liveUsers, setLiveUsers] = useState<Record<string, boolean>>({});
+  const [socketError, setSocketError] = useState("");
 
   const router = useRouter();
+
 
   useEffect(() => {
     const handler = setTimeout(() => { setDebouncedSearch(search); }, 500);
@@ -62,14 +57,14 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
   }, [search]);
 
   const getKey = (pageIndex: number, previousPageData: any) => {
-    if (previousPageData && previousPageData.users.length === 0) return null; 
+    if (previousPageData && previousPageData.users.length === 0) return null;
     return `/api/admin/users?role=${role}&search=${encodeURIComponent(debouncedSearch)}&status=${statusFilter}&page=${pageIndex + 1}&limit=12`;
   };
 
   const { data, size, setSize, isValidating, mutate } = useSWRInfinite(
-    getKey, 
+    getKey,
     fetcher,
-    { 
+    {
       keepPreviousData: true,
       revalidateOnFocus: false
     }
@@ -109,7 +104,8 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
       socket.off("multiple_users_status_result", handleBulkStatus);
       socket.off("user_status_change", handleStatusChange);
     };
-  }, [visibleUsers]);
+  }, []);
+
 
   // ACTION HANDLERS
   const handleDelete = async () => {
@@ -124,7 +120,7 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
       } else {
         toast.error(result.message || "Failed to delete");
       }
-    } catch { toast.error("Internal Server Error"); } 
+    } catch { toast.error("Internal Server Error"); }
     finally { setIsProcessing(false); setDeletingUser(null); }
   };
 
@@ -170,32 +166,32 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
     }
 
     return (
-      <div 
-          key={u.id} 
-          style={{ ...s.card, cursor: "pointer" }} 
-          onClick={() => handleRedirect(u.role)}
-          className="hover:shadow-md transition-shadow"
-        >
+      <div
+        key={u.id}
+        style={{ ...s.card, cursor: "pointer" }}
+        onClick={() => handleRedirect(u.role)}
+        className="hover:shadow-md transition-shadow"
+      >
         <div style={{ position: "absolute", top: 12, right: 12, display: "flex", gap: 4, zIndex: 10 }}>
-          <button 
-            onClick={(e) => { e.stopPropagation(); setSuspendingUser(u); }} 
-            style={s.actionBtn()} 
+          <button
+            onClick={(e) => { e.stopPropagation(); setSuspendingUser(u); }}
+            style={s.actionBtn()}
             title={u.isSuspended ? "Unsuspend" : "Suspend"}
           >
             {u.isSuspended ? <CheckCircle size={14} color="#22c55e" /> : <Ban size={14} color="#f59e0b" />}
           </button>
-          
-          <button 
-            onClick={(e) => { e.stopPropagation(); setEditingUser(u); }} 
-            style={s.actionBtn()} 
+
+          <button
+            onClick={(e) => { e.stopPropagation(); setEditingUser(u); }}
+            style={s.actionBtn()}
             title="Edit"
           >
             <Edit2 size={14} color="#6F6F6F" />
           </button>
-          
-          <button 
-            onClick={(e) => { e.stopPropagation(); setDeletingUser(u); }} 
-            style={s.actionBtn(true)} 
+
+          <button
+            onClick={(e) => { e.stopPropagation(); setDeletingUser(u); }}
+            style={s.actionBtn(true)}
             title="Delete"
           >
             <Trash2 size={14} color="#e53e3e" />
@@ -223,31 +219,32 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
             {(role === "ENGINEER") && (
               <div style={{ marginBottom: 6, display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={s.badge(u.status === "PENDING" ? "#f59e0b" : u.status === "REJECTED" ? "#ef4444" : "#FFAE58", "#f4f4f4")}>
-                  {u.status || "APPROVED"}
+                  {/* {u.status || "APPROVED"} */}
+                  {u.status}
                 </span>
-                
+
                 {/* Pending Actions - ADDED e.stopPropagation() */}
                 {u.status === "PENDING" && (
                   <div style={{ display: "flex", gap: 6 }}>
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); setStatusModalUser(u); setTargetStatus("APPROVED"); }} 
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setStatusModalUser(u); setTargetStatus("APPROVED"); }}
                       style={{ padding: "2px 8px", fontSize: 11, fontWeight: 600, background: "#dcfce7", color: "#16a34a", border: "1px solid #bbf7d0", borderRadius: 6, cursor: "pointer" }}
                     >
                       Approve
                     </button>
-                    <button 
-                      onClick={(e) => { e.stopPropagation(); setStatusModalUser(u); setTargetStatus("REJECTED"); }} 
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setStatusModalUser(u); setTargetStatus("REJECTED"); }}
                       style={{ padding: "2px 8px", fontSize: 11, fontWeight: 600, background: "#fee2e2", color: "#ef4444", border: "1px solid #fecaca", borderRadius: 6, cursor: "pointer" }}
                     >
                       Reject
                     </button>
                   </div>
                 )}
-                
+
                 {/* Rejected Actions - ADDED e.stopPropagation() */}
                 {u.status === "REJECTED" && (
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); setStatusModalUser(u); setTargetStatus("APPROVED"); }} 
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setStatusModalUser(u); setTargetStatus("APPROVED"); }}
                     style={{ padding: "2px 8px", fontSize: 11, fontWeight: 600, background: "#dcfce7", color: "#16a34a", border: "1px solid #bbf7d0", borderRadius: 6, cursor: "pointer" }}
                   >
                     Approve
@@ -285,7 +282,7 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
     <div style={s.page}>
       <div style={{ marginBottom: 28 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-          
+
           <h1 style={{ fontSize: 22, fontWeight: 600, color: "#050A30", display: "flex", alignItems: "center", gap: "10px" }}>
             {statusFilter === "PENDING" ? "Pending Requests" : tabLabel[role]}
             <span style={{ fontSize: 14, fontWeight: 500, color: "#6F6F6F" }}>
@@ -321,7 +318,7 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
             )}
 
             {role === "ENGINEER" && (
-              <button 
+              <button
                 onClick={() => setStatusFilter(statusFilter === "PENDING" ? "APPROVED" : "PENDING")}
                 className={`relative p-2.5 rounded-lg border transition-colors ${statusFilter === "PENDING" ? "bg-[#FFAE58] text-white border-[#FFAE58]" : "bg-white border-[#e5e5e5] text-gray-600 hover:bg-gray-50"}`}
                 title="View Pending Requests"

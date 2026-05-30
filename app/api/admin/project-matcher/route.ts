@@ -6,7 +6,6 @@ const ollama = new Ollama();
 
 export async function POST(req: NextRequest) {
     try {
-        console.log("calledd");
         
         const { engineers, projectId } = await req.json();
 
@@ -92,7 +91,6 @@ export async function POST(req: NextRequest) {
             );
 
         const topCandidates = relevantEngineers.slice(0, 20);
-console.log(relevantEngineers, "relevantEngineers");
         const prompt = `
 You are a senior engineering recruiter.
 

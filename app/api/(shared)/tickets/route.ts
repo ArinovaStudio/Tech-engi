@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getUser } from "@/lib/auth"; 
+import { getUser } from "@/lib/auth";
 import { uploadImage } from "@/lib/uploads";
 import { z } from "zod";
 
@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
     const tickets = await prisma.ticket.findMany({
       where: whereClause,
       orderBy: { createdAt: "desc" },
-      include: { 
+      include: {
         project: { select: { title: true } },
         raisedBy: { select: { name: true, image: true, role: true } }
       }
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
     }
 
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    
+
     const ticketsRaisedToday = await prisma.ticket.count({
       where: { raisedById: user.id, createdAt: { gte: twentyFourHoursAgo } }
     });
@@ -149,5 +149,82 @@ export async function POST(req: NextRequest) {
 
   } catch {
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    
+    const body = await req.json();
+
+    const { ticketId, status } = body;
+
+    if (!ticketId || !status) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "ticketId and status are required",
+        },
+        { status: 400 }
+      );
+    }
+
+    const validStatuses = [
+      "OPEN",
+      "IN_PROGRESS",
+      "RESOLVED",
+      "CLOSED",
+    ];
+
+    if (!validStatuses.includes(status)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid status",
+        },
+        { status: 400 }
+      );
+    }
+
+    const ticket = await prisma.ticket.findUnique({
+      where: {
+        id: ticketId,
+      },
+    });
+
+    if (!ticket) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Ticket not found",
+        },
+        { status: 404 }
+      );
+    }
+
+    const updatedTicket = await prisma.ticket.update({
+      where: {
+        id: ticketId,
+      },
+      data: {
+        status,
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: "Ticket status updated",
+      ticket: updatedTicket,
+    });
+  } catch (error) {
+    console.error("Update ticket status error:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Internal server error",
+      },
+      { status: 500 }
+    );
   }
 }

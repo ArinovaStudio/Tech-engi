@@ -144,7 +144,7 @@ export default function EngineerPayoutPage() {
               {hasPayoutDetails ? "Configured" : "Missing"}
             </p>
             <p className={`text-xs mt-1  ${hasPayoutDetails ? "text-blue-600" : "text-red-600"}`}>
-              {hasPayoutDetails ? "Ready for payouts" : "Please add in settings"}
+              {hasPayoutDetails ? "Ready for payouts" : "Please add in Profile"}
             </p>
           </div>
 

@@ -201,7 +201,7 @@ export default function EngineerDashboardPage() {
           <div className="p-1">
             <div className="flex flex items-center">
               <h3 className="mb-4 mt-4 flex items-center gap-3 text-3xl font-semibold">
-                Open Tickets
+                Tickets
               </h3>
               <span className="text-[#898d94] text-xl px-2 rounded">
                 ({projectsData?.projects?.reduce(

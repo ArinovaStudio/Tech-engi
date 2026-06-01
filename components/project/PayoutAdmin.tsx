@@ -122,8 +122,8 @@ export default function PayoutAdmin({
         {/* CLIENT USERS */}
         <div className="w-full lg:w-72 border border-[var(--border)] rounded-xl bg-white p-5 space-y-4 h-fit">
 
-          <h3 className="font-bold text-lg text-[var(--text-primary)]">
-            Client Users
+          <h3 className="font-semibold text-lg text-[var(--text-primary)]">
+            Client
           </h3>
 
           <div className="space-y-3">
@@ -162,8 +162,8 @@ export default function PayoutAdmin({
         {/* ENGINEER USERS */}
         <div className="w-full lg:w-72 border border-[var(--border)] rounded-xl bg-white p-5 space-y-4 h-fit">
 
-          <h3 className="font-bold text-lg text-[var(--text-primary)]">
-            Engineer Users
+          <h3 className="font-semibold text-lg text-[var(--text-primary)]">
+            Engineer
           </h3>
 
           <div className="space-y-3">

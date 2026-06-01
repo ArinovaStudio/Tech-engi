@@ -322,7 +322,7 @@ export default function ProjectProgress({data = [],}: {data: any[];}) {
                                     style={{
                                         height: `${height}%`,
                                         background: isActive
-                                            ? "#D9FF56"
+                                            ? "#FFAE58"
                                             : "#171725",
                                         minHeight:
                                             item.value > 0

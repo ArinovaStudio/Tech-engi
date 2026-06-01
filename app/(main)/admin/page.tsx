@@ -29,8 +29,7 @@ export default function DashboardPage() {
 
   const stats = data?.stats || {};
   const charts = data?.charts || {};
-
-
+  
   return (
     <DashboardShell>
       {/* Page header */}
@@ -60,7 +59,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-3">
           <StatCard
             title="Total Projects"
-            value="24"
+            value={stats.totalProjects?.toString()}
             highlighted
             change="5%"
             changeType="up"
@@ -68,21 +67,21 @@ export default function DashboardPage() {
 
           <StatCard
             title="Ended Projects"
-            value="10"
+            value={stats.completedProjects?.toString()}
             change="6%"
             changeType="up"
           />
 
           <StatCard
             title="Running Projects"
-            value="12"
+            value={stats.ongoingProjects?.toString()}
             change="2%"
             changeType="up"
           />
 
           <StatCard
-            title="Pending Project"
-            value="2"
+            title="Total Clients"
+            value={stats.totalClients?.toString()}
             subtitle="On Discuss"
           />
         </div>

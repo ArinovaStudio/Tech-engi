@@ -95,14 +95,14 @@ function ProjectCard({ project }: { project: Project }) {
 export default function EngineerProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  
+
   const [stats, setStats] = useState({ total: 0, active: 0, completed: 0 });
 
   useEffect(() => {
@@ -128,41 +128,67 @@ export default function EngineerProjectsPage() {
 
       const res = await fetch(`/api/engineer/projects?${query}`);
       const data = await res.json();
-      
+
       if (data.success) {
         setProjects(data.projects);
         setTotalPages(data.pagination.totalPages);
         setTotalItems(data.pagination.total);
         setStats(data.globalStats);
       }
-    } catch { 
+    } catch {
       // silent fail
-    } finally { 
-      setLoading(false); 
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => { 
-    fetchProjects(); 
+  useEffect(() => {
+    fetchProjects();
   }, [debouncedSearch, statusFilter, page]);
 
   return (
     <DashboardShell>
       <div className="space-y-6 pb-10">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold  text-[var(--text-primary)]">
-              My Assigned Projects
-            </h1>
-            <p className="text-xs  text-[var(--text-muted)] mt-0.5">
-              Overview of all your active and completed work
-            </p>
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold  text-[var(--text-primary)]">
+                My Assigned Projects
+              </h1>
+              <p className="text-xs  text-[var(--text-muted)] mt-0.5">
+                Overview of all your active and completed work
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 mt-4 flex-col md:flex-row"> 
+            <div className="relative w-full md:w-64 shrink-0">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+              <input
+                placeholder="Search projects..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 border border-[var(--border)] rounded-lg text-sm  bg-gray-50 text-[var(--text-primary)] outline-none focus:ring-1 focus:ring-[var(--primary)]"
+              />
+            </div>
+            <div className="relative w-full md:w-auto shrink-0">
+              <Filter size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full md:w-auto pl-8 pr-8 py-2 border border-[var(--border)] rounded-lg text-sm  bg-gray-50 text-[var(--text-primary)] outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[var(--primary)]"
+              >
+                <option value="ALL">All Status</option>
+                {Object.entries(STATUS_META).map(([k, v]) => (
+                  <option key={k} value={k}>{v.label}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
         {/* Global Stats */}
-        <div className="grid grid-cols-3 gap-4">
+        {/* <div className="grid grid-cols-3 gap-4">
           {[
             { label: "Total Assigned", value: stats.total, icon: <Briefcase size={16} />, color: "text-[var(--text-primary)]" },
             { label: "Active", value: stats.active, icon: <Clock size={16} />, color: "text-orange-500" },
@@ -176,10 +202,10 @@ export default function EngineerProjectsPage() {
               </div>
             </div>
           ))}
-        </div>
+        </div> */}
 
         {/* Filters */}
-        <div className="flex flex-col md:flex-row items-center gap-3 bg-white p-3 rounded-xl border border-[var(--border)] shadow-sm">
+        {/* <div className="flex flex-col md:flex-row items-center gap-3 bg-white p-3 rounded-xl border border-[var(--border)] shadow-sm">
           <div className="relative w-full md:w-64 shrink-0">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
             <input
@@ -205,7 +231,7 @@ export default function EngineerProjectsPage() {
           <span className="text-xs  text-[var(--text-muted)] px-2 font-medium w-full md:w-auto text-center md:text-left mt-1 md:mt-0">
             {totalItems} results found
           </span>
-        </div>
+        </div> */}
 
         {/* Content */}
         {loading ? (
@@ -230,7 +256,7 @@ export default function EngineerProjectsPage() {
                 <span className="text-sm text-[var(--text-muted)] ">
                   Page <span className="font-semibold text-[var(--text-primary)]">{page}</span> of {totalPages}
                 </span>
-                
+
                 <div className="flex gap-2">
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}

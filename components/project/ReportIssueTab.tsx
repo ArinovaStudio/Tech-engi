@@ -9,6 +9,7 @@ import {
   Shield,
   LucideLoader,
   Loader2,
+  Upload,
 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { useSession } from "next-auth/react";
@@ -132,7 +133,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
   const isClient = role === "CLIENT";
   const [newTicket, setNewTicket] = useState({
     issueType: "",
-    target: "PLATFORM",
+    target: role === "ADMIN" ? "Engineer" : "PLATFORM",
     description: "",
     images: [] as File[],
   });
@@ -156,6 +157,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
     } finally {
     }
   };
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -272,6 +274,9 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
       </div>
     );
 
+  const targetOptions = role === "ADMIN" ? ["Engineer"] : ["PLATFORM", "CLIENT"];
+
+
   return (
     <div className="space-y-6">
       <Toaster position="top-right" />
@@ -327,7 +332,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Sidebar */}
         <div className="w-full shrink-0">
-          <div className="bg-white rounded-xl border border-[var(--border)] p-2">
+          <div className="bg-white rounded-xl border border-[var(--border)] p-2 mb-3">
             <div className="flex gap-2 overflow-x-auto">
               {roleTabs.map((tab) => {
                 const count = tickets.filter((ticket) => {
@@ -371,162 +376,162 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
           </div>
 
           {/* Tickets */}
-        <div className="flex-1">
-          {/* Ticket List Here */}
+          <div className="flex-1">
+            {/* Ticket List Here */}
 
-          {filteredTickets.length === 0 ? (
-            loading ? (
-              <div className="min-h-full w-full flex justify-center items-center">
-                <Loader2 className="animate-spin" color="var(--primary)" />
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <AlertCircle
-                  className="mx-auto h-10 w-10 mb-3"
-                  style={{ color: "var(--border)" }}
-                />
-                <p
-                  className="text-sm"
-                  style={{ color: "var(--text-muted)" }}
-                >
-                  {activeTab === "ME"
-                    ? "You haven't reported any issues yet."
-                    : `No ${activeTab.toLowerCase()} issues found.`}
-                </p>
-              </div>
-            )
-          ) : (
-            <div className="space-y-3">
-              {filteredTickets.map((report: any) => {
-                return (
-                  <div
-                    key={report.id}
-                    className="bg-white rounded-xl border border-[var(--border)] p-5"
+            {filteredTickets.length === 0 ? (
+              loading ? (
+                <div className="min-h-full w-full flex justify-center items-center">
+                  <Loader2 className="animate-spin" color="var(--primary)" />
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <AlertCircle
+                    className="mx-auto h-10 w-10 mb-3"
+                    style={{ color: "var(--border)" }}
+                  />
+                  <p
+                    className="text-sm"
+                    style={{ color: "var(--text-muted)" }}
                   >
-                    <div className="flex items-start gap-3">
-                      <AlertCircle
-                        size={18}
-                        className="text-red-500"
-                        style={{ marginTop: 2 }}
-                      />
+                    {activeTab === "ME"
+                      ? "You haven't reported any issues yet."
+                      : `No ${activeTab.toLowerCase()} issues found.`}
+                  </p>
+                </div>
+              )
+            ) : (
+              <div className="space-y-3">
+                {filteredTickets.map((report: any) => {
+                  return (
+                    <div
+                      key={report.id}
+                      className="bg-white rounded-xl border border-[var(--border)] p-5"
+                    >
+                      <div className="flex items-start gap-3">
+                        <AlertCircle
+                          size={18}
+                          className="text-red-500"
+                          style={{ marginTop: 2 }}
+                        />
 
-                      <div className="flex-1">
-                        {/* Top Row */}
-                        <div className="flex items-center justify-between">
-                          {/* Type Badge */}
-                          <span className="text-xs uppercase font-semibold px-2.5 py-0.5 rounded-full border bg-gray-100 text-gray-700 border-gray-200">
-                            {report.issueType}
-                          </span>
+                        <div className="flex-1">
+                          {/* Top Row */}
+                          <div className="flex items-center justify-between">
+                            {/* Type Badge */}
+                            <span className="text-xs uppercase font-semibold px-2.5 py-0.5 rounded-full border bg-gray-100 text-gray-700 border-gray-200">
+                              {report.issueType}
+                            </span>
 
-                          {/* ✅ Status Dropdown */}
-                          <div className="relative">
-                            <button
-                              disabled={updating}
-                              onClick={() => {
-                                if (updating) return;
+                            {/* ✅ Status Dropdown */}
+                            <div className="relative">
+                              <button
+                                disabled={updating}
+                                onClick={() => {
+                                  if (updating) return;
 
-                                setOpenDropdownId((prev) =>
-                                  prev === report.id ? null : report.id
-                                );
-                              }}
-                              className={`text-xs px-2.5 py-1 rounded-full border flex items-center gap-1 ${statusColors[report.status]
-                                } ${updating ? "opacity-60 cursor-not-allowed" : ""}`}
-                            >
-                              {updating
-                                ? "Updating..."
-                                : report.status.replace("_", " ")}
-
-                              {role !== "ENGINEER" && !updating && (
-                                <span className="text-[10px]">▼</span>
-                              )}
-                            </button>
-
-                            {/* ✅ Controlled Dropdown */}
-                            {openDropdownId === report.id &&
-                              role !== "ENGINEER" &&
-                              !updating && (
-                                <div className="absolute right-0 mt-1 w-36 bg-white border rounded-lg shadow-md z-10">
-                                  {[
-                                    "OPEN",
-                                    "IN_PROGRESS",
-                                    "RESOLVED",
-                                    "CLOSED",
-                                  ].map((status) => (
-                                    <button
-                                      key={status}
-                                      onClick={async () => {
-                                        // ✅ Close dropdown immediately
-                                        setOpenDropdownId(null);
-
-                                        // ✅ Update status
-                                        await updateTicketStatus({
-                                          ticketId: report.id,
-                                          status,
-                                        });
-                                      }}
-                                      className="w-full text-black text-left px-3 py-2 text-xs hover:bg-gray-100"
-                                    >
-                                      {status.replace("_", " ")}
-                                    </button>
-                                  ))}
-                                </div>
-                              )}
-                          </div>
-                        </div>
-
-                        {/* Description */}
-                        <p
-                          className="text-sm mt-2"
-                          style={{ color: "var(--text-secondary)" }}
-                        >
-                          {report.description}
-                        </p>
-
-                        {/* Images */}
-                        {report.images?.length > 0 && (
-                          <div className="flex gap-2 mt-3 flex-wrap">
-                            {report.images.map((img: string, i: number) => (
-                              <a
-                                key={i}
-                                href={img}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                  setOpenDropdownId((prev) =>
+                                    prev === report.id ? null : report.id
+                                  );
+                                }}
+                                className={`text-xs px-2.5 py-1 rounded-full border flex items-center gap-1 ${statusColors[report.status]
+                                  } ${updating ? "opacity-60 cursor-not-allowed" : ""}`}
                               >
-                                <img
-                                  src={img}
-                                  alt="ticket"
-                                  className="w-16 h-16 object-cover rounded-lg border cursor-pointer hover:opacity-80 transition"
-                                />
-                              </a>
-                            ))}
+                                {updating
+                                  ? "Updating..."
+                                  : report.status.replace("_", " ")}
+
+                                {role !== "ENGINEER" && !updating && (
+                                  <span className="text-[10px]">▼</span>
+                                )}
+                              </button>
+
+                              {/* ✅ Controlled Dropdown */}
+                              {openDropdownId === report.id &&
+                                role !== "ENGINEER" &&
+                                !updating && (
+                                  <div className="absolute right-0 mt-1 w-36 bg-white border rounded-lg shadow-md z-10">
+                                    {[
+                                      "OPEN",
+                                      "IN_PROGRESS",
+                                      "RESOLVED",
+                                      "CLOSED",
+                                    ].map((status) => (
+                                      <button
+                                        key={status}
+                                        onClick={async () => {
+                                          // ✅ Close dropdown immediately
+                                          setOpenDropdownId(null);
+
+                                          // ✅ Update status
+                                          await updateTicketStatus({
+                                            ticketId: report.id,
+                                            status,
+                                          });
+                                        }}
+                                        className="w-full text-black text-left px-3 py-2 text-xs hover:bg-gray-100"
+                                      >
+                                        {status.replace("_", " ")}
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
+                            </div>
                           </div>
-                        )}
 
-                        {/* Footer */}
-                        <div
-                          className="flex items-center gap-4 mt-3 text-xs"
-                          style={{ color: "var(--text-muted)" }}
-                        >
-                          <span className="flex items-center gap-1">
-                            <User size={11} /> {report.raisedBy?.name || "User"}
-                          </span>
+                          {/* Description */}
+                          <p
+                            className="text-sm mt-2"
+                            style={{ color: "var(--text-secondary)" }}
+                          >
+                            {report.description}
+                          </p>
 
-                          <span className="flex items-center gap-1">
-                            <Calendar size={11} />
-                            {new Date(report.createdAt).toLocaleDateString()}
-                          </span>
+                          {/* Images */}
+                          {report.images?.length > 0 && (
+                            <div className="flex gap-2 mt-3 flex-wrap">
+                              {report.images.map((img: string, i: number) => (
+                                <a
+                                  key={i}
+                                  href={img}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <img
+                                    src={img}
+                                    alt="ticket"
+                                    className="w-16 h-16 object-cover rounded-lg border cursor-pointer hover:opacity-80 transition"
+                                  />
+                                </a>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Footer */}
+                          <div
+                            className="flex items-center gap-4 mt-3 text-xs"
+                            style={{ color: "var(--text-muted)" }}
+                          >
+                            <span className="flex items-center gap-1">
+                              <User size={11} /> {report.raisedBy?.name || "User"}
+                            </span>
+
+                            <span className="flex items-center gap-1">
+                              <Calendar size={11} />
+                              {new Date(report.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
 
-        
+
       </div>
 
 
@@ -585,7 +590,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                   Target *
                 </label>
                 <div className="flex gap-4">
-                  {["PLATFORM", "CLIENT"].map((t) => (
+                  {targetOptions.map((t) => (
                     <label
                       key={t}
                       className="flex items-center gap-2 cursor-pointer text-sm"
@@ -623,7 +628,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
               </div>
 
               {/* Images */}
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium mb-1.5">
                   Upload Images
                 </label>
@@ -639,6 +644,81 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                   }
                   disabled={creating}
                 />
+              </div> */}
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-[var(--text-primary)]">
+                  Upload Images
+                </label>
+
+                <label
+                  htmlFor="ticket-images"
+                  className={` group flex flex-col items-center justify-center w-full min-h-[140px] rounded-2xl border-2 border-dashed border-[#FFD4A6] bg-gradient-to-br from-[#FFF8F1] to-[#FFF3E6] cursor-pointer transition-all duration-300 hover:border-[#FFAE58] hover:shadow-[0_8px_30px_rgba(255,174,88,0.15)]`}>
+                  <input
+                    id="ticket-images"
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    disabled={creating}
+                    className="hidden"
+                    onChange={(e) =>
+                      setNewTicket({
+                        ...newTicket,
+                        images: Array.from(e.target.files || []),
+                      })
+                    }
+                  />
+
+                  <div className="w-12 h-12 rounded-2xl bg-[#FFAE58]/15 flex items-center justify-center mb-3">
+                    <Upload className="w-6 h-6 text-[#FFAE58]" />
+                  </div>
+
+                  <p className="text-sm font-semibold text-gray-800">
+                    Click to upload images
+                  </p>
+
+                  <p className="text-xs text-gray-500 mt-1">
+                    PNG, JPG, JPEG • Multiple files supported
+                  </p>
+
+                  {newTicket.images.length > 0 && (
+                    <div className="mt-5 grid grid-cols-3 gap-3 w-full px-4">
+                      {newTicket.images.map((file, index) => (
+                        <div
+                          key={index}
+                          className=" relative group overflow-hidden rounded-xl border border-[#FFD4A6] bg-white">
+                          <img
+                            src={URL.createObjectURL(file)}
+                            alt={file.name}
+                            className=" h-24 w-full object-cover"/>
+
+                          <div
+                            className=" absolute bottom-0 left-0 right-0 bg-black/50 px-2 py-1">
+                            <p
+                              className=" text-white text-[10px] truncate">
+                              {file.name}
+                            </p>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+
+                              setNewTicket((prev) => ({
+                                ...prev,
+                                images: prev.images.filter(
+                                  (_, i) => i !== index
+                                ),
+                              }));
+                            }}
+                            className=" absolute top-2 right-2 w-6 h-6 rounded-full bg-red-500 text-white text-xs opacity-0 group-hover:opacity-100 transition">
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </label>
               </div>
             </div>
 

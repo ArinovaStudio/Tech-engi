@@ -8,6 +8,7 @@ export default function AdminClientInfoCard({ user, onUpdate }: { user: any, onU
   const [isOpen, setIsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({ name: "", phone: "", bio: "" });
+console.log(user, "userss");
 
   useEffect(() => {
     if (user && isOpen) setFormData({ name: user.name || "", phone: user.phone || "", bio: user.bio || "" });
@@ -44,6 +45,7 @@ export default function AdminClientInfoCard({ user, onUpdate }: { user: any, onU
           <div><p className="text-xs text-[var(--text-muted)] font-semibold mb-1 uppercase tracking-wider">Phone</p><p className="font-semibold text-sm text-[var(--text-primary)]">{user.phone || "—"}</p></div>
           <div><p className="text-xs text-[var(--text-muted)] font-semibold mb-1 uppercase tracking-wider">Email Address</p><p className="font-semibold text-sm text-[var(--text-primary)] truncate">{user.email}</p></div>
           <div className="md:col-span-2"><p className="text-xs text-[var(--text-muted)] font-semibold mb-1 uppercase tracking-wider">Bio</p><p className="font-semibold text-sm text-[var(--text-primary)]">{user.bio || "—"}</p></div>
+          <div className="md:col-span-2"><p className="text-xs text-[var(--text-muted)] font-semibold mb-1 uppercase tracking-wider">Total Projects</p><p className="font-semibold text-sm text-[var(--text-primary)]">{user.clientProfile?.totalProjects}</p></div>
         </div>
       </div>
 

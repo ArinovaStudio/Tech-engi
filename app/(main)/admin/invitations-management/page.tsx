@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import DashboardShell from "@/components/layout/DashboardShell";
+import { StatusBadge } from "@/components/project/ProjectUI";
 
 type Invitation = {
   id: string;
@@ -174,20 +175,21 @@ export default function InvitationsManagementPage() {
                   {project.title}
                 </CardTitle>
 
-                <Badge variant="secondary">
+                {/* <Badge variant="secondary">
                   {project.status.replaceAll("_", " ")}
-                </Badge>
+                </Badge> */}
+                <StatusBadge status={project.status} />
               </CardHeader>
 
               <CardContent className="space-y-4">
                 {/* Engineers Preview */}
                 <div className="flex -space-x-2">
                   {project.engineers.slice(0, 3).map((eng: any, i: number) => (
-                    <Avatar key={i} className="border">
+                    <Avatar key={i} >
                       {eng.user.image ? (
-                        <AvatarImage src={eng.user.image} />
+                        <AvatarImage src={eng.user.image} className="border bg-blue-200" />
                       ) : (
-                        <AvatarFallback>
+                        <AvatarFallback className="border border-[#FCD9B6] bg-gradient-to-r from-[#FFAE58] via-[#FFBE73] to-[#FFD8A8] text-gray-800">
                           {eng.user.name?.[0]}
                         </AvatarFallback>
                       )}

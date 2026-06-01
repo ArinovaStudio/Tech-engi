@@ -59,7 +59,7 @@ export default function InvitationCard({ invitationsData, onAccept, onReject, }:
             {/* Header */}
             <div className="mb-3 flex items-center justify-between">
                 <h3 className="text-[34px] font-semibold tracking-[-1px] text-[#111111]">
-                    Assignments
+                    Invitations
                 </h3>
 
                 <span className="flex h-11 min-w-11 items-center justify-center rounded-full bg-[#F5F5F5] px-4 text-[15px] font-semibold text-[#666666]">
@@ -191,7 +191,7 @@ export default function InvitationCard({ invitationsData, onAccept, onReject, }:
                         </div>
 
                         <h4 className="mt-5 text-[18px] font-semibold text-[#222222]">
-                            No Assignments
+                            No Invitations
                         </h4>
 
                         <p className="mt-1 text-[14px] text-[#8A8A8A]">

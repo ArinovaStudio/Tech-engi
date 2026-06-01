@@ -8,6 +8,7 @@ import ChangePasswordModal from "./modals/ChangePasswordModal";
 export default function EngineerInfoCard({ user, onUpdate }: { user: any, onUpdate: () => void }) {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPassOpen, setIsPassOpen] = useState(false);
+console.log(user);
 
   return (
     <>
@@ -44,6 +45,10 @@ export default function EngineerInfoCard({ user, onUpdate }: { user: any, onUpda
           <div className="md:col-span-2">
             <p className="text-xs text-[var(--text-muted)] font-semibold mb-1 uppercase tracking-wider">Bio</p>
             <p className="font-semibold text-sm text-[var(--text-primary)]">{user.bio || "—"}</p>
+          </div>
+          <div className="md:col-span-2">
+            <p className="text-xs text-[var(--text-muted)] font-semibold mb-1 uppercase tracking-wider">Completed Projects</p>
+            <p className="font-semibold text-sm text-[var(--text-primary)]">{user.engineerProfile?.completedProjects}</p>
           </div>
         </div>
       </div>

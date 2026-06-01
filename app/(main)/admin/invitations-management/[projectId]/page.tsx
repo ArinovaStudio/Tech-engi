@@ -15,6 +15,7 @@ import {
   ArrowLeft,
   FolderSearch,
   ArrowRight,
+  SlidersHorizontal,
 } from "lucide-react";
 
 export default function ProjectDetailsPage() {
@@ -30,7 +31,14 @@ export default function ProjectDetailsPage() {
   const [aiLoading, setAiLoading] = useState(true);
   const [dots, setDots] = useState("");
   const [search, setSearch] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
   const hasRunAi = useRef(false);
+  const [filters, setFilters] = useState({
+    experiences: [] as string[],
+    skills: [] as string[],
+    qualifications: [] as string[],
+    aiOnly: false,
+  });
   const [draggedItem, setDraggedItem] =
     useState<any | null>(null);
 
@@ -591,27 +599,81 @@ export default function ProjectDetailsPage() {
     ...remainingEngineers,
   ];
 
+  // const filteredUsers = allUsers.filter((engineer) => {
+  //   const query = search.toLowerCase().trim();
+
+  //   if (!query) return true;
+
+  //   const skills =
+  //     engineer?.engineerProfile?.skills ||
+  //     engineer?.skills ||
+  //     [];
+
+  //   const experience =
+  //     engineer?.engineerProfile?.yearsOfExperienceNumber ||
+  //     engineer?.yearsOfExperience ||
+  //     0;
+
+  //   const qualification =
+  //     engineer?.engineerProfile?.qualification ||
+  //     engineer?.qualification ||
+  //     "";
+
+  //   return (
+  //     engineer?.name
+  //       ?.toLowerCase()
+  //       .includes(query) ||
+
+  //     engineer?.email
+  //       ?.toLowerCase()
+  //       .includes(query) ||
+
+  //     qualification
+  //       ?.toLowerCase()
+  //       .includes(query) ||
+
+  //     String(experience).includes(query) ||
+
+  //     skills.some((skill: string) =>
+  //       skill.toLowerCase().includes(query)
+  //     )
+  //   );
+  // });
+
+  const availableSkills = [
+    ...new Set(
+      engineers.flatMap(
+        (e) => e?.engineerProfile?.skills || []
+      )
+    ),
+  ];
+
   const filteredUsers = allUsers.filter((engineer) => {
+    const profile = engineer?.engineerProfile;
+
+    if (!profile) return false;
+
     const query = search.toLowerCase().trim();
 
-    if (!query) return true;
-
-    const skills =
-      engineer?.engineerProfile?.skills ||
-      engineer?.skills ||
-      [];
-
+    const skills = profile?.skills || [];
     const experience =
-      engineer?.engineerProfile?.yearsOfExperienceNumber ||
-      engineer?.yearsOfExperience ||
+      profile?.yearsOfExperienceNumber ??
+      engineer?.yearsOfExperience ??
       0;
 
     const qualification =
-      engineer?.engineerProfile?.qualification ||
+      profile?.qualification ||
       engineer?.qualification ||
       "";
 
-    return (
+    /*
+    ==========================
+    SEARCH FILTER
+    ==========================
+    */
+
+    const matchesSearch =
+      !query ||
       engineer?.name
         ?.toLowerCase()
         .includes(query) ||
@@ -628,9 +690,108 @@ export default function ProjectDetailsPage() {
 
       skills.some((skill: string) =>
         skill.toLowerCase().includes(query)
-      )
-    );
+      );
+
+    if (!matchesSearch) return false;
+
+    /*
+    ==========================
+    AI FILTER
+    ==========================
+    */
+
+    if (
+      filters.aiOnly &&
+      !aiSuggestionIds.has(engineer.id)
+    ) {
+      return false;
+    }
+
+    /*
+    ==========================
+    EXPERIENCE FILTER
+    ==========================
+    */
+
+    if (filters.experiences.length > 0) {
+      const matchesExperience =
+        filters.experiences.some((range) => {
+          switch (range) {
+            case "0-2":
+              return experience >= 0 && experience <= 2;
+
+            case "2-5":
+              return experience > 2 && experience <= 5;
+
+            case "5-10":
+              return experience > 5 && experience <= 10;
+
+            case "10+":
+              return experience > 10;
+
+            default:
+              return false;
+          }
+        });
+
+      if (!matchesExperience) {
+        return false;
+      }
+    }
+
+    /*
+    ==========================
+    SKILLS FILTER
+    ==========================
+    */
+
+    if (filters.skills.length > 0) {
+      const matchesSkill =
+        filters.skills.some((selectedSkill) =>
+          skills.some(
+            (skill: string) =>
+              skill.toLowerCase() ===
+              selectedSkill.toLowerCase()
+          )
+        );
+
+      if (!matchesSkill) {
+        return false;
+      }
+    }
+
+    /*
+    ==========================
+    QUALIFICATION FILTER
+    ==========================
+    */
+
+    if (filters.qualifications.length > 0) {
+      const matchesQualification =
+        filters.qualifications.some(
+          (q) =>
+            q.toLowerCase() ===
+            qualification.toLowerCase()
+        );
+
+      if (!matchesQualification) {
+        return false;
+      }
+    }
+
+    return true;
   });
+
+  const clearFilters = () => {
+    setFilters({
+      experiences: [],
+      skills: [],
+      qualifications: [],
+      aiOnly: false,
+    });
+
+    setSearch("");
+  };
 
   if (loading) {
     return (
@@ -888,30 +1049,40 @@ export default function ProjectDetailsPage() {
 
         {/* BACK BUTTON */}
         <div className="flex gap-5 items-center">
-          <div className="w-full max-w-md">
+          <div className="flex items-center gap-2 flex-1">
+            <div className="w-full max-w-md">
 
-            <input
-              type="text"
-              value={search}
-              onChange={(e) =>
-                setSearch(e.target.value)
-              }
-              placeholder="Search by name, skill, experience..."
-              className="
-      w-full
-      h-11
-      px-4
-      rounded-xl
-      border
-      border-gray-200
-      bg-white
-      text-sm
-      outline-none
-      focus:ring-2
-      focus:ring-cyan-500
-    "
-            />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) =>
+                  setSearch(e.target.value)
+                }
+                placeholder="Search by name, skill, experience..."
+                className=" w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:ring-2 focus:ring-cyan-500" />
 
+            </div>
+
+            <div className="flex gap-3">
+
+              <button
+                onClick={() => setShowFilters(true)}
+                className=" h-11 px-4 rounded-xl border bg-white flex items-center gap-2">
+                <SlidersHorizontal size={16} />
+                Filters
+
+                {(filters.skills.length +
+                  filters.experiences.length +
+                  filters.qualifications.length) > 0 && (
+                    <span className=" h-5 min-w-5 px-1 rounded-full bg-cyan-500 text-white text-[10px] flex items-center justify-center">
+                      {filters.skills.length +
+                        filters.experiences.length +
+                        filters.qualifications.length}
+                    </span>
+                  )}
+              </button>
+
+            </div>
           </div>
           <div
             className="flex sm:block w-full sm:w-auto"
@@ -1269,6 +1440,98 @@ export default function ProjectDetailsPage() {
           </div>
         ))}
       </div>
+
+      {showFilters && (
+        <div
+          className=" fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
+          <div
+            className=" w-[500px] max-w-[95vw] bg-white rounded-2xl p-6 shadow-xl">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold">
+                Filters
+              </h2>
+
+              <button
+                onClick={() => setShowFilters(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* EXPERIENCE */}
+            <div className="mb-5">
+              <h3 className="font-medium mb-3">
+                Experience
+              </h3>
+
+              <div className="flex flex-wrap gap-2">
+                {["0-2", "2-5", "5-10", "10+"].map(
+                  (exp) => (
+                    <button
+                      key={exp}
+                      onClick={() =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          experiences:
+                            prev.experiences.includes(exp)
+                              ? prev.experiences.filter(
+                                (e) => e !== exp
+                              )
+                              : [
+                                ...prev.experiences,
+                                exp,
+                              ],
+                        }))
+                      }
+                      className={`
+                  px-3 py-2 rounded-lg border
+                  ${filters.experiences.includes(exp)
+                          ? "bg-cyan-500 text-white"
+                          : "bg-white"
+                        }
+                `}
+                    >
+                      {exp} Years
+                    </button>
+                  )
+                )}
+              </div>
+            </div>
+
+            {/* AI PICK */}
+            <div className="mb-6">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={filters.aiOnly}
+                  onChange={(e) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      aiOnly: e.target.checked,
+                    }))
+                  }
+                />
+
+                AI Recommended Only
+              </label>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={clearFilters}
+                className=" px-4 py-2 border rounded-lg">
+                Clear
+              </button>
+
+              <button
+                 onClick={() => {setShowFilters(false);}}
+                className=" px-4 py-2 bg-cyan-500 text-white rounded-lg">
+                Apply
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

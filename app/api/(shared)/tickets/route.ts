@@ -112,8 +112,9 @@ export async function POST(req: NextRequest) {
 
     const isProjectClient = user.role === "CLIENT" && project.client?.userId === user.id;
     const isProjectEngineer = user.role === "ENGINEER" && project.engineer?.userId === user.id;
+    const isAdmin = user.role === "ADMIN";
 
-    if (!isProjectClient && !isProjectEngineer) {
+    if (!isProjectClient && !isProjectEngineer && !isAdmin) {
       return NextResponse.json({ success: false, message: "You are not a participant in this project" }, { status: 403 });
     }
 

@@ -40,7 +40,7 @@ export default function AdminEngineerProfile({ params }: { params: Promise<{ id:
 
   const user = data?.user;
   const profile = user?.engineerProfile;
-
+  
   if (!user) return <p className="text-center mt-10">User not found</p>;
 
   const handleDelete = async () => {

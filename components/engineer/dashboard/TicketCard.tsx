@@ -22,13 +22,13 @@ const actionConfig = {
         label: "Start Work",
         nextStatus: "IN_PROGRESS",
         className:
-            "bg-blue-600 hover:bg-blue-700 text-white",
+            "text-blue-600 hover:text-blue-700",
     },
     IN_PROGRESS: {
         label: "Resolve Issue",
         nextStatus: "RESOLVED",
         className:
-            "bg-green-600 hover:bg-green-700 text-white",
+            "text-green-600 hover:text-green-700",
     },
 };
 

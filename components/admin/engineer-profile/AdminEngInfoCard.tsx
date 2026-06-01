@@ -43,6 +43,7 @@ export default function AdminEngInfoCard({ user, onUpdate }: { user: any, onUpda
             <p className="text-xs text-[var(--text-muted)] font-semibold mb-1 uppercase tracking-wider">Full Name</p>
             <p className="font-semibold text-sm text-[var(--text-primary)]">{user.name}</p>
           </div>
+          
           <div>
             <p className="text-xs text-[var(--text-muted)] font-semibold mb-1 uppercase tracking-wider">Engineer ID</p>
             <p className="font-mono text-sm font-semibold text-[var(--text-secondary)]">{user.id}</p>
@@ -58,6 +59,10 @@ export default function AdminEngInfoCard({ user, onUpdate }: { user: any, onUpda
           <div className="md:col-span-2">
             <p className="text-xs text-[var(--text-muted)] font-semibold mb-1 uppercase tracking-wider">Bio</p>
             <p className="font-semibold text-sm text-[var(--text-primary)]">{user.bio || "—"}</p>
+          </div>
+          <div className="md:col-span-2">
+            <p className="text-xs text-[var(--text-muted)] font-semibold mb-1 uppercase tracking-wider">Completed Projects</p>
+            <p className="font-semibold text-sm text-[var(--text-primary)]">{user.engineerProfile?.completedProjects}</p>
           </div>
         </div>
       </div>

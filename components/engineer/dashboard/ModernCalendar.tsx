@@ -205,7 +205,7 @@ export default function ModernCalendar({
                   className={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-[13px] font-medium transition
                     ${
                       isHighlighted
-                        ? "bg-[#D7F266] text-[#111111]"
+                        ? "bg-[#FFAE58] text-[#111111]"
                         : "text-[#4A4A4A] hover:bg-[#F5F5F7]"
                     }
                   `}

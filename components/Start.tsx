@@ -342,7 +342,7 @@ const Start = () => {
           {/* Right */}
           <div ref={rightRef} className="flex flex-col items-start lg:items-end justify-between gap-6 lg:pt-2 w-full lg:max-w-[41%] text-left lg:text-right">
             <p className="text-[18px] sm:text-[22px] lg:text-[26px] font-medium font-id text-black">
-              Tech-ENGI connects students with skilled builders who turns your ideas, assignments and projects into ready-to-submit work fast!
+              Tech-ENGI connects students, startups, and businesses with verified engineering experts for projects, prototyping, product development, and consulting.
             </p>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center font-inter gap-3 w-full sm:w-auto">
               <Link href={'register/engineer'} className="px-6 py-4 text-[16px] font-bold text-gray-900 bg-[#F4F4F4] whitespace-nowrap text-center">

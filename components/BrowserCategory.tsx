@@ -9,31 +9,31 @@ gsap.registerPlugin(ScrollTrigger);
 const categories = [
   {
     title: "Robotics",
-    image: "/robotics.jpg",
+    image: "/robotics2.png",
     description1:
       "Robotics design, automation systems, robotic arm development, ROS integration, and autonomous solutions.",
   },
   {
     title: "Embedded System",
-    image: "/embedded-system.jpg",
+    image: "/embeddedsyatem2.jpg",
     description1:
       "Embedded firmware development, microcontroller programming, RTOS solutions, PCB integration, and hardware prototyping.",
   },
   {
     title: "IoT",
-    image: "/iot.jpg",
+    image: "/iot2.png",
     description1:
       "IoT device development, cloud connectivity, sensor integration, smart automation, and real-time monitoring systems.",
   },
   {
     title: "AI / ML Projects",
-    image: "/ai-ml.jpg",
+    image: "/aiml2.png",
     description1:
       "Machine learning models, computer vision, predictive analytics, NLP applications, and AI-powered automation.",
   },
   {
     title: "Software Projects",
-    image: "/software.jpg",
+    image: "/software2.png",
     description1:
       "Web applications, mobile apps, SaaS platforms, APIs, enterprise software, and full-stack development.",
   },

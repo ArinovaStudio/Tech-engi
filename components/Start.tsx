@@ -78,15 +78,7 @@ const Start = () => {
 
           {/* DESKTOP RIGHT */}
           <div
-            className="
-            hidden
-            lg:flex
-            items-center
-            gap-5
-
-            border-l-2
-            border-gray-300
-            pl-5
+            className=" hidden lg:flex items-center gap-5 border-l-2 border-gray-300 pl-5
           "
           >
             {/* SOCIAL */}
@@ -158,7 +150,7 @@ const Start = () => {
 
             {/* BUTTONS */}
             <div className="flex items-center gap-3">
-              <Link
+              {/* <Link
                 href="/login"
                 className="
                 inline-flex
@@ -180,30 +172,12 @@ const Start = () => {
               "
               >
                 BECOME BUILDER
-              </Link>
+              </Link> */}
 
               <Link
                 href="/login"
-                className="
-                inline-flex
-                items-center
-                justify-center
-                gap-2
-
-                px-4
-                py-1
-
-                text-[16px]
-
-                font-inter
-                bg-black
-                text-white
-                hover:bg-gray-800
-
-                whitespace-nowrap
-              "
-              >
-                GOT A PROJECT
+                className=" inline-flex items-center justify-center gap-2 w-50 px-4 py-1 text-[16px] font-inter bg-black text-white hover:bg-gray-800 whitespace-nowrap">
+                Login
                 <span className="text-base">↗</span>
               </Link>
             </div>
@@ -212,13 +186,7 @@ const Start = () => {
           {/* MOBILE MENU BUTTON */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="
-            lg:hidden
-            flex
-            items-center
-            justify-center
-          "
-          >
+            className=" lg:hidden flex items-center justify-center">
             {mobileMenuOpen ? (
               <X className="w-7 h-7 text-black" />
             ) : (
@@ -229,11 +197,7 @@ const Start = () => {
 
         {/* MOBILE MENU */}
         <div
-          className={`
-          lg:hidden
-          overflow-hidden
-          transition-all
-          duration-300
+          className={`lg:hidden overflow-hidden transition-all duration-300
 
           ${mobileMenuOpen
               ? "max-h-[500px] border-t border-gray-200"
@@ -360,9 +324,11 @@ const Start = () => {
           {/* Left */}
           <div className="flex-1">
             <div ref={taglineRef} className="flex items-center gap-2 mb-4 font-id text-[#FFAE58]">
-              <span className="text-[16px] uppercase">STRESS LESS</span>
+              <span className="text-[16px] uppercase">Engineering Projects</span>
               <span className="">|</span>
-              <span className="text-[16px] uppercase">TIMELY DELIVERY</span>
+              <span className="text-[16px] uppercase">Expert Engineers</span>
+              <span className="">|</span>
+               <span className="text-[16px] uppercase">On-Time Delivery</span>
             </div>
             <h1
               ref={headlineRef}

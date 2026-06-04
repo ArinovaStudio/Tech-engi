@@ -13,6 +13,24 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const projectId = searchParams.get("projectId");
+    const projectall = searchParams.get("all");
+
+    if (projectall) {
+      const allProjects = await prisma.project.findMany({
+        where: { clientId: user?.clientProfile?.id },
+        include: {
+          tickets: {
+            orderBy: { createdAt: "desc" },
+            include: {
+              project: { select: { title: true } },
+              raisedBy: { select: { name: true, image: true, role: true } }
+            }
+          }
+        }
+      })
+      const tickets = allProjects.flatMap(project => project.tickets);
+      return NextResponse.json({ success: true, tickets }, { status: 200 });
+    }
 
     if (!projectId) {
       return NextResponse.json({ success: false, message: "Project ID is required" }, { status: 400 });
@@ -58,8 +76,6 @@ export async function GET(req: NextRequest) {
       }
     });
 
-    console.log(tickets, "ticketss");
-    
 
     return NextResponse.json({ success: true, tickets }, { status: 200 });
   } catch {
@@ -158,7 +174,7 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    
+
     const body = await req.json();
 
     const { ticketId, status } = body;

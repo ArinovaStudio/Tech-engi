@@ -98,7 +98,7 @@ model EngineerProfile {
   idNumber                String
   idFile                  String
   yearsOfExperience       ExperienceLevel?
-  yearsOfExperienceNumber Int? @default(0)
+  yearsOfExperienceNumber Int?             @default(0)
 
   certifications    Json                        @default("[]")
   skills            String[]
@@ -169,7 +169,8 @@ model Project {
   description  String          @db.Text
   budget       Float
   instruments  String[]
-  currentPhase String[]         
+  currentPhase String[]
+  technology   Json?
   progress     Int             @default(0)
   priority     ProjectPriority @default(LOW)
 

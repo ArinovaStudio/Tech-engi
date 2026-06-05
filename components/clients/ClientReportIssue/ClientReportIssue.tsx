@@ -51,8 +51,6 @@ const ClientReportIssue = () => {
             if (!res.ok || !data.success) {
                 throw new Error(data.message || "Failed to fetch tickets");
             }
-            console.log(data.tickets);
-
             setTickets(data.tickets);
         } catch (err: any) {
             toast.error(err.message);

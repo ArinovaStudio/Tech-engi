@@ -145,7 +145,6 @@ const DesignOverview = ({ data }: { data: any }) => {
   ];
 
   const projectsData= data?.[0]
-  console.log(projectsData);
 
   const remainingDays = data?.[0]?.endDate
     ? Math.max(

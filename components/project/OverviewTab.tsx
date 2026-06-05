@@ -23,7 +23,7 @@ export default function OverviewTab({ project }: { project: any }) {
   const isAdmin = user?.role === "ADMIN";
   const isClient = user?.role === "CLIENT";
   const isEngineer = user?.role === "ENGINEER";
-  const canEditDetails = isAdmin || isClient;
+  const canEditDetails = isAdmin || isClient || isEngineer;
 
   const totalMilestones = project?.milestones?.length || 0;
   const completedMilestones = project?.milestones?.filter((m: any) => m.completed).length || 0;

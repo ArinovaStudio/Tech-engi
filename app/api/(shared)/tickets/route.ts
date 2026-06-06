@@ -86,7 +86,7 @@ export async function GET(req: NextRequest) {
 const ticketSchema = z.object({
   projectId: z.string(),
   issueType: z.enum(["PAYMENT", "COMMUNICATION", "TECHNICAL", "DELIVERY", "OTHER"]),
-  target: z.enum(["PLATFORM", "CLIENT"]).default("PLATFORM"),
+  target: z.enum(["PLATFORM", "CLIENT", "ENGINEER"]).default("PLATFORM"),
   description: z.string().min(10, "Description must be at least 10 characters"),
 });
 
@@ -138,9 +138,6 @@ export async function POST(req: NextRequest) {
     }
 
     let finalTarget = validation.data.target;
-    if (user.role === "CLIENT") {
-      finalTarget = "PLATFORM";
-    }
 
     const imageFiles = formData.getAll("images") as File[];
     if (imageFiles.length > 5) {

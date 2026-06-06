@@ -73,6 +73,9 @@ console.log("calleedd");
         designSystem,
       } = body;
 
+      console.log(technology, "technology", designSystem, "designSystem");
+      
+
       const project = await prisma.project.findUnique({
         where: {
           id: projectId,

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { X, Send } from "lucide-react";
 import toast from "react-hot-toast";
 import { T, inputCls, selectCls, labelStyle, getApiBase } from "./OverviewUI";
@@ -19,6 +19,11 @@ export const EditModal = ({ showModel, projectData, userRole }: { showModel: (v:
         item?.tech
     )
   );
+  const [layoutKey, setLayoutKey] = useState("");
+  const [layoutValue, setLayoutValue] = useState("");
+  const [visualKey, setVisualKey] = useState("");
+  const [visualValue, setVisualValue] = useState("");
+  const [keyPagesInput, setKeyPagesInput] = useState("");
   const [designSystem, setDesignSystem] = useState({
     brandName: "",
     colors: [] as string[],
@@ -30,20 +35,11 @@ export const EditModal = ({ showModel, projectData, userRole }: { showModel: (v:
 
     designType: [] as string[],
 
-    layoutStyle: {
-      navigation: "",
-      width: "",
-      spacing: "",
-    },
+    layoutStyle: {} as Record<string, string>,
 
     contentTone: [] as string[],
 
-    visualGuidelines: {
-      borderRadius: "",
-      icons: "",
-      animations: "",
-      illustrations: "",
-    },
+    visualGuidelines: {} as Record<string, string>,
 
     theme: [] as string[],
 
@@ -74,11 +70,12 @@ export const EditModal = ({ showModel, projectData, userRole }: { showModel: (v:
     e.preventDefault();
     setLoading(true);
     const apiBase = getApiBase(userRole);
-    const action = "UPDATE_PROGRESS" 
+    const action = "UPDATE_PROGRESS"
 
     try {
-      const payload: any = { projectId: projectData.id, ...formData, instruments, techArea, techName, colorInput, technology, designSystem, action};
+      const payload: any = { projectId: projectData.id, ...formData, instruments, techArea, techName, colorInput, technology, designSystem, action };
       if (!isAdmin) { delete payload.repository; delete payload.budget; }
+      console.log(payload);
 
       const res = await fetch(`${apiBase}/${projectData.id}`, {
         method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload,),
@@ -93,6 +90,43 @@ export const EditModal = ({ showModel, projectData, userRole }: { showModel: (v:
     } catch { toast.error("Failed to update project"); }
     finally { setLoading(false); }
   };
+
+  useEffect(() => {
+     if (projectData?.technology) {
+    setTechnology(projectData.technology);
+  }
+
+    if (!projectData?.designSystem) return;
+
+    const ds = projectData.designSystem;
+
+    setDesignSystem({
+      brandName: ds.brandName ?? "",
+      colors: ds.colors ?? [],
+
+      fonts: {
+        primary: ds.fonts?.primary ?? "",
+        secondary: ds.fonts?.secondary ?? "",
+      },
+
+      designType: ds.designType ?? [],
+      layoutStyle: ds.layoutStyle ?? {},
+      contentTone: ds.contentTone ?? [],
+      visualGuidelines: ds.visualGuidelines ?? {},
+      theme: ds.theme ?? [],
+      brandFeel: ds.brandFeel ?? "",
+      keyPages: ds.keyPages ?? [],
+
+      uniqueness: {
+        differentiator: ds.uniqueness?.differentiator ?? "",
+      },
+    });
+
+    setKeyPagesInput((ds.keyPages ?? []).join(", "));
+  }, [projectData]);
+
+  console.log(projectData, "ProjectData");
+
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(5,10,48,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: "1rem" }}>
@@ -306,41 +340,48 @@ export const EditModal = ({ showModel, projectData, userRole }: { showModel: (v:
 
               <div className="flex justify-between px-1">
                 {/* Brand Name */}
-              <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Brand Name
-                </label>
+                <div>
+                  <label className="block text-sm font-semibold mb-2">
+                    Brand Name
+                  </label>
 
-                <input
-                  value={designSystem.brandName}
+                  <input
+                    value={designSystem.brandName}
 
-                  onChange={(e) =>
+                    onChange={(e) =>
+                      setDesignSystem({
+                        ...designSystem,
+                        brandName: e.target.value,
+                      })
+                    }
+                    type="text"
+                    placeholder="Enter brand name"
+                    className="w-full px-4 py-3 rounded-xl border"
+                  />
+                </div>
+
+                {/* Brand Feel */}
+                <div className="w-[38%]">
+                  <label className="block text-sm font-semibold mb-2">
+                    Brand Feel
+                  </label>
+
+                  <select value={designSystem.brandFeel} onChange={(e) =>
                     setDesignSystem({
                       ...designSystem,
-                      brandName: e.target.value,
+                      brandFeel: e.target.value,
                     })
-                  }
-                  type="text"
-                  placeholder="Enter brand name"
-                  className="w-full px-4 py-3 rounded-xl border"
-                />
-              </div>
-
-              {/* Brand Feel */}
-              <div className="w-[38%]">
-                <label className="block text-sm font-semibold mb-2">
-                  Brand Feel
-                </label>
-
-                <select className="w-full px-4 py-3 rounded-xl border">
-                  <option>Modern</option>
-                  <option>Luxury</option>
-                  <option>Minimal</option>
-                  <option>Corporate</option>
-                  <option>Futuristic</option>
-                  <option>Playful</option>
-                </select>
-              </div>
+                  } className="w-full px-4 py-3 rounded-xl border">
+                    <option>Default</option>
+                    <option>Classic</option>
+                    <option>Modern</option>
+                    <option>Luxury</option>
+                    <option>Minimal</option>
+                    <option>Corporate</option>
+                    <option>Futuristic</option>
+                    <option>Playful</option>
+                  </select>
+                </div>
               </div>
 
               {/* Colors */}
@@ -533,6 +574,12 @@ export const EditModal = ({ showModel, projectData, userRole }: { showModel: (v:
                 </label>
 
                 <input
+                  value={designSystem.designType.join(", ")}
+                  onChange={(e) =>
+                    setDesignSystem({
+                      ...designSystem,
+                      designType: [e.target.value],
+                    })}
                   type="text"
                   placeholder="Dashboard, SaaS, Ecommerce, Portfolio"
                   className="w-full px-4 py-3 rounded-xl border"
@@ -547,6 +594,13 @@ export const EditModal = ({ showModel, projectData, userRole }: { showModel: (v:
                   </label>
 
                   <input
+                    value={designSystem.theme.join(", ")}
+                    onChange={(e) =>
+                      setDesignSystem({
+                        ...designSystem,
+                        theme: [e.target.value],
+                      })
+                    }
                     type="text"
                     placeholder="Light, Dark, Glassmorphism"
                     className="w-full px-4 py-3 rounded-xl border"
@@ -560,6 +614,13 @@ export const EditModal = ({ showModel, projectData, userRole }: { showModel: (v:
                   </label>
 
                   <input
+                    value={designSystem.contentTone.join(", ")}
+                    onChange={(e) =>
+                      setDesignSystem({
+                        ...designSystem,
+                        contentTone: [e.target.value],
+                      })
+                    }
                     type="text"
                     placeholder="Professional, Friendly, Technical"
                     className="w-full px-4 py-3 rounded-xl border"
@@ -569,15 +630,159 @@ export const EditModal = ({ showModel, projectData, userRole }: { showModel: (v:
               </div>
               {/* Layout Style */}
               <div>
-                <label className="block text-sm font-semibold mb-2">
-                  Layout Style
-                </label>
+                <label style={labelStyle}>Layout Style</label>
 
-                <textarea
-                  rows={3}
-                  placeholder="Sidebar navigation, full-width layout, spacious spacing..."
-                  className="w-full px-4 py-3 rounded-xl border"
-                />
+                {/* Existing Layout Properties */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 8,
+                    marginBottom: 12,
+                  }}
+                >
+                  {Object.entries(designSystem.layoutStyle).map(
+                    ([key, value]) => (
+                      <div
+                        key={key}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          padding: "10px 12px",
+                          border: `1px solid ${T.border}`,
+                          borderRadius: 10,
+                          background: T.bg,
+                        }}
+                      >
+                        <div>
+                          <div
+                            style={{
+                              fontSize: 11,
+                              fontWeight: 700,
+                              color: T.primary,
+                              textTransform: "uppercase",
+                            }}
+                          >
+                            {key}
+                          </div>
+
+                          <div
+                            style={{
+                              fontSize: 14,
+                              color: T.text,
+                            }}
+                          >
+                            {value}
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDesignSystem((prev) => {
+                              const updated = { ...prev.layoutStyle };
+                              delete updated[key];
+
+                              return {
+                                ...prev,
+                                layoutStyle: updated,
+                              };
+                            });
+                          }}
+                          style={{
+                            border: "none",
+                            background: "transparent",
+                            color: T.danger,
+                            cursor: "pointer",
+                            fontSize: 18,
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )
+                  )}
+                </div>
+
+                {/* Add New Property */}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "180px 1fr auto",
+                    gap: 8,
+                  }}
+                >
+                  <input
+                    type="text"
+                    placeholder="Property (e.g. navigation)"
+                    value={layoutKey}
+                    onChange={(e) => setLayoutKey(e.target.value)}
+                    className={inputCls}
+                  />
+
+                  <input
+                    type="text"
+                    placeholder="Value (e.g. Sticky top navbar)"
+                    value={layoutValue}
+                    onChange={(e) => setLayoutValue(e.target.value)}
+                    className={inputCls}
+                    onKeyDown={(e) => {
+                      if (
+                        e.key === "Enter" &&
+                        layoutKey.trim() &&
+                        layoutValue.trim()
+                      ) {
+                        e.preventDefault();
+
+                        setDesignSystem((prev) => ({
+                          ...prev,
+                          layoutStyle: {
+                            ...prev.layoutStyle,
+                            [layoutKey.trim()]: layoutValue.trim(),
+                          },
+                        }));
+
+                        setLayoutKey("");
+                        setLayoutValue("");
+                      }
+                    }}
+                  />
+
+                  <button
+                    type="button"
+                    disabled={!layoutKey.trim() || !layoutValue.trim()}
+                    onClick={() => {
+                      setDesignSystem((prev) => ({
+                        ...prev,
+                        layoutStyle: {
+                          ...prev.layoutStyle,
+                          [layoutKey.trim()]: layoutValue.trim(),
+                        },
+                      }));
+
+                      setLayoutKey("");
+                      setLayoutValue("");
+                    }}
+                    style={{
+                      padding: "8px 14px",
+                      background:
+                        !layoutKey.trim() || !layoutValue.trim()
+                          ? "#cbd5e1"
+                          : T.primary,
+                      border: "none",
+                      borderRadius: 8,
+                      color: "#fff",
+                      fontWeight: 600,
+                      cursor:
+                        !layoutKey.trim() || !layoutValue.trim()
+                          ? "not-allowed"
+                          : "pointer",
+                    }}
+                  >
+                    Add
+                  </button>
+                </div>
               </div>
 
               {/* Visual Guidelines */}
@@ -586,11 +791,107 @@ export const EditModal = ({ showModel, projectData, userRole }: { showModel: (v:
                   Visual Guidelines
                 </label>
 
-                <textarea
-                  rows={3}
-                  placeholder="Rounded corners, outline icons, subtle animations..."
-                  className="w-full px-4 py-3 rounded-xl border"
-                />
+                {/* Add New Guideline */}
+                <div className="grid grid-cols-[180px_1fr_auto] gap-2">
+                  <input
+                    type="text"
+                    placeholder="Property (e.g. borderRadius)"
+                    value={visualKey}
+                    onChange={(e) => setVisualKey(e.target.value)}
+                    className="px-4 py-3 rounded-xl border"
+                  />
+
+                  <input
+                    type="text"
+                    placeholder="Value (e.g. 16px rounded corners)"
+                    value={visualValue}
+                    onChange={(e) => setVisualValue(e.target.value)}
+                    className="px-4 py-3 rounded-xl border w-75"
+                    onKeyDown={(e) => {
+                      if (
+                        e.key === "Enter" &&
+                        visualKey.trim() &&
+                        visualValue.trim()
+                      ) {
+                        e.preventDefault();
+
+                        setDesignSystem((prev) => ({
+                          ...prev,
+                          visualGuidelines: {
+                            ...prev.visualGuidelines,
+                            [visualKey.trim()]: visualValue.trim(),
+                          },
+                        }));
+
+                        setVisualKey("");
+                        setVisualValue("");
+                      }
+                    }}
+                  />
+
+                  <button
+                    type="button"
+                    disabled={!visualKey.trim() || !visualValue.trim()}
+                    onClick={() => {
+                      setDesignSystem((prev) => ({
+                        ...prev,
+                        visualGuidelines: {
+                          ...prev.visualGuidelines,
+                          [visualKey.trim()]: visualValue.trim(),
+                        },
+                      }));
+
+                      setVisualKey("");
+                      setVisualValue("");
+                    }}
+                    className="px-6 bg-[#FFAE58] text-white rounded-xl disabled:opacity-50"
+                  >
+                    Add
+                  </button>
+                </div>
+
+                {/* Existing Guidelines */}
+                <div className="flex flex-col gap-2 mb-3">
+                  {Object.entries(designSystem.visualGuidelines).map(
+                    ([key, value]) => (
+                      <div
+                        key={key}
+                        className="flex items-center justify-between p-3 border rounded-xl"
+                      >
+                        <div>
+                          <div className="text-xs font-bold uppercase text-[#FFAE58]">
+                            {key}
+                          </div>
+
+                          <div className="text-sm">
+                            {value}
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDesignSystem((prev) => {
+                              const updated = {
+                                ...prev.visualGuidelines,
+                              };
+
+                              delete updated[key];
+
+                              return {
+                                ...prev,
+                                visualGuidelines: updated,
+                              };
+                            });
+                          }}
+                          className="text-red-500 text-lg"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )
+                  )}
+                </div>
               </div>
 
               {/* Key Pages */}
@@ -601,8 +902,21 @@ export const EditModal = ({ showModel, projectData, userRole }: { showModel: (v:
 
                 <input
                   type="text"
-                  placeholder="Home, About, Pricing, Dashboard, Contact"
+                  placeholder="Home, About, Pricing..."
                   className="w-full px-4 py-3 rounded-xl border"
+                  value={keyPagesInput}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setKeyPagesInput(value);
+
+                    setDesignSystem((prev) => ({
+                      ...prev,
+                      keyPages: value
+                        .split(",")
+                        .map((x) => x.trim())
+                        .filter(Boolean),
+                    }));
+                  }}
                 />
               </div>
 
@@ -613,6 +927,16 @@ export const EditModal = ({ showModel, projectData, userRole }: { showModel: (v:
                 </label>
 
                 <textarea
+                  value={designSystem.uniqueness.differentiator}
+                  onChange={(e) =>
+                    setDesignSystem((prev) => ({
+                      ...prev,
+                      uniqueness: {
+                        ...prev.uniqueness,
+                        differentiator: e.target.value,
+                      },
+                    }))
+                  }
                   rows={4}
                   placeholder="Describe the unique visual style, inspiration, differentiators..."
                   className="w-full px-4 py-3 rounded-xl border"

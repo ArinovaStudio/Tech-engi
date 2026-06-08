@@ -16,7 +16,6 @@ const EXP_LABELS: Record<string, string> = {
 
 export default function EngineerDetailsCard({ profile, onUpdate }: { profile: any, onUpdate: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
-  console.log(profile, "profile");
 
   return (
     <>

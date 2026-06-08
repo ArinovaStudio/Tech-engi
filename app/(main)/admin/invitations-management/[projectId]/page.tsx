@@ -33,6 +33,7 @@ export default function ProjectDetailsPage() {
   const [search, setSearch] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const hasRunAi = useRef(false);
+  const [inviting, setInviting] = useState(false)
   const [filters, setFilters] = useState({
     experiences: [] as string[],
     skills: [] as string[],
@@ -107,7 +108,8 @@ export default function ProjectDetailsPage() {
       const json = await res.json();
 
       setProject(json.project);
-
+      console.log(json.invitations);
+      
       setInvitations(json.invitations || []);
     } catch (err) {
       console.error(err);
@@ -337,7 +339,7 @@ export default function ProjectDetailsPage() {
     // console.log(newColumn);
 
     try {
-
+      setInviting(true)
       /*
       =====================================
       ENGINEER
@@ -516,9 +518,10 @@ export default function ProjectDetailsPage() {
       }
 
     } catch (error) {
-
       console.error(error);
 
+    } finally {
+      setInviting(false)
     }
 
     setDraggedItem(null);
@@ -945,6 +948,7 @@ export default function ProjectDetailsPage() {
       </div>
     );
   }
+console.log(filteredUsers, "alluserss");
 
   return (
     // <DashboardShell>
@@ -1039,7 +1043,7 @@ export default function ProjectDetailsPage() {
               color: "var(--text-primary)",
             }}
           >
-            Project Members
+            {project.title}
           </h1>
 
           <p
@@ -1052,6 +1056,24 @@ export default function ProjectDetailsPage() {
           </p>
 
         </div>
+
+        {inviting && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-3 rounded-2xl bg-white px-6 py-5 shadow-xl">
+              {/* Spinner */}
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-red-600" />
+
+              {/* Text */}
+              <p className="text-sm font-medium text-gray-700">
+                Updating invitation...
+              </p>
+
+              <p className="text-xs text-gray-400">
+                Please wait while we process changes
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* BACK BUTTON */}
         <div className="flex gap-5 items-center">
@@ -1249,7 +1271,8 @@ export default function ProjectDetailsPage() {
 
                                 <div className="flex items-center gap-2">
 
-                                  <h3
+                                  <div>
+                                    <h3
                                     className="font-semibold text-[18px] truncate leading-tight tracking-[-0.02em]"
                                     style={{
                                       color:
@@ -1258,6 +1281,19 @@ export default function ProjectDetailsPage() {
                                   >
                                     {engineer.name}
                                   </h3>
+
+                                  <p
+                          className="text-[11px] font-medium"
+                          style={{
+                            color:
+                              "var(--text-muted)",
+                          }}
+                        >
+                          {
+                            engineer?.email
+                          }
+                        </p>
+                                  </div>
 
                                   {isAiRecommended && (
                                     <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-cyan-100 text-cyan-700 border border-cyan-200">
@@ -1398,7 +1434,7 @@ export default function ProjectDetailsPage() {
                           }
                         </h3>
 
-                        {/* <p
+                        <p
                           className="text-[11px] font-medium"
                           style={{
                             color:
@@ -1406,9 +1442,9 @@ export default function ProjectDetailsPage() {
                           }}
                         >
                           {
-                            invitation.engineer?.qualification
+                            invitation.engineer?.user?.email
                           }
-                        </p> */}
+                        </p>
 
                         <div>
                           <div className="mb-3">

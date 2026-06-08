@@ -26,9 +26,7 @@ interface DailyScheduleCardProps {
   };
 }
 
-export default function DailyScheduleCard({
-  projectsData,
-}: DailyScheduleCardProps) {
+export default function DailyScheduleCard({projectsData,}: DailyScheduleCardProps) {
 
   // Get all tasks and sort by closest due date
   const tasks =

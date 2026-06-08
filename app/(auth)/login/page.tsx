@@ -51,7 +51,7 @@ export default function LoginPage() {
           <div className="w-130 bg-white h-full  p-8">
             <div className="text-center mb-8">
               <h1 className="text-2xl font-bold text-[#0f172a] tracking-tight">Welcome Back <span>👋</span></h1>
-              <p className="text-sm text-gray-500 mt-2">Log in to your Arinova account</p>
+              <p className="text-sm text-gray-500 mt-2">Log in to your TECH ENGI account</p>
             </div>
 
             {error && (
@@ -83,14 +83,6 @@ export default function LoginPage() {
 
               {/* Password Field */}
               <div className="space-y-1.5">
-                <div className="flex justify-between items-center mb-1">
-                  <label className="text-sm font-medium text-gray-700 ml-1">
-                    Password
-                  </label>
-                  <Link href="/forgot-password" className="text-xs text-[#f0b31e] hover:text-yellow-600 transition-colors font-medium">
-                    Forgot password?
-                  </Link>
-                </div>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-gray-400" />
@@ -110,6 +102,14 @@ export default function LoginPage() {
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
+                </div>
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-sm font-medium text-gray-700 ml-1">
+                    Password
+                  </label>
+                  <Link href="/forgot-password" className="text-xs text-[#f0b31e] hover:text-yellow-600 transition-colors font-medium">
+                    Forgot password?
+                  </Link>
                 </div>
               </div>
 

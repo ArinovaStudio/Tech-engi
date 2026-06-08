@@ -33,6 +33,13 @@ interface Project {
   tickets: Ticket[];
 }
 
+const statusOrder = {
+  OPEN: 0,
+  IN_PROGRESS: 1,
+  RESOLVED: 2,
+  CLOSED: 3,
+};
+
 type CardKey = "projects" | "revenue" | "received" | "pending";
 
 export default function EngineerDashboardPage() {
@@ -47,7 +54,7 @@ export default function EngineerDashboardPage() {
   // cache fetched data per period to avoid redundant calls
   const [cache, setCache] = useState<Record<string, AnalyticsData>>({});
 
-  const { data: projectsData, isLoading: projectsLoading,mutate } = useSWR("/api/engineer/perengineer-projects", fetcher);
+  const { data: projectsData, isLoading: projectsLoading, mutate } = useSWR("/api/engineer/perengineer-projects", fetcher);
   const { data: invitationsData } = useSWR("/api/engineer/invitation-engineer", fetcher);
   // console.log(invitationsData, "invitationsData");
 
@@ -124,7 +131,7 @@ export default function EngineerDashboardPage() {
   const totalProjects = cardData.projects?.overview?.totalAssigned ?? 0;
   const completionRate = totalProjects > 0 ? Math.round((completedProjects / totalProjects) * 100)
     : 0;
-    
+
   if (loading) {
     return (
       <DashboardShell>
@@ -201,7 +208,7 @@ export default function EngineerDashboardPage() {
           <div className="p-1">
             <div className="flex flex items-center">
               <h3 className="mb-4 mt-4 flex items-center gap-3 text-3xl font-semibold">
-                Tickets
+                Ticketss
               </h3>
               <span className="text-[#898d94] text-xl px-2 rounded">
                 ({projectsData?.projects?.reduce(
@@ -214,9 +221,17 @@ export default function EngineerDashboardPage() {
             <div className="space-y-4">
               {projectsData?.projects
                 ?.flatMap((project: Project) => project.tickets || [])
+                ?.sort(
+                  (a: Ticket, b: Ticket) =>
+                    statusOrder[a.status as keyof typeof statusOrder] -
+                    statusOrder[b.status as keyof typeof statusOrder]
+                )
                 ?.slice(0, 3)
                 ?.map((ticket: Ticket) => (
-                  <TicketCard key={ticket.id} ticket={ticket} onStatusUpdated={mutate}
+                  <TicketCard
+                    key={ticket.id}
+                    ticket={ticket}
+                    onStatusUpdated={mutate}
                   />
                 ))}
             </div>

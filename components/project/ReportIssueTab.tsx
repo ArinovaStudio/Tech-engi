@@ -274,7 +274,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
       </div>
     );
 
-  const targetOptions = role === "ADMIN" ? ["Engineer"] : role === "ENGINEER" ? ["Platform", "Client"] : ["Engineer", "Admin"];
+  const targetOptions = role === "ADMIN" ? ["Engineer", "Client"] : role === "ENGINEER" ? ["Platform", "Client"] : ["Engineer", "Platform"];
 
 
   return (

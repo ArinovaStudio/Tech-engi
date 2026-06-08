@@ -14,6 +14,8 @@ export async function POST(req: NextRequest) {
     const validation = verifyOtpSchema.safeParse(body);
     
     if (!validation.success) {
+      console.log("roo");
+      
       return NextResponse.json({ success: false, message: validation.error.issues[0].message }, { status: 400 });
     }
 
@@ -23,11 +25,17 @@ export async function POST(req: NextRequest) {
       where: { email_type: { email, type } } 
     });
 
+    console.log(otpRecord, "otpRecord", code);
+    
     if (!otpRecord || otpRecord.code !== code) {
+      console.log("issue");
+      
       return NextResponse.json({ success: false, message: "Invalid OTP" }, { status: 400 });
     }
 
     if (new Date() > otpRecord.expiresAt) {
+      console.log("issue");
+      
       await prisma.otp.delete({ where: { email_type: { email, type } } });
       return NextResponse.json({ success: false, message: "OTP has expired" }, { status: 400 });
     }

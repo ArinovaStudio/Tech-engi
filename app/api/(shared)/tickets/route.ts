@@ -114,6 +114,7 @@ export async function POST(req: NextRequest) {
       target: formData.get("target") as string || "PLATFORM",
       description: formData.get("description") as string,
     };
+console.log(formData);
 
     const validation = ticketSchema.safeParse(data);
     if (!validation.success) {
@@ -164,7 +165,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, message: "Ticket raised successfully" }, { status: 201 });
 
-  } catch {
+  } catch (error : any) {
+    console.log(error.message);
+    
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }

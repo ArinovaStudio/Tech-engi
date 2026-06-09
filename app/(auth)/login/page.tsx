@@ -4,7 +4,7 @@ import { useState } from "react";
 import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, ArrowLeft } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -50,6 +50,14 @@ export default function LoginPage() {
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="w-130 bg-white h-full  p-8">
             <div className="text-center mb-8">
+               <button
+              onClick={() => router.push('/')}
+              className="flex items-center cursor-pointer gap-2 text-sm text-gray-500 hover:text-gray-800 transition-colors mb-8"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </button>
+
               <h1 className="text-2xl font-bold text-[#0f172a] tracking-tight">Welcome Back <span>👋</span></h1>
               <p className="text-sm text-gray-500 mt-2">Log in to your TECH ENGI account</p>
             </div>

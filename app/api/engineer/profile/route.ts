@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getEngineer } from "@/lib/auth";
+import { getUser } from "@/lib/auth";
 import { deleteFile, uploadFile, uploadImage } from "@/lib/uploads";
 import { z } from "zod";
 import { generateEmbedding } from "@/lib/embeddings";
 
 export async function GET() {
   try {
-    const { user, error } = await getEngineer(false);
+    const { user, error } = await getUser();
     if (error || !user) {
       return NextResponse.json({ success: false, message: error || "Unauthorized" }, { status: 401 });
     }
@@ -78,7 +79,8 @@ const engineerProfileSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const { user, error } = await getEngineer(false);
+    const { user, error } = await getUser();
+    
     if (error || !user) {
       return NextResponse.json({ success: false, message: error || "Unauthorized" }, { status: 401 });
     }
@@ -243,6 +245,7 @@ export async function PUT(req: NextRequest) {
   try {
     const { user, error } = await getEngineer(false);
     if (error || !user) {
+      
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
     }
 

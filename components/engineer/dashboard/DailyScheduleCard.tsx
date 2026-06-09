@@ -110,7 +110,7 @@ export default function DailyScheduleCard({projectsData,}: DailyScheduleCardProp
       {/* Header */}
       <div className="mb-7 flex items-center justify-between">
 
-        <h3 className="text-[34px] font-semibold tracking-[-1px] text-[#111111]">
+        <h3 className="text-[25px] font-semibold tracking-[-1px] text-[#111111]">
           Daily Schedule
         </h3>
 

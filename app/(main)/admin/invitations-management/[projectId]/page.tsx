@@ -109,7 +109,7 @@ export default function ProjectDetailsPage() {
 
       setProject(json.project);
       console.log(json.invitations);
-      
+
       setInvitations(json.invitations || []);
     } catch (err) {
       console.error(err);
@@ -948,7 +948,6 @@ export default function ProjectDetailsPage() {
       </div>
     );
   }
-console.log(filteredUsers, "alluserss");
 
   return (
     // <DashboardShell>
@@ -1273,26 +1272,26 @@ console.log(filteredUsers, "alluserss");
 
                                   <div>
                                     <h3
-                                    className="font-semibold text-[18px] truncate leading-tight tracking-[-0.02em]"
-                                    style={{
-                                      color:
-                                        "var(--text-primary)",
-                                    }}
-                                  >
-                                    {engineer.name}
-                                  </h3>
+                                      className="font-semibold text-[18px] truncate leading-tight tracking-[-0.02em]"
+                                      style={{
+                                        color:
+                                          "var(--text-primary)",
+                                      }}
+                                    >
+                                      {engineer.name}
+                                    </h3>
 
-                                  <p
-                          className="text-[11px] font-medium"
-                          style={{
-                            color:
-                              "var(--text-muted)",
-                          }}
-                        >
-                          {
-                            engineer?.email
-                          }
-                        </p>
+                                    <p
+                                      className="text-[11px] font-medium"
+                                      style={{
+                                        color:
+                                          "var(--text-muted)",
+                                      }}
+                                    >
+                                      {
+                                        engineer?.email
+                                      }
+                                    </p>
                                   </div>
 
                                   {isAiRecommended && (
@@ -1333,7 +1332,7 @@ console.log(filteredUsers, "alluserss");
                                     (skill: string, index: number) => (
                                       <span
                                         key={index}
-                                        className="px-2.5 py-1 rounded-full text-[9px] sm:text-[10px] font-medium bg-[#FFF7ED] border border-[#FED7AA] whitespace-nowrap"
+                                        className="px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-medium bg-[#FFF7ED] border border-[#FED7AA] whitespace-nowrap"
                                         style={{
                                           color: "#C2410C",
                                         }}
@@ -1454,7 +1453,7 @@ console.log(filteredUsers, "alluserss");
 
                                 <span
                                   key={index}
-                                  className="px-2.5 mr-2 py-1 rounded-full text-[9px] sm:text-[10px] font-medium bg-[#FFF7ED] border border-[#FED7AA] whitespace-nowrap"
+                                  className="px-2.5 mr-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-medium bg-[#FFF7ED] border border-[#FED7AA] whitespace-nowrap"
                                   style={{
                                     color: "#C2410C",
                                   }}

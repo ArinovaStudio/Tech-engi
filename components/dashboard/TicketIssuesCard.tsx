@@ -186,7 +186,7 @@ export default function TicketIssuesCard({ projects, }: TicketIssuesCardProps) {
                                     </p>
                                 </div>
 
-                                <div className="rounded-full bg-white px-3 py-1.5 text-[11px] font-semibold text-red-800 shadow-[0_2px_10px_rgba(0,0,0,0.08)]">
+                                <div className="rounded-full bg-white px-2 py-1 text-[11px] font-semibold text-red-800 shadow-[0_2px_10px_rgba(0,0,0,0.08)]">
                                     {ticket.status}
                                 </div>
                             </div>

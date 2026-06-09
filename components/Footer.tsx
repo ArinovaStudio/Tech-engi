@@ -253,7 +253,7 @@ const Footer = () => {
         <div
           className=" max-w-[1600px] mx-auto px-4 sm:px-6 py-6 sm:py-10 flex flex-col lg:flex-row items-center justify-between gap-4 text-center lg:text-left">
           <p className="text-[14px] sm:text-[15px]">
-            © 2026 Tech ENGI
+            © 2026 TsQuery
           </p>
 
           <p className="text-[14px] sm:text-[15px]">

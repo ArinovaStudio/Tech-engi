@@ -44,7 +44,6 @@ export default function EngineerDetailsModal({ isOpen, onClose, profile, onUpdat
 
   useEffect(() => {
     if (isOpen) {
-      console.log(profile);
 
       setQualification(profile?.qualification || "UG");
       setIdType(profile?.idType || "AADHAAR");

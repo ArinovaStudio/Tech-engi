@@ -97,243 +97,134 @@ const BrowserCategory = () => {
 
     return () => ctx.revert();
   }, []);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const startAutoRotate = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+
+    intervalRef.current = setInterval(() => {
+      setSelectedCategory((prev) => {
+        const currentIndex = categories.findIndex(
+          (c) => c.title === prev.title
+        );
+
+        return categories[(currentIndex + 1) % categories.length];
+      });
+    }, 3000);
+  };
+
+  useEffect(() => {
+    startAutoRotate();
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, []);
 
   return (
-   <section className="w-full bg-white py-12 sm:py-16 lg:py-20 px-4 sm:px-6 font-id">
-  <div className="max-w-[1600px] mx-auto">
+    <section id="Categories" className="w-full bg-white py-12 sm:py-16 lg:py-20 px-4 sm:px-6 font-id">
+      <div className="max-w-[1600px] mx-auto">
 
-    {/* HEADER */}
-    <div
-      ref={headerRef}
-      className="
-        flex
-        flex-col
-        lg:flex-row
+        {/* HEADER */}
+        <div
+          ref={headerRef}
+          className=" flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 mb-12 " >
+          {/* LEFT */}
+          <div>
+            <p
+              className=" text-[42px] sm:text-[54px] lg:text-[64px] font-black leading-[1.0] text-black " >
+              Browse by
+            </p>
 
-        lg:items-start
-        lg:justify-between
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="h-[3px] w-10 sm:w-16 bg-black" />
 
-        gap-8
-        mb-12
-      "
-    >
-      {/* LEFT */}
-      <div>
-        <p
-          className="
-            text-[42px]
-            sm:text-[54px]
-            lg:text-[64px]
+              <p
+                className=" text-[42px] sm:text-[54px] lg:text-[64px] font-black leading-[1.0] text-black " >
+                Category
+              </p>
+            </div>
+          </div>
 
-            font-black
-            leading-[1.0]
-            text-black
-          "
-        >
-          Browse by
-        </p>
-
-        <div className="flex items-center gap-3 sm:gap-4">
-          <div className="h-[3px] w-10 sm:w-16 bg-black" />
-
-          <p
-            className="
-              text-[42px]
-              sm:text-[54px]
-              lg:text-[64px]
-
-              font-black
-              leading-[1.0]
-              text-black
-            "
-          >
-            Category
+          {/* RIGHT */}
+          <p className="text-[6px] sm:text-[10px] lg:text-[15px] font-medium text-gray-500 text-left lg:text-right font-inter lg:mt-4 leading-none">
+            Find projects and talent across key
+            <br className="hidden sm:block" />
+            engineering disciplines
           </p>
         </div>
-      </div>
 
-      {/* RIGHT */}
-      <p
-        className="
-          text-[18px]
-          sm:text-[24px]
-          lg:text-[30px]
-
-          font-medium
-          text-black
-
-          text-left
-          lg:text-right
-
-          font-inter
-          lg:mt-4
-          leading-relaxed
-        "
-      >
-        Find projects and talent across key
-        <br className="hidden sm:block" />
-        engineering disciplines
-      </p>
-    </div>
-
-    {/* MAIN LAYOUT */}
-    <div
-      className="
-        grid
-        grid-cols-1
-        xl:grid-cols-[520px_1fr]
-
-        gap-10
-        items-start
-      "
-    >
-      {/* LEFT CATEGORIES */}
-      <div
-        ref={listRef}
-        className="
-          flex
-          flex-col
-          gap-3
-        "
-      >
-        {categories.map((cat, i) => {
-          const active = selectedCategory.title === cat.title;
-
-          return (
-            <button
-              key={cat.title}
-              onClick={() => setSelectedCategory(cat)}
-              className={`
-                flex
-                items-center
-
-                gap-3
-                sm:gap-5
-
-                px-4
-                sm:px-6
-
-                py-4
-                sm:py-5
-
-                border
-                transition-all
-                duration-300
-
-                rounded-none
-                cursor-pointer
-                text-left
-
-                ${
-                  active
-                    ? "bg-black text-white border-black"
-                    : "bg-white text-black border-gray-300 hover:border-black"
-                }
-              `}
-            >
-              <span
-                className="
-                  text-[22px]
-                  sm:text-[30px]
-
-                  font-bold
-                  font-spacegrotesk
-                  shrink-0
-                "
-              >
-                {i + 1}.
-              </span>
-
-              <span
-                className="
-                  text-[20px]
-                  sm:text-[30px]
-
-                  font-medium
-                  font-id
-
-                  leading-tight
-                "
-              >
-                {cat.title}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* RIGHT CONTENT */}
-      <div ref={detailRef} className="min-w-0">
-
-        {/* TITLE */}
-        <h3
-          className="
-            text-[34px]
-            sm:text-[42px]
-            lg:text-[50px]
-
-            font-bold
-            text-black
-
-            text-left
-            lg:text-right
-
-            mb-4
-            leading-tight
-          "
-        >
-          {selectedCategory.title}
-        </h3>
-
-        {/* IMAGE */}
+        {/* MAIN LAYOUT */}
         <div
-          className="
-            w-full
-            overflow-hidden
-            rounded-sm
-            mb-6
+          className=" grid grid-cols-1 xl:grid-cols-[520px_1fr] gap-10 items-start " >
+          {/* LEFT CATEGORIES */}
+          <div
+            ref={listRef}
+            className=" flex flex-col gap-3">
+            {categories.map((cat, i) => {
+              const active = selectedCategory.title === cat.title;
+
+              return (
+                <button
+                  key={cat.title}
+                  onClick={() => {
+                    setSelectedCategory(cat);
+                    startAutoRotate(); // reset timer on manual click
+                  }}
+                  className={` flex items-center gap-3 sm:gap-5 px-4 sm:px-6 py-4 sm:py-5 border transition-all duration-300 rounded-none cursor-pointer text-left
+
+                ${active
+                      ? "bg-black text-white border-black"
+                      : "bg-white text-black border-gray-300 hover:border-black"
+                    }
+              `}
+                >
+                  <span
+                    className=" text-[22px] sm:text-[30px] font-bold font-spacegrotesk shrink-0">
+                    {i + 1}.
+                  </span>
+
+                  <span
+                    className=" text-[20px] sm:text-[30px] font-medium font-id leading-tight">
+                    {cat.title}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* RIGHT CONTENT */}
+          <div ref={detailRef} className="min-w-0">
+
+            {/* TITLE */}
+            <h3
+              className=" text-[34px] sm:text-[42px] lg:text-[50px] font-bold text-black text-left lg:text-right leading-tight">
+              {selectedCategory.title}
+            </h3>
+
+            <h4
+              className=" text-[14px] sm:text-[15px] lg:text-[17px] text-gray-800 text-left lg:text-right mb-1 font-semibold font-inter leading-relaxed">
+              {selectedCategory.description1}
+            </h4>
+
+            {/* IMAGE */}
+            <div
+              className=" w-full overflow-hidden mb-6
           "
-        >
-          <Image
-            src={selectedCategory.image}
-            alt={selectedCategory.title}
-            width={900}
-            height={400}
-            priority
-            className="
-              w-full
+            >
+              <Image
+                src={selectedCategory.image}
+                alt={selectedCategory.title}
+                width={900}
+                height={400}
+                priority
+                className=" w-full h-[220px] sm:h-[300px] lg:h-[420px] object-cover" />
+            </div>
 
-              h-[220px]
-              sm:h-[300px]
-              lg:h-[420px]
+            {/* DESCRIPTION 1 */}
 
-              object-cover
-            "
-          />
-        </div>
 
-        {/* DESCRIPTION 1 */}
-        <p
-          className="
-            text-[14px]
-            sm:text-[15px]
-            lg:text-[16px]
-
-            text-gray-600
-
-            text-left
-            lg:text-right
-
-            mb-4
-            font-inter
-            leading-relaxed
-          "
-        >
-          {selectedCategory.description1}
-        </p>
-
-        {/* DESCRIPTION 2 */}
-        {/* <p
+            {/* DESCRIPTION 2 */}
+            {/* <p
           className="
             text-[14px]
             sm:text-[15px]
@@ -350,10 +241,10 @@ const BrowserCategory = () => {
         >
           {selectedCategory.description2}
         </p> */}
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
   );
 };
 

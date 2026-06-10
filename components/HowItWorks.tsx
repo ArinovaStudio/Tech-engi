@@ -13,7 +13,7 @@ const HowItWorks = () => {
         {
             icon: Users,
             title: "Get Matched With Experts",
-            description: "Connect with verified engineers specializing in Robotics, IoT, AI/ML, Embedded Systems, and Software Development."
+            description: "Connect with verified engineers in Robotics, IoT, AI/ML, Embedded Systems, and Software Development."
         },
         {
             icon: Rocket,
@@ -26,7 +26,7 @@ const HowItWorks = () => {
     const cardsRef = useScrollAnimation('fadeUp')
 
     return (
-        <section className="w-full px-6">
+        <section id='howitworks' className="w-full px-6">
             <div className="w-full">
                 {/* Header */}
                 <div ref={headerRef} className="text-center space-y-1 mb-16">

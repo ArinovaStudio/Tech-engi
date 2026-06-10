@@ -5,21 +5,27 @@ import { useScrollAnimation } from '@/lib/useScrollAnimation'
 import Image from 'next/image';
 
 const stats = [
-  { value: '10,000+', label: 'Projects Successfully Delivered' },
-  { value: '1,200+', label: 'Verified Engineers Onboarded' },
+  { value: '500+', label: 'Projects Successfully Delivered' },
+  { value: '300+', label: 'Verified Engineers Onboarded' },
   { value: '95%', label: 'Client Satisfaction Rate' },
-  { value: '500+', label: 'Startup Projects Supported' },
-  { value: '50+', label: 'Engineering Domains Covered' },
+  { value: '150+', label: 'Startup Projects Supported' },
+  { value: '15+', label: 'Engineering Domains Covered' },
   { value: '24/7', label: 'Project Assistance Available' },
 ]
 
 const companyIcons = [
-  { src: '/sugar.png', label: 'sugar' },
-  { src: '/abc.png', label: 'abc' },
-  { src: '/bbc.png', label: 'bbc' },
-  { src: '/gateway.png', label: 'gateway' },
-  { src: '/moto.png', label: 'moto' },
-  { src: '/flash.png', label: 'flash' },
+  { src: '/partner/image.png', label: 'vsCode' },
+  { src: '/partner/image copy.png', label: 'rasbaripi' },
+  { src: '/partner/image copy 2.png', label: 'c' },
+  { src: '/partner/image copy 3.png', label: 'c++' },
+  { src: '/partner/image copy 4.png', label: 'c#' },
+  { src: '/partner/image copy 5.png', label: 'java' },
+  { src: '/partner/image copy 12.png', label: 'python' },
+  { src: '/partner/image copy 11.png', label: 'figma' },
+  { src: '/partner/image copy 8.png', label: 'react' },
+  { src: '/partner/image copy 9.png', label: 'Kotline' },
+  { src: '/partner/image copy 10.png', label: 'postgrsql' },
+  { src: '/partner/image copy 7.png', label: 'django' },
 ]
 
 const Stats = () => {

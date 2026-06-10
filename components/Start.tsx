@@ -4,6 +4,31 @@ import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+
+
+const heroTestimonials = [
+  {
+    name: "Tarun",
+    role: "Student at XYZ College",
+    text: "Tech-ENGI helped me complete my final-year project with expert guidance and timely delivery.",
+  },
+  {
+    name: "Rahul",
+    role: "Mechanical Engineering Student",
+    text: "The platform connected me with experienced engineers who helped me turn my project idea into reality.",
+  },
+  {
+    name: "Priya",
+    role: "Startup Founder",
+    text: "Finding specialized engineering talent was quick and straightforward. The entire process felt seamless.",
+  },
+  {
+    name: "Aman",
+    role: "Electronics Student",
+    text: "Great experience working with professionals. Communication was smooth and project quality exceeded expectations.",
+  },
+];
 
 const Start = () => {
   const navRef = useRef<HTMLElement>(null);
@@ -12,6 +37,7 @@ const Start = () => {
   const rightRef = useRef<HTMLDivElement>(null);
   const bannerRef = useRef<HTMLDivElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
 
   useEffect(() => {
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
@@ -21,10 +47,21 @@ const Start = () => {
       .fromTo(rightRef.current, { x: 40, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6 }, "-=0.4")
       .fromTo(bannerRef.current, { scaleY: 0.8, opacity: 0, transformOrigin: "top" }, { scaleY: 1, opacity: 1, duration: 0.7 }, "-=0.3");
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTestimonial(
+        (prev) => (prev + 1) % heroTestimonials.length
+      );
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="min-h-screen p-5 font-sans">
+    <div className="min-h-screen p-5 font-sans w-full">
       {/* Navbar */}
-      <header className="border-2 border-gray-200 overflow-hidden">
+      <header className="border-2 border-gray-200 overflow-hidden py-3">
         <div
           className=" max-w-full mx-auto px-4 sm:px-6 h-[64p flex items-center justify-between " >
           {/* LEFT */}
@@ -38,9 +75,11 @@ const Start = () => {
             {/* DESKTOP NAV */}
             <nav
               className=" hidden lg:flex items-center gap-8 font-id text-[14px] text-black " >
-              <a href="#">How it works?</a>
-              <a href="#">Explore Projects</a>
-              <a href="#">Blogs</a>
+              <a href="#howitworks">How it works?</a>
+              {/* <a href="#">Explore Projects</a> */}
+              <a href="#Services">Services</a>
+              <a href="#Categories">Categories</a>
+              <a href="#Testimonials">Testimonials</a>
             </nav>
           </div>
 
@@ -158,7 +197,7 @@ const Start = () => {
         <div
           className={`lg:hidden overflow-hidden transition-all duration-300
 
-          ${mobileMenuOpen ? "max-h-[500px] border-t border-gray-200": "max-h-0"}`}
+          ${mobileMenuOpen ? "max-h-[500px] border-t border-gray-200" : "max-h-0"}`}
         >
           <div className="px-4 py-5 flex flex-col gap-5 bg-white">
             {/* NAV LINKS */}
@@ -241,7 +280,7 @@ const Start = () => {
       {/* Hero Section */}
       <main className="max-w-full mx-auto px-6 pt-6 pb-0">
         {/* Top row */}
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 mb-8">
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 mt-15">
           {/* Left */}
           <div className="flex-1">
             <div ref={taglineRef} className="flex items-center gap-2 mb-4 font-id text-[#FFAE58]">
@@ -249,7 +288,7 @@ const Start = () => {
               <span className="">|</span>
               <span className="text-[16px] uppercase">Expert Engineers</span>
               <span className="">|</span>
-               <span className="text-[16px] uppercase">On-Time Delivery</span>
+              <span className="text-[16px] uppercase">On-Time Delivery</span>
             </div>
             <h1
               ref={headlineRef}
@@ -277,10 +316,10 @@ const Start = () => {
         </div>
 
         {/* Orange Banner */}
-        <div className="relative min-h-[420px] lg:min-h-137.5">
+        <div className="relative min-h-[420px] lg:min-h-[600px]">
 
           {/* Background rounded layer */}
-          <div className="absolute inset-0 rounded-2xl bg-[#FFAE58]" />
+          <div className="absolute inset-0 rounded-2xl bg-[#FFAE58] h-[620px]" />
 
           {/* Two guys image — desktop only, scales with viewport ✅ */}
           <div
@@ -316,45 +355,60 @@ const Start = () => {
           </div>
 
           {/* Bottom-left: Avatars + Trusted */}
-          <div className="
-          hidden lg:flex
-      relative lg:absolute lg:bottom-15 lg:left-20
-      flex flex-col items-center gap-3
-      px-5 pb-6 pt-4 lg:p-0
-    ">
-            <div className="flex flex-start -space-x-3 w-full">
+          <div className="hidden lg:flex relative lg:absolute lg:bottom-15 lg:left-20 flex flex-col items-center gap-3 px-5 pb-6 pt-4 lg:p-0">
+
+            <div className="flex items-center -space-x-3 w-full">
               {[
-                { bg: "#c0392b" },
-                { bg: "#27ae60" },
-                { bg: "#2980b9" },
-                { bg: "#8e44ad" },
-                { bg: "#e67e22" },
-              ].map((a, i) => (
+                "/student/image copy 4.png",
+                "/student/image copy 2.png",
+                "/student/image copy 3.png",
+                "/student/image copy.png",
+                "/student/image.png",
+              ].map((src, i) => (
                 <div
                   key={i}
-                  className="w-9 h-9 rounded-full border-2 border-white"
-                  style={{ backgroundColor: a.bg }}
-                />
+                  className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-white"
+                >
+                  <Image
+                    src={src}
+                    alt={`User ${i + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
               ))}
             </div>
-            <span className="text-white font-semibold font-id text-[20px] lg:text-[24px]">Trusted by 1M+ Students</span>
+            <span className="text-white font-semibold font-id text-[20px] lg:text-[24px]">Trusted by 1K+ Students</span>
           </div>
 
           {/* Testimonial card */}
-          <div className="
-          hidden lg:flex lg:flex-col
-      relative lg:absolute lg:bottom-40 lg:right-30
-      max-w-[320px] font-inter
-      px-5 pb-6 lg:p-0
-    ">
-            <p className="text-white font-bold text-[25px] mb-0.5">Tarun</p>
-            <p className="text-white/70 text-[15px] mb-2">student at XYZ college</p>
-            <div className="border-t border-white/40 pt-2">
-              <p className="text-white/90 text-[15px] leading-relaxed">
-                Lorem ipsum dolor sit amet consectetur. Viverra imperdiet sit viverra sed fusca aliquet eget. Amet faucibus amet sapien dui. Est a at viverra cursus montes libero massa a. Urna.
-              </p>
-            </div>
-          </div>
+         <AnimatePresence mode="wait">
+  <motion.div
+    key={currentTestimonial}
+    initial={{ opacity: 0, x: 60 }}
+    animate={{ opacity: 1, x: 0 }}
+    exit={{ opacity: 0, x: -60 }}
+    transition={{
+      duration: 0.45,
+      ease: [0.22, 1, 0.36, 1],
+    }}
+    className="hidden lg:flex lg:flex-col relative lg:absolute lg:bottom-40 lg:right-30 max-w-[320px] font-inter px-5 pb-6 lg:p-0"
+  >
+    <p className="text-white font-bold text-[25px] mb-0.5">
+      {heroTestimonials[currentTestimonial].name}
+    </p>
+
+    <p className="text-white/70 text-[15px] mb-2">
+      {heroTestimonials[currentTestimonial].role}
+    </p>
+
+    <div className="border-t border-white/40 pt-2">
+      <p className="text-white/90 text-[15px] leading-relaxed">
+        {heroTestimonials[currentTestimonial].text}
+      </p>
+    </div>
+  </motion.div>
+</AnimatePresence>
 
         </div>
       </main>

@@ -54,9 +54,9 @@ const Footer = () => {
 
           <ul className="space-y-2">
             <li>
-              <a href="#" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 hover:text-black font-id flex items-center gap-1 " >
+              <a href="#Services" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 hover:text-black font-id flex items-center gap-1 " >
                 <span className="text-gray-400">›</span>
-                Explore Projects
+                Services
               </a>
             </li>
             <li>
@@ -72,9 +72,9 @@ const Footer = () => {
               </a>
             </li>
             <li>
-              <a href="#" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 hover:text-black font-id flex items-center gap-1 " >
+              <a href="#howitworks" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 hover:text-black font-id flex items-center gap-1 " >
                 <span className="text-gray-400">›</span>
-                Contact sales
+                How it works
               </a>
             </li>
           </ul>

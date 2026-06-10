@@ -382,33 +382,33 @@ const Start = () => {
           </div>
 
           {/* Testimonial card */}
-         <AnimatePresence mode="wait">
-  <motion.div
-    key={currentTestimonial}
-    initial={{ opacity: 0, x: 60 }}
-    animate={{ opacity: 1, x: 0 }}
-    exit={{ opacity: 0, x: -60 }}
-    transition={{
-      duration: 0.45,
-      ease: [0.22, 1, 0.36, 1],
-    }}
-    className="hidden lg:flex lg:flex-col relative lg:absolute lg:bottom-40 lg:right-30 max-w-[320px] font-inter px-5 pb-6 lg:p-0"
-  >
-    <p className="text-white font-bold text-[25px] mb-0.5">
-      {heroTestimonials[currentTestimonial].name}
-    </p>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentTestimonial}
+              initial={{ opacity: 0, x: 60 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -60 }}
+              transition={{
+                duration: 0.45,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="hidden lg:flex lg:flex-col relative lg:absolute lg:bottom-40 lg:right-30 max-w-[320px] font-inter px-5 pb-6 lg:p-0"
+            >
+              <p className="text-white font-bold text-[25px] mb-0.5">
+                {heroTestimonials[currentTestimonial].name}
+              </p>
 
-    <p className="text-white/70 text-[15px] mb-2">
-      {heroTestimonials[currentTestimonial].role}
-    </p>
+              <p className="text-white/70 text-[15px] mb-2">
+                {heroTestimonials[currentTestimonial].role}
+              </p>
 
-    <div className="border-t border-white/40 pt-2">
-      <p className="text-white/90 text-[15px] leading-relaxed">
-        {heroTestimonials[currentTestimonial].text}
-      </p>
-    </div>
-  </motion.div>
-</AnimatePresence>
+              <div className="border-t border-white/40 pt-2">
+                <p className="text-white/90 text-[15px] leading-relaxed">
+                  {heroTestimonials[currentTestimonial].text}
+                </p>
+              </div>
+            </motion.div>
+          </AnimatePresence>
 
         </div>
       </main>

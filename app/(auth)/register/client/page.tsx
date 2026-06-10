@@ -15,6 +15,7 @@ import {
   KeyRound,
   ArrowLeft
 } from "lucide-react";
+import Image from "next/image";
 
 export default function ClientRegisterPage() {
   const router = useRouter();
@@ -165,6 +166,15 @@ export default function ClientRegisterPage() {
   return (
     <div className="flex w-full h-screen">
       <div className="w-[50%] h-screen">
+        <div className="">
+          <button
+            onClick={() => router.push('/')}
+            className="flex items-center cursor-pointer gap-2 text-sm text-gray-500 hover:text-gray-800 transition-colors m-5"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </button>
+        </div>
         <div className="min-h-screen flex flex-col justify-center items-center p-4 font-sans relative">
           <div className="w-full flex items-center justify-center bg-white p-8 sm:p-10 relative overflow-hidden">
 
@@ -172,13 +182,6 @@ export default function ClientRegisterPage() {
             {step === 1 && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 w-120">
                 <div className="text-center mb-8">
-                  <button
-                    onClick={() => router.push('/')}
-                    className="flex items-center cursor-pointer gap-2 text-sm text-gray-500 hover:text-gray-800 transition-colors mb-8"
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                    Back
-                  </button>
                   <div className="flex h-14 w-14 items-center justify-center rounded-[1rem] bg-[#f0b31e] shadow-lg shadow-yellow-500/30 mx-auto mb-4">
                     <Briefcase className="h-7 w-7 text-white" />
                   </div>
@@ -420,7 +423,13 @@ export default function ClientRegisterPage() {
           <div className="mt-20">
             {/* Logo */}
             <div className="w-24 h-24 bg-white rounded-sm flex items-center justify-center text-black font-bold text-sm shadow-xl">
-              LOGO
+              <Image
+                src="/logo.png"
+                alt="logo"
+                width={100}
+                height={100}
+                className="rounded-sm"
+              />
             </div>
 
             {/* Hero */}

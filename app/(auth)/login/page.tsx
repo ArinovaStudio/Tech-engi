@@ -5,6 +5,7 @@ import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, Mail, Lock, ArrowLeft } from "lucide-react";
+import Image from "next/image";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -46,17 +47,20 @@ export default function LoginPage() {
 
   return (
     <div className="flex w-full h-screen">
-      <div className="w-[50%] h-screen">
+      <div className="w-[50%] h-screen ">
+        <div className="">
+          <button
+            onClick={() => router.push('/')}
+            className="flex items-center cursor-pointer gap-2 text-sm text-gray-500 hover:text-gray-800 transition-colors m-5"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </button>
+        </div>
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="w-130 bg-white h-full  p-8">
             <div className="text-center mb-8">
-               <button
-              onClick={() => router.push('/')}
-              className="flex items-center cursor-pointer gap-2 text-sm text-gray-500 hover:text-gray-800 transition-colors mb-8"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </button>
+
 
               <h1 className="text-2xl font-bold text-[#0f172a] tracking-tight">Welcome Back <span>👋</span></h1>
               <p className="text-sm text-gray-500 mt-2">Log in to your TECH ENGI account</p>
@@ -91,6 +95,11 @@ export default function LoginPage() {
 
               {/* Password Field */}
               <div className="space-y-1.5">
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-sm font-medium text-gray-700 ml-1">
+                    Password
+                  </label>
+                </div>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                     <Lock className="h-5 w-5 text-gray-400" />
@@ -112,9 +121,7 @@ export default function LoginPage() {
                   </button>
                 </div>
                 <div className="flex justify-between items-center mb-1">
-                  <label className="text-sm font-medium text-gray-700 ml-1">
-                    Password
-                  </label>
+                  <div></div>
                   <Link href="/forgot-password" className="text-xs text-[#f0b31e] hover:text-yellow-600 transition-colors font-medium">
                     Forgot password?
                   </Link>
@@ -196,8 +203,14 @@ export default function LoginPage() {
 
           <div className="mt-20">
             {/* Logo */}
-            <div className="w-24 h-24 bg-white rounded-sm flex items-center justify-center text-black font-bold text-sm shadow-xl">
-              LOGO
+            <div className="w-24 h-24 bg-white rounded-sm flex items-center  justify-center text-black font-bold text-sm shadow-xl">
+              <Image
+                src="/logo.png"
+                alt="logo"
+                width={100}
+                height={100}
+                className="rounded-sm"
+              />
             </div>
 
             {/* Hero */}

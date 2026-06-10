@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Eye, EyeOff, Mail, Lock, Loader2, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 interface FormErrors {
   [key: string]: string;
@@ -31,7 +32,7 @@ const ForgotPasswordPage = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     console.log(name, value);
-    
+
     setFormData((prev) => ({ ...prev, [name]: value.replace(/\s/g, "") }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -146,16 +147,17 @@ const ForgotPasswordPage = () => {
     <div className="flex w-full h-screen">
       {/* ── Left: Form ── */}
       <div className="w-[50%] h-screen">
+        <div className="">
+          <button
+            onClick={() => router.push('/')}
+            className="flex items-center cursor-pointer gap-2 text-sm text-gray-500 hover:text-gray-800 transition-colors m-5"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </button>
+        </div>
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="w-130 bg-white h-full p-8">
-            {/* Back button */}
-            <button
-              onClick={() => router.back()}
-              className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 transition-colors mb-8"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </button>
 
             {/* Heading */}
             <div className="mb-8">
@@ -186,8 +188,8 @@ const ForgotPasswordPage = () => {
                     onChange={handleChange}
                     placeholder="you@example.com"
                     className={`w-full pl-11 pr-4 h-12 rounded-xl border bg-transparent focus:bg-white outline-none transition-all text-sm text-black disabled:opacity-50 disabled:cursor-not-allowed ${errors.email
-                        ? "border-red-400 focus:border-red-400 focus:ring-1 focus:ring-red-200"
-                        : "border-gray-200 focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e]/30"
+                      ? "border-red-400 focus:border-red-400 focus:ring-1 focus:ring-red-200"
+                      : "border-gray-200 focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e]/30"
                       }`}
                   />
                   {/* green dot when valid */}
@@ -232,8 +234,8 @@ const ForgotPasswordPage = () => {
                           placeholder="••••••"
                           maxLength={6}
                           className={`w-full pl-11 pr-4 h-12 rounded-xl border bg-transparent focus:bg-white outline-none transition-all text-sm text-black disabled:opacity-50 disabled:cursor-not-allowed ${errors.otp
-                              ? "border-red-400 focus:border-red-400 focus:ring-1 focus:ring-red-200"
-                              : "border-gray-200 focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e]/30"
+                            ? "border-red-400 focus:border-red-400 focus:ring-1 focus:ring-red-200"
+                            : "border-gray-200 focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e]/30"
                             }`}
                         />
                       </div>
@@ -274,8 +276,8 @@ const ForgotPasswordPage = () => {
                     onChange={handleChange}
                     placeholder="••••••••"
                     className={`w-full pl-11 pr-11 h-12 rounded-xl border bg-transparent focus:bg-white outline-none transition-all text-sm text-black disabled:opacity-50 disabled:cursor-not-allowed ${errors.newPassword
-                        ? "border-red-400 focus:border-red-400 focus:ring-1 focus:ring-red-200"
-                        : "border-gray-200 focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e]/30"
+                      ? "border-red-400 focus:border-red-400 focus:ring-1 focus:ring-red-200"
+                      : "border-gray-200 focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e]/30"
                       }`}
                   />
                   <button
@@ -301,7 +303,7 @@ const ForgotPasswordPage = () => {
               {/* Submit */}
               <button
                 type="submit"
-                disabled={resetLoading|| otpVerified}
+                disabled={resetLoading || otpVerified}
                 className="w-full h-12 bg-[#f0b31e] hover:bg-[#e0a61a] text-white rounded-xl text-base font-semibold shadow-md shadow-yellow-500/20 transition-all flex justify-center items-center disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {resetLoading ? (
@@ -337,7 +339,13 @@ const ForgotPasswordPage = () => {
         <div className="relative z-10 flex flex-col h-full">
           <div className="mt-20">
             <div className="w-24 h-24 bg-white rounded-sm flex items-center justify-center text-black font-bold text-sm shadow-xl">
-              LOGO
+              <Image
+                src="/logo.png"
+                alt="logo"
+                width={100}
+                height={100}
+                className="rounded-sm"
+              />
             </div>
             <div className="mt-12">
               <h1 className="text-white text-7xl font-extrabold tracking-tight leading-none">

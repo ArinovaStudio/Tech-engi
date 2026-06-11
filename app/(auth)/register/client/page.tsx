@@ -52,6 +52,18 @@ export default function ClientRegisterPage() {
     }
 
     try {
+      const registerRes = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password, role: "CLIENT" }),
+      });
+
+      const registerData = await registerRes.json();
+
+      if (!registerRes.ok || !registerData.success) {
+        throw new Error(registerData.message || "Registration failed");
+      }
+
       // Send the OTP
       const otpRes = await fetch("/api/auth/otp/send", {
         method: "POST",
@@ -98,18 +110,6 @@ export default function ClientRegisterPage() {
 
       if (!verifyRes.ok || !verifyData.success) {
         throw new Error(verifyData.message || "Invalid OTP code");
-      }
-
-      const registerRes = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, role: "CLIENT" }),
-      });
-
-      const registerData = await registerRes.json();
-
-      if (!registerRes.ok || !registerData.success) {
-        throw new Error(registerData.message || "Registration failed");
       }
 
       const signInRes = await signIn("credentials", {

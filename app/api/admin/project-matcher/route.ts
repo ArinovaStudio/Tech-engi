@@ -6,7 +6,7 @@ const ollama = new Ollama();
 
 export async function POST(req: NextRequest) {
     try {
-        
+
         const { engineers, projectId } = await req.json();
 
         if (!engineers || !Array.isArray(engineers) || !projectId) {
@@ -208,9 +208,6 @@ Rules:
                 )
             );
             
-            
-// console.log(aiSuggestions, "AI SUGGESTIONSss");
-
         return NextResponse.json(
             {
                 success: true,

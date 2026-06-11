@@ -276,8 +276,6 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
 
   const targetOptions = role === "ADMIN" ? ["Engineer", "Client"] : role === "ENGINEER" ? ["Platform", "Client"] : ["Engineer", "Platform"];
 
-  console.log(filteredTickets);
-
   const statusChange = {}
 
   return (
@@ -493,6 +491,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                                   href={img}
                                   target="_blank"
                                   rel="noopener noreferrer"
+                                  download
                                 >
                                   <img
                                     src={img}

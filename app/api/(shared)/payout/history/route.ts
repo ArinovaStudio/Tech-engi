@@ -14,7 +14,7 @@ export async function GET() {
       const engineerProfile = user.engineerProfile;
 
       if (!engineerProfile) {
-        return NextResponse.json( { success: true, transactions: [], stats: { totalReceived: 0, totalPending: 0 } }, { status: 200 } );
+        return NextResponse.json({ success: true, transactions: [], stats: { totalReceived: 0, totalPending: 0 } }, { status: 200 });
       }
 
       const validProjects = await prisma.project.findMany({
@@ -33,10 +33,10 @@ export async function GET() {
       const validProjectIds = validProjects.map(p => p.id);
 
       const payoutTransactions = await prisma.transaction.findMany({
-        where: { 
-          userId: user.id, 
+        where: {
+          userId: user.id,
           type: "PAYOUT_ENGINEER",
-          projectId: { in: validProjectIds } 
+          projectId: { in: validProjectIds }
         },
         orderBy: { createdAt: "desc" },
         include: { project: { select: { title: true } } },
@@ -75,18 +75,18 @@ export async function GET() {
         else if (t.status === "PENDING") totalPending += t.amount;
       }
 
-      return NextResponse.json( { success: true, transactions: allPayouts, stats: { totalReceived, totalPending } }, { status: 200 } );
+      return NextResponse.json({ success: true, transactions: allPayouts, stats: { totalReceived, totalPending } }, { status: 200 });
     }
 
     // client payout history
     if (user.role === "CLIENT") {
       const clientProfile = user.clientProfile;
-      
+
       if (!clientProfile) {
-        return NextResponse.json({ 
-          success: true, transactions: [], 
-          stats: { totalSpent: 0, totalRefunded: 0, pendingRefunds: 0, totalBudget: 0, totalProjects: 0, pendingAmount: 0 }, 
-          pendingProjects: [] 
+        return NextResponse.json({
+          success: true, transactions: [],
+          stats: { totalSpent: 0, totalRefunded: 0, pendingRefunds: 0, totalBudget: 0, totalProjects: 0, pendingAmount: 0 },
+          pendingProjects: []
         }, { status: 200 });
       }
 
@@ -113,9 +113,9 @@ export async function GET() {
 
       const totalProjects = projects.length;
       const totalBudget = projects.reduce((acc, p) => acc + (p.budget || 0), 0);
-      
-      const pendingProjects = projects.filter(p => p.status === "DRAFT" || p.status === "AWAITING_FINAL_PAYMENT");
-      
+
+      const pendingProjects = projects.filter((p) =>["DRAFT", "AWAITING_FINAL_PAYMENT"].includes(p.status));
+
       let pendingAmount = 0;
       for (const p of pendingProjects) {
         if (p.status === "DRAFT") {
@@ -125,9 +125,9 @@ export async function GET() {
         }
       }
 
-      return NextResponse.json({ 
-        success: true, 
-        transactions, 
+      return NextResponse.json({
+        success: true,
+        transactions,
         stats: { totalSpent, totalRefunded, pendingRefunds, totalBudget, totalProjects, pendingAmount },
         pendingProjects
       }, { status: 200 });

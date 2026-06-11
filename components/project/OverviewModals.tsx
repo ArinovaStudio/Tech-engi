@@ -24,6 +24,7 @@ export const EditModal = ({ showModel, projectData, userRole }: { showModel: (v:
   const [visualKey, setVisualKey] = useState("");
   const [visualValue, setVisualValue] = useState("");
   const [keyPagesInput, setKeyPagesInput] = useState("");
+  const [status, setStatus] = useState(projectData.status);
   const [designSystem, setDesignSystem] = useState({
     brandName: "",
     colors: [] as string[],
@@ -64,6 +65,7 @@ export const EditModal = ({ showModel, projectData, userRole }: { showModel: (v:
     priority: projectData.priority || "LOW",
     repository: projectData.repository || "",
     budget: projectData.budget || 0,
+    status: projectData.status || "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -91,9 +93,9 @@ export const EditModal = ({ showModel, projectData, userRole }: { showModel: (v:
   };
 
   useEffect(() => {
-     if (projectData?.technology) {
-    setTechnology(projectData.technology);
-  }
+    if (projectData?.technology) {
+      setTechnology(projectData.technology);
+    }
 
     if (!projectData?.designSystem) return;
 
@@ -148,6 +150,31 @@ export const EditModal = ({ showModel, projectData, userRole }: { showModel: (v:
                   <div><label style={labelStyle}>Repository</label><input type="text" value={formData.repository} onChange={(e) => setFormData({ ...formData, repository: e.target.value })} className={inputCls} placeholder="URL ending in .git" /></div>
                 </>
               )}
+
+              <div>
+                <label style={labelStyle}>Status</label>
+
+                <select
+                  disabled={isEngineer}
+                  value={formData.status}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      status: e.target.value,
+                    })
+                  }
+                  className={selectCls}
+                >
+                  <option value="DRAFT">DRAFT</option>
+                  <option value="SEARCHING">SEARCHING</option>
+                  <option value="IN_PROGRESS">In Progress</option>
+                  <option value="IN_REVIEW">On IN_REVIEW</option>
+                  <option value="AWAITING_FINAL_PAYMENT">AWAITING_FINAL_PAYMENT</option>
+                  <option value="COMPLETED">Completed</option>
+                  <option value="CANCELED">CANCELED</option>
+                </select>
+              </div>
+
             </div>
 
             <div>

@@ -29,6 +29,7 @@ export default function InvitationsManagementPage() {
   const router = useRouter();
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const fetchInvitations = async () => {
@@ -69,6 +70,10 @@ export default function InvitationsManagementPage() {
 
     fetchInvitations();
   }, []);
+
+  const filteredProjects = projects.filter((project) =>
+    project.title.toLowerCase().includes(search.toLowerCase())
+  );
 
   if (loading) {
     return (
@@ -151,18 +156,29 @@ export default function InvitationsManagementPage() {
     <DashboardShell>
       <div className="p-6 space-y-6">
         {/* HEADER */}
-        <div>
-          <h1 className="text-2xl font-semibold text-[var(--text-primary)]">
-            Invitations Management
-          </h1>
-          <p className="text-sm text-[var(--text-muted)]">
-            Select a project to manage engineer invitations
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-[var(--text-primary)]">
+              Invitations Management
+            </h1>
+            <p className="text-sm text-[var(--text-muted)]">
+              Select a project to manage engineer invitations
+            </p>
+          </div>
+
+          <div>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search projects..."
+              className=" h-11 w-full md:w-80 px-4 rounded-xl border border-[var(--border)] bg-white text-sm outline-none focus:ring-2 focus:ring-orange-400 " />
+          </div>
         </div>
 
         {/* GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {projects.map((project) => (
+          {filteredProjects.map((project) => (
             <Card
               key={project.id}
               onClick={() =>

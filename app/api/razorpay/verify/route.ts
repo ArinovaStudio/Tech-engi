@@ -45,6 +45,8 @@ export async function POST(req: NextRequest) {
     }
 
     const project = transaction.project;
+    let adminsToNotify: { email: string }[] = [];
+    let engineerEmailHtml = "";
 
     await prisma.$transaction(async (tx) => {
 
@@ -69,15 +71,21 @@ export async function POST(req: NextRequest) {
         });
         const payoutAmount = project.budget * 0.4;
 
-        const engineerEmailHtml = advancePaymentSuccessTemplate(
-          project.title,
-          payoutAmount
-        );
+        await tx.projectInvitation.create({
+          data: {
+            projectId: project.id,
+          }
+        })
 
-        await sendEmail(
-          project.engineer!.user.email,
-          "Advance Payment Received",
-          engineerEmailHtml
+        const admins = await tx.user.findMany({
+          where: {
+            role: "ADMIN",
+          },
+        });
+
+        engineerEmailHtml = advancePaymentSuccessTemplate(
+          project.title,
+          project.budget * 0.4
         );
 
       } else if (transaction.type === "FINAL_PAYMENT") {
@@ -122,6 +130,16 @@ export async function POST(req: NextRequest) {
       }
     });
 
+    await Promise.all(
+      adminsToNotify.map((admin) =>
+        sendEmail(
+          admin.email,
+          "Advance Payment Received",
+          engineerEmailHtml
+        )
+      )
+    );
+
     // Send email to engineer if final payment
     if (transaction.type === "FINAL_PAYMENT" && project.engineer?.user.email) {
       const payoutAmount = project.budget * 0.7;
@@ -134,7 +152,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true, message: "Payment verified successfully" }, { status: 200 });
-  } catch {
+  } catch (error: any) {
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }

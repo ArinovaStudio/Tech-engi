@@ -119,7 +119,6 @@ const ClientAnalyticsDashboard = () => {
       </div>
     </div>
   );
-  console.log(filteredProjects, "filteredProjects");
 
   // Projects List
   if (!projectId || showProjects) return (
@@ -263,6 +262,7 @@ const ClientAnalyticsDashboard = () => {
       {showCreate && <CreateProjectModal onClose={() => setShowCreate(false)} onCreated={() => setShowProjects(false)} user={user} />}
     </div>
   );
+console.log(projectAnalytics, "projectAnalytics", projectId);
 
   // Detailed Project Analytics
   return (
@@ -277,7 +277,7 @@ const ClientAnalyticsDashboard = () => {
         </button>
       </div>
 
-      <ClientOverview data={projectAnalytics?.overview} />
+      <ClientOverview data={projectAnalytics?.overview} projectId={projectId} />
       <DesignOverview data={projectAnalytics?.projects} />
       {/* data={projectAnalytics?.design} */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

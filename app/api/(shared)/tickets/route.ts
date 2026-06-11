@@ -103,9 +103,9 @@ export async function POST(req: NextRequest) {
       where: { raisedById: user.id, createdAt: { gte: twentyFourHoursAgo } }
     });
 
-    if (ticketsRaisedToday >= 3) {
-      return NextResponse.json({ success: false, message: "You have reached the daily limit of 3 tickets" }, { status: 429 });
-    }
+    // if (ticketsRaisedToday >= 3) {
+    //   return NextResponse.json({ success: false, message: "You have reached the daily limit of 3 tickets" }, { status: 429 });
+    // }
 
     const formData = await req.formData();
     const data = {

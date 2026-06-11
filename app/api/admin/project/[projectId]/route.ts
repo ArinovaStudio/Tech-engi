@@ -20,7 +20,10 @@ const adminUpdateSchema = z.object({
   status: z.enum(["DRAFT", "SEARCHING", "IN_PROGRESS", "IN_REVIEW", "AWAITING_FINAL_PAYMENT", "COMPLETED", "CANCELED"]).optional(),
   progress: z.number().min(0).max(100).optional(),
   priority: z.enum(["LOW", "MEDIUM", "HIGH"]).optional(),
-  repository: z.string().url("Must be a valid URL").optional().nullable(),
+  repository: z.preprocess(
+    (val) => val === "" ? undefined : val,
+    z.string().url("Must be a valid Repository URL").optional()
+  ),
   startDate: z.coerce.date().optional().nullable(),
   endDate: z.coerce.date().optional().nullable(),
   instruments: z.array(z.string()).optional(),
@@ -37,6 +40,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ proj
     const { designSystem, action, ...projectFields } = body;
 
     const validation = adminUpdateSchema.safeParse(projectFields);
+    console.log(validation.data, projectFields, validation?.error?.issues[0].message);
+
     if (!validation.success) return NextResponse.json({ success: false, message: validation.error.issues[0].message }, { status: 400 });
 
     const existingProject = await prisma.project.findUnique({ where: { id: projectId } });
@@ -54,85 +59,85 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ proj
     let savedDesignSystem = null;
 
     if (designSystem) {
-        savedDesignSystem =
-          await prisma.designSystem.upsert({
-            where: {
-              projectId,
-            },
+      savedDesignSystem =
+        await prisma.designSystem.upsert({
+          where: {
+            projectId,
+          },
 
-            update: {
-              brandName:
-                designSystem.brandName,
+          update: {
+            brandName:
+              designSystem.brandName,
 
-              colors:
-                designSystem.colors,
+            colors:
+              designSystem.colors,
 
-              fonts:
-                designSystem.fonts,
+            fonts:
+              designSystem.fonts,
 
-              designType:
-                designSystem.designType,
+            designType:
+              designSystem.designType,
 
-              layoutStyle:
-                designSystem.layoutStyle,
+            layoutStyle:
+              designSystem.layoutStyle,
 
-              contentTone:
-                designSystem.contentTone,
+            contentTone:
+              designSystem.contentTone,
 
-              visualGuidelines:
-                designSystem.visualGuidelines,
+            visualGuidelines:
+              designSystem.visualGuidelines,
 
-              theme:
-                designSystem.theme,
+            theme:
+              designSystem.theme,
 
-              brandFeel:
-                designSystem.brandFeel,
+            brandFeel:
+              designSystem.brandFeel,
 
-              keyPages:
-                designSystem.keyPages,
+            keyPages:
+              designSystem.keyPages,
 
-              uniqueness:
-                designSystem.uniqueness,
-            },
+            uniqueness:
+              designSystem.uniqueness,
+          },
 
-            create: {
-              projectId,
+          create: {
+            projectId,
 
-              brandName:
-                designSystem.brandName,
+            brandName:
+              designSystem.brandName,
 
-              colors:
-                designSystem.colors,
+            colors:
+              designSystem.colors,
 
-              fonts:
-                designSystem.fonts,
+            fonts:
+              designSystem.fonts,
 
-              designType:
-                designSystem.designType,
+            designType:
+              designSystem.designType,
 
-              layoutStyle:
-                designSystem.layoutStyle,
+            layoutStyle:
+              designSystem.layoutStyle,
 
-              contentTone:
-                designSystem.contentTone,
+            contentTone:
+              designSystem.contentTone,
 
-              visualGuidelines:
-                designSystem.visualGuidelines,
+            visualGuidelines:
+              designSystem.visualGuidelines,
 
-              theme:
-                designSystem.theme,
+            theme:
+              designSystem.theme,
 
-              brandFeel:
-                designSystem.brandFeel,
+            brandFeel:
+              designSystem.brandFeel,
 
-              keyPages:
-                designSystem.keyPages,
+            keyPages:
+              designSystem.keyPages,
 
-              uniqueness:
-                designSystem.uniqueness,
-            },
-          });
-      }
+            uniqueness:
+              designSystem.uniqueness,
+          },
+        });
+    }
 
     return NextResponse.json({ success: true, message: "Project updated successfully" }, { status: 200 });
   } catch {

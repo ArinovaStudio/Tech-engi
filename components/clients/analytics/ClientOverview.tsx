@@ -1,9 +1,11 @@
 'use client';
 
-import { FileText, DollarSign, Calendar } from 'lucide-react';
+import { FileText, DollarSign, Calendar, ThumbsDownIcon, ThumbsUp } from 'lucide-react';
 import { format } from 'date-fns/format';
+import toast from 'react-hot-toast';
+import { useState } from 'react';
 
-const ClientOverview = ({ data }: { data: any }) => {
+const ClientOverview = ({ data, projectId }: { data: any, projectId: any }) => {
   if (!data) return (
     <div className="p-6 text-center text-red-500 dark:text-red-400">No project data available</div>
   );
@@ -20,6 +22,28 @@ const ClientOverview = ({ data }: { data: any }) => {
   const projectManager = data.projectManager || 'Unassigned';
   const overallProgress = data.overallProgress ?? 0;
   const circumference = +(2 * Math.PI * 80).toFixed(1);
+  const [status, setStatus] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("/api/client/statuschange", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status, projectId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Status updated");
+      } else {
+        toast.error(data.message || "Failed to update");
+      }
+    } catch (error) {
+      toast.error("Something went wrong");
+
+    }
+
+  };
 
   return (
     <div className="dark:bg-gray-900">
@@ -109,6 +133,37 @@ const ClientOverview = ({ data }: { data: any }) => {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <span className="text-5xl font-bold text-gray-900 dark:text-white">{overallProgress}%</span>
                 </div>
+              </div>
+              <div className="flex items-center justify-between gap-8 mt-3">
+
+                {/* THUMBS UP */}
+                <button
+                  onClick={() => {
+                    setStatus("AWAITING_FINAL_PAYMENT");
+                    handleSubmit(new Event("submit") as any);
+                  }}
+                  className="relative group cursor-pointer">
+                  <ThumbsUp className="text-green-500 hover:text-green-600 transition" />
+
+                  <div className="absolute bottom-full mb-2 hidden group-hover:block bg-black text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
+                    satisfied
+                  </div>
+                </button>
+
+                {/* THUMBS DOWN */}
+                <button
+                  onClick={() => {
+                    setStatus("IN_PROGRESS");
+                    handleSubmit(new Event("submit") as any);
+                  }}
+                  className="relative group cursor-pointer">
+                  <ThumbsDownIcon className="text-red-500 hover:text-red-600 transition" />
+
+                  <div className="absolute bottom-full mb-2 hidden group-hover:block bg-black text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
+                    There is some Bugs
+                  </div>
+                </button>
+
               </div>
             </div>
           </div>

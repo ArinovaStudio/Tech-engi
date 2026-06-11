@@ -72,19 +72,53 @@ export default function ProjectDetailsPage() {
 
   ];
 
+  // const getInvitationsByStatus = (status: string) => {
+  //   if (status === "ALL_USERS") {
+  //     return invitations;
+  //   }
+
+  //   if (status === "APPROVED") {
+  //     return invitations.filter(
+  //       (inv) => inv.status === "ACCEPTED"
+  //     );
+  //   }
+
+  //   if (status === "REJECTED") {
+  //     return invitations.filter(
+  //       (inv) =>
+  //         inv.status === "REJECTED" ||
+  //         inv.status === "ADMIN_REJECTED"
+  //     );
+  //   }
+
+  //   if (status === "WAITING") {
+  //     return invitations.filter(
+  //       (inv) =>
+  //         inv.status === "PENDING_ADMIN" ||
+  //         inv.status === "SENT"
+  //     );
+  //   }
+
+  //   return [];
+  // };
+
   const getInvitationsByStatus = (status: string) => {
+    const validInvitations = invitations.filter(
+      (inv) => inv.engineerId && inv.engineer
+    );
+
     if (status === "ALL_USERS") {
-      return invitations;
+      return validInvitations;
     }
 
     if (status === "APPROVED") {
-      return invitations.filter(
+      return validInvitations.filter(
         (inv) => inv.status === "ACCEPTED"
       );
     }
 
     if (status === "REJECTED") {
-      return invitations.filter(
+      return validInvitations.filter(
         (inv) =>
           inv.status === "REJECTED" ||
           inv.status === "ADMIN_REJECTED"
@@ -92,7 +126,7 @@ export default function ProjectDetailsPage() {
     }
 
     if (status === "WAITING") {
-      return invitations.filter(
+      return validInvitations.filter(
         (inv) =>
           inv.status === "PENDING_ADMIN" ||
           inv.status === "SENT"
@@ -108,7 +142,6 @@ export default function ProjectDetailsPage() {
       const json = await res.json();
 
       setProject(json.project);
-      console.log(json.invitations);
 
       setInvitations(json.invitations || []);
     } catch (err) {
@@ -1226,12 +1259,38 @@ export default function ProjectDetailsPage() {
 
                       return !alreadyInvited;
                     }).filter(
-                      (engineer) => engineer?.engineerProfile
+                      (engineer) => engineer?.engineerProfile && engineer?.isSuspended === false
                     )
                     .map((engineer) => {
                       const isAiRecommended =
                         aiSuggestionIds.has(engineer.id);
+                      const getExperienceNumber = (
+                        level?: string
+                      ) => {
+                        switch (level) {
+                          case "FRESHER":
+                            return "0-1";
 
+                          case "ONE_TO_TWO_YEARS":
+                            return "1-2";
+
+                          case "THREE_TO_FIVE_YEARS":
+                            return "3-5";
+
+                          case "FIVE_TO_EIGHT_YEARS":
+                            return "5-8";
+
+                          case "EIGHT_PLUS_YEARS":
+                            return "8+";
+
+                          default:
+                            return 0;
+                        }
+                      };
+
+                      const experience = getExperienceNumber(
+                        engineer?.engineerProfile?.yearsOfExperience
+                      );
                       return (
                         <div
                           key={engineer.id}
@@ -1351,15 +1410,9 @@ export default function ProjectDetailsPage() {
                                   color: "#475569",
                                 }}
                               >
-                                {
-                                  engineer
-                                    ?.engineerProfile
-                                    ?.yearsOfExperienceNumber ||
-                                  0
-                                }{" "}
+                                {experience}{" "}
                                 years
                               </span>
-
                             </div>
                           </div>
                         </div>
@@ -1392,16 +1445,14 @@ export default function ProjectDetailsPage() {
                     <div className="flex items-center gap-3">
 
                       {/* IMAGE */}
-                      {invitation.engineer.user
+                      {invitation?.engineer?.user
                         .image ? (
                         <img
                           src={
-                            invitation.engineer
-                              .user.image
+                            invitation?.engineer?.user?.image
                           }
                           alt={
-                            invitation.engineer
-                              .user.name
+                            invitation.engineer?.user?.name
                           }
                           className="w-12 h-12 rounded-full object-cover" />
                       ) : (
@@ -1412,7 +1463,7 @@ export default function ProjectDetailsPage() {
                               "var(--primary)",
                           }}
                         >
-                          {invitation.engineer.user.name?.charAt(
+                          {invitation?.engineer?.user?.name.charAt(
                             0
                           )}
                         </div>

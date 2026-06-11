@@ -22,7 +22,7 @@ interface Project {
 }
 
 const STATUS_META: Record<string, { label: string; color: string }> = {
-  DRAFT: { label: "Draft", color: "bg-gray-100 text-gray-600" },
+  // DRAFT: { label: "Draft", color: "bg-gray-100 text-gray-600" },
   SEARCHING: { label: "Searching Engineer", color: "bg-blue-100 text-blue-700" },
   IN_PROGRESS: { label: "In Progress", color: "bg-green-100 text-green-700" },
   IN_REVIEW: { label: "In Review", color: "bg-purple-100 text-purple-700" },
@@ -152,7 +152,6 @@ export default function ProjectsPage() {
       const data = await res.json();
 
       if (data.success) {
-        console.log(data.projects, "projects");
 
         setProjects(data.projects);
         setTotalPages(data.pagination.totalPages);
@@ -256,7 +255,11 @@ export default function ProjectsPage() {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {projects.map((p) => <ProjectCard key={p.id} project={p} />)}
+              {projects
+                .filter((p) => p.status !== "DRAFT")
+                .map((p) => (
+                  <ProjectCard key={p.id} project={p} />
+                ))}
             </div>
 
             {/* Pagination Controls */}

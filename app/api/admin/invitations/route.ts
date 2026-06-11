@@ -164,7 +164,6 @@ export async function GET(req: NextRequest) {
     if (status && ["PENDING_ADMIN", "SENT", "ACCEPTED", "REJECTED", "ADMIN_REJECTED", "EXPIRED", "DROPPED"].includes(status)) {
       whereClause.status = status;
     }
-console.log(whereClause, "whereClause");
 
     const invitations = await prisma.projectInvitation.findMany({
       where: whereClause,
@@ -178,7 +177,6 @@ console.log(whereClause, "whereClause");
       },
       orderBy: { createdAt: "desc" }
     });
-console.log(invitations, "invitations");
 
     const formattedInvitations = invitations.map(inv => ({
       ...inv,
@@ -485,7 +483,6 @@ export async function DELETE(req: NextRequest) {
         project: true,
       },
     });
-    console.log(invitation, "invvv", id);
 
     if (!invitation?.project?.id) {
       return NextResponse.json(

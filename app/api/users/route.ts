@@ -17,6 +17,7 @@ export async function GET(req: NextRequest) {
                     bio: true,
                     phone: true,
                     lastActiveAt: true,
+                    isSuspended: true,
 
                     engineerProfile: {
                         select: {

@@ -12,11 +12,11 @@ interface Props {
 }
 
 const COLORS = [
-  "#A855F7",
-  "#3B82F6",
-  "#22C55E",
-  "#EF4444",
-  "#F59E0B",
+  "#FFD27A",
+  "#C97A1D ",
+  "#F4A340",
+  "#8C6239",
+  "#E5E7EB",
   "#06B6D4",
   "#EC4899",
   "#8B5CF6",
@@ -132,7 +132,7 @@ const ProjectDistribution: React.FC<Props> = ({ data = [], }) => {
         </div>
 
         {/* Legend */}
-        <div className="mt-8 grid w-full grid-cols-2 gap-4">
+        <div className="mt-8 grid w-full grid-cols-2">
           {data.map(
             (item, index) => (
               <div
@@ -150,9 +150,9 @@ const ProjectDistribution: React.FC<Props> = ({ data = [], }) => {
                   }}
                 />
 
-                <div className="flex flex-1 items-center justify-between">
+                <div className="flex flex-1 items-center justify-between mr-2">
                   <span className="line-clamp-2 text-sm font-medium text-[#374151]">
-                    {item.name}Manage engineers and invitations
+                    {item.name}
                   </span>
 
                   <span className="text-sm font-semibold text-[#111827]">

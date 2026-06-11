@@ -15,6 +15,7 @@ export default function OverviewTab({ project }: { project: any }) {
   const [currentProgress, setCurrentProgress] = useState(project?.progress || 0);
   const [editModel, setEditModel] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [updating, setUpdating] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   // Roles

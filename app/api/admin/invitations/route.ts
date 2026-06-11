@@ -261,7 +261,7 @@ export async function POST(req: NextRequest) {
           id: invitation.project.id
         },
         data: {
-          engineerId: invitation.engineer.id
+          engineerId: invitation?.engineer?.id
         }
       })
     }
@@ -273,7 +273,7 @@ export async function POST(req: NextRequest) {
     )
       .replace(
         "{{engineerName}}",
-        invitation.engineer.user.name || "Engineer"
+        invitation?.engineer?.user.name || "Engineer"
       )
       .replace(
         "{{projectTitle}}",
@@ -299,7 +299,7 @@ export async function POST(req: NextRequest) {
       );
 
     await sendEmail(
-      invitation.engineer.user.email,
+      invitation?.engineer?.user?.email as any,
       invitation.status === "ACCEPTED"
         ? "Congratulations! You Have Been Assigned To A Project"
         : "Project Invitation - Response Required Within 24 Hours",
@@ -395,7 +395,7 @@ export async function PATCH(req: NextRequest) {
           id: updatedInvitation.project.id
         },
         data: {
-          engineerId: updatedInvitation.engineer.id
+          engineerId: updatedInvitation?.engineer?.id
         }
       })
     }
@@ -406,7 +406,7 @@ export async function PATCH(req: NextRequest) {
     const emailHtml = emailTemplate
       .replace(
         "{{engineerName}}",
-        updatedInvitation.engineer.user.name ||
+        updatedInvitation?.engineer?.user.name ||
         "Engineer"
       )
       .replace(
@@ -436,7 +436,7 @@ export async function PATCH(req: NextRequest) {
       subject = "Project Invitation Declined";
     }
 
-    await sendEmail(updatedInvitation.engineer.user.email, subject, emailHtml);
+    await sendEmail(updatedInvitation?.engineer?.user?.email as any , subject, emailHtml);
 
     return NextResponse.json(
       { success: true, invitation: updatedInvitation, }, { status: 200, });

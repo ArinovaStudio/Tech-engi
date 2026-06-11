@@ -57,8 +57,8 @@ export function startInvitationExpiryJob() {
       // 1. Send emails
       await Promise.all(
         expiredInvitations.map(async (inv) => {
-          const email = inv.engineer.user.email;
-          const name = inv.engineer.user.name;
+          const email = inv?.engineer?.user.email;
+          const name = inv?.engineer?.user.name;
 
           if (!email) return;
 

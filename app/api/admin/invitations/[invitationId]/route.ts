@@ -100,7 +100,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ in
 
     const engineerEarnings = Math.floor(invitation.project.budget * 0.7);
 
-    if (invitation.engineer.user.email) {
+    if (invitation?.engineer?.user.email) {
       const emailHtml = projectInvitationTemplate(
         invitation.engineer.user.name || "Engineer",
         invitation.project.title,

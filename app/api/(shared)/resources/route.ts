@@ -40,13 +40,13 @@ export async function GET(req: NextRequest) {
     if (tab === "credentials") {
       typeFilter = { equals: "CREDENTIALS" };
     } else if (tab === "assets") {
-      typeFilter = { not: "CREDENTIALS" };
+      typeFilter = { equals: "CREDENTIALS" };
     }
 
     const resources = await prisma.projectResource.findMany({
       where: { 
         projectId,
-        ...(tab ? { type: typeFilter } : {})
+        
       },
       orderBy: { createdAt: "desc" },
       include: { addedBy: { select: { name: true, role: true, image: true } } }

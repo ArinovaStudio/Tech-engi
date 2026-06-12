@@ -40,7 +40,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ proj
     const { designSystem, action, ...projectFields } = body;
 
     const validation = adminUpdateSchema.safeParse(projectFields);
-    console.log(validation.data, projectFields, validation?.error?.issues[0].message);
 
     if (!validation.success) return NextResponse.json({ success: false, message: validation.error.issues[0].message }, { status: 400 });
 

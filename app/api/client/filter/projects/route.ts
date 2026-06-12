@@ -6,8 +6,7 @@ export async function GET(req: NextRequest) {
   try {
     
     const { user, error } = await getClient();
-    const userId = user?.clientProfile?.id;;
-console.log(userId);
+    const userId = user?.clientProfile?.id;
 
     if (error || !userId) {
       return NextResponse.json(

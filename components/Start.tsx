@@ -3,30 +3,44 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { ArrowRight, Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-
 
 const heroTestimonials = [
   {
-    name: "Tarun",
-    role: "Student at XYZ College",
-    text: "Tech-ENGI helped me complete my final-year project with expert guidance and timely delivery.",
+    name: "Sneha",
+    role: "Computer Science Student, SRM Institute of Science and Technology",
+    text: "I was struggling to turn my AI project idea into actual code. The mentor helped me structure everything and build a working model step by step.",
   },
   {
-    name: "Rahul",
-    role: "Mechanical Engineering Student",
-    text: "The platform connected me with experienced engineers who helped me turn my project idea into reality.",
+    name: "Aditya",
+    role: "B.Tech Information Technology Student, MAKAUT",
+    text: "I had issues integrating backend APIs in my project. The guidance I got helped me understand the flow and fix everything properly.",
   },
   {
-    name: "Priya",
-    role: "Startup Founder",
-    text: "Finding specialized engineering talent was quick and straightforward. The entire process felt seamless.",
+    name: "Ishita",
+    role: "Computer Engineering Student, Pune Institute of Computer Technology",
+    text: "My web development project was stuck in deployment. I got clear help on fixing errors and finally hosted it successfully.",
   },
   {
-    name: "Aman",
-    role: "Electronics Student",
-    text: "Great experience working with professionals. Communication was smooth and project quality exceeded expectations.",
+    name: "Rohan",
+    role: "Computer Science Student, VIT Vellore",
+    text: "I was confused about how to implement my machine learning project beyond theory. The explanation made it much easier to actually code it.",
+  },
+  {
+    name: "Mehul",
+    role: "Information Technology Student, IIIT Lucknow",
+    text: "I needed help debugging my full-stack project. The support was practical and helped me fix issues quickly without wasting time.",
+  },
+  {
+    name: "Ayesha",
+    role: "Computer Science Engineering Student, SRM University",
+    text: "My project on data analytics wasn’t giving correct outputs. The mentor helped me identify mistakes in preprocessing and model selection.",
+  },
+  {
+    name: "Karan",
+    role: "Software Engineering Student, Punjab Engineering College",
+    text: "I was stuck with my backend logic in a project. The guidance helped me understand the architecture and complete it properly.",
   },
 ];
 
@@ -59,7 +73,7 @@ const Start = () => {
   }, []);
 
   return (
-    <div className="min-h-screen p-5 font-sans w-full">
+    <div className="lg:min-h-screen p-5 font-sans w-full h-[5vh]:">
       {/* Navbar */}
       <header className="border-2 border-gray-200 overflow-hidden py-3">
         <div
@@ -92,7 +106,7 @@ const Start = () => {
             <div
               className=" flex items-center gap-4 border-r border-gray-200 pr-5 " >
               {/* LinkedIn */}
-              <a href="#" aria-label="LinkedIn">
+              <a href="https://www.linkedin.com/company/tsquarey1" target="_blank" aria-label="LinkedIn">
                 <svg
                   width="20"
                   height="20"
@@ -110,7 +124,9 @@ const Start = () => {
               </a>
 
               {/* Instagram */}
-              <a href="#" aria-label="Instagram">
+              <a href="https://www.instagram.com/tsy1_tech.engi?igsh=MTdvNnZzdHpvb215bg%3D%3D&utm_source=qr"
+                target="_blank"
+                aria-label="Instagram">
                 <svg
                   width="20"
                   height="20"
@@ -129,19 +145,15 @@ const Start = () => {
               </a>
 
               {/* Facebook */}
-              <a href="#" aria-label="Facebook">
+              <a href="https://youtu.be/7jniNW5R2R0" target="_blank" aria-label="Facebook">
                 <svg
-                  width="20"
-                  height="20"
+                  width="18"
+                  height="18"
                   viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-black"
+                  fill="currentColor"
+                  className="text-[#8A8A8A] hover:text-red-600 transition-colors"
                 >
-                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                  <path d="M23.5 6.2a2.98 2.98 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A2.98 2.98 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 2.98 2.98 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a2.98 2.98 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.75 15.5v-7l6 3.5-6 3.5z" />
                 </svg>
               </a>
             </div>
@@ -176,7 +188,7 @@ const Start = () => {
                 href="/login"
                 className=" inline-flex items-center justify-center gap-2 w-50 px-4 py-1 text-[16px] font-inter bg-black text-white hover:bg-gray-800 whitespace-nowrap">
                 Login
-                <span className="text-base">↗</span>
+                <span className="text-base"> <ArrowRight /></span>
               </Link>
             </div>
           </div>
@@ -270,7 +282,7 @@ const Start = () => {
                 href="/login"
                 className=" flex items-center justify-center gap-2 px-4 py-3 text-[15px] bg-black text-white">
                 Login
-                <span>↗</span>
+                <span><ArrowRight /></span>
               </Link>
             </div>
           </div>
@@ -278,7 +290,7 @@ const Start = () => {
       </header>
 
       {/* Hero Section */}
-      <main className="max-w-full mx-auto px-6 pt-6 pb-0">
+      <main className="max-w-full mx-auto px-6 pt-6 pb-0 lg:h-full h-[96vh]">
         {/* Top row */}
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 mt-15">
           {/* Left */}
@@ -319,7 +331,7 @@ const Start = () => {
         <div className="relative min-h-[420px] lg:min-h-[600px]">
 
           {/* Background rounded layer */}
-          <div className="absolute inset-0 rounded-2xl bg-[#FFAE58] h-[620px]" />
+          <div className="absolute inset-0 rounded-2xl bg-[#FFAE58] lg:h-[600px] md:h-[400px] mt-10 lg:mt-0 h-[225px]" />
 
           {/* Two guys image — desktop only, scales with viewport ✅ */}
           <div
@@ -347,15 +359,15 @@ const Start = () => {
             <Image
               src="/two-guys.png"
               alt="Student and builder shaking hands"
-              width={1200}
-              height={1200}
-              className="w-full max-w-[340px] h-auto scale-125 object-contain"
+              width={6000}
+              height={6000}
+              className="w-full max-w-[400px] h-[260px] md:max-w-[400px] md:h-[545px] scale-125 object-contain"
               priority
             />
           </div>
 
           {/* Bottom-left: Avatars + Trusted */}
-          <div className="hidden lg:flex relative lg:absolute lg:bottom-15 lg:left-20 flex flex-col items-center gap-3 px-5 pb-6 pt-4 lg:p-0">
+          <div className=" hidden md:flex md:absolute md:bottom-22 md:left-10 lg:flex relative lg:absolute lg:bottom-15 lg:left-20 flex flex-col items-center gap-3 px-5 pb-6 lg:pt-4 lg:p-0">
 
             <div className="flex items-center -space-x-3 w-full">
               {[
@@ -389,7 +401,7 @@ const Start = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -60 }}
               transition={{
-                duration: 0.45,
+                duration: 3,
                 ease: [0.22, 1, 0.36, 1],
               }}
               className="hidden lg:flex lg:flex-col relative lg:absolute lg:bottom-40 lg:right-30 max-w-[320px] font-inter px-5 pb-6 lg:p-0"

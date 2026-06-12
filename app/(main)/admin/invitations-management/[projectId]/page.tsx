@@ -7,16 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
-import {
-  Users,
-  CheckCircle2,
-  XCircle,
-  Clock3,
-  ArrowLeft,
-  FolderSearch,
-  ArrowRight,
-  SlidersHorizontal,
-} from "lucide-react";
+import { Users, CheckCircle2, XCircle, Clock3, ArrowLeft, FolderSearch, ArrowRight, SlidersHorizontal, } from "lucide-react";
 
 export default function ProjectDetailsPage() {
   const { projectId } = useParams();
@@ -563,35 +554,6 @@ export default function ProjectDetailsPage() {
   const filteredEngineers = engineers.filter((engineer) => engineer.engineerProfile !== null);
   // console.log(filteredEngineers, "filtered engineers");
 
-  const automation = async () => {
-    try {
-      setAiLoading(true);
-      const filteredEngineers = engineers.filter((engineer) => engineer.engineerProfile !== null);
-      if (filteredEngineers.length < 0) {
-        return;
-      }
-      const res = await fetch(`/api/admin/project-matcher`, {
-        method: "POST",
-        headers: {
-          "Content-Type":
-            "application/json",
-        },
-        body: JSON.stringify({
-          projectId,
-          engineers: filteredEngineers,
-        }),
-      });
-      const json = await res.json();
-
-      const lead = setAiSuggestions(json.aiSuggestions || []);
-    } catch (error) {
-      console.error(error);
-    } finally {
-
-      setAiLoading(false);
-    }
-  }
-
   useEffect(() => {
     fetchData();
     fetchEngineers();
@@ -628,13 +590,9 @@ export default function ProjectDetailsPage() {
     )
   );
 
-  const remainingEngineers =
-    engineers.filter(
-      (engineer) =>
-        !aiSuggestionIds.has(
-          engineer.id
-        )
-    );
+  const aiIds = new Set(aiSuggestions.map((e: any) => e.id));
+
+const remainingEngineers = engineers
 
   const allUsers = [
     ...aiSuggestions,
@@ -691,7 +649,7 @@ export default function ProjectDetailsPage() {
   ];
 
   const filteredUsers = allUsers.filter((engineer) => {
-    const profile = engineer?.engineerProfile;
+   const profile = engineer?.engineerProfile || engineer;
 
     if (!profile) return false;
 
@@ -824,6 +782,36 @@ export default function ProjectDetailsPage() {
     return true;
   });
 
+  const automation = async () => {
+    try {
+      setAiLoading(true);
+      const filteredEngineers = engineers.filter((engineer) =>engineer.engineerProfile !== null &&engineer?.isSuspended === false);
+      if (filteredEngineers.length < 0) {
+        return;
+      }
+      
+      const res = await fetch(`/api/admin/project-matcher`, {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify({
+          projectId,
+          engineers: filteredEngineers,
+        }),
+      });
+      const json = await res.json();
+
+      const lead = setAiSuggestions(json.aiSuggestions || []);
+    } catch (error) {
+      console.error(error);
+    } finally {
+
+      setAiLoading(false);
+    }
+  }
+
   const clearFilters = () => {
     setFilters({
       experiences: [],
@@ -834,6 +822,16 @@ export default function ProjectDetailsPage() {
 
     setSearch("");
   };
+
+const sortedUsers = [...filteredUsers].sort((a, b) => {
+  const aAI = aiSuggestions.findIndex((x: any) => x.id === a.id);
+  const bAI = aiSuggestions.findIndex((x: any) => x.id === b.id);
+
+  const aRank = aAI === -1 ? 999 : aAI;
+  const bRank = bAI === -1 ? 999 : bAI;
+
+  return aRank - bRank;
+});
 
   if (loading) {
     return (
@@ -1249,7 +1247,7 @@ export default function ProjectDetailsPage() {
                     </div>
                   )}
 
-                  {filteredUsers
+                  {sortedUsers
                     .filter((engineer) => {
                       const alreadyInvited = invitations.some(
                         (invitation) =>
@@ -1259,7 +1257,7 @@ export default function ProjectDetailsPage() {
 
                       return !alreadyInvited;
                     }).filter(
-                      (engineer) => engineer?.engineerProfile && engineer?.isSuspended === false
+                      (engineer) =>engineer?.isSuspended === false && engineer?.engineerProfile
                     )
                     .map((engineer) => {
                       const isAiRecommended =

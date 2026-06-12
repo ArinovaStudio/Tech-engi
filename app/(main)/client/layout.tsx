@@ -64,7 +64,7 @@ export default function ClientLayout({
   // Prevent protected UI flash
 
   return (
-    <div className="min-h-screen bg-blue-300">
+    <div className="min-h-screen">
       <DashboardShell>
         <div className="transition-all duration-300 ease-in-out h-full">
           <div className="">

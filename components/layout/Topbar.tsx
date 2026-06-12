@@ -78,7 +78,6 @@ export default function Topbar() {
                   <button
                     key={project.id}
                     onClick={() => {
-                      console.log("clicked:", project.id);
                       window.location.href = `/client?projectId=${project.id}`;
                     }}
                     className="w-full text-left p-3 hover:bg-gray-50 border-b last:border-b-0 transition"

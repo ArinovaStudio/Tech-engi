@@ -23,7 +23,7 @@ interface Project {
 
 const STATUS_META: Record<string, { label: string; color: string }> = {
   // DRAFT: { label: "Draft", color: "bg-gray-100 text-gray-600" },
-  SEARCHING: { label: "Searching Engineer", color: "bg-blue-100 text-blue-700" },
+  SEARCHING: { label: "Searching", color: "bg-blue-100 text-blue-700" },
   IN_PROGRESS: { label: "In Progress", color: "bg-green-100 text-green-700" },
   IN_REVIEW: { label: "In Review", color: "bg-purple-100 text-purple-700" },
   AWAITING_FINAL_PAYMENT: { label: "Awaiting Final Payment", color: "bg-orange-100 text-orange-700" },
@@ -193,53 +193,61 @@ export default function ProjectsPage() {
         </div> */}
 
         {/* Filters */}
-        <div className="flex md:flex-row items-center justify-between gap-3 p-3 ">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold text-[var(--text-primary)]">
-                All Projects
-              </h1>
-              <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                Overview of all client projects
-              </p>
-            </div>
-          </div>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-3">
+  
+  {/* Title Section */}
+  <div>
+    <h1 className="text-2xl font-semibold text-[var(--text-primary)]">
+      All Projects
+    </h1>
+    <p className="text-xs text-[var(--text-muted)] mt-0.5">
+      Overview of all client projects
+    </p>
+  </div>
 
-          <div className="flex gap-3 items-center">
+  {/* Controls */}
+  <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto md:items-center">
 
-            {/* Search Bar */}
-            <div className="relative w-full md:w-64 shrink-0">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
-              <input
-                placeholder="Search projects..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 border border-[var(--border)] rounded-lg text-sm bg-gray-50 text-[var(--text-primary)] outline-none focus:ring-1 focus:ring-[var(--primary)]"
-              />
-            </div>
+    {/* Search */}
+    <div className="relative w-full sm:w-64">
+      <Search
+        size={14}
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
+      />
+      <input
+        placeholder="Search projects..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="w-full pl-9 pr-4 py-2 border border-[var(--border)] rounded-lg text-sm bg-gray-50 text-[var(--text-primary)] outline-none focus:ring-1 focus:ring-[var(--primary)]"
+      />
+    </div>
 
-            {/* Filter Dropdown */}
-            <div className="relative w-full md:w-auto shrink-0">
-              <Filter size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full md:w-auto pl-8 pr-8 py-2 border border-[var(--border)] rounded-lg text-sm bg-gray-50 text-[var(--text-primary)] outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[var(--primary)]"
-              >
-                <option value="ALL">All Status</option>
-                {Object.entries(STATUS_META).map(([k, v]) => (
-                  <option key={k} value={k}>{v.label}</option>
-                ))}
-              </select>
-            </div>
+    {/* Filter */}
+    <div className="relative w-full sm:w-48">
+      <Filter
+        size={13}
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none"
+      />
+      <select
+        value={statusFilter}
+        onChange={(e) => setStatusFilter(e.target.value)}
+        className="w-full pl-8 pr-8 py-2 border border-[var(--border)] rounded-lg text-sm bg-gray-50 text-[var(--text-primary)] outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[var(--primary)]"
+      >
+        <option value="ALL">All Status</option>
+        {Object.entries(STATUS_META).map(([k, v]) => (
+          <option key={k} value={k}>
+            {v.label}
+          </option>
+        ))}
+      </select>
+    </div>
 
-            {/* Results text */}
-            <span className="text-xs text-[var(--text-muted)] px-2 font-medium w-full md:w-auto text-center md:text-left mt-1 md:mt-0">
-              {totalItems} results found
-            </span>
-          </div>
-
-        </div>
+    {/* Results */}
+    <span className="text-xs text-[var(--text-muted)] font-medium text-left sm:text-center md:text-left whitespace-nowrap">
+      {totalItems} results
+    </span>
+  </div>
+</div>
 
         {/* Content */}
         {loading ? (

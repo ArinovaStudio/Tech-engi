@@ -146,7 +146,7 @@ const BrowserCategory = () => {
           </div>
 
           {/* RIGHT */}
-          <p className="text-[6px] sm:text-[10px] lg:text-[15px] font-medium text-gray-500 text-left lg:text-right font-inter lg:mt-4 leading-none">
+          <p className="text-[6px] sm:text-[10px] lg:text-[18px] font-medium text-gray-500 text-left lg:text-right font-inter lg:mt-4 leading-none">
             Find projects and talent across key
             <br className="hidden sm:block" />
             engineering disciplines
@@ -197,12 +197,12 @@ const BrowserCategory = () => {
 
             {/* TITLE */}
             <h3
-              className=" text-[34px] sm:text-[42px] lg:text-[50px] font-bold text-black text-left lg:text-right leading-tight">
+              className=" text-[34px] sm:text-[42px] lg:text-[50px] font-extrabold text-black text-left lg:text-right leading-tight">
               {selectedCategory.title}
             </h3>
 
             <h4
-              className=" text-[14px] sm:text-[15px] lg:text-[17px] text-gray-800 text-left lg:text-right mb-1 font-semibold font-inter leading-relaxed">
+              className="text-[14px] sm:text-[15px] lg:text-[17px] text-gray-700 text-left lg:text-right mb-1 font-inter leading-relaxed">
               {selectedCategory.description1}
             </h4>
 

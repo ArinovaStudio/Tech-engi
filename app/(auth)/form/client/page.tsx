@@ -198,8 +198,7 @@ export default function ClientFormPage() {
               </h1>
 
               <p className="text-white/85 text-lg max-w-xl mt-4 leading-relaxed">
-                Lorem ipsum dolor sit amet consectetur. Suscipit sed amet commodo vel
-                ultrices tortor orci. Enim lectus turpis augue donec. Gravida non
+                Connect with skilled engineers and get your technical projects done faster. From prototypes to complex systems, we help turn ideas into real working solutions with the right expertise.
               </p>
             </div>
           </div>

@@ -3,9 +3,9 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 const Footer = () => {
-  const[email,setEmail]= useState("");
+  const [email, setEmail] = useState("");
 
-  const handleSend= async () => {
+  const handleSend = async () => {
     try {
       const res = await fetch("/api/subscribemail", {
         method: "POST",
@@ -13,7 +13,7 @@ const Footer = () => {
       });
       if (res.ok) { toast.success("Thank you for subscribing"); }
       else toast.error("Sorry for the inconvenience");
-    } catch { toast.error("Error occurred"); } 
+    } catch { toast.error("Error occurred"); }
   };
 
   return (
@@ -89,10 +89,10 @@ const Footer = () => {
 
           <ul className="space-y-2">
             {[
-              "support@tech-engi.com",
-              "9086345xx2",
-              "Area 51, Siliguri, west Bengal",
-              "sales@tech-engi.com",
+              "tsy1@tsquarey.store",
+              // "9086345xx2",
+              // "Area 51, Siliguri, west Bengal",
+              // "sales@tech-engi.com",
             ].map((item) => (
               <li
                 key={item}
@@ -115,17 +115,17 @@ const Footer = () => {
           <div
             className=" flex flex-col items-start xl:items-end gap-3 mb-4 " >
             <input
-            value={email}
+              value={email}
               type="email"
-              onChange={(e)=>setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
               className=" w-full px-4 py-4 text-[13px] outline-none font-id placeholder-gray-400 bg-[#F0F0F focus:ring-2 focus:ring-blue-500 focus:border-blue-500 " />
 
             <button
-            onClick={()=>{
-               handleSend();
-              
-            }}
+              onClick={() => {
+                handleSend();
+
+              }}
               className=" bg-black text-white text-[12px] font-bold px-5 py-3 font-id hover:bg-gray-800 whitespace-nowrap " >
               SUBSCRIBE
             </button>
@@ -135,7 +135,7 @@ const Footer = () => {
           <div
             className=" flex items-center gap-4 justify-start xl:justify-end " >
             {/* LinkedIn */}
-            <a href="#" aria-label="LinkedIn">
+            <a href="https://www.linkedin.com/company/tsquarey1" target="_blank" aria-label="LinkedIn">
               <svg
                 width="18"
                 height="18"
@@ -153,7 +153,7 @@ const Footer = () => {
             </a>
 
             {/* Instagram */}
-            <a href="#" aria-label="Instagram">
+            <a href="https://www.instagram.com/tsy1_tech.engi?igsh=MTdvNnZzdHpvb215bg%3D%3D&utm_source=qr " target="_blank" aria-label="Instagram">
               <svg
                 width="18"
                 height="18"
@@ -179,18 +179,15 @@ const Footer = () => {
             </a>
 
             {/* Facebook */}
-            <a href="#" aria-label="Facebook">
+            <a href="https://youtu.be/7jniNW5R2R0" target="_blank" aria-label="Facebook">
               <svg
                 width="18"
                 height="18"
                 viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-[#8A8A8A] hover:text-black"
+                fill="currentColor"
+                className="text-[#8A8A8A] hover:text-red-600 transition-colors"
               >
-                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                <path d="M23.5 6.2a2.98 2.98 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A2.98 2.98 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 2.98 2.98 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a2.98 2.98 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.75 15.5v-7l6 3.5-6 3.5z" />
               </svg>
             </a>
           </div>

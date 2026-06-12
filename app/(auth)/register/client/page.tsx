@@ -439,8 +439,8 @@ export default function ClientRegisterPage() {
               </h1>
 
               <p className="text-white/85 text-lg max-w-xl mt-4 leading-relaxed">
-                Lorem ipsum dolor sit amet consectetur. Suscipit sed amet commodo vel
-                ultrices tortor orci. Enim lectus turpis augue donec. Gravida non
+                Post your project, find skilled engineers, and build products faster with
+                a trusted network of technical talent at your fingertips.
               </p>
             </div>
           </div>

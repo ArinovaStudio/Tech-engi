@@ -32,7 +32,7 @@ const ProjectDistribution: React.FC<Props> = ({ data = [], }) => {
   } | null>(null);
   const total = data.reduce((sum, item) => sum + item.value, 0) || 1;
 
-  const size = 300;
+  const size = 280;
   const strokeWidth = 50;
 
   const radius =

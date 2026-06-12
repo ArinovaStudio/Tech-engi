@@ -673,7 +673,7 @@ export default function EngineerFormPage() {
                       ) {
                         e.preventDefault();
                         setShowErrors(true);
-                        
+
                         return;
                       }
 
@@ -730,8 +730,7 @@ export default function EngineerFormPage() {
               </h1>
 
               <p className="text-white/85 text-lg max-w-xl mt-4 leading-relaxed">
-                Lorem ipsum dolor sit amet consectetur. Suscipit sed amet commodo vel
-                ultrices tortor orci. Enim lectus turpis augue donec. Gravida non
+                Connect with skilled engineers and get your technical work done faster and more efficiently. From ideas to execution, collaborate with experts who help you build real, working solutions.
               </p>
             </div>
           </div>

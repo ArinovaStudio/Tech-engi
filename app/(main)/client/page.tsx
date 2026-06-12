@@ -262,7 +262,6 @@ const ClientAnalyticsDashboard = () => {
       {showCreate && <CreateProjectModal onClose={() => setShowCreate(false)} onCreated={() => setShowProjects(false)} user={user} />}
     </div>
   );
-console.log(projectAnalytics, "projectAnalytics", projectId);
 
   // Detailed Project Analytics
   return (
@@ -292,7 +291,7 @@ console.log(projectAnalytics, "projectAnalytics", projectId);
       </div>
 
       <BudgetAndDocs data={projectAnalytics?.budget} tasks={projectAnalytics?.projects} projects={projectAnalytics?.projects} />
-      <DesignPreviewSection data={projectAnalytics?.preview} />
+      {/* <DesignPreviewSection data={projectAnalytics?.preview} /> */}
     </div>
   );
 };

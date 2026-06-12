@@ -5,7 +5,9 @@ import {
   FileArchive, FileText, Plus, Loader2, Download, Eye, Trash2,
   Image as ImageIcon, Link as LinkIcon, ExternalLink, Copy, CopyCheck,
   Paperclip,
-  X
+  X,
+  EyeOff,
+  Check
 } from "lucide-react";
 import toast from "react-hot-toast";
 import Image from "next/image";
@@ -201,6 +203,33 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
     resourceId: null,
   });
 
+  const [visibleCredentials, setVisibleCredentials] = useState<Record<string, boolean>>({});
+
+  const [actionState, setActionState] = useState<{
+    id: string | null;
+    action: "copy" | "download" | null;
+  }>({
+    id: null,
+    action: null,
+  });
+
+  const triggerSuccess = (
+    resourceId: string,
+    action: "copy" | "download"
+  ) => {
+    setActionState({
+      id: resourceId,
+      action,
+    });
+
+    setTimeout(() => {
+      setActionState({
+        id: null,
+        action: null,
+      });
+    }, 1000);
+  };
+
   const { data: session } = useSession();
   const role = session?.user?.role?.toUpperCase()?.trim() || "";
   const isAdmin = role === "ADMIN";
@@ -355,22 +384,249 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
 
       {loading ? (
         <div className="w-full h-[50vh] flex justify-center items-center">
-          <Loader2 className="animate-spin" style={{ color: "var(--primary)" }} size={40} />
+          <Loader2
+            className="animate-spin"
+            style={{ color: "var(--primary)" }}
+            size={40}
+          />
         </div>
       ) : resources.length === 0 ? (
-        <div className="text-center py-12  text-sm" style={{ color: "var(--text-muted)" }}>
+        <div className="text-center py-12 text-sm text-gray-500">
           No resources uploaded yet.
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-          {resources.map((res) => (
-            <AssetsCard
-              key={res.id}
-              resource={res}
-              onDelete={openDeleteModal}
-              isAdmin={isAdmin}
-            />
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+
+          {/* HEADER */}
+          <div className="grid grid-cols-12 gap-4 px-5 py-4 border-b bg-gray-50 font-semibold text-sm text-gray-600">
+            <div className="col-span-4">Resource</div>
+            <div className="col-span-2">Type</div>
+            <div className="col-span-2">Added By</div>
+            <div className="col-span-2">Created</div>
+            <div className="col-span-2 text-right">Actions</div>
+          </div>
+
+          {/* ROWS */}
+          {resources.map((resource) => (
+            <div
+              key={resource.id}
+              className="grid grid-cols-12 gap-4 px-5 py-4 border-b border-gray-100 items-center hover:bg-gray-50 transition"
+            >
+
+              {/* RESOURCE */}
+              <div className="col-span-4 flex items-center gap-3 min-w-0">
+
+                <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                  {resource.type === "IMAGE" ? (
+                    <ImageIcon size={18} />
+                  ) : resource.type === "FILE" ? (
+                    <FileArchive size={18} />
+                  ) : resource.type === "LINK" ? (
+                    <LinkIcon size={18} />
+                  ) : (
+                    <FileText size={18} />
+                  )}
+                </div>
+
+                <div className="min-w-0 flex-1">
+
+                  {resource.type === "CREDENTIALS" &&
+                    visibleCredentials[resource.id] ? (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2">
+                      <pre className="text-xs whitespace-pre-wrap font-mono text-yellow-800">
+                        {resource.content}
+                      </pre>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="font-medium truncate">
+                        {resource.title}
+                      </p>
+
+                      {(resource.type === "LINK" ||
+                        resource.type === "TEXT") && (
+                          <p className="text-xs text-gray-500 truncate">
+                            {resource.content}
+                          </p>
+                        )}
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* TYPE */}
+              <div className="col-span-2">
+                <span
+                  className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold
+          ${resource.type === "IMAGE"
+                      ? "bg-green-100 text-green-700"
+                      : resource.type === "FILE"
+                        ? "bg-blue-100 text-blue-700"
+                        : resource.type === "LINK"
+                          ? "bg-purple-100 text-purple-700"
+                          : resource.type === "CREDENTIALS"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-yellow-100 text-yellow-700"
+                    }`}
+                >
+                  {resource.type}
+                </span>
+              </div>
+
+              {/* USER */}
+              <div className="col-span-2 flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full overflow-hidden border">
+                  {resource.addedBy?.image ? (
+                    <Image
+                      src={resource.addedBy.image}
+                      alt={resource.addedBy.name}
+                      width={32}
+                      height={32}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-orange-100 text-orange-600 text-xs font-bold">
+                      {resource.addedBy?.name?.charAt(0)}
+                    </div>
+                  )}
+                </div>
+
+                <span className="text-sm truncate">
+                  {resource.addedBy?.name}
+                </span>
+              </div>
+
+              {/* DATE */}
+              <div className="col-span-2 text-sm text-gray-500">
+                {new Date(resource.createdAt).toLocaleDateString()}
+              </div>
+
+              {/* ACTIONS */}
+              <div className="col-span-2 flex justify-end gap-2">
+
+                {/* FILE / IMAGE */}
+                {(resource.type === "FILE" ||
+                  resource.type === "IMAGE") && (
+                    <>
+                      <button
+                        onClick={() =>
+                          window.open(resource.content, "_blank")
+                        }
+                        className="p-2 rounded-lg hover:bg-gray-100 transition"
+                      >
+                        <Eye size={16} />
+                      </button>
+
+                      <a
+                        href={resource.content}
+                        download
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() =>
+                          triggerSuccess(resource.id, "download")
+                        }
+                        className="p-2 rounded-lg hover:bg-gray-100 transition"
+                      >
+                        {actionState.id === resource.id &&
+                          actionState.action === "download" ? (
+                          <Check
+                            size={16}
+                            className="text-green-600"
+                          />
+                        ) : (
+                          <Download size={16} />
+                        )}
+                      </a>
+                    </>
+                  )}
+
+                {/* LINK */}
+                {resource.type === "LINK" && (
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        resource.content
+                      );
+
+                      triggerSuccess(resource.id, "copy");
+                    }}
+                    className="p-2 rounded-lg hover:bg-gray-100 transition"
+                  >
+                    {actionState.id === resource.id &&
+                      actionState.action === "copy" ? (
+                      <Check
+                        size={16}
+                        className="text-green-600"
+                      />
+                    ) : (
+                      <Copy size={16} />
+                    )}
+                  </button>
+                )}
+
+                {/* TEXT */}
+                {resource.type === "TEXT" && (
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        resource.content
+                      );
+
+                      triggerSuccess(resource.id, "copy");
+                    }}
+                    className="p-2 rounded-lg hover:bg-gray-100 transition"
+                  >
+                    {actionState.id === resource.id &&
+                      actionState.action === "copy" ? (
+                      <Check
+                        size={16}
+                        className="text-green-600"
+                      />
+                    ) : (
+                      <Copy size={16} />
+                    )}
+                  </button>
+                )}
+
+                {/* CREDENTIALS */}
+                {resource.type === "CREDENTIALS" && (
+                  <button
+                    onClick={() =>
+                      setVisibleCredentials((prev) => ({
+                        ...prev,
+                        [resource.id]:
+                          !prev[resource.id],
+                      }))
+                    }
+                    className="p-2 rounded-lg hover:bg-gray-100 transition"
+                  >
+                    {visibleCredentials[resource.id] ? (
+                      <EyeOff size={16} />
+                    ) : (
+                      <Eye size={16} />
+                    )}
+                  </button>
+                )}
+
+                {/* DELETE */}
+                {isAdmin && (
+                  <button
+                    onClick={() =>
+                      openDeleteModal(resource.id)
+                    }
+                    className="p-2 rounded-lg text-red-500 hover:bg-red-50 transition"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                )}
+              </div>
+            </div>
           ))}
+
+          {resources.length === 0 && (
+            <div className="py-12 text-center text-gray-500">
+              No resources found
+            </div>
+          )}
         </div>
       )}
 

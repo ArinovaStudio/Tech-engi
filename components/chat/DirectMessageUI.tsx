@@ -7,74 +7,62 @@ import { useAuth } from "@/hooks/useAuth";
 import { globalSocket } from "@/components/SocketAnnouncer";
 import ChatSidebar from "./direct/ChatSidebar";
 import ChatArea from "./direct/ChatArea";
-import { Loader2 } from "lucide-react";
+import { Loader2, Menu } from "lucide-react";
 
 export default function DirectMessageUI() {
   const { user: currentUser } = useAuth();
+
   const [selectedContact, setSelectedContact] = useState<any>(null);
   const [liveUsers, setLiveUsers] = useState<Record<string, boolean>>({});
-  // Sidebar filtering states
-  const [activeTab, setActiveTab] = useState<string>("ALL");
+
+  const [activeTab, setActiveTab] = useState("ALL");
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
+  // ✅ MOBILE SIDEBAR STATE
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   useEffect(() => {
-    const handler = setTimeout(() => setDebouncedSearch(search), 500);
-    return () => clearTimeout(handler);
+    const t = setTimeout(() => setDebouncedSearch(search), 400);
+    return () => clearTimeout(t);
   }, [search]);
 
-  // SWR Infinite Pagination
-  const getKey = (pageIndex: number, previousPageData: any) => {
-    if (previousPageData && !previousPageData.hasMore) return null;
-    return `/api/chat/direct/contacts?search=${encodeURIComponent(debouncedSearch)}&role=${activeTab}&page=${pageIndex + 1}&limit=20`;
+  const getKey = (pageIndex: number, prev: any) => {
+    if (prev && !prev.hasMore) return null;
+
+    return `/api/chat/direct/contacts?search=${debouncedSearch}&role=${activeTab}&page=${pageIndex + 1}&limit=20`;
   };
 
-  const { data, size, setSize, isValidating, mutate } = useSWRInfinite(getKey, fetcher, { keepPreviousData: true });
+  const { data, size, setSize, isValidating, mutate } = useSWRInfinite(
+    getKey,
+    fetcher
+  );
 
-  const contacts = data ? data.flatMap(page => page.contacts || []) : [];
+  const contacts = data ? data.flatMap(p => p.contacts || []) : [];
   const isLoadingInitialData = !data && isValidating;
-  const isReachingEnd = data && data[data.length - 1]?.hasMore === false;
-
-  useEffect(() => {
-    if (contacts.length === 0) return;
-    const userIds = contacts.map((c: any) => c.id).filter(Boolean); 
-    
-    if (userIds.length > 0) {
-      globalSocket.emit("check_multiple_users_status", userIds);
-    }
-
-    const handleBulkStatus = (statuses: Record<string, boolean>) => {
-      setLiveUsers(prev => ({ ...prev, ...statuses }));
-    };
-
-    const handleStatusChange = ({ userId, isOnline }: { userId: string, isOnline: boolean }) => {
-      setLiveUsers(prev => ({ ...prev, [userId]: isOnline }));
-    };
-
-    globalSocket.on("multiple_users_status_result", handleBulkStatus);
-    globalSocket.on("user_status_change", handleStatusChange);
-
-    return () => {
-      globalSocket.off("multiple_users_status_result", handleBulkStatus);
-      globalSocket.off("user_status_change", handleStatusChange);
-    };
-  }, [contacts]);
-
-  if (!currentUser) {
-    return (
-      <div className="flex items-center justify-center h-[60vh]">
-        <Loader2 className="animate-spin text-[var(--primary)]" size={36} />
-      </div>
-    );
-  }
 
   return (
-    <div className="flex h-[90vh] w-full bg-white border border-[var(--border)] rounded-2xl overflow-hidden shadow-sm">
-      <ChatSidebar 
-        currentUser={currentUser} 
-        contacts={contacts} 
-        selectedContact={selectedContact} 
-        setSelectedContact={setSelectedContact}
+    <div className="flex h-[90vh] w-full bg-white overflow-hidden relative">
+
+      {/* ✅ MOBILE TOP BAR */}
+      <div className="md:hidden absolute top-2 left-2 z-30">
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="p-2 bg-white shadow rounded"
+        >
+          <Menu size={18} />
+        </button>
+      </div>
+
+      {/* SIDEBAR */}
+      <ChatSidebar
+        currentUser={currentUser}
+        contacts={contacts}
+        selectedContact={selectedContact}
+        setSelectedContact={(c: any) => {
+          setSelectedContact(c);
+          setSidebarOpen(false); // close on mobile
+        }}
         liveUsers={liveUsers}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -82,15 +70,21 @@ export default function DirectMessageUI() {
         setSearch={setSearch}
         isLoading={isLoadingInitialData}
         isValidating={isValidating}
-        isReachingEnd={isReachingEnd}
+        isReachingEnd={false}
         loadMore={() => setSize(size + 1)}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
-      <ChatArea 
-        currentUser={currentUser} 
-        selectedContact={selectedContact} 
-        isOnline={selectedContact ? liveUsers[selectedContact.id] : false}
-        mutateContacts={mutate}
-      />
+
+      {/* CHAT AREA */}
+      <div className="flex-1">
+        <ChatArea
+          currentUser={currentUser}
+          selectedContact={selectedContact}
+          isOnline={selectedContact ? liveUsers[selectedContact.id] : false}
+          mutateContacts={mutate}
+        />
+      </div>
     </div>
   );
 }

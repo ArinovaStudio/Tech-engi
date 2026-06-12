@@ -17,7 +17,6 @@ const PreviewCard = ({ title, buttonText, buttonColor, onClick }: {
 
 const DesignPreviewSection = ({ data }: { data: any }) => {
   if (!data?.finalProjectLink && !data?.repository) return null;
-
   const handleRedirect = (url: string) => {
     if (!url) return;
     let finalUrl = url.trim();

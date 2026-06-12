@@ -201,7 +201,7 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
 
   if (!selectedContact) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center text-gray-400 bg-[#f0f2f5]">
+      <div className="flex-1 flex flex-col items-center justify-center text-gray-400 bg-[#ffffff]">
         <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-4">
           <MessageSquare size={32} className="text-gray-400" />
         </div>
@@ -212,120 +212,198 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-[#f0f2f5] relative">
-      {/* Header with Live Status & Select Actions */}
-      <div className="h-16 shrink-0 bg-white border-b border-[var(--border)] flex items-center justify-between px-6 z-10">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden relative">
-            {selectedContact.image ? (
-              <Image src={selectedContact.image} alt={selectedContact.name} width={40} height={40} className="object-cover" />
-            ) : (
-              <UserIcon size={20} className="text-gray-500" />
-            )}
-          </div>
-          <div>
-            <div className="flex items-baseline gap-2">
-              <h3 className="font-bold text-[var(--text-primary)] ">{selectedContact.name}</h3>
-              {selectedContact.projectNames && (
-                <span className="text-[10px] text-[var(--primary)] font-semibold uppercase tracking-wider truncate max-w-[200px]">
-                  • {selectedContact.projectNames}
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className={`text-xs font-medium ${isOnline ? "text-green-500" : "text-gray-400"}`}>
-                {isOnline ? "Online" : "Offline"}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center">
-          {isSelectMode ? (
-            <div className="flex items-center gap-3">
-              <button 
-                onClick={() => { setIsSelectMode(false); setSelectedMessageIds([]); }} 
-                className="text-sm font-medium text-gray-500 hover:text-gray-700 px-3 py-1.5 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={handleMassDelete} 
-                disabled={selectedMessageIds.length === 0} 
-                className="text-sm font-semibold bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1.5 rounded-lg disabled:opacity-50 transition-colors flex items-center gap-1"
-              >
-                <Trash2 size={14} /> Delete {selectedMessageIds.length > 0 ? `(${selectedMessageIds.length})` : ""}
-              </button>
-            </div>
+     <div className="flex-1 flex flex-col bg-[#f0f2f5] relative h-full">
+    
+    {/* HEADER */}
+    <div className="
+      h-14 sm:h-16
+      shrink-0 bg-white border-b border-[var(--border)]
+      flex items-center justify-between
+      px-3 sm:px-6
+      z-10
+    ">
+      
+      {/* LEFT USER INFO */}
+      <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+        
+        {/* Avatar */}
+        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+          {selectedContact.image ? (
+            <Image
+              src={selectedContact.image}
+              alt={selectedContact.name}
+              width={40}
+              height={40}
+              className="object-cover"
+            />
           ) : (
-            <button 
-              onClick={() => setIsSelectMode(true)} 
-              className="text-sm font-medium text-gray-500 hover:text-[var(--primary)] flex items-center gap-1 transition-colors"
-            >
-              <CheckSquare size={16} /> Select
-            </button>
+            <UserIcon size={18} className="text-gray-500" />
           )}
         </div>
+
+        {/* Name */}
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <h3 className="font-bold text-sm sm:text-base text-[var(--text-primary)] truncate">
+              {selectedContact.name}
+            </h3>
+
+            {selectedContact.projectNames && (
+              <span className="hidden sm:inline text-[10px] text-[var(--primary)] font-semibold uppercase tracking-wider truncate max-w-[120px]">
+                • {selectedContact.projectNames}
+              </span>
+            )}
+          </div>
+
+          <span className={`text-[11px] sm:text-xs font-medium ${
+            isOnline ? "text-green-500" : "text-gray-400"
+          }`}>
+            {isOnline ? "Online" : "Offline"}
+          </span>
+        </div>
       </div>
 
-      {/* Message List */}
-      <div ref={scrollContainerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-6 flex flex-col gap-3">
-        {isLoadingMore && <div className="flex justify-center py-2"><Loader2 className="animate-spin text-gray-400" size={20} /></div>}
-        
-        {messages.map((msg: any) => {
-          const isMine = msg.senderId === currentUser?.id;
-          return (
-            <MessageItem 
-              key={msg.id} 
-              msg={msg} 
-              isMine={msg.senderId === currentUser?.id}
-              isAdmin={currentUser?.role === 'ADMIN'}
-              showDetails={false}
-              onEdit={(m: any) => { setEditingMessage(m); setInputMessage(m.content); }}
-              onDelete={(id: string) => globalSocket.emit("delete_dm", { messageId: id, senderId: currentUser.id })}
-              isSelectMode={isSelectMode && isMine} 
-              isSelected={selectedMessageIds.includes(msg.id)}
-              onToggleSelect={toggleSelectMessage}
-            />
-          );
-        })}
-        <div ref={messagesEndRef} />
-      </div>
+      {/* RIGHT ACTIONS */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        {isSelectMode ? (
+          <>
+            <button
+              onClick={() => {
+                setIsSelectMode(false);
+                setSelectedMessageIds([]);
+              }}
+              className="text-xs sm:text-sm text-gray-500 px-2 sm:px-3 py-1.5 rounded-lg"
+            >
+              Cancel
+            </button>
 
-      {error && (
-        <div className="mx-6 mb-2 mt-2 px-3 py-2 bg-red-50 border border-red-200 flex items-center justify-between rounded-md">
-          <p className="text-xs  text-red-600 font-medium">{error}</p>
-          <button onClick={() => setError(null)}><X size={13} className="text-red-400 hover:text-red-600" /></button>
+            <button
+              onClick={handleMassDelete}
+              disabled={selectedMessageIds.length === 0}
+              className="text-xs sm:text-sm font-semibold bg-red-100 text-red-600 px-2 sm:px-3 py-1.5 rounded-lg disabled:opacity-50 flex items-center gap-1"
+            >
+              <Trash2 size={14} />
+              <span className="hidden sm:inline">
+                Delete {selectedMessageIds.length > 0 ? `(${selectedMessageIds.length})` : ""}
+              </span>
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={() => setIsSelectMode(true)}
+            className="text-xs sm:text-sm text-gray-500 flex items-center gap-1"
+          >
+            <CheckSquare size={16} />
+            <span className="hidden sm:inline">Select</span>
+          </button>
+        )}
+      </div>
+    </div>
+
+    {/* MESSAGES */}
+    <div
+      ref={scrollContainerRef}
+      onScroll={handleScroll}
+      className="
+        flex-1 overflow-y-auto
+        p-3 sm:p-6
+        flex flex-col gap-2 sm:gap-3
+      "
+    >
+      {isLoadingMore && (
+        <div className="flex justify-center py-2">
+          <Loader2 className="animate-spin text-gray-400" size={18} />
         </div>
       )}
 
-      {/* Input Area */}
-      <div className={`p-4 bg-white border-t border-[var(--border)] transition-opacity ${isSelectMode ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
-        {editingMessage && (
-          <div className="flex items-center justify-between bg-orange-50 px-4 py-2 rounded-t-lg border-b border-orange-100 text-sm text-orange-800 mb-2">
-            <span>Editing message...</span>
-            <button onClick={() => { setEditingMessage(null); setInputMessage(""); }}><X size={16} /></button>
-          </div>
-        )}
+      {messages.map((msg: any) => (
+        <MessageItem
+          key={msg.id}
+          msg={msg}
+          isMine={msg.senderId === currentUser?.id}
+          isAdmin={currentUser?.role === "ADMIN"}
+          showDetails={false}
+          onEdit={(m: any) => {
+            setEditingMessage(m);
+            setInputMessage(m.content);
+          }}
+          onDelete={(id: string) =>
+            globalSocket.emit("delete_dm", {
+              messageId: id,
+              senderId: currentUser.id,
+            })
+          }
+          isSelectMode={isSelectMode && msg.senderId === currentUser?.id}
+          isSelected={selectedMessageIds.includes(msg.id)}
+          onToggleSelect={toggleSelectMessage}
+        />
+      ))}
 
-        <form onSubmit={handleSubmit} className="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2 focus-within:ring-1 focus-within:ring-[#FFAE58]">
-          
-          <input
-            type="text"
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            placeholder="Message........"
-            className="flex-1 bg-transparent border-none px-2 py-1 text-sm focus:outline-none placeholder:text-gray-400 text-gray-800"
-          />
-          <button 
-            type="submit" 
-            disabled={!inputMessage.trim()} 
-            className="w-9 h-9 shrink-0 bg-[#FFAE58] text-white rounded-full flex items-center justify-center hover:bg-[#e89b45] disabled:opacity-50 transition-colors"
-          >
-            <Send size={16} />
-          </button>
-        </form>
-      </div>
+      <div ref={messagesEndRef} />
     </div>
+
+    {/* ERROR */}
+    {error && (
+      <div className="mx-3 sm:mx-6 mb-2 px-3 py-2 bg-red-50 border border-red-200 flex items-center justify-between rounded-md">
+        <p className="text-xs text-red-600 font-medium">{error}</p>
+        <button onClick={() => setError(null)}>
+          <X size={13} />
+        </button>
+      </div>
+    )}
+
+    {/* INPUT */}
+    <div
+      className={`
+        p-3 sm:p-4 bg-white border-t border-[var(--border)]
+        ${isSelectMode ? "opacity-50 pointer-events-none" : ""}
+      `}
+    >
+      {editingMessage && (
+        <div className="flex items-center justify-between bg-orange-50 px-3 sm:px-4 py-2 rounded-t-lg border-b border-orange-100 text-xs sm:text-sm text-orange-800 mb-2">
+          <span>Editing message...</span>
+          <button onClick={() => { setEditingMessage(null); setInputMessage(""); }}>
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
+      <form
+        onSubmit={handleSubmit}
+        className="
+          flex items-center gap-2
+          bg-gray-100 rounded-full
+          px-3 sm:px-4 py-2
+          focus-within:ring-1 focus-within:ring-[#FFAE58]
+        "
+      >
+        <input
+          type="text"
+          value={inputMessage}
+          onChange={(e) => setInputMessage(e.target.value)}
+          placeholder="Message..."
+          className="
+            flex-1 bg-transparent border-none
+            text-sm focus:outline-none
+            placeholder:text-gray-400 text-gray-800
+          "
+        />
+
+        <button
+          type="submit"
+          disabled={!inputMessage.trim()}
+          className="
+            w-8 h-8 sm:w-9 sm:h-9
+            bg-[#FFAE58] text-white
+            rounded-full flex items-center justify-center
+            hover:bg-[#e89b45]
+            disabled:opacity-50
+          "
+        >
+          <Send size={16} />
+        </button>
+      </form>
+    </div>
+  </div>
   );
 }

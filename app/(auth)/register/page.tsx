@@ -465,8 +465,9 @@ export default function RegisterPage() {
               </h1>
 
               <p className="text-white/85 text-lg max-w-xl mt-4 leading-relaxed">
-                Lorem ipsum dolor sit amet consectetur. Suscipit sed amet commodo vel
-                ultrices tortor orci. Enim lectus turpis augue donec. Gravida non
+                Build, deploy, and scale your engineering ideas with confidence. TECH ENGI
+                connects you with the tools and talent to turn concepts into real-world
+                solutions.
               </p>
             </div>
           </div>

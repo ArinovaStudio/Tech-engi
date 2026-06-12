@@ -45,6 +45,8 @@ const ClientOverview = ({ data, projectId }: { data: any, projectId: any }) => {
 
   };
 
+  const isReviewStage = data?.status === "IN_REVIEW";
+
   return (
     <div className="dark:bg-gray-900">
       <div className="w-full">
@@ -57,7 +59,7 @@ const ClientOverview = ({ data, projectId }: { data: any, projectId: any }) => {
                   <FileText className="w-5 h-5" />
                 </div>
                 <div className="relative z-10">
-                  <h2 className="text-3xl font-bold mb-1 truncate">{projectName}</h2>
+                  <h2 className="text-2xl font-bold mb-1 truncate">{projectName}</h2>
                   <p className="text-blue-100 text-sm">Project Name</p>
                 </div>
               </div>
@@ -138,30 +140,44 @@ const ClientOverview = ({ data, projectId }: { data: any, projectId: any }) => {
 
                 {/* THUMBS UP */}
                 <button
+                  disabled={!isReviewStage}
                   onClick={() => {
                     setStatus("AWAITING_FINAL_PAYMENT");
                     handleSubmit(new Event("submit") as any);
                   }}
-                  className="relative group cursor-pointer">
+                  className={`relative group ${isReviewStage
+                    ? "cursor-pointer"
+                    : "cursor-not-allowed opacity-50"
+                    }`}
+                >
                   <ThumbsUp className="text-green-500 hover:text-green-600 transition" />
 
-                  <div className="absolute bottom-full mb-2 hidden group-hover:block bg-black text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
-                    satisfied
-                  </div>
+                  {isReviewStage && (
+                    <div className="absolute bottom-full mb-2 hidden group-hover:block bg-black text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
+                      Satisfied
+                    </div>
+                  )}
                 </button>
 
                 {/* THUMBS DOWN */}
                 <button
+                  disabled={!isReviewStage}
                   onClick={() => {
                     setStatus("IN_PROGRESS");
                     handleSubmit(new Event("submit") as any);
                   }}
-                  className="relative group cursor-pointer">
+                  className={`relative group ${isReviewStage
+                      ? "cursor-pointer"
+                      : "cursor-not-allowed opacity-50"
+                    }`}
+                >
                   <ThumbsDownIcon className="text-red-500 hover:text-red-600 transition" />
 
-                  <div className="absolute bottom-full mb-2 hidden group-hover:block bg-black text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
-                    There is some Bugs
-                  </div>
+                  {isReviewStage && (
+                    <div className="absolute bottom-full mb-2 hidden group-hover:block bg-black text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
+                      There are some bugs
+                    </div>
+                  )}
                 </button>
 
               </div>

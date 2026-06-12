@@ -71,11 +71,11 @@ const LatestUpdates = ({ data, }: { data: any; }) => {
 
   {/* Header */}
   <div className="flex items-start justify-between mb-5 shrink-0">
-    <h2 className="text-[46px] leading-none font-black text-black font-id">
+    <h2 className="text-[30px] leading-none font-black text-black font-id">
       Latest Task
     </h2>
 
-    <span className="text-[24px] text-[#7d7d7d] font-semibold font-id mt-1">
+    <span className="text-[18px] text-[#7d7d7d] font-semibold font-id mt-1">
       {new Date(project?.updatedAt).toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "short",
@@ -105,12 +105,12 @@ const LatestUpdates = ({ data, }: { data: any; }) => {
           </span>
 
           {/* Title */}
-          <h3 className="text-[22px] font-semibold text-gray-700 mb-2 pr-24">
+          <h3 className="text-[18px] font-semibold text-gray-700 mb-2 pr-24">
             {task.title}
           </h3>
 
           {/* Description */}
-          <p className="text-[18px] leading-[1.5] text-[#474747] font-medium pr-24">
+          <p className="text-[15px] leading-[1.5] text-[#474747] font-medium pr-24">
             {task.description || "Task updated"}
           </p>
         </div>

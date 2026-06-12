@@ -73,7 +73,7 @@ const Milestones = ({ milestones = [] }: { milestones: any[] }) => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
 
-        <h2 className="text-[42px] leading-none font-black text-black font-id">
+        <h2 className="text-[30px] leading-none font-black text-black font-id">
           Milestones
         </h2>
 
@@ -99,7 +99,7 @@ const Milestones = ({ milestones = [] }: { milestones: any[] }) => {
               <div className="flex items-start justify-between gap-4">
 
                 <div>
-                  <h3 className="text-[22px] font-bold text-black font-id">
+                  <h3 className="text-[18px] font-bold text-black font-id">
                     {m.title}
                   </h3>
 

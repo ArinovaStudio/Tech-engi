@@ -496,8 +496,7 @@ export default function EngineerRegisterPage() {
               </h1>
 
               <p className="text-white/85 text-lg max-w-xl mt-4 leading-relaxed">
-                Lorem ipsum dolor sit amet consectetur. Suscipit sed amet commodo vel
-                ultrices tortor orci. Enim lectus turpis augue donec. Gravida non
+                Join a growing community of engineers building real-world products. Showcase your skills, connect with teams, and get matched with projects that fit your expertise.
               </p>
             </div>
           </div>

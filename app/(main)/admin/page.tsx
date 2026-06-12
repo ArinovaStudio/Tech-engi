@@ -29,6 +29,7 @@ export default function DashboardPage() {
 
   const stats = data?.stats || {};
   const charts = data?.charts || {};
+  console.log(stats);
   
   return (
     <DashboardShell>
@@ -56,7 +57,7 @@ export default function DashboardPage() {
       </div> */}
 
       <div className="flex flex-col">
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-5 gap-5 mb-3">
           <StatCard
             title="Total Projects"
             value={stats.totalProjects?.toString()}
@@ -82,7 +83,12 @@ export default function DashboardPage() {
           <StatCard
             title="Total Clients"
             value={stats.totalClients?.toString()}
-            subtitle="On Discuss"
+            subtitle=""
+          />
+          <StatCard
+            title="Total Engineer"
+            value={stats.totalEngineer?.toString()}
+            subtitle=""
           />
         </div>
 

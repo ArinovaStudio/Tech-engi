@@ -16,6 +16,7 @@ export async function GET() {
     const searchingProjects = await prisma.project.count({ where: { status: "SEARCHING" } });
     const canceledProjects = await prisma.project.count({ where: { status: "CANCELED" } });
     const awaitingFinalCount = await prisma.project.count({ where: { status: "AWAITING_FINAL_PAYMENT" } });
+    const totalEngineer = await prisma.user.count({ where: { role: "ENGINEER" } });
 
 
     const revenueTransactions = await prisma.transaction.findMany({
@@ -75,7 +76,8 @@ export async function GET() {
         ongoingProjects,
         completedProjects,
         totalRevenue,
-        pendingRevenue
+        pendingRevenue,
+        totalEngineer,
       },
       charts: {
         revenue: {

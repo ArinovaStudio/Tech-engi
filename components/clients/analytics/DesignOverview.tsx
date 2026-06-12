@@ -122,23 +122,23 @@ const DesignOverview = ({ data }: { data: any }) => {
 
   const slides = [
     [
-      { label: "Brand Name", value: designSystem?.brandName || "-" },
-      { label: "Brand Feel", value: designSystem?.brandFeel || "-" },
-      { label: "Theme", value: designSystem?.theme?.[0] || "-" },
+      { label: "Brand Name", value: designSystem?.brandName || "" },
+      { label: "Brand Feel", value: designSystem?.brandFeel || "" },
+      { label: "Theme", value: designSystem?.theme?.[0] || "" },
     ],
     [
-      { label: "Primary Font", value: designSystem?.fonts?.primary || "-" },
-      { label: "Secondary Font", value: designSystem?.fonts?.secondary || "-" },
+      { label: "Primary Font", value: designSystem?.fonts?.primary || "" },
+      { label: "Secondary Font", value: designSystem?.fonts?.secondary || "" },
     ],
     [
-      { label: "Design Type", value: designSystem?.designType?.[0] || "-" },
-      { label: "Content Tone", value: designSystem?.contentTone?.[0] || "-" },
+      { label: "Design Type", value: designSystem?.designType?.[0] || "" },
+      { label: "Content Tone", value: designSystem?.contentTone?.[0] || "" },
     ],
     [
-      { label: "Key Pages", value: designSystem?.keyPages?.join(", ") || "-" },
+      { label: "Key Pages", value: designSystem?.keyPages?.join(", ") || "" },
       {
         label: "Uniqueness",
-        value: designSystem?.uniqueness?.differentiator || "-",
+        value: designSystem?.uniqueness?.differentiator || "",
       },
     ],
   ];
@@ -161,6 +161,18 @@ const DesignOverview = ({ data }: { data: any }) => {
       (1000 * 60 * 60 * 24)
     )
     : null;
+
+  // Create filtered slides first
+  const validSlides = slides
+    .map((slide) =>
+      slide.filter(
+        (item) =>
+          item.value !== null &&
+          item.value !== undefined &&
+          String(item.value).trim() !== ""
+      )
+    )
+    .filter((slide) => slide.length > 0);
 
   const daysText =
     daysDifference === null
@@ -207,50 +219,61 @@ const DesignOverview = ({ data }: { data: any }) => {
           </div>
 
           {/* Slides */}
-          <div className="overflow-hidden relative h-32">
-            <div
-              className="flex transition-transform duration-500 ease-out"
-              style={{
-                transform: `translateX(-${currentSlide * 100}%)`,
-              }}
-            >
-              {slides.map((slide, i) => (
-                <div key={i} className="min-w-full space-y-4 pr-4">
-                  {slide.map((item, j) => (
-                    <div
-                      key={j}
-                      className="flex items-center justify-between"
-                    >
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {item.label}
-                      </span>
+          {validSlides.length === 0 ? (
+            <div className="h-32 flex items-center justify-center rounded-lg border border-dashed border-gray-300 dark:border-gray-700">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                No Design System
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="overflow-hidden relative h-32">
+                <div
+                  className="flex transition-transform duration-500 ease-out"
+                  style={{
+                    transform: `translateX(-${currentSlide * 100}%)`,
+                  }}
+                >
+                  {validSlides.map((slide, i) => (
+                    <div key={i} className="min-w-full space-y-4 pr-4">
+                      {slide.map((item, j) => (
+                        <div
+                          key={j}
+                          className="flex items-center justify-between"
+                        >
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            {item.label}
+                          </span>
 
-                      <span
-                        className="text-sm font-medium text-gray-900 dark:text-white max-w-sm truncate"
-                        title={item.value}
-                      >
-                        {item.value}
-                      </span>
+                          <span
+                            className="text-sm font-medium text-gray-900 dark:text-white max-w-sm truncate"
+                            title={String(item.value)}
+                          >
+                            {item.value}
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          {/* Button */}
-          <div className="flex justify-end">
-            <button
-              onClick={() =>
-                setCurrentSlide((p) => (p + 1) % slides.length)
-              }
-              className="bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400 py-1 px-4 rounded-full flex items-center gap-2 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
-            >
-              <span className="font-medium">Next Attributes</span>
-
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
+              {/* Show button only when there are multiple slides */}
+              {validSlides.length > 1 && (
+                <div className="flex justify-end">
+                  <button
+                    onClick={() =>
+                      setCurrentSlide((p) => (p + 1) % validSlides.length)
+                    }
+                    className="bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400 py-1 px-4 rounded-full flex items-center gap-2 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+                  >
+                    <span className="font-medium">Next Attributes</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+            </>
+          )}
 
         </div>
       </div>
@@ -311,7 +334,7 @@ const DesignOverview = ({ data }: { data: any }) => {
           <div className="p-5 border-r border-[#d6d6d6]">
 
             <div>
-              <h3 className="text-[20px] font-medium text-[#7d7d7d] font-id">
+              <h3 className="text-[18px] font-medium text-[#7d7d7d] font-id">
                 Current Phase
               </h3>
 
@@ -320,7 +343,7 @@ const DesignOverview = ({ data }: { data: any }) => {
               <div className="bg-gradient-to-r from-[#B14FFF] to-[#A34CF3] rounded-xl px-4 py-3 flex items-center gap-3">
                 <span className="text-white text-[18px]">✎</span>
 
-                <span className="text-white text-[20px] font-semibold font-id">
+                <span className="text-white text-[18px] font-semibold font-id">
                   {project?.currentPhase?.length
                     ? project.currentPhase[0]
                     : "Not Started"}
@@ -334,7 +357,7 @@ const DesignOverview = ({ data }: { data: any }) => {
           {/* RIGHT SECTION */}
           <div className="p-5">
 
-            <h3 className="text-[20px] font-medium text-[#7d7d7d] font-id">
+            <h3 className="text-[18px] font-medium text-[#7d7d7d] font-id">
               Technology Used
             </h3>
 

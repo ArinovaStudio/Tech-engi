@@ -41,6 +41,7 @@ export async function GET(req: NextRequest) {
         success: true,
         data: {
           overview: {
+            status: project.status,
             name: project.title,
             priority: project.priority,
             budget: project.budget,

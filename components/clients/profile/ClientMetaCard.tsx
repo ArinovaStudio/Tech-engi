@@ -1,12 +1,13 @@
 "use client";
 
-import { Camera } from "lucide-react";
+import { Camera, Loader2 } from "lucide-react";
 import React, { useRef, useState } from "react";
 
 export default function ClientMetaCard({ user }: { user: any }) {
   if (!user) return null;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [image, setImage] = useState(user?.image);
+  const [imageLoader, setImageLoader] = useState(false);
 
   const handleUpload = async (
     e: React.ChangeEvent<HTMLInputElement>
@@ -16,6 +17,7 @@ export default function ClientMetaCard({ user }: { user: any }) {
     if (!file) return;
 
     try {
+      setImageLoader(true);
       const formData = new FormData();
       formData.append("image", file);
 
@@ -37,24 +39,37 @@ export default function ClientMetaCard({ user }: { user: any }) {
     } catch (error) {
       console.error(error);
       alert("Failed to upload image");
+    } finally {
+      setImageLoader(false);
     }
   };
 
   return (
     <div className="p-6 border border-[var(--border)] rounded-2xl bg-white flex flex-col md:flex-row items-center md:items-start gap-6 shadow-sm">
       <div className="relative shrink-0">
-        <div className="w-24 h-24 rounded-full border-4 border-gray-50 bg-[var(--primary)] text-white flex items-center justify-center text-3xl font-bold overflow-hidden shadow-sm">
+        <div className="w-24 h-24 rounded-full border-4 border-gray-50 bg-[var(--primary)] text-white flex items-center justify-center text-3xl font-bold overflow-hidden shadow-sm relative">
+
+          {/* IMAGE */}
           {image ? (
             <img
               src={image}
               alt="avatar"
               className="w-full h-full object-cover"
+              onLoad={() => setImageLoader(false)}   // safety
             />
           ) : (
-            user.name?.charAt(0)?.toUpperCase() || "C"
+            <span>{user.name?.charAt(0)?.toUpperCase() || "C"}</span>
+          )}
+
+          {/* LOADER OVERLAY */}
+          {imageLoader && (
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+              <Loader2 className="animate-spin text-white" size={22} />
+            </div>
           )}
         </div>
 
+        {/* CAMERA BUTTON */}
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
@@ -63,6 +78,7 @@ export default function ClientMetaCard({ user }: { user: any }) {
           <Camera size={14} />
         </button>
 
+        {/* INPUT */}
         <input
           ref={fileInputRef}
           type="file"

@@ -442,7 +442,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                                   ? "Updating..."
                                   : report.status.replace("_", " ")}
 
-                                {( report.raisedById === currentUserId || role === "ADMIN") && !updating && (
+                                {(role === "ADMIN") && !updating && (
                                   <span className="text-[10px]">▼</span>
                                 )}
                               </button>
@@ -451,7 +451,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                               {(
                                 openDropdownId === report.id &&
                                 !updating &&
-                                ( report.raisedById === currentUserId || role === "ADMIN")) && (
+                                (role === "ADMIN")) && (
                                   <div className="absolute right-0 mt-1 w-36 bg-white border rounded-lg shadow-md z-10">
                                     {["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"].map((status) => (
                                       <button

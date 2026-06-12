@@ -78,7 +78,7 @@ const RiskBlockage = ({ tickets = [] }: { tickets: any[] }) => {
             <AlertTriangle className="w-5 h-5 text-[#f5a300]" />
           </div>
 
-          <span className="text-[20px] font-semibold text-black font-id">
+          <span className="text-[18px] font-semibold text-black font-id">
             {ticket.issueType}
           </span>
         </div>

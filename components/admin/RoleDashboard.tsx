@@ -21,7 +21,7 @@ const socket = io({
 });
 
 const s = {
-  page: { minHeight: "100vh", background: "#f9fafb", padding: 32, fontFamily: "inherit" } as React.CSSProperties,
+  page: { minHeight: "100vh", background: "#fffffff", padding: 32, fontFamily: "inherit" } as React.CSSProperties,
   card: { position: "relative", background: "#fff", borderRadius: 12, border: "1px solid #e5e5e5", padding: 20, boxShadow: "0 1px 4px rgba(5,10,48,0.05)", transition: "box-shadow 0.2s" } as React.CSSProperties,
   avatar: (isSuspended: boolean) => ({ width: 56, height: 56, borderRadius: "50%", background: isSuspended ? "#fee2e2" : "#fff4e6", border: `2px solid ${isSuspended ? "#ef4444" : "#FFAE58"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 600, color: isSuspended ? "#ef4444" : "#FFAE58", position: "relative", flexShrink: 0 } as React.CSSProperties),
   dot: (isActive: boolean) => ({ position: "absolute", bottom: 1, right: 1, width: 11, height: 11, borderRadius: "50%", background: isActive ? "#22c55e" : "#9ca3af", border: "2px solid #fff" } as React.CSSProperties),
@@ -106,7 +106,7 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
     };
   }, []);
 
-// console.log(data,"userss");
+  // console.log(data,"userss");
 
   // ACTION HANDLERS
   const handleDelete = async () => {
@@ -171,118 +171,201 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
         key={u.id}
         style={{ ...s.card, cursor: "pointer" }}
         onClick={() => handleRedirect(u.role)}
-        className="hover:shadow-md transition-shadow"
+        className="hover:shadow-md transition-shadow relative p-4 sm:p-5 bg-amber-300"
       >
-        <div style={{ position: "absolute", top: 12, right: 12, display: "flex", gap: 4, zIndex: 10 }}>
+        {/* ACTION BUTTONS */}
+        <div className="absolute top-3 right-3 flex gap-2 z-10">
           <button
-            onClick={(e) => { e.stopPropagation(); setSuspendingUser(u); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setSuspendingUser(u);
+            }}
             style={s.actionBtn()}
-            title={u.isSuspended ? "Unsuspend" : "Suspend"}
           >
-            {u.isSuspended ? <CheckCircle size={14} color="#22c55e" /> : <Ban size={14} color="#f59e0b" />}
+            {u.isSuspended ? (
+              <CheckCircle size={14} color="#22c55e" />
+            ) : (
+              <Ban size={14} color="#f59e0b" />
+            )}
           </button>
 
           <button
-            onClick={(e) => { e.stopPropagation(); setEditingUser(u); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setEditingUser(u);
+            }}
             style={s.actionBtn()}
-            title="Edit"
           >
             <Edit2 size={14} color="#6F6F6F" />
           </button>
 
           <button
-            onClick={(e) => { e.stopPropagation(); setDeletingUser(u); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setDeletingUser(u);
+            }}
             style={s.actionBtn(true)}
-            title="Delete"
           >
             <Trash2 size={14} color="#e53e3e" />
           </button>
         </div>
 
-        <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
-          <div style={s.avatar(u.isSuspended)}>
+        {/* MAIN CONTENT */}
+        <div className="flex flex-col sm:flex-row gap-4 lg:gap-5">
+
+          {/* AVATAR */}
+          <div style={s.avatar(u.isSuspended)} className="shrink-0">
             {u.image ? (
-              <Image src={u.image} alt={u.name || "User"} width={56} height={56} style={{ borderRadius: "50%", objectFit: "cover" }} />
+              <Image
+                src={u.image}
+                alt={u.name || "User"}
+                width={48}
+                height={48}
+                className="sm:w-[56px] sm:h-[56px] rounded-full object-cover"
+              />
             ) : (
-              (u.name || "U").charAt(0).toUpperCase()
-            )}
-            <div style={s.dot(isActive)} />
-          </div>
-
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4, paddingRight: 80 }}>
-              <span style={{ fontSize: 15, fontWeight: 600, color: u.isSuspended ? "#ef4444" : "#050A30" }}>
-                {u.name || "Unnamed"}
-              </span>
-            </div>
-
-            {/* INLINE STATUS & ACTIONS FOR ENGINEERS */}
-            {(role === "ENGINEER") && (
-              <div style={{ marginBottom: 6, display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={s.badge(u.status === "PENDING" ? "#f59e0b" : u.status === "REJECTED" ? "#ef4444" : "#22C55E", "#f4f4f4")}>
-                  {/* {u.status || "APPROVED"} */}
-                  {u.status}
-                </span>
+              <div className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-gray-200 font-semibold">
+                {(u.name || "U").charAt(0).toUpperCase()}
               </div>
             )}
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-              <div style={s.iconRow}><Mail size={12} /><span className="truncate">{u.email}</span></div>
-              {role === "CLIENT" && <div style={s.iconRow}><User size={12} /><span>Projects: {u.totalProjects || 0}</span></div>}
-              {role === "ENGINEER" && <div style={s.iconRow}><User size={12} /><span>Completed Work: {u.completedProjects || 0}</span></div>}
+            <div style={s.dot(isActive)} />
+          </div>
+
+          {/* DETAILS */}
+          <div className="flex-1 min-w-0">
+
+            {/* NAME */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+              <span
+                className={`text-[15px] font-semibold ${u.isSuspended ? "text-red-500" : "text-[#050A30]"
+                  }`}
+              >
+                {u.name || "Unnamed"}
+              </span>
+
+              {role === "ENGINEER" && (
+                <span
+                  style={s.badge(
+                    u.status === "PENDING"
+                      ? "#f59e0b"
+                      : u.status === "REJECTED"
+                        ? "#ef4444"
+                        : "#22C55E",
+                    "#f4f4f4"
+                  )}
+                >
+                  {u.status}
+                </span>
+              )}
+            </div>
+
+            {/* INFO */}
+            <div className="mt-2 flex flex-col gap-1 text-sm text-gray-600">
+              <div style={s.iconRow}>
+                <Mail size={12} />
+                <span className="truncate">{u.email}</span>
+              </div>
+
+              {role === "CLIENT" && (
+                <div style={s.iconRow}>
+                  <User size={12} />
+                  <span>Projects: {u.totalProjects || 0}</span>
+                </div>
+              )}
+
+              {role === "ENGINEER" && (
+                <div style={s.iconRow}>
+                  <User size={12} />
+                  <span>Completed Work: {u.completedProjects || 0}</span>
+                </div>
+              )}
+
               {u.joinedAt && (
                 <div style={s.iconRow}>
                   <Calendar size={12} />
-                  <span>Joined: {new Date(u.joinedAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</span>
+                  <span>
+                    Joined:{" "}
+                    {new Date(u.joinedAt).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </span>
                 </div>
               )}
             </div>
-          </div>
-        </div>
 
-        <div style={s.divider}>
-          <p style={{ fontSize: 12, color: "#4B4B4B", margin: 0, lineHeight: "1.4" }}>
-            {role === "ENGINEER" && <><strong>Skills:</strong> {u.skills?.length ? u.skills.join(", ") : "Not provided"}</>}
-            {role === "CLIENT" && <><strong>Expertise:</strong> {u.expertise?.length ? u.expertise.join(", ") : "Not provided"}</>}
-            {role === "ADMIN" && "Platform Administrator"}
-          </p>
-        </div>
+            {/* DIVIDER TEXT */}
+            <div className="mt-3 border-t pt-3">
+              <p className="text-xs text-gray-600 leading-relaxed">
+                {role === "ENGINEER" && (
+                  <>
+                    <strong>Skills:</strong>{" "}
+                    {u.skills?.length ? u.skills.join(", ") : "Not provided"}
+                  </>
+                )}
 
-        <div className="mt-3" style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-          {/* Pending Actions - ADDED e.stopPropagation() */}
-          {u.status === "PENDING" && (
-            <div style={{ display: "flex", gap: 6 }}>
-              <button
-                onClick={(e) => { e.stopPropagation(); setStatusModalUser(u); setTargetStatus("APPROVED"); }}
-                style={{ padding: "2px 8px", fontSize: 11, fontWeight: 600, background: "#dcfce7", color: "#16a34a", border: "1px solid #bbf7d0", borderRadius: 6, cursor: "pointer" }}
-              >
-                Approve
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); setStatusModalUser(u); setTargetStatus("REJECTED"); }}
-                style={{ padding: "2px 8px", fontSize: 11, fontWeight: 600, background: "#fee2e2", color: "#ef4444", border: "1px solid #fecaca", borderRadius: 6, cursor: "pointer" }}
-              >
-                Reject
-              </button>
+                {role === "CLIENT" && (
+                  <>
+                    <strong>Expertise:</strong>{" "}
+                    {u.expertise?.length ? u.expertise.join(", ") : "Not provided"}
+                  </>
+                )}
+
+                {role === "ADMIN" && "Platform Administrator"}
+              </p>
             </div>
-          )}
 
-          {/* Rejected Actions - ADDED e.stopPropagation() */}
-          {u.status === "REJECTED" && (
-            <button
-              onClick={(e) => { e.stopPropagation(); setStatusModalUser(u); setTargetStatus("APPROVED"); }}
-              style={{ padding: "2px 8px", fontSize: 11, fontWeight: 600, background: "#dcfce7", color: "#16a34a", border: "1px solid #bbf7d0", borderRadius: 6, cursor: "pointer" }}
-            >
-              Approve
-            </button>
-          )}
+            {/* ACTIONS */}
+            <div className="mt-3 flex flex-wrap gap-2 justify-end">
+              {u.status === "PENDING" && (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setStatusModalUser(u);
+                      setTargetStatus("APPROVED");
+                    }}
+                    className="px-2 py-1 text-xs font-semibold bg-green-100 text-green-600 rounded-md"
+                  >
+                    Approve
+                  </button>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setStatusModalUser(u);
+                      setTargetStatus("REJECTED");
+                    }}
+                    className="px-2 py-1 text-xs font-semibold bg-red-100 text-red-500 rounded-md"
+                  >
+                    Reject
+                  </button>
+                </>
+              )}
+
+              {u.status === "REJECTED" && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setStatusModalUser(u);
+                    setTargetStatus("APPROVED");
+                  }}
+                  className="px-2 py-1 text-xs font-semibold bg-green-100 text-green-600 rounded-md"
+                >
+                  Approve
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     );
   };
 
   return (
-    <div style={s.page}>
+    <div className="w-full" style={s.page}>
       <div style={{ marginBottom: 28 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
 
@@ -305,7 +388,8 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
               />
             </div>
 
-            {role === "ENGINEER" && (
+            <div className="flex items-center gap-8">
+              {role === "ENGINEER" && (
               <div className="relative">
                 <Filter size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                 <select
@@ -334,6 +418,7 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
                 )}
               </button>
             )}
+            </div>
           </div>
         </div>
       </div>

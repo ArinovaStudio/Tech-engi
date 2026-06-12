@@ -24,6 +24,7 @@ const WhatWeOffer = () => {
     "Prototype & MVP Development.",
     "Dedicated Project Management.",
     "Scalable Engineering Solutions.",
+    "End-to-End Product Development"
   ]
 
   const titleRef = useScrollAnimation('fadeUp')
@@ -94,7 +95,7 @@ const WhatWeOffer = () => {
             className=" flex flex-row items-stretch gap-0 w-full" >
             {/* CARD */}
             <div
-              className=" border border-slate-300 lg:border-b-0 p-5 sm:p-8 w-full lg:-mb-10 " >
+              className=" border border-slate-300 lg:border-b-1 p-5 sm:p-8 w-full lg:-mb-10 " >
               <div className="space-y-5 sm:space-y-6">
                 {clientsOffers.map((offer, index) => (
                   <div

@@ -220,8 +220,7 @@ export default function LoginPage() {
               </h1>
 
               <p className="text-white/85 text-lg max-w-xl mt-4 leading-relaxed">
-                Lorem ipsum dolor sit amet consectetur. Suscipit sed amet commodo vel
-                ultrices tortor orci. Enim lectus turpis augue donec. Gravida non
+                A platform where clients and engineers collaborate to solve real technical problems. Get support for building, fixing, and delivering projects with clarity and speed.
               </p>
             </div>
           </div>

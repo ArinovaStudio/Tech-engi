@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Clock } from "lucide-react";
+import { Clock, LucideLoader } from "lucide-react";
 import PayoutHistory from "./PayoutHistory";
 import PaymentModal from "./payout/PayoutModal";
 import { fetcher } from "@/lib/fetcher";
@@ -40,24 +40,12 @@ function SummaryCard({
   );
 }
 
-export default function PayoutAdmin({
-  projectId,
-}: {
-  projectId: string;
-}) {
-  const [selectedUser, setSelectedUser] =
-    useState<User | null>(null);
+export default function PayoutAdmin({ projectId, }: { projectId: string; }) {
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTx, setEditingTx] = useState<any>(null);
 
-  const [isModalOpen, setIsModalOpen] =
-    useState(false);
-
-  const [editingTx, setEditingTx] =
-    useState<any>(null);
-
-  const { data, mutate } = useSWR(
-    `/api/payout/${projectId}`,
-    fetcher
-  );
+  const { data, mutate, isLoading } = useSWR(`/api/payout/${projectId}`,fetcher);
 
   const stats = data?.stats ?? {};
   const users = stats?.users ?? [];
@@ -112,6 +100,18 @@ export default function PayoutAdmin({
       (t.type === "PAYOUT_ENGINEER" ||
         t.type === "REFUND_CLIENT")
   );
+  
+  if (isLoading) {
+  return (
+    <div className="flex items-center justify-center py-12">
+        <LucideLoader
+          className="animate-spin"
+          style={{ color: "var(--primary)" }}
+          size={40}
+        />
+      </div>
+  );
+}
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 text-black">
@@ -134,11 +134,10 @@ export default function PayoutAdmin({
                   setSelectedUser(user)
                 }
                 className={`w-full text-left px-4 py-3 rounded-xl border transition-all flex items-center justify-between
-                ${
-                  selectedUser?.id === user?.id
+                ${selectedUser?.id === user?.id
                     ? "border-[var(--primary)] bg-[var(--primary)]/5 shadow-sm"
                     : "border-[var(--border)] hover:bg-[var(--bg)]"
-                }`}
+                  }`}
               >
                 <div>
                   <p className="font-bold text-sm text-[var(--text-primary)]">
@@ -174,11 +173,10 @@ export default function PayoutAdmin({
                   setSelectedUser(user)
                 }
                 className={`w-full text-left px-4 py-3 rounded-xl border transition-all flex items-center justify-between
-                ${
-                  selectedUser?.id === user?.id
+                ${selectedUser?.id === user?.id
                     ? "border-[var(--primary)] bg-[var(--primary)]/5 shadow-sm"
                     : "border-[var(--border)] hover:bg-[var(--bg)]"
-                }`}
+                  }`}
               >
                 <div>
                   <p className="font-bold text-sm text-[var(--text-primary)]">
@@ -220,7 +218,7 @@ export default function PayoutAdmin({
             </>
           ) : (
             <>
-             <SummaryCard
+              <SummaryCard
                 title="Total Engineer Payout"
                 value={`₹${engineerBudget.toLocaleString()}`}
               />
@@ -234,11 +232,10 @@ export default function PayoutAdmin({
 
           {/* BANK DETAILS */}
           <SummaryCard
-            title={`${
-              selectedUser?.role === "CLIENT"
+            title={`${selectedUser?.role === "CLIENT"
                 ? "Client"
                 : "Engineer"
-            } Bank Details`}
+              } Bank Details`}
             value={
               selectedUser ? (
                 selectedUser.payoutDetail ? (
@@ -358,7 +355,7 @@ export default function PayoutAdmin({
 
                       <span className="font-bold text-[var(--text-primary)]">
                         {pendingTx.type ===
-                        "REFUND_CLIENT"
+                          "REFUND_CLIENT"
                           ? "refund"
                           : "payout"}
                       </span>{" "}

@@ -56,7 +56,7 @@ const Stats = () => {
         <div ref={iconsRef} className="mt-26 w-full h-full border border-slate-200 py-8 w-full overflow-hidden">
           <div className="flex animate-marquee items-center">
             {[...companyIcons, ...companyIcons].map((company, index) => (
-              <div key={index} className="flex-shrink-0 h-16 w-[100px] lg:w-[290px] h-[100px] relative">
+              <div key={index} className="flex-shrink-0 h-10 w-[190px] lg:w-[290px] h-[60px] relative">
                 <Image src={company.src} alt={company.label} fill className="object-contain" />
               </div>
             ))}

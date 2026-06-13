@@ -9,7 +9,7 @@ const engineerUpdateSchema = z.object({
   repository: z.string().url("Please provide a valid repository URL").optional().nullable()
 });
 
-export async function PUT(req: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
+export async function PUT(req: NextRequest) {
   try {
     const { user, error } = await getUser();
 
@@ -40,8 +40,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ proj
         designSystem,
         projectId,
       } = body;
-      
-console.log(technology,designSystem);
 
       const project = await prisma.project.findUnique({
         where: {
@@ -174,7 +172,6 @@ console.log(technology,designSystem);
     }
 
   } catch (error:any) {
-    console.log(error.message);
     
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }

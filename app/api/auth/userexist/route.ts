@@ -8,8 +8,6 @@ interface Body {
 export async function POST(req: NextRequest) {
   try {
     const { email }: Body = await req.json();
-console.log(email, "emaill");
-
     if (!email) {
       return NextResponse.json(
         {

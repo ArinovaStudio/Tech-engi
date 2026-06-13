@@ -39,48 +39,52 @@ export default function EngineerRegisterPage() {
     setIsLoading(true);
     setError("");
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
-      setIsLoading(false);
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      const registerRes = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, role: "ENGINEER" }),
-      });
-
-      const registerData = await registerRes.json();
-
-      if (!registerRes.ok || !registerData.success) {
-        throw new Error(registerData.message || "Registration failed");
+      if (password.length < 6) {
+        throw new Error("Password must be at least 6 characters");
       }
 
-      // Send the OTP
+      if (password !== confirmPassword) {
+        throw new Error("Passwords do not match");
+      }
+      
+      // check email exists
+      const existsRes = await fetch("/api/auth/userexist", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+        }),
+      });
+
+      const existsData = await existsRes.json();
+
+      if (existsData.exists) {
+        throw new Error("Email already registered");
+      }
+
+      // send otp
       const otpRes = await fetch("/api/auth/otp/send", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, type: "VERIFY_EMAIL" }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          type: "VERIFY_EMAIL",
+        }),
       });
 
       const otpData = await otpRes.json();
 
       if (!otpRes.ok || !otpData.success) {
-        throw new Error("Account created, but failed to send OTP email.");
+        throw new Error("Failed to send OTP");
       }
 
       setSuccessMsg("We've sent a 6-digit code to your email.");
-      // setOtpSend(true);
       setStep(2);
-
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -111,6 +115,18 @@ export default function EngineerRegisterPage() {
 
       if (!verifyRes.ok || !verifyData.success) {
         throw new Error(verifyData.message || "Invalid OTP code");
+      }
+
+      const registerRes = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password, role: "ENGINEER" }),
+      });
+
+      const registerData = await registerRes.json();
+
+      if (!registerRes.ok || !registerData.success) {
+        throw new Error(registerData.message || "Registration failed");
       }
 
       const signInRes = await signIn("credentials", {
@@ -167,7 +183,7 @@ export default function EngineerRegisterPage() {
   return (
     <div className="flex w-full h-screen">
       <div className="w-[50%] h-screen">
-         <div className="">
+        <div className="">
           <button
             onClick={() => router.push('/')}
             className="flex items-center cursor-pointer gap-2 text-sm text-gray-500 hover:text-gray-800 transition-colors m-5"

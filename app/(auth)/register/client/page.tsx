@@ -52,16 +52,20 @@ export default function ClientRegisterPage() {
     }
 
     try {
-      const registerRes = await fetch("/api/auth/register", {
+      const existsRes = await fetch("/api/auth/userexist", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, role: "CLIENT" }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+        }),
       });
 
-      const registerData = await registerRes.json();
+      const existsData = await existsRes.json();
 
-      if (!registerRes.ok || !registerData.success) {
-        throw new Error(registerData.message || "Registration failed");
+      if (existsData.exists) {
+        throw new Error("Email already registered");
       }
 
       // Send the OTP
@@ -110,6 +114,18 @@ export default function ClientRegisterPage() {
 
       if (!verifyRes.ok || !verifyData.success) {
         throw new Error(verifyData.message || "Invalid OTP code");
+      }
+
+      const registerRes = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password, role: "CLIENT" }),
+      });
+
+      const registerData = await registerRes.json();
+
+      if (!registerRes.ok || !registerData.success) {
+        throw new Error(registerData.message || "Registration failed");
       }
 
       const signInRes = await signIn("credentials", {

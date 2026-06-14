@@ -59,7 +59,7 @@ export default function AdminClientProfile({ params }: { params: Promise<{ id: s
             </button>
             <div>
               <h2 className="text-xl font-bold font-inter text-[var(--text-primary)]">Manage Client</h2>
-              <p className="text-xs font-inter text-[var(--text-muted)]">ID: {user.id}</p>
+              <p className="text-xs font-inter text-[var(--text-muted)]">ID: {user.id.slice(0, 20)}...</p>
             </div>
           </div>
 

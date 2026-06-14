@@ -4,7 +4,7 @@ import { Edit2 } from "lucide-react";
 import EngineerModal from "@/components/engineer/profile/modals/EngineerModal";
 import toast from "react-hot-toast";
 
-export default function AdminClientInfoCard({ user, onUpdate }: { user: any, onUpdate: () => void }) {
+export default function zAdminClientInfoCard({ user, onUpdate }: { user: any, onUpdate: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({ name: "", phone: "", bio: "" });
@@ -40,7 +40,7 @@ export default function AdminClientInfoCard({ user, onUpdate }: { user: any, onU
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
           <div><p className="text-xs text-[var(--text-muted)] font-semibold mb-1 uppercase tracking-wider">Full Name</p><p className="font-semibold text-sm text-[var(--text-primary)]">{user.name}</p></div>
-          <div><p className="text-xs text-[var(--text-muted)] font-semibold mb-1 uppercase tracking-wider">Client ID</p><p className="font-mono text-sm font-semibold text-[var(--text-secondary)]">{user.id}</p></div>
+          <div><p className="text-xs text-[var(--text-muted)] font-semibold mb-1 uppercase tracking-wider">Client ID</p><p className="font-mono text-sm font-semibold text-[var(--text-secondary)]">{user.id.slice(0, 8)}...</p></div>
           <div><p className="text-xs text-[var(--text-muted)] font-semibold mb-1 uppercase tracking-wider">Phone</p><p className="font-semibold text-sm text-[var(--text-primary)]">{user.phone || "—"}</p></div>
           <div><p className="text-xs text-[var(--text-muted)] font-semibold mb-1 uppercase tracking-wider">Email Address</p><p className="font-semibold text-sm text-[var(--text-primary)] truncate">{user.email}</p></div>
           <div className="md:col-span-2"><p className="text-xs text-[var(--text-muted)] font-semibold mb-1 uppercase tracking-wider">Bio</p><p className="font-semibold text-sm text-[var(--text-primary)]">{user.bio || "—"}</p></div>

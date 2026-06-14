@@ -75,7 +75,7 @@ export default function RegisterPage() {
       const otpData = await otpRes.json();
 
       if (!otpRes.ok || !otpData.success) {
-        throw new Error("Account created, but failed to send OTP email.");
+        throw new Error("failed to send OTP email.");
       }
 
       setSuccessMsg("We've sent a 6-digit code to your email.");

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Briefcase, Loader2, X, Plus } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
+import Image from "next/image";
 
 export default function ClientFormPage() {
   const router = useRouter();
@@ -54,9 +55,10 @@ export default function ClientFormPage() {
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.message);
 
-      // router.push("/form/payout");
+      router.push("/client");
     } catch (err: any) {
       setError(err.message);
+    }finally{
       setIsLoading(false);
     }
   };
@@ -74,8 +76,8 @@ export default function ClientFormPage() {
   }
 
   return (
-    <div className="flex w-full h-screen">
-      <div className="w-[50%] h-screen">
+    <div className="flex flex-col lg:flex-row w-full h-screen">
+      <div className="w-full lg:w-[50%] h-screen">
         <div className="min-h-screen flex flex-col justify-center items-center p-4 font-sans">
           <div className="w-full max-w-[420px] rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8 sm:p-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="text-center mb-8">
@@ -161,7 +163,7 @@ export default function ClientFormPage() {
           </div>
         </div>
       </div>
-      <div className="w-[50%] rounded-[40px] relative overflow-hidden p-10 flex flex-col justify-between mt-3 mr-3 mb-3">
+      <div className="hidden lg:flex lg:w-[50%] rounded-[40px] relative overflow-hidden p-10 flex-col justify-between mt-3 mr-3 mb-3">
 
         {/* MAIN YELLOW GRADIENT LIKE REFERENCE IMAGE */}
         <div className="absolute inset-0 bg-[linear-gradient(135deg,#FFF6D6_0%,#F8D978_18%,#F0B31E_45%,#E8A400_65%,#FFF1C2_100%)]" />
@@ -188,7 +190,15 @@ export default function ClientFormPage() {
           <div className="mt-20">
             {/* Logo */}
             <div className="w-24 h-24 bg-white rounded-sm flex items-center justify-center text-black font-bold text-sm shadow-xl">
-              LOGO
+              <div className="w-24 h-24 bg-white rounded-sm flex items-center justify-center text-black font-bold text-sm shadow-xl">
+                <Image
+                  src="/logo.png"
+                  alt="logo"
+                  width={100}
+                  height={100}
+                  className="rounded-sm"
+                />
+              </div>
             </div>
 
             {/* Hero */}

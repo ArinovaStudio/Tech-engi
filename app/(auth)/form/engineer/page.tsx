@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Wrench, Loader2, X, Plus, Upload, FileText } from "lucide-react";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
+import toast from "react-hot-toast";
+import { signOut } from "next-auth/react";
+
 
 const QUALIFICATIONS = [
   { value: "UG", label: "Under Graduate (Student)" },
@@ -173,11 +177,17 @@ export default function EngineerFormPage() {
 
       const data = await res.json();
 
-      if (!res.ok || !data.success) throw new Error(data.message);
+      if (!res.ok || !data.success) toast.error(data.message || "Failed to send OTP");
 
-      // router.push("/form/payout");
+      await signOut({
+        callbackUrl: "/login",
+      });
+
+      router.push("/");
     } catch (err: any) {
       setError(err.message);
+
+    } finally {
       setIsLoading(false);
     }
   };
@@ -211,8 +221,8 @@ export default function EngineerFormPage() {
   }
 
   return (
-    <div className="flex w-full h-screen">
-      <div className="w-[50%] h-screen">
+    <div className="flex flex-col lg:flex-row w-full h-screen">
+      <div className="w-full lg:w-[50%] h-screen">
         <div className="flex items-center justify-center px-4 py-8 font-sans w-full">
 
           {/* Increased around 30% from previous small version */}
@@ -693,7 +703,7 @@ export default function EngineerFormPage() {
           </div>
         </div>
       </div>
-      <div className="w-[50%] rounded-[40px] relative overflow-hidden p-10 flex flex-col justify-between mt-6 mr-6">
+      <div className="hidden lg:flex lg:w-[50%] rounded-[40px] relative overflow-hidden p-10 flex-col justify-between mt-6 mr-6">
 
         {/* MAIN YELLOW GRADIENT LIKE REFERENCE IMAGE */}
         <div className="absolute inset-0 bg-[linear-gradient(135deg,#FFF6D6_0%,#F8D978_18%,#F0B31E_45%,#E8A400_65%,#FFF1C2_100%)]" />
@@ -720,7 +730,13 @@ export default function EngineerFormPage() {
           <div className="mt-20">
             {/* Logo */}
             <div className="w-24 h-24 bg-white rounded-sm flex items-center justify-center text-black font-bold text-sm shadow-xl">
-              LOGO
+              <Image
+                src="/logo.png"
+                alt="logo"
+                width={100}
+                height={100}
+                className="rounded-sm"
+              />
             </div>
 
             {/* Hero */}

@@ -15,12 +15,12 @@ export default function ClientInfoCard({ user, onUpdate }: { user: any, onUpdate
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-[var(--border)] pb-4">
           <h4 className="text-lg font-bold font-inter text-[var(--text-primary)]">Personal Information</h4>
           <div className="flex gap-2">
-             <button onClick={() => setIsEditOpen(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[var(--border)] text-sm font-semibold hover:bg-gray-50 transition-colors">
-               <Edit2 size={14} /> Edit
-             </button>
-             <button onClick={() => setIsPassOpen(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[var(--border)] text-sm font-semibold hover:bg-gray-50 transition-colors">
-               <ShieldCheck size={14} /> Change Password
-             </button>
+            <button onClick={() => setIsEditOpen(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[var(--border)] text-sm font-semibold hover:bg-gray-50 transition-colors">
+              <Edit2 size={14} /> Edit
+            </button>
+            <button onClick={() => setIsPassOpen(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[var(--border)] text-sm font-semibold hover:bg-gray-50 transition-colors">
+              <ShieldCheck size={14} /> Change Password
+            </button>
           </div>
         </div>
 
@@ -31,7 +31,9 @@ export default function ClientInfoCard({ user, onUpdate }: { user: any, onUpdate
           </div>
           <div>
             <p className="text-xs text-[var(--text-muted)] font-semibold mb-1 uppercase tracking-wider">Client ID</p>
-            <p className="font-mono text-sm font-semibold text-[var(--text-secondary)]">{user.id}</p>
+            <p className="font-mono text-xs font-semibold text-[var(--text-secondary)]">
+              {user.id.slice(0, 8)}...
+            </p>
           </div>
           <div>
             <p className="text-xs text-[var(--text-muted)] font-semibold mb-1 uppercase tracking-wider">Phone</p>

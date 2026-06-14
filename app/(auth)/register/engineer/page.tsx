@@ -47,7 +47,7 @@ export default function EngineerRegisterPage() {
       if (password !== confirmPassword) {
         throw new Error("Passwords do not match");
       }
-      
+
       // check email exists
       const existsRes = await fetch("/api/auth/userexist", {
         method: "POST",
@@ -181,8 +181,8 @@ export default function EngineerRegisterPage() {
   };
 
   return (
-    <div className="flex w-full h-screen">
-      <div className="w-[50%] h-screen">
+    <div className="flex flex-col lg:flex-row w-full h-screen">
+      <div className="w-full lg:w-[50%]  h-screen">
         <div className="">
           <button
             onClick={() => router.push('/')}
@@ -469,7 +469,7 @@ export default function EngineerRegisterPage() {
           </div>
         </div>
       </div>
-      <div className="w-[50%] rounded-[40px] relative overflow-hidden p-10 flex flex-col justify-between m-6">
+      <div className="hidden lg:flex lg:w-[50%] rounded-[40px] relative overflow-hidden p-10 flex-col justify-between m-6">
 
         {/* MAIN YELLOW GRADIENT LIKE REFERENCE IMAGE */}
         <div className="absolute inset-0 bg-[linear-gradient(135deg,#FFF6D6_0%,#F8D978_18%,#F0B31E_45%,#E8A400_65%,#FFF1C2_100%)]" />

@@ -30,12 +30,6 @@ const faqs = [
 
 const testimonials = [
   {
-    name: "Cecilia Pouros",
-    role: "Regional Markets Executive",
-    image: "/white-guy.jpg",
-    text: "Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit.",
-  },
-  {
     name: "Baisakhi",
     role: "Startup Founder",
     image: "/users/image copy 8.png",

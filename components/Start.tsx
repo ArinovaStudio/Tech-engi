@@ -292,15 +292,28 @@ const Start = () => {
       {/* Hero Section */}
       <main className="max-w-full mx-auto px-6 pt-6 pb-0 lg:h-full h-[96vh]">
         {/* Top row */}
-        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 mt-15">
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8 lg:mt-15">
           {/* Left */}
           <div className="flex-1">
-            <div ref={taglineRef} className="flex items-center gap-2 mb-4 font-id text-[#FFAE58]">
-              <span className="text-[16px] uppercase">Engineering Projects</span>
-              <span className="">|</span>
-              <span className="text-[16px] uppercase">Expert Engineers</span>
-              <span className="">|</span>
-              <span className="text-[16px] uppercase">On-Time Delivery</span>
+            <div
+              ref={taglineRef}
+              className="flex flex-col lg:flex-row items-start lg:items-center gap-2 mb-4 font-id text-[#FFAE58]"
+            >
+              <span className="text-[16px] sm:text-[16px] lg:text-[18px] uppercase">
+                Engineering Projects
+              </span>
+
+              <span className="hidden lg:block">|</span>
+
+              <span className="text-[12px] sm:text-[16px] lg:text-[18px] uppercase">
+                Expert Engineers
+              </span>
+
+              <span className="hidden lg:block">|</span>
+
+              <span className="text-[12px] sm:text-[16px] lg:text-[18px] uppercase">
+                On-Time Delivery
+              </span>
             </div>
             <h1
               ref={headlineRef}

@@ -214,15 +214,15 @@ const Start = () => {
           <div className="px-4 py-5 flex flex-col gap-5 bg-white">
             {/* NAV LINKS */}
             <nav className="flex flex-col gap-4 text-[15px] font-id text-black">
-              <a href="#">How it works?</a>
-              <a href="#">Explore Projects</a>
-              <a href="#">Blogs</a>
+              <a href="#Services">Services</a>
+              <a href="#Categories">Categories</a>
+              <a href="#Testimonials">Testimonials</a>
             </nav>
 
             {/* SOCIAL */}
             <div className="flex items-center gap-4">
-              {/* LinkedIn */}
-              <a href="#" aria-label="LinkedIn">
+             {/* LinkedIn */}
+              <a href="https://www.linkedin.com/company/tsquarey1" target="_blank" aria-label="LinkedIn">
                 <svg
                   width="20"
                   height="20"
@@ -240,7 +240,9 @@ const Start = () => {
               </a>
 
               {/* Instagram */}
-              <a href="#" aria-label="Instagram">
+              <a href="https://www.instagram.com/tsy1_tech.engi?igsh=MTdvNnZzdHpvb215bg%3D%3D&utm_source=qr"
+                target="_blank"
+                aria-label="Instagram">
                 <svg
                   width="20"
                   height="20"
@@ -259,19 +261,15 @@ const Start = () => {
               </a>
 
               {/* Facebook */}
-              <a href="#" aria-label="Facebook">
+              <a href="https://youtu.be/7jniNW5R2R0" target="_blank" aria-label="Facebook">
                 <svg
-                  width="20"
-                  height="20"
+                  width="18"
+                  height="18"
                   viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="text-black"
+                  fill="currentColor"
+                  className="text-[#8A8A8A] hover:text-red-600 transition-colors"
                 >
-                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                  <path d="M23.5 6.2a2.98 2.98 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A2.98 2.98 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 2.98 2.98 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a2.98 2.98 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.75 15.5v-7l6 3.5-6 3.5z" />
                 </svg>
               </a>
             </div>

@@ -55,7 +55,7 @@ export default function OverviewTab({ project }: { project: any }) {
   const triggerPayment = (isFromCompleteFlow = false) => {
     processPayment({
       projectId: project.id,
-      redirectPath: `/client/project/${project.id}`,
+      redirectPath: `/client`,
       user: { name: user?.name, email: user?.email },
       description: `Project Payment - ${project.title}`,
       onSuccess: () => {

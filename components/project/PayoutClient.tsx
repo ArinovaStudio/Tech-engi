@@ -52,7 +52,7 @@ export default function PayoutClient({ projectId }: Props) {
   const handlePayment = () => {
     processPayment({
       projectId,
-      redirectPath: `/client/project/${projectId}`,
+      redirectPath: `/client`,
       description: "Final Payment (60%)",
       onSuccess: () => {
         mutate(); 

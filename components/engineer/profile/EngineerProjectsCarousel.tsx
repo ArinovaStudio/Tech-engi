@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight, FolderKanban, ArrowUpRight,} from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type Project = {
   id: string;
@@ -20,11 +21,9 @@ interface EngineerProjectsCarouselProps {
   onProjectSelect?: (project: Project) => void;
 }
 
-export default function EngineerProjectsCarousel({
-  projects,
-  onProjectSelect,
-}: EngineerProjectsCarouselProps) {
+export default function EngineerProjectsCarousel({ projects, onProjectSelect,}: EngineerProjectsCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const scrollLeft = () => {
     scrollRef.current?.scrollBy({
@@ -222,7 +221,7 @@ export default function EngineerProjectsCarousel({
               )}
 
               <button
-                onClick={() => onProjectSelect?.(project)}
+                onClick={() => router.push(`/engineer/project/${project.id}`)}
                 className="w-full py-3 rounded-xl text-white font-medium flex items-center justify-center gap-2 transition hover:opacity-90"
                 style={{
                   background: "var(--primary)",

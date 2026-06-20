@@ -70,7 +70,7 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
       // Trigger payment
       processPayment({
         projectId,
-        redirectPath: `/client/project/${projectId}`,
+        redirectPath: `/client`,
         user: { name: user?.name, email: user?.email },
         description: "Advance Payment (40%)",
         

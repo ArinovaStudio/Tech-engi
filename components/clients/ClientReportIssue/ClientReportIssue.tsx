@@ -19,6 +19,16 @@ const typeColors: Record<string, string> = {
     DELIVERY: "bg-pink-100 text-pink-600",
     OTHER: "bg-gray-100 text-gray-600",
 };
+
+const statusOrder: Record<string, number> = {
+    OPEN: 0,
+    IN_PROGRESS: 1,
+    RESOLVED: 2,
+    CLOSED: 3,
+};
+
+
+
 const ClientReportIssue = () => {
     const [tickets, setTickets] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -42,6 +52,13 @@ const ClientReportIssue = () => {
         images: [] as File[],
     });
     const [activeTab, setActiveTab] = useState("ME");
+
+    const getInitialTicket = () => ({
+        issueType: "",
+        target: role === "ADMIN" ? "Engineer" : "PLATFORM",
+        description: "",
+        images: [] as File[],
+    });
 
     const fetchTickets = async () => {
         try {
@@ -90,9 +107,11 @@ const ClientReportIssue = () => {
         } catch (err: any) {
             toast.error(err.message);
         } finally {
+            setSelectedProjectId("")
+            setNewTicket(getInitialTicket());
             setShowModal(false);
             setCreating(false);
-            
+
         }
     };
 
@@ -181,6 +200,10 @@ const ClientReportIssue = () => {
                 return true;
         }
     });
+
+    const sortedTickets = [...filteredTickets].sort(
+        (a, b) => statusOrder[a.status] - statusOrder[b.status]
+    );
 
     if (loading)
         return (
@@ -351,7 +374,7 @@ const ClientReportIssue = () => {
                                 )
                             ) : (
                                 <div className="space-y-3">
-                                    {filteredTickets.map((report: any) => {
+                                    {sortedTickets.map((report: any) => {
                                         return (
                                             <div
                                                 key={report.id}
@@ -392,42 +415,7 @@ const ClientReportIssue = () => {
                                                                     {updating
                                                                         ? "Updating..."
                                                                         : report.status.replace("_", " ")}
-
-                                                                    {report.raisedById === currentUserId && !updating && (
-                                                                        <span className="text-[10px]">▼</span>
-                                                                    )}
                                                                 </button>
-
-                                                                {/* ✅ Controlled Dropdown */}
-                                                                {openDropdownId === report.id &&
-                                                                    report.raisedById === currentUserId &&
-                                                                    !updating && (
-                                                                        <div className="absolute right-0 mt-1 w-36 bg-white border rounded-lg shadow-md z-10">
-                                                                            {[
-                                                                                "OPEN",
-                                                                                "IN_PROGRESS",
-                                                                                "RESOLVED",
-                                                                                "CLOSED",
-                                                                            ].map((status) => (
-                                                                                <button
-                                                                                    key={status}
-                                                                                    onClick={async () => {
-                                                                                        // ✅ Close dropdown immediately
-                                                                                        setOpenDropdownId(null);
-
-                                                                                        // ✅ Update status
-                                                                                        await updateTicketStatus({
-                                                                                            ticketId: report.id,
-                                                                                            status,
-                                                                                        });
-                                                                                    }}
-                                                                                    className="w-full text-black text-left px-3 py-2 text-xs hover:bg-gray-100"
-                                                                                >
-                                                                                    {status.replace("_", " ")}
-                                                                                </button>
-                                                                            ))}
-                                                                        </div>
-                                                                    )}
                                                             </div>
                                                         </div>
 
@@ -685,12 +673,8 @@ const ClientReportIssue = () => {
                             <button
                                 onClick={() => {
                                     setShowModal(false);
-                                    setNewTicket({
-                                        issueType: "",
-                                        target: "PLATFORM",
-                                        description: "",
-                                        images: [],
-                                    });
+                                    setSelectedProjectId("")
+                                    setNewTicket(getInitialTicket());
                                 }}
                                 className="px-4 py-2 border rounded-lg text-sm"
                             >

@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { DollarSign, CreditCard, TrendingUp, Clock, CheckCircle, Wallet, AlertCircle, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth"; 
 import { usePayment } from "@/hooks/usePayment";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 
 interface Transaction {
   id: string;
@@ -33,12 +35,12 @@ interface PendingProject {
 export default function ClientAccountPage() {
   const { user } = useAuth();
   const { processPayment, loading: isPaying } = usePayment();
-  
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [pendingProjects, setPendingProjects] = useState<PendingProject[]>([]);
   const [paying, setPaying] = useState<string | null>(null); 
   const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     if (user) fetchData();
@@ -63,6 +65,62 @@ export default function ClientAccountPage() {
       setLoading(false);
     }
   }
+  useEffect(() => {
+    if (!user?.id || loading) return;
+    const tourKey = `tour_seen_account_${user.id}`;
+    if (localStorage.getItem(tourKey)) return;
+
+    const timer = setTimeout(() => {
+      const driverObj = driver({
+        showProgress: true,
+        animate: true,
+        smoothScroll: true,
+        popoverClass: "custom-tour-popover",
+        overlayOpacity: 0.35,
+        nextBtnText: "Next →",
+        prevBtnText: "← Prev",
+        doneBtnText: "Done ✓",
+        onPopoverRender: (popover) => {
+          const style = (el: HTMLElement) => {
+            el.style.setProperty("background", "var(--primary)", "important");
+            el.style.setProperty("color", "#ffffff", "important");
+            el.style.setProperty("opacity", "1", "important");
+            el.style.setProperty("border", "none", "important");
+          };
+          if (popover.nextButton) style(popover.nextButton);
+          if (popover.previousButton) {
+            popover.previousButton.style.setProperty("background", "transparent", "important");
+            popover.previousButton.style.setProperty("color", "var(--text-secondary)", "important");
+            popover.previousButton.style.setProperty("border", "1px solid var(--border)", "important");
+          }
+        },
+        onDestroyed: () => {
+          localStorage.setItem(tourKey, "true");
+        },
+        steps: [
+          {
+            element: "#payment-history-section",
+            popover: {
+              title: "Payment History",
+              description: "Every transaction across all your projects lives here — advance payments, final payments, and refunds — each with its status and date.",
+            },
+          },
+          {
+            element: "#new-activity-section",
+            popover: {
+              title: "New Activity",
+              description: "Any pending payments you owe show up here, with the exact amount due. Hit Pay Now to settle an advance or final payment directly.",
+            },
+          },
+        ],
+      });
+
+      driverObj.drive();
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [user?.id, loading]);
+
 
   async function handlePay(project: PendingProject) {
     setPaying(project.id);
@@ -196,7 +254,7 @@ export default function ClientAccountPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Transaction History */}
-        <div className="col-span-1 lg:col-span-2 bg-white rounded-xl border border-[var(--border)] h-[600px] flex flex-col">
+        <div id="payment-history-section" className="col-span-1 lg:col-span-2 bg-white rounded-xl border border-[var(--border)] h-[600px] flex flex-col">
           <div className="p-5 border-b border-[var(--border)]">
             <h2 className="text-lg font-bold " style={{ color: "var(--text-primary)" }}>Payment History</h2>
             <p className="text-sm  mt-0.5" style={{ color: "var(--text-muted)" }}>All your transactions</p>
@@ -242,7 +300,7 @@ export default function ClientAccountPage() {
         </div>
 
         {/* New Activity */}
-        <div className="col-span-1 lg:col-span-1 bg-white rounded-xl border border-[var(--border)] h-[600px] flex flex-col">
+        <div id="new-activity-section" className="col-span-1 lg:col-span-1 bg-white rounded-xl border border-[var(--border)] h-[600px] flex flex-col">
           <div className="p-5 border-b border-[var(--border)] flex items-center justify-between">
             <div>
               <h2 className="text-lg font-bold " style={{ color: "var(--text-primary)" }}>New Activity</h2>

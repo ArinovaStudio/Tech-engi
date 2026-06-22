@@ -46,7 +46,7 @@ export default function ClientMetaCard({ user }: { user: any }) {
 
   return (
     <div className="p-6 border border-[var(--border)] rounded-2xl bg-white flex flex-col md:flex-row items-center md:items-start gap-6 shadow-sm">
-      <div className="relative shrink-0">
+      <div id="profile-photo" className="relative shrink-0">
         <div className="w-24 h-24 rounded-full border-4 border-gray-50 bg-[var(--primary)] text-white flex items-center justify-center text-3xl font-bold overflow-hidden shadow-sm relative">
 
           {/* IMAGE */}

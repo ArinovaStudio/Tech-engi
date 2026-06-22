@@ -1,5 +1,5 @@
 "use client";
-
+import { useEffect } from "react"; 
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import EngineerMetaCard from "@/components/engineer/profile/EngineerMetaCard";
@@ -8,9 +8,12 @@ import EngineerDetailsCard from "@/components/engineer/profile/EngineerDetailsCa
 import EngineerAccountCard from "@/components/engineer/profile/EngineerAccountCard";
 import DashboardShell from "@/components/layout/DashboardShell";
 import EngineerProjectsCarousel from "@/components/engineer/profile/EngineerProjectsCarousel";
-
+import { startProfileTourIfNew } from "@/config/engineerProfileTour";
 export default function Profile() {
   const { data, isLoading, mutate } = useSWR("/api/engineer/profile", fetcher);
+   useEffect(() => {
+    if (data?.user) startProfileTourIfNew();  // 👈 add this
+  }, [data?.user]);
 
   if (isLoading) {
       return (

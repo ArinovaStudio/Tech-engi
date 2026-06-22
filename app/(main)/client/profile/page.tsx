@@ -1,5 +1,4 @@
 "use client";
-
 import useSWR from "swr";
 import { fetcher } from "@/lib/fetcher";
 import ClientInfoCard from "@/components/clients/profile/ClientInfoCard";
@@ -7,12 +6,70 @@ import ClientDetailsCard from "@/components/clients/profile/ClientDetailsCard";
 import EngineerAccountCard from "@/components/engineer/profile/EngineerAccountCard";
 import ClientMetaCard from "@/components/clients/profile/ClientMetaCard";
 import ClientProjectsCarousel from "@/components/clients/profile/ClientProjectsCarousel";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 
 export default function ClientProfile() {
   const router = useRouter();
   const { data, isLoading, mutate } = useSWR("/api/client/profile", fetcher);
+  useEffect(() => {
+    if (isLoading || !data?.user?.id) return;
+    const tourKey = `tour_seen_profile_${data.user.id}`;
+    if (localStorage.getItem(tourKey)) return;
+
+    const timer = setTimeout(() => {
+      const driverObj = driver({
+        showProgress: true,
+        animate: true,
+        smoothScroll: true,
+        popoverClass: "custom-tour-popover",
+        overlayOpacity: 0.35,
+        nextBtnText: "Next →",
+        prevBtnText: "← Prev",
+        doneBtnText: "Done ✓",
+        onPopoverRender: (popover) => {
+          const style = (el: HTMLElement) => {
+            el.style.setProperty("background", "var(--primary)", "important");
+            el.style.setProperty("color", "#ffffff", "important");
+            el.style.setProperty("opacity", "1", "important");
+            el.style.setProperty("border", "none", "important");
+          };
+          if (popover.nextButton) style(popover.nextButton);
+          if (popover.previousButton) {
+            popover.previousButton.style.setProperty("background", "transparent", "important");
+            popover.previousButton.style.setProperty("color", "var(--text-secondary)", "important");
+            popover.previousButton.style.setProperty("border", "1px solid var(--border)", "important");
+          }
+        },
+        onDestroyed: () => {
+          localStorage.setItem(tourKey, "true");
+        },
+        steps: [
+          {
+            element: "#profile-photo",
+            popover: {
+              title: "Profile Photo",
+              description: "Click the camera icon to upload or update your profile picture. This is how your team members and engineers will recognize you.",
+            },
+          },
+          {
+            element: "#payout-details",
+            popover: {
+              title: "Payout Details",
+              description: "Set up your UPI ID or bank account here so payments can be processed smoothly. Hit Edit to add or update your details anytime.",
+            },
+          },
+        ],
+      });
+
+      driverObj.drive();
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [isLoading, data?.user?.id]);
+      
 
   if (isLoading) return <div className="flex items-center justify-center h-[80vh]"><div className="animate-spin rounded-full h-10 w-10 border-b-2" style={{ borderColor: "var(--primary)" }} /></div>;
 

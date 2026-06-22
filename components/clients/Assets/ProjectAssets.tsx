@@ -2,30 +2,29 @@
 import { AlertCircle, LucideLoader, Upload, Download, Copy, Check, Eye, EyeOff, } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import toast, { Toaster } from "react-hot-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 
 const getTypeBadgeClass = (type: string) => {
     switch (type) {
         case "FILE":
             return "bg-slate-100 text-slate-700 border border-slate-200";
-
         case "IMAGE":
             return "bg-green-100 text-green-700 border border-green-200";
-
         case "LINK":
             return "bg-purple-100 text-purple-700 border border-purple-200";
-
         case "TEXT":
             return "bg-amber-100 text-amber-700 border border-amber-200";
-
         case "CREDENTIALS":
             return "bg-red-100 text-red-700 border border-red-200";
-
         default:
             return "bg-gray-100 text-gray-700 border border-gray-200";
     }
 };
 
 const ProjectAssets = () => {
+    const { user } = useAuth() as { user: { id: string } };
     const [loading, setLoading] = useState(false);
     const [projects, setProjects] = useState<any[]>([]);
     const [visibleCredentials, setVisibleCredentials] = useState<Record<string, boolean>>({});
@@ -78,7 +77,6 @@ const ProjectAssets = () => {
             setAssetLoading(true);
             let content = resource.content;
 
-            // Upload file/image first
             if (
                 ["IMAGE", "FILE"].includes(resource.type) &&
                 selectedFile
@@ -105,7 +103,6 @@ const ProjectAssets = () => {
                 content = uploadData.url;
             }
 
-            // Create resource
             const formData = new FormData();
 
             formData.append("projectId", selectedProjectId);
@@ -134,7 +131,6 @@ const ProjectAssets = () => {
 
             toast.success("Resource created successfully");
 
-            // Reset form
             setResource({
                 projectId: "",
                 title: "",
@@ -146,7 +142,6 @@ const ProjectAssets = () => {
             setSelectedFile(null);
             setShowModal(false);
 
-            // Optional refresh
             fetchProjects();
         } catch (err: any) {
             console.error(err);
@@ -162,6 +157,79 @@ const ProjectAssets = () => {
     useEffect(() => {
         fetchProjects();
     }, []);
+
+    // Assets Tour
+    useEffect(() => {
+        if (!user?.id || loading) return;
+        const tourKey = `tour_seen_assets_${user.id}`;
+        if (localStorage.getItem(tourKey)) return;
+
+        const timer = setTimeout(() => {
+            const driverObj = driver({
+                showProgress: true,
+                animate: true,
+                smoothScroll: true,
+                popoverClass: "custom-tour-popover",
+                overlayOpacity: 0.35,
+                nextBtnText: "Next →",
+                prevBtnText: "← Prev",
+                doneBtnText: "Done ✓",
+                onPopoverRender: (popover) => {
+                    const style = (el: HTMLElement) => {
+                        el.style.setProperty("background", "var(--primary)", "important");
+                        el.style.setProperty("color", "#ffffff", "important");
+                        el.style.setProperty("opacity", "1", "important");
+                        el.style.setProperty("border", "none", "important");
+                    };
+                    if (popover.nextButton) style(popover.nextButton);
+                    if (popover.previousButton) {
+                        popover.previousButton.style.setProperty("background", "transparent", "important");
+                        popover.previousButton.style.setProperty("color", "var(--text-secondary)", "important");
+                        popover.previousButton.style.setProperty("border", "1px solid var(--border)", "important");
+                    }
+                },
+                onDestroyed: () => {
+                    setShowModal(false);
+                    localStorage.setItem(tourKey, "true");
+                },
+                steps: [
+                    {
+                        element: "#upload-assets-btn",
+                        popover: {
+                            title: "Upload Assets",
+                            description: "Click here anytime to add a new file, image, link, text snippet, or credentials to a project. Let's walk through it.",
+                            onNextClick: (_el, _step, opts) => {
+                                setShowModal(true);
+                                setTimeout(() => opts.driver.moveNext(), 300);
+                            },
+                        },
+                    },
+                    { element: "#asset-guidelines", popover: { title: "Upload Guidelines", description: "A quick reference for what kinds of files and assets you can upload, and how to keep them organized." } },
+                    { element: "#asset-select-project", popover: { title: "Project", description: "Choose which project this resource belongs to." } },
+                    { element: "#asset-resource-title", popover: { title: "Resource Title", description: "Give the asset a clear, descriptive name so it's easy to find later." } },
+                    { element: "#asset-resource-type", popover: { title: "Resource Type", description: "Choose the kind of resource — File, Image, Link, Text, or Credentials. The form below adjusts based on your choice." } },
+                    { element: "#asset-upload-input", popover: { title: "Upload File", description: "Select the actual file or image to upload from your device." } },
+                    {
+                        element: "#asset-actions",
+                        popover: {
+                            title: "Create Your Resource",
+                            description: "Once everything's filled in, hit Create Resource. You'll see it appear in the table right away.",
+                            onNextClick: (_el, _step, opts) => {
+                                setShowModal(false);
+                                opts.driver.moveNext();
+                            },
+                        },
+                    },
+                    { element: "#asset-filters", popover: { title: "Search & Filter", description: "Quickly find resources by name, project, or type using these controls." } },
+                    { element: "#asset-table", popover: { title: "All Resources", description: "Every uploaded asset lives here, with quick actions to download files, copy links/text, or reveal credentials." } },
+                ],
+            });
+
+            driverObj.drive();
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, [user?.id, loading]);
 
     const allResources = projects.flatMap((project: any) =>
         (project.resources || []).map((resource: any) => ({
@@ -261,7 +329,6 @@ const ProjectAssets = () => {
             </div>
         );
 
-
     return (
         <div className='w-full h-full flex flex-1 flex-col'>
             {/* Header Section */}
@@ -283,6 +350,7 @@ const ProjectAssets = () => {
                 </div>
 
                 <button
+                    id="upload-assets-btn"
                     onClick={() => setShowModal(true)}
                     className="cursor-pointer group relative overflow-hidden rounded-xl px-5 py-2.5 font-semibold text-white transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                     style={{
@@ -300,6 +368,7 @@ const ProjectAssets = () => {
 
             {/* GuideLine Section */}
             <div
+                id="asset-guidelines"
                 className="rounded-lg p-4 border"
                 style={{ background: "var(--primary-light)", borderColor: "#ffd9a8" }}
             >
@@ -328,7 +397,7 @@ const ProjectAssets = () => {
                 </ul>
             </div>
 
-            <div className="mt-5 mb-4 flex flex-col lg:flex-row gap-4">
+            <div id="asset-filters" className="mt-5 mb-4 flex flex-col lg:flex-row gap-4">
 
                 {/* Search */}
                 <input
@@ -384,7 +453,7 @@ const ProjectAssets = () => {
             </div>
 
             {/* Main Section */}
-            <div className="mt-5 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+            <div id="asset-table" className="mt-5 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
                 {/* Header */}
                 <div className="grid grid-cols-12 gap-4 px-5 py-4 border-b bg-gray-50 dark:bg-gray-800 font-medium text-sm text-gray-600 dark:text-gray-300">
                     <div className="col-span-4">Resource Title</div>
@@ -454,7 +523,6 @@ const ProjectAssets = () => {
 
                             {/* Actions */}
                             <div className="col-span-1 flex justify-end">
-                                {/* FILE / IMAGE */}
                                 {(resource.type === "FILE" ||
                                     resource.type === "IMAGE") && (
                                         <a
@@ -497,7 +565,6 @@ const ProjectAssets = () => {
                                         </a>
                                     )}
 
-                                {/* LINK */}
                                 {resource.type === "LINK" && (
                                     <button
                                         onClick={() => {
@@ -539,7 +606,6 @@ const ProjectAssets = () => {
                                     </button>
                                 )}
 
-                                {/* TEXT */}
                                 {resource.type === "TEXT" && (
                                     <button
                                         onClick={() => {
@@ -581,7 +647,6 @@ const ProjectAssets = () => {
                                     </button>
                                 )}
 
-                                {/* CREDENTIALS */}
                                 {resource.type === "CREDENTIALS" && (
                                     <button
                                         onClick={() =>
@@ -613,17 +678,6 @@ const ProjectAssets = () => {
                         <p className="text-gray-500">
                             No resources found
                         </p>
-
-                        {/* <button
-                            onClick={() => {
-                                setSearchTerm("");
-                                setSelectedProject("ALL");
-                                setSelectedType("ALL");
-                            }}
-                            className="mt-3 px-4 py-2 rounded-lg bg-blue-600 text-white"
-                        >
-                            Clear Filters
-                        </button> */}
                     </div>
                 )}
             </div>
@@ -649,7 +703,7 @@ const ProjectAssets = () => {
                         <div className="space-y-5">
 
                             {/* Project */}
-                            <div>
+                            <div id="asset-select-project">
                                 <label className="block text-sm font-semibold mb-2">
                                     Project
                                 </label>
@@ -677,7 +731,7 @@ const ProjectAssets = () => {
                             </div>
 
                             {/* Title */}
-                            <div>
+                            <div id="asset-resource-title">
                                 <label className="block text-sm font-semibold mb-2">
                                     Resource Title
                                 </label>
@@ -697,7 +751,7 @@ const ProjectAssets = () => {
                             </div>
 
                             {/* Type */}
-                            <div>
+                            <div id="asset-resource-type">
                                 <label className="block text-sm font-semibold mb-2">
                                     Resource Type
                                 </label>
@@ -721,25 +775,9 @@ const ProjectAssets = () => {
                                 </select>
                             </div>
 
-                            {/* Lock */}
-                            {/* <div className="flex items-center gap-3">
-                                <input
-                                    type="checkbox"
-                                    checked={resource.isLocked}
-                                    onChange={(e) =>
-                                        setResource({
-                                            ...resource,
-                                            isLocked: e.target.checked,
-                                        })
-                                    }
-                                />
-
-                                <span>Lock Resource</span>
-                            </div> */}
-
                             {/* Upload */}
                             {["IMAGE", "FILE"].includes(resource.type) && (
-                                <div>
+                                <div id="asset-upload-input">
                                     <label className="block text-sm font-semibold mb-2">
                                         Upload {resource.type}
                                     </label>
@@ -830,7 +868,7 @@ const ProjectAssets = () => {
                             )}
 
                             {/* Footer */}
-                            <div className="flex justify-end gap-3 pt-4">
+                            <div id="asset-actions" className="flex justify-end gap-3 pt-4">
                                 <button
                                     onClick={() => setShowModal(false)}
                                     className="px-5 py-2.5 border rounded-xl"

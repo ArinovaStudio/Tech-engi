@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   CheckCircle2,
   Clock,
@@ -21,6 +21,9 @@ import TextArea from "../form/input/TextArea";
 // import Loader from '../common/Loading';
 // import RichTextEditor from '../common/editor/Editor';
 // import { htmlToText } from '../common/editor/htmlToText';
+import { useNewTaskTour } from "@/hooks/useNewTaskTour";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 
 interface Comment {
   id: string;
@@ -91,257 +94,219 @@ const NewTaskModal: React.FC<{
   currentUser,
   mode,
 }) => {
-  if (!isOpen) return null;
-  const removeAttachment = (index: number) => {
-    setNewTask((prev: NewTaskShape) => {
-      if (!prev.attachments) return prev;
+    if (!isOpen) return null;
+    const removeAttachment = (index: number) => {
+      setNewTask((prev: NewTaskShape) => {
+        if (!prev.attachments) return prev;
 
-      const updated = prev.attachments.filter((_, i) => i !== index);
+        const updated = prev.attachments.filter((_, i) => i !== index);
 
-      return {
-        ...prev,
-        attachments: updated.length ? updated : null,
-      };
-    });
-  };
-  return (
-    <div className="fixed inset-0 z-9999 flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <div className="relative w-full max-w-2xl rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto bg-white">
-        <div className="sticky top-0 z-10 border-b px-6 py-4 border-[var(--border)] bg-white">
-          <div className="flex items-center justify-between">
-            <h2
-              className="text-xl font-bold "
-              style={{ color: "var(--text-primary)" }}
-            >
-              Create New Task
-            </h2>
-            <button
-              onClick={onClose}
-              className="p-2 rounded-lg hover:bg-[var(--bg)] transition-colors"
-              style={{ color: "var(--text-muted)" }}
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-        <div className="p-6 space-y-6">
-          <div>
-            <label
-              className="block text-sm font-semibold  mb-2"
-              style={{ color: "var(--text-secondary)" }}
-            >
-              Task Title *
-            </label>
-            <input
-              type="text"
-              value={newTask.title}
-              onChange={(e) =>
-                setNewTask({ ...newTask, title: e.target.value })
-              }
-              placeholder="Enter task title..."
-              className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
-              style={{ color: "var(--text-primary)" }}
-            />
-          </div>
-          <div>
-            <label
-              className="block text-sm font-semibold  mb-2"
-              style={{ color: "var(--text-secondary)" }}
-            >
-              Describe Your Task
-            </label>
-            <TextArea
-              value={newTask.description}
-              className="bg-white! text-black! border-1! outline-none! ring-0! border-border!"
-              onChange={(e) => setNewTask({ ...newTask, description: e })}
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label
-                className="block text-sm font-semibold  mb-2"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                Assignee
-              </label>
-              <div className="flex items-center gap-2 pl-1">
-                <User
-                  className="w-4 h-4"
-                  style={{ color: "var(--text-muted)" }}
-                />
-                <p
-                  className=" text-sm"
-                  style={{ color: "var(--text-primary)" }}
-                >
-                  {currentUser?.name || newTask.assignee || "Loading..."}
-                </p>
-              </div>
-            </div>
-            <div>
-              <label
-                className="block text-sm font-semibold  mb-2"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                Due Date
-              </label>
-              <div className="relative">
-                <Calendar
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
-                  style={{ color: "var(--text-muted)" }}
-                />
-                <input
-                  type="date"
-                  value={newTask.dueDate}
-                  onChange={(e) =>
-                    setNewTask({ ...newTask, dueDate: e.target.value })
-                  }
-                  className="w-full pl-10 pr-4 py-3 rounded-lg border border-[var(--border)] bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
-                  style={{ color: "var(--text-primary)" }}
-                />
-              </div>
-            </div>
-            <div>
-              <label
-                className="block text-sm font-semibold  mb-2"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                Priority
-              </label>
-              <div className="flex gap-2">
-                {(["LOW", "MEDIUM", "HIGH"] as const).map((priority) => (
-                  <button
-                    key={priority}
-                    onClick={() => setNewTask({ ...newTask, priority })}
-                    className={`flex-1 px-4 py-3 rounded-lg border  text-sm capitalize transition-all ${
-                      newTask.priority === priority
-                        ? priority === "LOW"
-                          ? "bg-blue-50 text-blue-700 border-blue-300"
-                          : priority === "MEDIUM"
-                          ? "bg-[var(--primary-light)] text-[#b87a2e] border-[#ffd9a8]"
-                          : "bg-red-50 text-red-700 border-red-300"
-                        : "bg-white border-[var(--border)] hover:bg-[var(--bg)]"
-                    }`}
-                    style={
-                      newTask.priority !== priority
-                        ? { color: "var(--text-muted)" }
-                        : {}
-                    }
-                  >
-                    {priority}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label
-                className="block text-sm font-semibold  mb-2"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                Status
-              </label>
-              <select
-                value={newTask.status}
-                onChange={(e) =>
-                  setNewTask({
-                    ...newTask,
-                    status: e.target.value as Task["status"],
-                  })
-                }
-                className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+        return {
+          ...prev,
+          attachments: updated.length ? updated : null,
+        };
+      });
+    };
+    return (
+      <div className="fixed inset-0 z-9999 flex items-center justify-center p-4">
+        <div
+          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          onClick={onClose}
+        />
+        <div className="relative w-full max-w-2xl rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto bg-white">
+          <div className="sticky top-0 z-10 border-b px-6 py-4 border-[var(--border)] bg-white">
+            <div className="flex items-center justify-between">
+              <h2
+                className="text-xl font-bold "
                 style={{ color: "var(--text-primary)" }}
               >
-                <option value="NOT_STARTED">Assigned</option>
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="ON_HOLD">On Hold</option>
-              </select>
+                Create New Task
+              </h2>
+              <button
+                onClick={onClose}
+                className="p-2 rounded-lg hover:bg-[var(--bg)] transition-colors"
+                style={{ color: "var(--text-muted)" }}
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
           </div>
-          <div>
-            <label
-              className="block text-sm font-semibold  mb-2"
-              style={{ color: "var(--text-secondary)" }}
-            >
-              Tags
-            </label>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {newTask.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1 rounded-lg text-xs  flex items-center gap-2 bg-[var(--primary-light)] border border-[#ffd9a8]"
-                  style={{ color: "var(--primary)" }}
-                >
-                  {tag}
-                  <button
-                    onClick={() => handleRemoveTag(tag)}
-                    className="hover:opacity-70"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
-            </div>
-            <input
-              type="text"
-              placeholder="Add tags (press Enter)..."
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleAddTag(e.currentTarget.value);
-                  e.currentTarget.value = "";
+          <div className="p-6 space-y-6">
+            <div id="task-title">
+              <label
+                className="block text-sm font-semibold  mb-2"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                Task Title *
+              </label>
+              <input
+                type="text"
+                value={newTask.title}
+                onChange={(e) =>
+                  setNewTask({ ...newTask, title: e.target.value })
                 }
-              }}
-              className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
-              style={{ color: "var(--text-primary)" }}
-            />
-          </div>
+                placeholder="Enter task title..."
+                className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                style={{ color: "var(--text-primary)" }}
+              />
+            </div>
+            <div id="task-description">
+              <label
+                className="block text-sm font-semibold  mb-2"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                Describe Your Task
+              </label>
+              <TextArea
+                value={newTask.description}
+                className="bg-white! text-black! border-1! outline-none! ring-0! border-border!"
+                onChange={(e) => setNewTask({ ...newTask, description: e })}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div id="task-assignee">
+                <label
+                  className="block text-sm font-semibold  mb-2"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  Assignee
+                </label>
+                <div className="flex items-center gap-2 pl-1">
+                  <User
+                    className="w-4 h-4"
+                    style={{ color: "var(--text-muted)" }}
+                  />
+                  <p
+                    className=" text-sm"
+                    style={{ color: "var(--text-primary)" }}
+                  >
+                    {currentUser?.name || newTask.assignee || "Loading..."}
+                  </p>
+                </div>
+              </div>
+              <div id="task-due-date">
+                <label
+                  className="block text-sm font-semibold  mb-2"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  Due Date
+                </label>
+                <div className="relative">
+                  <Calendar
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
+                    style={{ color: "var(--text-muted)" }}
+                  />
+                  <input
+                    type="date"
+                    value={newTask.dueDate}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, dueDate: e.target.value })
+                    }
+                    className="w-full pl-10 pr-4 py-3 rounded-lg border border-[var(--border)] bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                    style={{ color: "var(--text-primary)" }}
+                  />
+                </div>
+              </div>
+              <div id="task-priority">
+                <label
+                  className="block text-sm font-semibold  mb-2"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  Priority
+                </label>
+                <div className="flex gap-2">
+                  {(["LOW", "MEDIUM", "HIGH"] as const).map((priority) => (
+                    <button
+                      key={priority}
+                      onClick={() => setNewTask({ ...newTask, priority })}
+                      className={`flex-1 px-4 py-3 rounded-lg border  text-sm capitalize transition-all ${newTask.priority === priority
+                          ? priority === "LOW"
+                            ? "bg-blue-50 text-blue-700 border-blue-300"
+                            : priority === "MEDIUM"
+                              ? "bg-[var(--primary-light)] text-[#b87a2e] border-[#ffd9a8]"
+                              : "bg-red-50 text-red-700 border-red-300"
+                          : "bg-white border-[var(--border)] hover:bg-[var(--bg)]"
+                        }`}
+                      style={
+                        newTask.priority !== priority
+                          ? { color: "var(--text-muted)" }
+                          : {}
+                      }
+                    >
+                      {priority}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div id="task-status">
+                <label
+                  className="block text-sm font-semibold  mb-2"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  Status
+                </label>
+                <select
+                  value={newTask.status}
+                  onChange={(e) =>
+                    setNewTask({
+                      ...newTask,
+                      status: e.target.value as Task["status"],
+                    })
+                  }
+                  className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  <option value="NOT_STARTED">Assigned</option>
+                  <option value="IN_PROGRESS">In Progress</option>
+                  <option value="ON_HOLD">On Hold</option>
+                </select>
+              </div>
+            </div>
+            <div id="task-tags">
+              <label
+                className="block text-sm font-semibold  mb-2"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                Tags
+              </label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {newTask.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-3 py-1 rounded-lg text-xs  flex items-center gap-2 bg-[var(--primary-light)] border border-[#ffd9a8]"
+                    style={{ color: "var(--primary)" }}
+                  >
+                    {tag}
+                    <button
+                      onClick={() => handleRemoveTag(tag)}
+                      className="hover:opacity-70"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <input
+                type="text"
+                placeholder="Add tags (press Enter)..."
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAddTag(e.currentTarget.value);
+                    e.currentTarget.value = "";
+                  }
+                }}
+                className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                style={{ color: "var(--text-primary)" }}
+              />
+            </div>
 
-          <div
-            className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer border-[var(--border)] bg-[var(--bg)]"
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => {
-              e.preventDefault();
-              const files = Array.from(e.dataTransfer.files || []);
-              if (!files.length) return;
-
-              setNewTask((prev) => {
-                const existing = prev.attachments ?? [];
-
-                return {
-                  ...prev,
-                  attachments: [...existing, ...files],
-                };
-              });
-            }}
-            onClick={() => document.getElementById("task-file-input")?.click()}
-          >
-            <Paperclip
-              className="w-8 h-8 mx-auto mb-2"
-              style={{ color: "var(--text-muted)" }}
-            />
-            <p
-              className="text-sm mb-1 "
-              style={{ color: "var(--text-muted)" }}
-            >
-              Click to upload or drag and drop
-            </p>
-            <p
-              className="text-xs "
-              style={{ color: "var(--text-muted)" }}
-            >
-              PDF, DOC, Images up to 10MB each
-            </p>
-
-            <input
-              id="task-file-input"
-              type="file"
-              multiple
-              className="hidden"
-              onChange={(e) => {
-                const files = Array.from(e.target.files || []);
+            <div
+              className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer border-[var(--border)] bg-[var(--bg)]"
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                const files = Array.from(e.dataTransfer.files || []);
                 if (!files.length) return;
 
                 setNewTask((prev) => {
@@ -352,63 +317,100 @@ const NewTaskModal: React.FC<{
                     attachments: [...existing, ...files],
                   };
                 });
-
-                e.target.value = "";
               }}
-            />
-          </div>
+              onClick={() => document.getElementById("task-file-input")?.click()}
+            >
+              <Paperclip
+                className="w-8 h-8 mx-auto mb-2"
+                style={{ color: "var(--text-muted)" }}
+              />
+              <p
+                className="text-sm mb-1 "
+                style={{ color: "var(--text-muted)" }}
+              >
+                Click to upload or drag and drop
+              </p>
+              <p
+                className="text-xs "
+                style={{ color: "var(--text-muted)" }}
+              >
+                PDF, DOC, Images up to 10MB each
+              </p>
 
-          {(newTask.attachments?.length ?? 0) > 0 && (
-            <div className="mt-3 space-y-2">
-              {newTask.attachments?.map((file, index) => (
-                <div
-                  key={`${file.name}-${index}`}
-                  className="flex items-center justify-between text-sm px-4 pr-3 py-3.5 rounded-lg bg-white border border-[var(--border)] "
-                  style={{ color: "var(--text-primary)" }}
-                >
-                  <span className="truncate max-w-[80%]">{file.name}</span>
+              <input
+                id="task-file-input"
+                type="file"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  const files = Array.from(e.target.files || []);
+                  if (!files.length) return;
 
-                  <button type="button" onClick={() => removeAttachment(index)}>
-                    <LucideXCircle size={18} className="text-red-400" />
-                  </button>
-                </div>
-              ))}
+                  setNewTask((prev) => {
+                    const existing = prev.attachments ?? [];
+
+                    return {
+                      ...prev,
+                      attachments: [...existing, ...files],
+                    };
+                  });
+
+                  e.target.value = "";
+                }}
+              />
             </div>
-          )}
 
-          <div className="flex gap-3 pt-4">
-            <button
-              onClick={onClose}
-              className="flex-1 px-6 py-3 rounded-lg  text-sm bg-[var(--bg)] border border-[var(--border)]"
-              style={{ color: "var(--text-secondary)" }}
-            >
-              Cancel
-            </button>
-            <button
-              onClick={isLoading ? () => {} : handleCreateTask}
-              disabled={
-                isLoading ||
-                !newTask.title.trim() ||
-                !newTask.description.trim() ||
-                !newTask.dueDate
-              }
-              className="flex-1 px-6 py-3 text-white rounded-lg  text-sm disabled:opacity-40 disabled:cursor-not-allowed grid place-items-center"
-              style={{ background: "var(--primary)" }}
-            >
-              {isLoading ? (
-                <LucideLoader className="animate-spin text-white" size={20} />
-              ) : mode === "edit" ? (
-                "Update Task"
-              ) : (
-                "Create Task"
-              )}
-            </button>
+            {(newTask.attachments?.length ?? 0) > 0 && (
+              <div className="mt-3 space-y-2">
+                {newTask.attachments?.map((file, index) => (
+                  <div
+                    key={`${file.name}-${index}`}
+                    className="flex items-center justify-between text-sm px-4 pr-3 py-3.5 rounded-lg bg-white border border-[var(--border)] "
+                    style={{ color: "var(--text-primary)" }}
+                  >
+                    <span className="truncate max-w-[80%]">{file.name}</span>
+
+                    <button type="button" onClick={() => removeAttachment(index)}>
+                      <LucideXCircle size={18} className="text-red-400" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-4">
+              <button
+                onClick={onClose}
+                className="flex-1 px-6 py-3 rounded-lg  text-sm bg-[var(--bg)] border border-[var(--border)]"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={isLoading ? () => { } : handleCreateTask}
+                disabled={
+                  isLoading ||
+                  !newTask.title.trim() ||
+                  !newTask.description.trim() ||
+                  !newTask.dueDate
+                }
+                className="flex-1 px-6 py-3 text-white rounded-lg  text-sm disabled:opacity-40 disabled:cursor-not-allowed grid place-items-center"
+                style={{ background: "var(--primary)" }}
+              >
+                {isLoading ? (
+                  <LucideLoader className="animate-spin text-white" size={20} />
+                ) : mode === "edit" ? (
+                  "Update Task"
+                ) : (
+                  "Create Task"
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 export default function KanbanTab({ projectId }: KanbanTabProps) {
   const [selectedTask, setSelectedTask] = useState<any | null>(null);
@@ -434,7 +436,7 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
 
   const [transition, setTransition] = useState(false);
-
+  const { startTaskTour } = useNewTaskTour();
   const [newTask, setNewTask] = useState<NewTaskShape>({
     title: "",
     description: "",
@@ -464,7 +466,7 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
           }));
         }
       })
-      .catch(() => {});
+      .catch(() => { });
 
     // const res = localStorage.getItem("user");
     // const data = res ? JSON.parse(res) : null;
@@ -791,6 +793,87 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
     if (!selectedTask) return;
     fetchReports(selectedTask.id);
   }, [selectedTask?.id]);
+  useEffect(() => {
+    if (showNewTaskModal && taskMode === "create" && currentUser?.id) {
+      const tourKey = `hasSeenNewTaskTour_${currentUser.id}`;
+      const hasSeenTour = localStorage.getItem(tourKey);
+
+      if (!hasSeenTour) {
+        const timer = setTimeout(() => {
+          startTaskTour();
+          localStorage.setItem(tourKey, "true");
+        }, 200);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [showNewTaskModal, taskMode, currentUser]);
+  // Board-level Kanban tour
+useEffect(() => {
+  if (!currentUser?.id || loading) return;
+  const tourKey = `tour_seen_kanban_${currentUser.id}`;
+  if (localStorage.getItem(tourKey)) return;
+
+  const timer = setTimeout(() => {
+    const driverObj = driver({
+      showProgress: true,
+      animate: true,
+      smoothScroll: true,
+      popoverClass: "custom-tour-popover",
+      overlayOpacity: 0.35,
+      nextBtnText: "Next →",
+      prevBtnText: "← Prev",
+      doneBtnText: "Done ✓",
+      onPopoverRender: (popover) => {
+        const style = (el: HTMLElement) => {
+          el.style.setProperty("background", "var(--primary)", "important");
+          el.style.setProperty("color", "#ffffff", "important");
+          el.style.setProperty("opacity", "1", "important");
+          el.style.setProperty("border", "none", "important");
+        };
+        if (popover.nextButton) style(popover.nextButton);
+        if (popover.previousButton) {
+          popover.previousButton.style.setProperty("background", "transparent", "important");
+          popover.previousButton.style.setProperty("color", "var(--text-secondary)", "important");
+          popover.previousButton.style.setProperty("border", "1px solid var(--border)", "important");
+        }
+      },
+      onDestroyed: () => {
+        localStorage.setItem(tourKey, "true");
+      },
+      steps: [
+        {
+          element: "#kanban-columns",
+          popover: {
+            title: "Kanban Board",
+            description: "Your tasks are organized into 4 columns — On Hold, Not Started, In Progress, and Completed. Drag and drop any task card between columns to update its status.",
+          },
+        },
+        {
+          element: "#kanban-search",
+          popover: {
+            title: "Search Tasks",
+            description: "Quickly find any task by typing its title or description here.",
+          },
+        },
+        {
+          element: "#kanban-new-task-btn",
+          popover: {
+            title: "Create a Task",
+            description: "Click here to add a new task to this project. Let's walk through the task form next.",
+            onNextClick: (_el: any, _step: any, opts: any) => {
+              setShowNewTaskModal(true);
+              opts.driver.destroy();
+            },
+          },
+        },
+      ],
+    });
+
+    driverObj.drive();
+  }, 1000);
+
+  return () => clearTimeout(timer);
+}, [currentUser?.id, loading]);
 
   const handleReport = async () => {
     if (!message.trim() || !selectedTask) {
@@ -845,10 +928,10 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
         "assigneeAvatar",
         newTask.assignee
           ? newTask.assignee
-              .split(" ")
-              .map((n) => n[0])
-              .join("")
-              .toUpperCase()
+            .split(" ")
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase()
           : ""
       );
       formData.append("priority", newTask.priority);
@@ -916,7 +999,7 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
   );
 
   const getTasksByStatus = (status: Task["status"]) => filteredTasks.filter((task) => task.status === status);
-  
+
   if (loading) {
     return (
       <div className="w-full h-[50vh] flex justify-center items-center">
@@ -934,7 +1017,8 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
         <div className="max-w-[1600px] mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <h1
-              className="text-2xl font-bold "
+              id="kanban-title"
+              className="text-2xl font-bold"
               style={{ color: "var(--text-primary)" }}
             >
               Project Kanban Board
@@ -946,6 +1030,7 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
                   style={{ color: "var(--text-muted)" }}
                 />
                 <input
+                  id="kanban-search"
                   type="text"
                   placeholder="Search tasks..."
                   value={searchQuery}
@@ -955,15 +1040,16 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
                 />
               </div>
               {
-                currentUser?.role!=="CLIENT" && 
+                currentUser?.role !== "CLIENT" &&
                 <button
-                onClick={() => setShowNewTaskModal(true)}
-                className="px-4 py-2 text-white rounded-lg  text-sm flex items-center gap-2"
-                style={{ background: "var(--primary)" }}
+                  id="kanban-new-task-btn"
+                  onClick={() => setShowNewTaskModal(true)}
+                  className="px-4 py-2 text-white rounded-lg  text-sm flex items-center gap-2"
+                  style={{ background: "var(--primary)" }}
                 >
-                <Plus className="w-4 h-4" />
-                New Task
-              </button>
+                  <Plus className="w-4 h-4" />
+                  New Task
+                </button>
               }
             </div>
           </div>
@@ -971,7 +1057,7 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
       </div>
 
       <div className="max-w-[1600px] mx-auto px-6 py-6">
-        <div className="grid grid-cols-4 gap-6">
+        <div id="kanban-columns" className="grid grid-cols-4 gap-6">
           {columns.map((column) => {
             const Icon = column.icon;
             const columnTasks = getTasksByStatus(column.id as Task["status"]);
@@ -980,15 +1066,14 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
                 <div className="flex items-center justify-between mb-4 pb-3 border-b border-[var(--border)]">
                   <div className="flex items-center gap-2">
                     <div
-                      className={`p-2 rounded-lg ${
-                        column.color === "blue"
+                      className={`p-2 rounded-lg ${column.color === "blue"
                           ? "bg-blue-50 text-blue-600"
                           : column.color === "yellow"
-                          ? "bg-yellow-50 text-yellow-600"
-                          : column.color === "orange"
-                          ? "bg-orange-50 text-orange-600"
-                          : "bg-green-50 text-green-600"
-                      }`}
+                            ? "bg-yellow-50 text-yellow-600"
+                            : column.color === "orange"
+                              ? "bg-orange-50 text-orange-600"
+                              : "bg-green-50 text-green-600"
+                        }`}
                     >
                       <Icon className="w-5 h-5" />
                     </div>
@@ -1008,23 +1093,21 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
                 </div>
 
                 <div
-                  onDragOver={currentUser?.role!=="CLIENT" ? handleDragOver: undefined}
-                  onDrop={currentUser?.role!=="CLIENT" ? () => handleDrop(column.id as Task["status"]):undefined}
-                  className={`flex-1 space-y-3 min-h-[200px] p-1 rounded-lg ${
-                    draggedTask && draggedTask.status !== column.id
+                  onDragOver={currentUser?.role !== "CLIENT" ? handleDragOver : undefined}
+                  onDrop={currentUser?.role !== "CLIENT" ? () => handleDrop(column.id as Task["status"]) : undefined}
+                  className={`flex-1 space-y-3 min-h-[200px] p-1 rounded-lg ${draggedTask && draggedTask.status !== column.id
                       ? "bg-[var(--bg)]"
                       : ""
-                  }`}
+                    }`}
                 >
                   {columnTasks.map((task) => (
                     <div
                       key={task.id}
-                      draggable={currentUser?.role!=="CLIENT"}
-                      onDragStart={currentUser?.role!=="CLIENT" ? () => handleDragStart(task):undefined}
+                      draggable={currentUser?.role !== "CLIENT"}
+                      onDragStart={currentUser?.role !== "CLIENT" ? () => handleDragStart(task) : undefined}
                       onClick={() => setSelectedTask(task)}
-                      className={`p-4 rounded-xl border cursor-pointer transition-all bg-white border-[var(--border)] hover:shadow-md ${
-                        draggedTask?.id === task.id ? "opacity-50" : ""
-                      }`}
+                      className={`p-4 rounded-xl border cursor-pointer transition-all bg-white border-[var(--border)] hover:shadow-md ${draggedTask?.id === task.id ? "opacity-50" : ""
+                        }`}
                     >
                       <div className="flex flex-col gap-4 items-start justify-between mb-3">
                         <h3
@@ -1040,9 +1123,8 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
                           {task.description}
                         </p>
                         <span
-                          className={`px-2 py-1 rounded-md text-xs font-medium border ${
-                            priorityClasses[task.priority]
-                          } flex-shrink-0`}
+                          className={`px-2 py-1 rounded-md text-xs font-medium border ${priorityClasses[task.priority]
+                            } flex-shrink-0`}
                         >
                           {task.priority}
                         </span>

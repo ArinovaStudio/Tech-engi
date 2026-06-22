@@ -3,18 +3,78 @@
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import {
-  Lock,
-  ShieldCheck,
-  Eye,
-  EyeOff,
-  Copy,
-  CheckCheck,
-  KeyRound,
-  ExternalLink,
-  Plus,
-  Loader2,
+  Lock, ShieldCheck, Eye, EyeOff, Copy, CheckCheck,
+  KeyRound, ExternalLink, Plus, Loader2,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
+const tourStyles = `
+  .driver-popover {
+    border-radius: 16px !important;
+    padding: 24px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+    border: none !important;
+    max-width: 380px !important;
+    font-family: inherit !important;
+  }
+  .driver-popover-title {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    color: #0a0a1a !important;
+    margin-bottom: 8px !important;
+  }
+  .driver-popover-description {
+    font-size: 14px !important;
+    color: #64748b !important;
+    line-height: 1.6 !important;
+  }
+  .driver-popover-progress-text {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: var(--primary) !important;
+  }
+  .driver-popover-footer {
+    margin-top: 20px !important;
+    gap: 10px !important;
+  }
+  .driver-popover-prev-btn {
+    border: 1.5px solid #e2e8f0 !important;
+    background: white !important;
+    color: #1e293b !important;
+    border-radius: 10px !important;
+    padding: 8px 18px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
+  }
+  .driver-popover-prev-btn:hover {
+    background: #f8fafc !important;
+  }
+  .driver-popover-next-btn {
+    background: var(--primary) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 8px 18px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
+  }
+  .driver-popover-next-btn:hover {
+    opacity: 0.9 !important;
+  }
+  .driver-popover-close-btn {
+    color: #94a3b8 !important;
+    font-size: 18px !important;
+  }
+  .driver-popover-close-btn:hover {
+    color: #1e293b !important;
+  }
+  .driver-overlay {
+    background: rgba(0, 0, 0, 0.5) !important;
+  }
+`;
 
 interface Credential {
   id: string;
@@ -41,13 +101,12 @@ interface CredentialsTabProps {
 }
 
 function LockScreen({ status }: { status: UnlockStatus }) {
-
   return (
     <div className="relative min-h-[480px] flex items-center justify-center p-8 overflow-hidden bg-gray-50 rounded-2xl">
       <div className="relative z-10 bg-gray-100 rounded-[20px] px-9 py-10 max-w-[420px] w-full flex flex-col items-center gap-4 shadow-[0_0_0_1px_#ffffff06,0_32px_64px_#00000080]">
         <div className="relative w-[72px] h-[72px] flex items-center justify-center mb-1">
           <Lock className="text-[var(--primary)] w-20 h-20 relative z-10" strokeWidth={1.5} />
-            </div>
+        </div>
         <div className="flex items-center gap-2 mt-2 text-[11px] text-black">
           <span>Credentials are end-to-end encrypted and auto-unlock on completion</span>
         </div>
@@ -77,18 +136,11 @@ function CredentialCard({ cred }: { cred: Credential }) {
           </div>
           <p className="text-xs text-slate-500 mt-0.5">Added by {cred.addedBy.name}</p>
         </div>
-
         <div className="flex gap-1">
-          <button
-            onClick={() => setVisible(!visible)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
+          <button onClick={() => setVisible(!visible)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             {visible ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
-          <button
-            onClick={copy}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
+          <button onClick={copy} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             {copied ? <CheckCheck size={18} className="text-green-500" /> : <Copy size={18} />}
           </button>
           {cred.content.startsWith("http") && (
@@ -98,12 +150,11 @@ function CredentialCard({ cred }: { cred: Credential }) {
           )}
         </div>
       </div>
-
       <div className="font-mono text-sm bg-gray-50 border border-gray-200 rounded-lg p-4 break-all min-h-[60px]">
-  {visible
-    ? cred.content
-    : `${cred.content.slice(0, 12)}***************${cred.content.slice(-8)}`}
-</div>
+        {visible
+          ? cred.content
+          : `${cred.content.slice(0, 12)}***************${cred.content.slice(-8)}`}
+      </div>
     </div>
   );
 }
@@ -112,8 +163,7 @@ function CredentialCard({ cred }: { cred: Credential }) {
 const CredentialsTab = ({ projectId }: CredentialsTabProps) => {
   const { data: session } = useSession();
   const userRole = session?.user?.role;
-
-  const isPrivileged = userRole === "ADMIN" || userRole === "ENGINEER"; // Both can upload & view
+  const isPrivileged = userRole === "ADMIN" || userRole === "ENGINEER";
 
   const [credentials, setCredentials] = useState<Credential[]>([]);
   const [status, setStatus] = useState<UnlockStatus | null>(null);
@@ -127,10 +177,7 @@ const CredentialsTab = ({ projectId }: CredentialsTabProps) => {
     try {
       const res = await fetch(`/api/resources?projectId=${projectId}&tab=credentials`);
       const data = await res.json();
-
-      if (data.success) {
-        setCredentials(data.resources);
-      }
+      if (data.success) setCredentials(data.resources);
     } catch (err) {
       console.error(err);
       toast.error("Failed to load credentials");
@@ -141,7 +188,6 @@ const CredentialsTab = ({ projectId }: CredentialsTabProps) => {
     try {
       const res = await fetch(`/api/project/${projectId}`);
       const data = await res.json();
-
       if (data.success && data.project) {
         setStatus({
           progress: data.project.progress || 0,
@@ -155,24 +201,86 @@ const CredentialsTab = ({ projectId }: CredentialsTabProps) => {
     }
   };
 
+  // ── 1. Load data ─────────────────────────────────────────
   useEffect(() => {
     const loadAll = async () => {
       setLoading(true);
       await Promise.all([fetchUnlockStatus(), fetchCredentials()]);
       setLoading(false);
     };
-
     loadAll();
   }, [projectId]);
 
-  const isUnlocked = status && (
+  // ── 2. Tour — runs once after loading completes ───────────
+  useEffect(() => {
+    if (loading) return;
+    if (!isPrivileged) return;
+
+    const tourKey = `credentials_tour_${projectId}`;
+    if (localStorage.getItem(tourKey)) return;
+    const styleEl = document.createElement("style");
+  styleEl.id = "driver-tour-styles";
+  if (!document.getElementById("driver-tour-styles")) {
+    styleEl.textContent = tourStyles;
+    document.head.appendChild(styleEl);
+  }
+
+
+    const driverObj = driver({
+      showProgress: true,
+      steps: [
+        {
+          element: "#cred-header",
+          popover: {
+            title: "Project Credentials",
+            description:
+              "All your project credentials — hosting logins, database passwords, URLs — are stored here securely.",
+            side: "bottom",
+            align: "start",
+          },
+        },
+        {
+          element: "#add-credential-btn",
+          popover: {
+            title: "Add a Credential",
+            description: "Click this to securely store a new credential for your team.",
+            side: "left",
+            align: "start",
+            onNextClick: () => {
+              setShowAddModal(true);
+              setTimeout(() => driverObj.moveNext(), 350);
+            },
+          },
+        },
+        {
+          element: "#credential-modal",
+          popover: {
+            title: "Fill in the Details",
+            description:
+              "Give it a title and paste in the credentials (username, password, URL, etc.). Hit Add Credential when done.",
+            side: "top",
+            align: "center",
+          },
+        },
+      ],
+      onDestroyStarted: () => {
+        localStorage.setItem(tourKey, "true");
+        setShowAddModal(false);
+        driverObj.destroy();
+      },
+    });
+
+    setTimeout(() => driverObj.drive(), 600);
+  }, [loading]);
+
+  // ─────────────────────────────────────────────────────────
+  const isUnlocked =
+    status &&
     status.progress === 100 &&
     status.isEngineerFinished &&
     status.isReviewApproved &&
-    status.isFinalPaymentMade
-  );
+    status.isFinalPaymentMade;
 
-  // Show lock screen only to CLIENT when not unlocked
   if (!isPrivileged && status && !isUnlocked) {
     return <LockScreen status={status} />;
   }
@@ -191,11 +299,7 @@ const CredentialsTab = ({ projectId }: CredentialsTabProps) => {
     formData.append("content", newContent);
 
     try {
-      const res = await fetch("/api/resources", {
-        method: "POST",
-        body: formData,
-      });
-
+      const res = await fetch("/api/resources", { method: "POST", body: formData });
       const data = await res.json();
 
       if (data.success) {
@@ -224,7 +328,8 @@ const CredentialsTab = ({ projectId }: CredentialsTabProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Header */}
+      <div id="cred-header" className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <ShieldCheck className="w-8 h-8 text-[var(--primary)]" />
           <div>
@@ -237,6 +342,7 @@ const CredentialsTab = ({ projectId }: CredentialsTabProps) => {
 
         {isPrivileged && (
           <button
+            id="add-credential-btn"
             onClick={() => setShowAddModal(true)}
             className="flex items-center gap-2 bg-[var(--primary)] text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-all active:scale-95"
           >
@@ -246,11 +352,14 @@ const CredentialsTab = ({ projectId }: CredentialsTabProps) => {
         )}
       </div>
 
+      {/* Credential list */}
       {credentials.length === 0 ? (
         <div className="bg-white border border-dashed border-gray-300 rounded-2xl py-20 text-center">
           <KeyRound size={52} className="mx-auto text-gray-400 mb-4" />
           <p className="text-lg font-medium text-gray-600">No credentials added yet</p>
-          {isPrivileged && <p className="text-sm text-gray-500 mt-1">Click "Add Credential" to get started</p>}
+          {isPrivileged && (
+            <p className="text-sm text-gray-500 mt-1">Click "Add Credential" to get started</p>
+          )}
         </div>
       ) : (
         <div className="grid gap-4">
@@ -263,7 +372,7 @@ const CredentialsTab = ({ projectId }: CredentialsTabProps) => {
       {/* Add Credential Modal */}
       {showAddModal && (
         <div className="fixed inset-0 text-black bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6">
+          <div id="credential-modal" className="bg-white rounded-2xl max-w-md w-full p-6">
             <h3 className="text-xl font-semibold mb-4">Add New Credential</h3>
 
             <input

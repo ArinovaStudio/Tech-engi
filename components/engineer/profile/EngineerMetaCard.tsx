@@ -58,6 +58,7 @@ export default function EngineerMetaCard({ user, }: { user: any; }) {
         </div>
 
         <button
+          data-tour="profile-photo"
           type="button"
           onClick={() => fileInputRef.current?.click()}
           className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white border shadow flex items-center justify-center hover:bg-gray-50"

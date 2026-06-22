@@ -96,7 +96,7 @@ const BudgetAndDocs = ({ data, tasks, projects, }: { data: any; tasks: any[]; pr
         </div> */}
 
         {/* Payment History */}
-        <div className="h-[450px] flex flex-col">
+        <div id="payment-history" className="h-[450px] flex flex-col">
   <h3 className="font-semibold text-gray-900 dark:text-white shrink-0">
     Payment History
   </h3>
@@ -184,7 +184,7 @@ const BudgetAndDocs = ({ data, tasks, projects, }: { data: any; tasks: any[]; pr
       </div>
 
       {/* Right — Budget Overview */}
-      <div className="col-span-2 bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
+      <div id="budget-overview" className="col-span-2 bg-white dark:bg-gray-800 rounded-2xl p-8 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
         <div className="space-y-5 w-1/2">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">Budget Overview</h2>
           <div className="space-y-3">

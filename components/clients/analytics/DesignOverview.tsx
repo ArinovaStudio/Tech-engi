@@ -254,7 +254,7 @@ const DesignOverview = ({ data }: { data: any }) => {
 
   return (
     <div className="dark:bg-gray-900 mt-10 flex gap-6 items-stretch">
-      <div className="w-[35%] h-[380px] bg-gray-100 dark:bg-gray-800 rounded-2xl p-6 border-2 border-blue-200 dark:border-blue-800 relative">
+      <div id="design-system" className="w-[35%] h-[380px] bg-gray-100 dark:bg-gray-800 rounded-2xl p-6 border-2 border-blue-200 dark:border-blue-800 relative">
 
         <div className="absolute top-0 left-6 -translate-y-1/2 z-20">
           <span className="bg-blue-500 text-white px-5 py-2 leading-none rounded-md text-sm font-medium whitespace-nowrap">
@@ -417,8 +417,7 @@ const DesignOverview = ({ data }: { data: any }) => {
           </div>
 
           {/* CENTER SECTION */}
-          <div className="p-5 border-r border-[#d6d6d6]">
-
+          <div id="current-phase" className="p-5 border-r border-[#d6d6d6]">
             <div>
               <h3 className="text-[18px] font-medium text-[#7d7d7d] font-id">
                 Current Phase
@@ -441,7 +440,7 @@ const DesignOverview = ({ data }: { data: any }) => {
           </div>
 
           {/* RIGHT SECTION */}
-          <div className="p-5">
+          <div id="technology-used" className="p-5">
 
             <h3 className="text-[18px] font-medium text-[#7d7d7d] font-id">
               Technology Used

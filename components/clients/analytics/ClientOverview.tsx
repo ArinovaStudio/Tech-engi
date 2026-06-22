@@ -1,5 +1,4 @@
 'use client';
-
 import { FileText, DollarSign, Calendar, ThumbsDownIcon, ThumbsUp } from 'lucide-react';
 import { format } from 'date-fns/format';
 import toast from 'react-hot-toast';
@@ -14,14 +13,13 @@ const ClientOverview = ({ data, projectId }: { data: any, projectId: any }) => {
   const projectBudget = data.budget || 0;
   const projectDescription = data.description || 'No description available';
   const currency = '₹';
-
   const startDate = data.startDate ? format(new Date(data.startDate), 'dd MMM.yyyy') : 'N/A';
   const deadline = data.deadline ? format(new Date(data.deadline), 'dd MMM.yyyy') : 'N/A';
   const daysRemaining = data.daysRemaining ?? 0;
-
   const projectManager = data.projectManager || 'Unassigned';
   const overallProgress = data.overallProgress ?? 0;
   const circumference = +(2 * Math.PI * 80).toFixed(1);
+
   const [status, setStatus] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,9 +38,7 @@ const ClientOverview = ({ data, projectId }: { data: any, projectId: any }) => {
       }
     } catch (error) {
       toast.error("Something went wrong");
-
     }
-
   };
 
   const isReviewStage = data?.status === "IN_REVIEW";
@@ -54,7 +50,8 @@ const ClientOverview = ({ data, projectId }: { data: any, projectId: any }) => {
           <div className="lg:col-span-8 space-y-4">
             {/* Top Cards */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gradient-to-r from-blue-600/60 to-blue-900 rounded-2xl p-6 text-white relative overflow-hidden flex flex-col justify-end">
+              {/* Project Name */}
+              <div id="project-summary-card" className="bg-gradient-to-r from-blue-600/60 to-blue-900 rounded-2xl p-6 text-white relative overflow-hidden flex flex-col justify-end">
                 <div className="absolute top-4 right-4 w-10 h-10 bg-gray-100/40 rounded-lg flex items-center justify-center">
                   <FileText className="w-5 h-5" />
                 </div>
@@ -64,7 +61,8 @@ const ClientOverview = ({ data, projectId }: { data: any, projectId: any }) => {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-r from-purple-600/50 to-purple-900 rounded-2xl p-6 text-white relative overflow-hidden flex flex-col justify-end">
+              {/* Project Budget */}
+              <div id="project-budget-card" className="bg-gradient-to-r from-purple-600/50 to-purple-900 rounded-2xl p-6 text-white relative overflow-hidden flex flex-col justify-end">
                 <div className="absolute top-4 right-4 w-10 h-10 bg-gray-100/40 rounded-lg flex items-center justify-center">
                   <DollarSign className="w-5 h-5" />
                 </div>
@@ -77,20 +75,23 @@ const ClientOverview = ({ data, projectId }: { data: any, projectId: any }) => {
 
             {/* Bottom Row */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+              {/* Description */}
+              <div id="project-description" className="p-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                 <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed line-clamp-5">{projectDescription}</p>
               </div>
 
               <div className="flex flex-col gap-4 col-span-1">
                 <div className="flex gap-4 w-full">
-                  <div className="bg-gray-100 dark:bg-gray-800 w-full rounded-2xl p-5 shadow-sm border border-gray-400/50 dark:border-gray-700">
+                  {/* Start Date */}
+                  <div id="start-date-card" className="bg-gray-100 dark:bg-gray-800 w-full rounded-2xl p-5 shadow-sm border border-gray-400/50 dark:border-gray-700">
                     <div className="flex flex-col items-start">
                       <span className="text-xs text-gray-600 dark:text-gray-400 mb-1">Start Date</span>
                       <p className="text-lg font-bold text-gray-900 dark:text-white">{startDate}</p>
                     </div>
                   </div>
 
-                  <div className="bg-gray-100 dark:bg-gray-800 w-full rounded-2xl p-5 shadow-sm border border-gray-400/50 dark:border-gray-700">
+                  {/* Deadline */}
+                  <div id="deadline-card" className="bg-gray-100 dark:bg-gray-800 w-full rounded-2xl p-5 shadow-sm border border-gray-400/50 dark:border-gray-700">
                     <div className="flex flex-col items-start">
                       <span className="text-xs text-gray-600 dark:text-gray-400 mb-1">Deadline</span>
                       <p className="text-lg font-bold text-gray-900 dark:text-white">{deadline}</p>
@@ -99,14 +100,16 @@ const ClientOverview = ({ data, projectId }: { data: any, projectId: any }) => {
                 </div>
 
                 <div className="flex gap-4 w-full">
-                  <div className="bg-gray-100 dark:bg-gray-800 w-full rounded-2xl p-5 shadow-sm border border-gray-400/50 dark:border-gray-700">
+                  {/* Project Engineer */}
+                  <div id="engineer-card" className="bg-gray-100 dark:bg-gray-800 w-full rounded-2xl p-5 shadow-sm border border-gray-400/50 dark:border-gray-700">
                     <div className="flex flex-col items-start gap-1">
                       <span className="text-xs text-gray-600 dark:text-gray-400">Project Engineer</span>
                       <p className="text-lg font-bold text-gray-900 dark:text-white truncate w-full">{projectManager}</p>
                     </div>
                   </div>
 
-                  <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-400/50 dark:border-gray-700">
+                  {/* Days Left */}
+                  <div id="days-left-card" className="bg-gray-100 dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-400/50 dark:border-gray-700">
                     <div className="flex flex-col items-start gap-1">
                       <span className="text-xs text-gray-600 dark:text-gray-400">Days Left</span>
                       <p className="text-lg font-bold text-gray-900 dark:text-white">
@@ -121,7 +124,7 @@ const ClientOverview = ({ data, projectId }: { data: any, projectId: any }) => {
 
           {/* Right — Progress Circle */}
           <div className="lg:col-span-4">
-            <div className="bg-gray-100 dark:bg-gray-800 h-full rounded-2xl p-6 shadow-sm border dark:border-gray-700 flex flex-col items-center justify-center">
+            <div id="overall-progress" className="bg-gray-100 dark:bg-gray-800 h-full rounded-2xl p-6 shadow-sm border dark:border-gray-700 flex flex-col items-center justify-center">
               <h3 className="font-bold text-gray-900 dark:text-white mb-8">Overall Progress</h3>
               <div className="relative w-48 h-48">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
@@ -136,8 +139,7 @@ const ClientOverview = ({ data, projectId }: { data: any, projectId: any }) => {
                   <span className="text-5xl font-bold text-gray-900 dark:text-white">{overallProgress}%</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between gap-8 mt-3">
-
+              <div id="progress-feedback" className="flex items-center justify-between gap-8 mt-3">
                 {/* THUMBS UP */}
                 <button
                   disabled={!isReviewStage}
@@ -145,13 +147,9 @@ const ClientOverview = ({ data, projectId }: { data: any, projectId: any }) => {
                     setStatus("AWAITING_FINAL_PAYMENT");
                     handleSubmit(new Event("submit") as any);
                   }}
-                  className={`relative group ${isReviewStage
-                    ? "cursor-pointer"
-                    : "cursor-not-allowed opacity-50"
-                    }`}
+                  className={`relative group ${isReviewStage ? "cursor-pointer" : "cursor-not-allowed opacity-50"}`}
                 >
                   <ThumbsUp className="text-green-500 hover:text-green-600 transition" />
-
                   {isReviewStage && (
                     <div className="absolute bottom-full mb-2 hidden group-hover:block bg-black text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
                       Satisfied
@@ -166,20 +164,15 @@ const ClientOverview = ({ data, projectId }: { data: any, projectId: any }) => {
                     setStatus("IN_PROGRESS");
                     handleSubmit(new Event("submit") as any);
                   }}
-                  className={`relative group ${isReviewStage
-                      ? "cursor-pointer"
-                      : "cursor-not-allowed opacity-50"
-                    }`}
+                  className={`relative group ${isReviewStage ? "cursor-pointer" : "cursor-not-allowed opacity-50"}`}
                 >
                   <ThumbsDownIcon className="text-red-500 hover:text-red-600 transition" />
-
                   {isReviewStage && (
                     <div className="absolute bottom-full mb-2 hidden group-hover:block bg-black text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
                       There are some bugs
                     </div>
                   )}
                 </button>
-
               </div>
             </div>
           </div>

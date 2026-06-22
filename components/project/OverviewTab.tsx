@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import { ArrowUp, CheckCheck, LucideCheckCheck, LucideCopy, LucideEdit3, Send, CreditCard } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
@@ -15,9 +14,10 @@ export default function OverviewTab({ project }: { project: any }) {
   const [currentProgress, setCurrentProgress] = useState(project?.progress || 0);
   const [editModel, setEditModel] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
-   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [updating, setUpdating] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+
   // Roles
   const isAdmin = user?.role === "ADMIN";
   const isClient = user?.role === "CLIENT";
@@ -79,12 +79,10 @@ export default function OverviewTab({ project }: { project: any }) {
     try {
       const res = await fetch(`/api/client/projects/${project.id}/complete`, { method: "POST" });
       const data = await res.json();
-
       if (data.success) {
         toast.success("Project Approved! Initiating final payment...");
         triggerPayment(true);
-      }
-      else {
+      } else {
         toast.error(data.message || "Failed to complete");
       }
     } catch {
@@ -99,7 +97,6 @@ export default function OverviewTab({ project }: { project: any }) {
   const cardStyle: React.CSSProperties = { background: T.card, border: `1px solid ${T.border}`, borderRadius: 16, padding: "1.5rem" };
   const teamSectionLabel = isClient ? "Your Engineer" : isEngineer ? "Your Client" : "Team Members";
 
-  // Prevent multiple clicks if EITHER the local update OR the razorpay hook is loading
   const isActionDisabled = updating || isPaying;
 
   return (
@@ -114,7 +111,9 @@ export default function OverviewTab({ project }: { project: any }) {
         {/* LEFT COLUMN */}
         <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
-            <div style={{ ...cardStyle, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+
+            {/* Overall Progress */}
+            <div id="overall-progress" style={{ ...cardStyle, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
               <ProgressGauge progress={currentProgress} />
               <p style={{ margin: "12px 0 0", fontWeight: 600, fontSize: 14, color: T.text }}>Overall Progress</p>
               {isEngineer || isAdmin && (
@@ -148,8 +147,9 @@ export default function OverviewTab({ project }: { project: any }) {
               </div>
             </div>
           )}
-          
-          <div>
+
+          {/* Engineer / Team */}
+          <div id="engineer-card">
             <h2 style={{ fontSize: 16, fontWeight: 700, color: T.text, margin: "0 0 4px" }}>{teamSectionLabel}</h2>
             {isClient && (project.engineer?.user ? <TeamMemberCard user={project.engineer.user} label="Engineer" /> : <p style={{ fontSize: 13, color: T.textMuted, marginTop: 8 }}>No engineer assigned yet</p>)}
             {isEngineer && (project.client?.user ? <TeamMemberCard user={project.client.user} label="Client" /> : <p style={{ fontSize: 13, color: T.textMuted, marginTop: 8 }}>No client found</p>)}
@@ -164,195 +164,105 @@ export default function OverviewTab({ project }: { project: any }) {
           <div>
             {/* DESIGN SYSTEM */}
             {project.designSystem && (
-              <div className="mt-6">
+              <div id="design-system" className="mt-6">
                 <h2 className="text-lg font-bold text-gray-900 mb-5">
                   Design System
                 </h2>
-
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-
                   {/* LEFT COLUMN */}
                   <div className="space-y-5">
-
                     {/* Brand */}
                     <div className="bg-white border border-gray-200 rounded-xl p-5">
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                        Brand Name
-                      </p>
-
-                      <p className="text-base font-semibold text-gray-900">
-                        {project.designSystem.brandName || "-"}
-                      </p>
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Brand Name</p>
+                      <p className="text-base font-semibold text-gray-900">{project.designSystem.brandName || "-"}</p>
                     </div>
-
                     {/* Colors */}
                     {project.designSystem.colors?.length > 0 && (
                       <div className="bg-white border border-gray-200 rounded-xl p-5">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                          Color Palette
-                        </p>
-
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Color Palette</p>
                         <div className="flex flex-wrap gap-3">
-                          {project.designSystem.colors.map(
-                            (color: string, index: number) => (
-                              <div
-                                key={index}
-                                className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2"
-                              >
-                                <div
-                                  className="w-5 h-5 rounded-full border border-gray-200"
-                                  style={{
-                                    backgroundColor: color,
-                                  }}
-                                />
-
-                                <span className="text-xs font-medium">
-                                  {color}
-                                </span>
-                              </div>
-                            )
-                          )}
+                          {project.designSystem.colors.map((color: string, index: number) => (
+                            <div key={index} className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2">
+                              <div className="w-5 h-5 rounded-full border border-gray-200" style={{ backgroundColor: color }} />
+                              <span className="text-xs font-medium">{color}</span>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
-
                     {/* Fonts */}
                     <div className="bg-white border border-gray-200 rounded-xl p-5">
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                        Typography
-                      </p>
-
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Typography</p>
                       <div className="space-y-3">
-
                         <div className="grid grid-cols-[120px_1fr]">
-                          <span className="text-xs font-semibold text-gray-600">
-                            Primary Font
-                          </span>
-
-                          <span className="text-sm text-gray-900">
-                            {project.designSystem.fonts?.primary || "-"}
-                          </span>
+                          <span className="text-xs font-semibold text-gray-600">Primary Font</span>
+                          <span className="text-sm text-gray-900">{project.designSystem.fonts?.primary || "-"}</span>
                         </div>
-
                         <div className="grid grid-cols-[120px_1fr]">
-                          <span className="text-xs font-semibold text-gray-600">
-                            Secondary Font
-                          </span>
-
-                          <span className="text-sm text-gray-900">
-                            {project.designSystem.fonts?.secondary || "-"}
-                          </span>
+                          <span className="text-xs font-semibold text-gray-600">Secondary Font</span>
+                          <span className="text-sm text-gray-900">{project.designSystem.fonts?.secondary || "-"}</span>
                         </div>
-
                       </div>
                     </div>
-
                     {/* Key Pages */}
                     {project.designSystem.keyPages?.length > 0 && (
                       <div className="bg-white border border-gray-200 rounded-xl p-5">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                          Key Pages
-                        </p>
-
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Key Pages</p>
                         <div className="flex flex-wrap gap-2">
-                          {project.designSystem.keyPages.map(
-                            (page: string, index: number) => (
-                              <span
-                                key={index}
-                                className="px-3 py-1.5 text-xs font-medium rounded-full bg-blue-50 text-blue-700 border border-blue-200"
-                              >
-                                {page}
-                              </span>
-                            )
-                          )}
+                          {project.designSystem.keyPages.map((page: string, index: number) => (
+                            <span key={index} className="px-3 py-1.5 text-xs font-medium rounded-full bg-blue-50 text-blue-700 border border-blue-200">{page}</span>
+                          ))}
                         </div>
                       </div>
                     )}
                   </div>
-
                   {/* RIGHT COLUMN */}
                   <div className="space-y-5">
-
                     {/* Layout Style */}
                     {project.designSystem.layoutStyle && (
                       <div className="bg-white border border-gray-200 rounded-xl p-5">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                          Layout Style
-                        </p>
-
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Layout Style</p>
                         <div className="space-y-2">
-                          {Object.entries(
-                            project.designSystem.layoutStyle
-                          ).map(([key, value]: any) => (
-                            <div
-                              key={key}
-                              className="grid grid-cols-[160px_1fr] items-center px-3 py-2 rounded-lg border border-gray-100"
-                            >
-                              <span className="text-xs font-semibold text-gray-700 capitalize">
-                                {key}
-                              </span>
-
-                              <span className="text-sm text-gray-900">
-                                {String(value)}
-                              </span>
+                          {Object.entries(project.designSystem.layoutStyle).map(([key, value]: any) => (
+                            <div key={key} className="grid grid-cols-[160px_1fr] items-center px-3 py-2 rounded-lg border border-gray-100">
+                              <span className="text-xs font-semibold text-gray-700 capitalize">{key}</span>
+                              <span className="text-sm text-gray-900">{String(value)}</span>
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
-
                     {/* Visual Guidelines */}
                     {project.designSystem.visualGuidelines && (
                       <div className="bg-white border border-gray-200 rounded-xl p-5">
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                          Visual Guidelines
-                        </p>
-
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Visual Guidelines</p>
                         <div className="space-y-2">
-                          {Object.entries(
-                            project.designSystem.visualGuidelines
-                          ).map(([key, value]: any) => (
-                            <div
-                              key={key}
-                              className="grid grid-cols-[160px_1fr] items-center px-3 py-2 rounded-lg border border-gray-100"
-                            >
-                              <span className="text-xs font-semibold text-gray-700 capitalize">
-                                {key}
-                              </span>
-
-                              <span className="text-sm text-gray-900">
-                                {String(value)}
-                              </span>
+                          {Object.entries(project.designSystem.visualGuidelines).map(([key, value]: any) => (
+                            <div key={key} className="grid grid-cols-[160px_1fr] items-center px-3 py-2 rounded-lg border border-gray-100">
+                              <span className="text-xs font-semibold text-gray-700 capitalize">{key}</span>
+                              <span className="text-sm text-gray-900">{String(value)}</span>
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
-
                     {/* Uniqueness */}
                     <div className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-5">
-                      <p className="text-xs font-semibold text-orange-600 uppercase tracking-wide mb-3">
-                        Unique Selling Point
-                      </p>
-
-                      <p className="text-sm leading-relaxed text-gray-800">
-                        {project.designSystem.uniqueness?.differentiator || "-"}
-                      </p>
+                      <p className="text-xs font-semibold text-orange-600 uppercase tracking-wide mb-3">Unique Selling Point</p>
+                      <p className="text-sm leading-relaxed text-gray-800">{project.designSystem.uniqueness?.differentiator || "-"}</p>
                     </div>
-
                   </div>
                 </div>
               </div>
             )}
           </div>
-
         </div>
 
         {/* RIGHT COLUMN */}
         <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          <div style={cardStyle}>
+          <div id="project-summary-card" style={cardStyle}>
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "1rem" }}>
-              <h2 style={{ fontSize: 16, fontWeight: 700, color: T.text, margin: 0 }}>Project Information</h2>
+              <h2 id="dashboard-title" style={{ fontSize: 16, fontWeight: 700, color: T.text, margin: 0 }}>Project Information</h2>
               <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                 {canEditDetails && (
                   <button onClick={() => setEditModel(true)} style={{ background: "transparent", border: "none", cursor: "pointer", color: T.textMuted, padding: 4 }}>
@@ -369,13 +279,11 @@ export default function OverviewTab({ project }: { project: any }) {
                   <Send size={15} /> Submit for Review
                 </button>
               )}
-              {/* MARK AS COMPLETED BUTTON */}
               {isClient && project.status === "IN_REVIEW" && (
                 <button onClick={handleClientComplete} disabled={isActionDisabled} style={{ padding: "8px 16px", background: T.success, border: "none", borderRadius: 8, color: "#fff", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, opacity: isActionDisabled ? 0.7 : 1 }}>
                   <CheckCheck size={16} /> {isActionDisabled ? "Processing..." : "Mark as Completed"}
                 </button>
               )}
-              {/* FINAL PAYMENT BUTTON */}
               {isClient && project.status === "AWAITING_FINAL_PAYMENT" && (
                 <button onClick={() => triggerPayment(false)} disabled={isActionDisabled} style={{ padding: "8px 16px", background: T.primary, border: "none", borderRadius: 8, color: "#fff", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, opacity: isActionDisabled ? 0.7 : 1 }}>
                   <CreditCard size={16} /> {isPaying ? "Processing..." : "Pay Final Payment"}
@@ -384,18 +292,21 @@ export default function OverviewTab({ project }: { project: any }) {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+
+              {/* Status & Priority */}
+              <div id="project-status" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 <StatusBadge status={project.status} />
                 {project.priority && <PriorityBadge priority={project.priority} />}
               </div>
 
-              <div>
+              {/* Title & Description */}
+              <div id="project-description">
                 <h3 style={{ margin: "0 0 4px", fontSize: 15, fontWeight: 600, color: T.text }}>{project.title}</h3>
                 <p style={{ margin: 0, fontSize: 13, color: T.textSec, lineHeight: 1.6 }}>{project.description}</p>
               </div>
 
               {(isAdmin || isEngineer) && (project.budget != null || project.earnings != null) && (
-                <div style={{ background: T.bg, borderRadius: 10, padding: "10px 14px", border: `1px solid ${T.border}` }}>
+                <div id="project-budget-card" style={{ background: T.bg, borderRadius: 10, padding: "10px 14px", border: `1px solid ${T.border}` }}>
                   <p style={{ margin: "0 0 2px", fontSize: 11, fontWeight: 600, color: T.textMuted, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                     {isEngineer ? "Earnings" : "Budget"}
                   </p>
@@ -405,15 +316,16 @@ export default function OverviewTab({ project }: { project: any }) {
                 </div>
               )}
 
+              {/* Start Date & Deadline */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 {project.startDate && (
-                  <div style={{ background: T.bg, borderRadius: 10, padding: "10px 14px", border: `1px solid ${T.border}` }}>
+                  <div id="start-date-card" style={{ background: T.bg, borderRadius: 10, padding: "10px 14px", border: `1px solid ${T.border}` }}>
                     <p style={{ margin: "0 0 2px", fontSize: 11, color: T.textMuted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>Start Date</p>
                     <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: T.text }}>{new Date(project.startDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</p>
                   </div>
                 )}
                 {project.endDate && (
-                  <div style={{ background: T.bg, borderRadius: 10, padding: "10px 14px", border: `1px solid ${T.border}` }}>
+                  <div id="deadline-card" style={{ background: T.bg, borderRadius: 10, padding: "10px 14px", border: `1px solid ${T.border}` }}>
                     <p style={{ margin: "0 0 2px", fontSize: 11, color: T.textMuted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>Deadline</p>
                     <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: T.text }}>{new Date(project.endDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</p>
                   </div>
@@ -446,25 +358,15 @@ export default function OverviewTab({ project }: { project: any }) {
               )}
             </div>
 
+            {/* Technology Stack */}
             {project.technology && project.technology.length > 0 && (
-              <div className="mt-4">
-                <h2 className="text-base font-bold text-gray-900 mb-4">
-                  Technology Stack
-                </h2>
-
+              <div id="technology-used" className="mt-4">
+                <h2 className="text-base font-bold text-gray-900 mb-4">Technology Stack</h2>
                 <div className="flex flex-wrap gap-3">
                   {project.technology.map((t: any, i: number) => (
-                    <div
-                      key={i}
-                      className="border border-gray-300 rounded-lg px-3 py-2 min-w-[120px]"
-                    >
-                      <p className="text-xs font-semibold text-gray-500">
-                        {t.area}
-                      </p>
-
-                      <p className="text-sm font-semibold text-gray-900">
-                        {t.tech}
-                      </p>
+                    <div key={i} className="border border-gray-300 rounded-lg px-3 py-2 min-w-[120px]">
+                      <p className="text-xs font-semibold text-gray-500">{t.area}</p>
+                      <p className="text-sm font-semibold text-gray-900">{t.tech}</p>
                     </div>
                   ))}
                 </div>
@@ -472,7 +374,8 @@ export default function OverviewTab({ project }: { project: any }) {
             )}
           </div>
 
-          <div style={cardStyle}>
+          {/* Work Done History */}
+          <div id="latest-task" style={cardStyle}>
             <h2 style={{ fontSize: 16, fontWeight: 700, color: T.text, margin: "0 0 1rem" }}>Work Done History</h2>
             {project.kanbanTasks && project.kanbanTasks.length > 0 ? (
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

@@ -20,6 +20,7 @@ import {
   Delete,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { startMilestoneTourIfNew } from "@/config/engineerMilestoneTour";
 
 export default function MilestoneTab({ projectId }: any) {
   const [milestones, setMilestones] = useState<any[]>([]);
@@ -84,6 +85,11 @@ export default function MilestoneTab({ projectId }: any) {
       fetchCurrentUser();
     }
   }, [projectId]);
+  useEffect(() => {
+  if (!loading) {
+    startMilestoneTourIfNew(() => setOpen(true));
+  }
+}, [loading]);
 
   const fetchCurrentUser = async () => {
     try {
@@ -504,6 +510,7 @@ export default function MilestoneTab({ projectId }: any) {
         </h2>
         {currentUser?.role !== "CLIENT" && (
           <button
+            data-tour="add-milestone-btn"
             onClick={() => setOpen(true)}
             className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm"
             style={{ background: "var(--primary)" }}
@@ -711,6 +718,7 @@ export default function MilestoneTab({ projectId }: any) {
                   Title *
                 </label>
                 <input
+                  data-tour="milestone-title"
                   type="text"
                   value={newMilestone.title}
                   onChange={(e) =>
@@ -728,6 +736,7 @@ export default function MilestoneTab({ projectId }: any) {
                 </label>
 
                 <textarea
+                  data-tour="milestone-description"
                   value={newMilestone.description || ""}
                   onChange={(e) =>
                     setNewMilestone({
@@ -743,7 +752,7 @@ export default function MilestoneTab({ projectId }: any) {
               </div>
 
               {/* DEADLINE */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div data-tour="milestone-dates" className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                 {/* START DATE */}
                 <div>
@@ -799,6 +808,7 @@ export default function MilestoneTab({ projectId }: any) {
                   Type
                 </label>
                 <select
+                  data-tour="milestone-type"
                   className={inputCls}
                   value={newMilestone.type}
                   onChange={(e) =>
@@ -870,6 +880,7 @@ export default function MilestoneTab({ projectId }: any) {
                   </label>
 
                   <div
+                    data-tour="milestone-upload"
                     onDragEnter={(e) => {
                       e.preventDefault();
                       e.stopPropagation();

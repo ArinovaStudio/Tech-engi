@@ -54,7 +54,7 @@ import { AlertTriangle } from 'lucide-react';
 const RiskBlockage = ({ tickets = [] }: { tickets: any[] }) => {
   const user = useAuth(); // example
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 border-2 border-red-400 shadow-sm relative">
+    <div id="risk-blockage" className="bg-white dark:bg-gray-800 rounded-2xl p-5 border-2 border-red-400 shadow-sm relative">
 
       {/* Badge */}
       <div className="absolute -top-4 right-8 z-20">

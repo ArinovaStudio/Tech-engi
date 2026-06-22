@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FileArchive, FileText, Plus, Loader2, Download, Eye, Trash2,
   Image as ImageIcon, Link as LinkIcon, ExternalLink, Copy, CopyCheck,
@@ -12,6 +12,58 @@ import {
 import toast from "react-hot-toast";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
+import { driver, type Driver, type DriveStep } from "driver.js";
+import "driver.js/dist/driver.css";
+
+// driver.js's default overlay can read as quite heavy, and the cutout
+// around the active element sometimes looks "dulled" rather than crisp.
+// This keeps the highlighted element at full brightness with a clean ring.
+// Plain <style> (not styled-jsx) so it works regardless of project setup.
+function TourStyleOverrides() {
+  return (
+    <style
+      // eslint-disable-next-line react/no-danger
+      dangerouslySetInnerHTML={{
+        __html: `
+          .driver-active-element {
+            filter: none !important;
+            opacity: 1 !important;
+            box-shadow: 0 0 0 3px var(--primary, #f97316) !important;
+          }
+          .driver-popover {
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18) !important;
+          }
+          .driver-popover-footer button {
+            border: none !important;
+            color: #ffffff !important;
+            text-shadow: none !important;
+            font-weight: 600 !important;
+            border-radius: 8px !important;
+            padding: 6px 16px !important;
+          }
+          .driver-popover-prev-btn {
+            background: var(--primary, #f97316) !important;
+            opacity: 0.85;
+          }
+          .driver-popover-next-btn {
+            background: var(--primary, #f97316) !important;
+          }
+          .driver-popover-prev-btn:hover,
+          .driver-popover-next-btn:hover {
+            background: var(--primary, #f97316) !important;
+            opacity: 1 !important;
+          }
+          .driver-popover-prev-btn.driver-popover-btn-disabled {
+            background: #e5e7eb !important;
+            color: #9ca3af !important;
+            opacity: 1 !important;
+            cursor: not-allowed !important;
+          }
+        `,
+      }}
+    />
+  );
+}
 
 interface Resource {
   id: string;
@@ -25,6 +77,9 @@ interface Resource {
   };
   isLocked?: boolean;
 }
+
+// Bump this if you ever change the tour steps and want everyone to see it again
+const ASSETS_TOUR_KEY = "assets_tour_seen_v1";
 
 function AssetsCard({ resource, onDelete, isAdmin }: {
   resource: Resource;
@@ -195,6 +250,10 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
   const [content, setContent] = useState("");
   const [deleting, setDeleting] = useState(false);
 
+  // Holds the active driver.js instance so the "open modal -> continue tour"
+  // handoff can call .moveNext() / .destroy() on it from outside the effect.
+  const tourRef = useRef<Driver | null>(null);
+
   const [deleteModal, setDeleteModal] = useState<{
     open: boolean;
     resourceId: string | null;
@@ -258,6 +317,135 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
     fetchResources();
   }, [projectId]);
 
+  // ---------------------------------------------------------------------
+  // TOUR
+  // ---------------------------------------------------------------------
+  // Flow: page steps (Resources heading -> table header -> a row -> Upload
+  // Resource button) -> clicking "Next" on the Upload button step opens the
+  // modal -> tour continues inside the modal (Title -> Type -> Dropzone ->
+  // Upload button) -> destroy + mark as seen on close/finish.
+  useEffect(() => {
+    // Don't start until we know the role (so we only show the upload-button
+    // step when canUpload is actually true) and resources have loaded so the
+    // table/row exist in the DOM.
+    if (loading) return;
+
+    const alreadySeen = localStorage.getItem(ASSETS_TOUR_KEY);
+    if (alreadySeen) return;
+
+    // Nothing to point the row-step at if there are no resources yet.
+    const hasRow = resources.length > 0;
+
+    const markSeenAndCleanup = () => {
+      localStorage.setItem(ASSETS_TOUR_KEY, "true");
+      tourRef.current = null;
+    };
+
+    const steps: DriveStep[] = [
+      {
+        element: '[data-tour="assets-heading"]',
+        popover: {
+          title: "Resources",
+          description:
+            "This is where every file, image, link, note, and credential shared on this project lives.",
+        },
+      },
+      ...(hasRow
+        ? [
+            {
+              element: '[data-tour="assets-table-header"]',
+              popover: {
+                title: "Resource List",
+                description:
+                  "Each resource shows its type, who added it, and when it was created.",
+              },
+            },
+            {
+              element: '[data-tour="assets-row-0"]',
+              popover: {
+                title: "Take an Action",
+                description:
+                  "View, download, copy, or reveal a resource right from this row, depending on its type.",
+              },
+            },
+          ]
+        : []),
+      ...(canUpload
+        ? [
+            {
+              element: '[data-tour="upload-resource-btn"]',
+              popover: {
+                title: "Add a New Resource",
+                description:
+                  "Click here any time you want to upload an image, file, link, note, or credentials.",
+                onNextClick: () => {
+                  // Open the modal, then wait a tick for it to mount before
+                  // advancing the tour into it.
+                  setOpen(true);
+                  setTimeout(() => {
+                    tourRef.current?.moveNext();
+                  }, 150);
+                },
+              },
+            },
+            {
+              element: '[data-tour="upload-title-input"]',
+              popover: {
+                title: "Name Your Resource",
+                description: "Give it a short, clear title so it's easy to find later.",
+              },
+            },
+            {
+              element: '[data-tour="upload-type-select"]',
+              popover: {
+                title: "Choose a Type",
+                description:
+                  "Pick Image, File, Link, Text Note, or Credentials. The form below changes to match.",
+              },
+            },
+            {
+              element: '[data-tour="upload-dropzone-or-content"]',
+              popover: {
+                title: "Add the Content",
+                description:
+                  "Drag & drop a file here, or type/paste your link, note, or credentials, depending on the type you picked.",
+              },
+            },
+            {
+              element: '[data-tour="upload-submit-btn"]',
+              popover: {
+                title: "You're All Set",
+                description: "Once everything looks good, click Upload to save the resource.",
+              },
+            },
+          ]
+        : []),
+    ];
+
+    if (steps.length === 0) return;
+
+    const tour = driver({
+      showProgress: true,
+      allowClose: true,
+      overlayOpacity: 0.35,
+      stagePadding: 6,
+      stageRadius: 10,
+      onDestroyed: () => {
+        markSeenAndCleanup();
+      },
+      steps,
+    });
+
+    tourRef.current = tour;
+    tour.drive();
+
+    return () => {
+      tour.destroy();
+      tourRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, canUpload, resources.length]);
+
   const uploadResource = async () => {
     if (!title) return toast.error("Title is required");
 
@@ -307,24 +495,6 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
     });
   };
 
-  // const deleteResource = async (resourceId: string) => {
-  //   if (!confirm("Delete this resource?")) return;
-
-  //   try {
-  //     const res = await fetch(`/api/resources/${resourceId}`, { method: "DELETE" });
-  //     const data = await res.json();
-
-  //     if (data.success) {
-  //       await fetchResources();
-  //       toast.success("Resource deleted");
-  //     } else {
-  //       toast.error(data.message || "Delete failed");
-  //     }
-  //   } catch {
-  //     toast.error("Failed to delete");
-  //   }
-  // };
-
   const deleteResource = async (resourceId: string) => {
     try {
       const res = await fetch(`/api/resources/${resourceId}`, {
@@ -363,16 +533,27 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
     }
   };
 
+  // If the user closes/cancels the modal mid-tour, kill the tour gracefully
+  // instead of leaving it pointed at a now-unmounted element.
+  const closeUploadModal = () => {
+    setOpen(false);
+    if (tourRef.current) {
+      tourRef.current.destroy();
+    }
+  };
+
   const inputCls = "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)]  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
   const labelCls = "block text-sm font-medium  mb-1.5";
 
   return (
     <div className="space-y-6">
+      <TourStyleOverrides />
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold " style={{ color: "var(--text-primary)" }}>Resources</h2>
+        <h2 data-tour="assets-heading" className="text-2xl font-bold " style={{ color: "var(--text-primary)" }}>Resources</h2>
 
         {canUpload && (
           <button
+            data-tour="upload-resource-btn"
             onClick={() => setOpen(true)}
             className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm"
             style={{ background: "var(--primary)" }}
@@ -398,7 +579,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
 
           {/* HEADER */}
-          <div className="grid grid-cols-12 gap-4 px-5 py-4 border-b bg-gray-50 font-semibold text-sm text-gray-600">
+          <div data-tour="assets-table-header" className="grid grid-cols-12 gap-4 px-5 py-4 border-b bg-gray-50 font-semibold text-sm text-gray-600">
             <div className="col-span-4">Resource</div>
             <div className="col-span-2">Type</div>
             <div className="col-span-2">Added By</div>
@@ -407,9 +588,10 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
           </div>
 
           {/* ROWS */}
-          {resources.map((resource) => (
+          {resources.map((resource, index) => (
             <div
               key={resource.id}
+              data-tour={index === 0 ? "assets-row-0" : undefined}
               className="grid grid-cols-12 gap-4 px-5 py-4 border-b border-gray-100 items-center hover:bg-gray-50 transition"
             >
 
@@ -637,6 +819,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
             <h2 className="text-lg font-semibold  mb-4">Upload Resource</h2>
 
             <input
+              data-tour="upload-title-input"
               type="text"
               placeholder="Resource Title"
               value={title}
@@ -646,6 +829,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
 
             <label className={labelCls}>Type</label>
             <select
+              data-tour="upload-type-select"
               className={`${inputCls} mb-4`}
               value={type}
               onChange={(e) => setType(e.target.value as any)}
@@ -662,6 +846,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
 
             {(type === "FILE" || type === "IMAGE") ? (
               <div
+                data-tour="upload-dropzone-or-content"
                 onDragEnter={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -772,6 +957,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
               </div>
             ) : (
               <textarea
+                data-tour="upload-dropzone-or-content"
                 placeholder={
                   type === "LINK" ? "Paste URL..." :
                     type === "CREDENTIALS" ? "Username / Password / Notes..." :
@@ -785,12 +971,13 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
 
             <div className="flex justify-end gap-3 mt-4">
               <button
-                onClick={() => setOpen(false)}
+                onClick={closeUploadModal}
                 className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg  text-sm"
               >
                 Cancel
               </button>
               <button
+                data-tour="upload-submit-btn"
                 disabled={uploading}
                 onClick={uploadResource}
                 className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm disabled:opacity-40"

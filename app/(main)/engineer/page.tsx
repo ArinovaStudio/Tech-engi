@@ -12,6 +12,9 @@ import ModernCalendar from "@/components/engineer/dashboard/ModernCalendar";
 import TicketCard from "@/components/engineer/dashboard/TicketCard";
 import InvitationCard from "@/components/engineer/dashboard/InvitationCard";
 import DailyScheduleCard from "@/components/engineer/dashboard/DailyScheduleCard";
+import { useAuth } from "@/hooks/useAuth";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 
 interface AnalyticsData {
   overview: { totalAssigned: number; completedProjects: number; newInvitations: number };
@@ -57,6 +60,63 @@ export default function EngineerDashboardPage() {
   const { data: projectsData, isLoading: projectsLoading, mutate } = useSWR("/api/engineer/perengineer-projects", fetcher);
   const { data: invitationsData } = useSWR("/api/engineer/invitation-engineer", fetcher);
   // console.log(invitationsData, "invitationsData");
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user?.id || loading) return;
+    const tourKey = `tour_seen_engineer_dashboard_${user.id}`;
+    if (localStorage.getItem(tourKey)) return;
+
+    const timer = setTimeout(() => {
+      const driverObj = driver({
+        showProgress: true,
+        animate: true,
+        smoothScroll: true,
+        popoverClass: "custom-tour-popover",
+        overlayOpacity: 0.35,
+        nextBtnText: "Next →",
+        prevBtnText: "← Prev",
+        doneBtnText: "Done ✓",
+        onPopoverRender: (popover) => {
+          const style = (el: HTMLElement) => {
+            el.style.setProperty("background", "var(--primary)", "important");
+            el.style.setProperty("color", "#ffffff", "important");
+            el.style.setProperty("opacity", "1", "important");
+            el.style.setProperty("border", "none", "important");
+          };
+          if (popover.nextButton) style(popover.nextButton);
+          if (popover.previousButton) {
+            popover.previousButton.style.setProperty("background", "transparent", "important");
+            popover.previousButton.style.setProperty("color", "var(--text-secondary)", "important");
+            popover.previousButton.style.setProperty("border", "1px solid var(--border)", "important");
+          }
+        },
+        onDestroyed: () => {
+          localStorage.setItem(tourKey, "true");
+        },
+        steps: [
+          {
+            element: "#engineer-calendar",
+            popover: {
+              title: "Project Calendar",
+              description: "See all your project deadlines plotted on a calendar. Click any date to view which projects are due — hover a project to see its status, progress, and priority.",
+            },
+          },
+          {
+            element: "#engineer-invitations",
+            popover: {
+              title: "Project Invitations",
+              description: "New project matches assigned to you by the admin appear here. Review the project details and earnings, then accept or reject — respond quickly since it's first come, first served.",
+            },
+          },
+        ],
+      });
+
+      driverObj.drive();
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [user?.id, loading]);
 
   const fetchAnalytics = useCallback(async (period: Period) => {
     if (cache[period]) {
@@ -238,8 +298,12 @@ export default function EngineerDashboardPage() {
           </div>
         </div>
         <div className=" w-[30%] flex flex-col gap-6 items-center p-1 ml-1">
-          <ModernCalendar projects={projectsData?.projects} />
-          <InvitationCard invitationsData={invitationsData} />
+          <div id="engineer-calendar" className="w-full">
+            <ModernCalendar projects={projectsData?.projects} />
+          </div>
+          <div id="engineer-invitations" className="w-full">
+            <InvitationCard invitationsData={invitationsData} />
+          </div>
         </div>
       </div>
     </DashboardShell>

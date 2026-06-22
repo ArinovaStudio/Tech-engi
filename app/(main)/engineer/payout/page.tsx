@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { DollarSign, Wallet, Clock, CheckCircle, CreditCard, Landmark } from "lucide-react";
 import DashboardShell from "@/components/layout/DashboardShell";
+import { startPayoutTourIfNew } from "@/lib/payoutTour";
 
 interface Transaction {
   id: string;
@@ -26,6 +27,14 @@ export default function EngineerPayoutPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Start the one-time onboarding tour once the page has finished
+  // loading and the data-tour elements are actually in the DOM.
+  useEffect(() => {
+    if (!loading) {
+      startPayoutTourIfNew();
+    }
+  }, [loading]);
 
   async function fetchData() {
     try {
@@ -104,14 +113,21 @@ export default function EngineerPayoutPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           
           {/* 1. Total Potential Earnings */}
-          <div className="rounded-xl p-5 text-white" style={{ background: "var(--primary)" }}>
+          <div
+            data-tour="total-earnings"
+            className="rounded-xl p-5 text-white"
+            style={{ background: "var(--primary)" }}
+          >
             <Wallet size={28} className="opacity-70 mb-3" />
             <p className="text-xs ">Total Earnings</p>
             <p className="text-2xl font-bold  mt-0.5">₹{totalPotential.toLocaleString()}</p>
           </div>
 
           {/* 2. Amount Received */}
-          <div className="rounded-xl p-5 bg-white border border-[var(--border)]">
+          <div
+            data-tour="amount-received"
+            className="rounded-xl p-5 bg-white border border-[var(--border)]"
+          >
             <CheckCircle size={28} className="text-green-500 mb-3" />
             <p className="text-xs " style={{ color: "var(--text-muted)" }}>
               Amount Received
@@ -123,7 +139,10 @@ export default function EngineerPayoutPage() {
           </div>
 
           {/* 3. Amount Pending */}
-          <div className="rounded-xl p-5 bg-white border border-[var(--border)]">
+          <div
+            data-tour="amount-pending"
+            className="rounded-xl p-5 bg-white border border-[var(--border)]"
+          >
             <Clock size={28} className="text-yellow-500 mb-3" />
             <p className="text-xs " style={{ color: "var(--text-muted)" }}>
               Amount Pending
@@ -135,7 +154,10 @@ export default function EngineerPayoutPage() {
           </div>
 
           {/* 4. Bank Details Status */}
-          <div className="rounded-xl p-5 bg-white border border-[var(--border)]">
+          <div
+            data-tour="bank-details"
+            className="rounded-xl p-5 bg-white border border-[var(--border)]"
+          >
             <Landmark size={28} className={hasPayoutDetails ? "text-blue-500 mb-3" : "text-red-500 mb-3"} />
             <p className="text-xs " style={{ color: "var(--text-muted)" }}>
               Bank Details
@@ -149,7 +171,10 @@ export default function EngineerPayoutPage() {
           </div>
 
           {/* 5. Last Payment */}
-          <div className="rounded-xl p-5 bg-white border border-[var(--border)]">
+          <div
+            data-tour="last-payment"
+            className="rounded-xl p-5 bg-white border border-[var(--border)]"
+          >
             <CreditCard size={28} className="text-purple-500 mb-3" />
             <p className="text-xs " style={{ color: "var(--text-muted)" }}>
               Last Payment
@@ -175,7 +200,7 @@ export default function EngineerPayoutPage() {
         </div>
 
         {/* Payout History */}
-        <div className="bg-white rounded-xl border border-[var(--border)]">
+        <div data-tour="payout-history" className="bg-white rounded-xl border border-[var(--border)]">
           <div className="p-5 border-b border-[var(--border)]">
             <h2 className="text-lg font-semibold " style={{ color: "var(--text-primary)" }}>
               Payout History

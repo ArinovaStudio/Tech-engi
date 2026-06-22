@@ -6,7 +6,6 @@ import { useParams } from "next/navigation";
 import TabContent from "@/components/project/TabContent";
 import { Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-
 // Tab definitions
 const CLIENT_TABS = ["Overview", "Tasks", "Milestones", "Credentials", "Assets", "Report Issue", "Chat", "Payout"];
 
@@ -101,8 +100,6 @@ export default function ProjectDetailPage() {
   return (
     <div>
       {/* Project Header */}
-      <h1 className="text-lg font-bold  text-[var(--text-primary)] pb-4">{project.title}</h1>
-
       <TabBar tabs={tabs} active={activeTab} setActive={setActiveTab} />
 
       <div className="mt-6  px-2">

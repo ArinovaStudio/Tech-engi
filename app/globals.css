@@ -215,3 +215,143 @@
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+/* === Driver.js theme using project design tokens === */
+
+.custom-tour-popover.driver-popover {
+  background: var(--popover);
+  color: var(--popover-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  max-width: 380px;
+}
+
+.custom-tour-popover .driver-popover-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--popover-foreground);
+  margin-bottom: 8px;
+}
+
+.custom-tour-popover .driver-popover-description {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.custom-tour-popover .driver-popover-progress-text {
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.custom-tour-popover .driver-popover-footer {
+  margin-top: 18px;
+}
+
+.custom-tour-popover.driver-popover .driver-popover-footer button,
+.custom-tour-popover.driver-popover .driver-popover-footer button:hover,
+.custom-tour-popover.driver-popover .driver-popover-footer button:focus {
+  background: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  opacity: 1;
+}
+
+.custom-tour-popover.driver-popover .driver-popover-footer button:hover {
+  filter: brightness(0.92);
+  transform: translateY(-1px);
+}
+
+.custom-tour-popover .driver-popover-prev-btn {
+  background: transparent !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.custom-tour-popover.driver-popover .driver-popover-prev-btn:hover {
+  background: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+
+.custom-tour-popover .driver-popover-close-btn {
+  color: var(--text-muted);
+  font-size: 18px;
+}
+
+.custom-tour-popover .driver-popover-close-btn:hover {
+  color: var(--popover-foreground);
+}
+
+.custom-tour-popover .driver-popover-arrow {
+  border-color: var(--popover) !important;
+}
+
+.driver-active-element {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 35%, transparent) !important;
+  border-radius: var(--radius-md);
+}
+/* driver.js theme overrides — matches app design tokens (--primary, --border, --text-primary, --text-muted) */
+/* Import this once globally, e.g. in app/globals.css: @import "./payout-tour-theme.css"; */
+
+.driver-popover.payout-tour-popover {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem; /* rounded-xl */
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.12);
+  padding: 1.25rem;
+  max-width: 320px;
+  font-family: inherit;
+}
+
+.payout-tour-popover .driver-popover-title {
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.375rem;
+}
+
+.payout-tour-popover .driver-popover-description {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.payout-tour-popover .driver-popover-progress-text {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.payout-tour-popover .driver-popover-footer button {
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text-primary);
+  text-shadow: none;
+}
+
+.payout-tour-popover .driver-popover-footer .driver-popover-next-btn,
+.payout-tour-popover .driver-popover-footer .driver-popover-done-btn {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.payout-tour-popover .driver-popover-close-btn {
+  color: var(--text-muted);
+}
+
+.payout-tour-popover .driver-popover-arrow-side-left.driver-popover-arrow,
+.payout-tour-popover .driver-popover-arrow-side-right.driver-popover-arrow,
+.payout-tour-popover .driver-popover-arrow-side-top.driver-popover-arrow,
+.payout-tour-popover .driver-popover-arrow-side-bottom.driver-popover-arrow {
+  border-color: #ffffff;
+}
+
+/* Highlighted element outline — subtle, matches primary color instead of driver.js default */
+.driver-active-element {
+  border-radius: 0.75rem !important;
+}

@@ -5,6 +5,9 @@ import { AlertCircle, Plus, Calendar, User, Shield, LucideLoader, Loader2, Uploa
 import toast, { Toaster } from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { format } from "date-fns";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
+
 const statusColors: Record<string, string> = {
     OPEN: "bg-red-100 text-red-600",
     IN_PROGRESS: "bg-yellow-100 text-yellow-700",
@@ -45,6 +48,8 @@ const ClientReportIssue = () => {
     const [projects, setProjects] = useState<any[]>([]);
     const [selectedProjectId, setSelectedProjectId] = useState("");
     const isClient = role === "CLIENT";
+    const currentUserId = session?.user?.id;
+    const roleTabs = role === "ADMIN" ? ["ME", "ENGINEER", "CLIENT"] : ["ME", "ENGINEER", "ADMIN"];
     const [newTicket, setNewTicket] = useState({
         issueType: "",
         target: role === "ADMIN" ? "Engineer" : "PLATFORM",
@@ -166,11 +171,112 @@ const ClientReportIssue = () => {
         fetchTickets();
     }, []);
 
-    const roleTabs = role === "ADMIN" ? ["ME", "ENGINEER", "CLIENT"] : ["ME", "ENGINEER", "ADMIN"];
+    // ...inside the component, after the existing useEffect:
+
+    useEffect(() => {
+        if (!currentUserId) return;
+        const tourKey = `tour_seen_report_issue_${currentUserId}`;
+        if (localStorage.getItem(tourKey)) return;
+
+        const timer = setTimeout(() => {
+            const driverObj = driver({
+                showProgress: true,
+                animate: true,
+                smoothScroll: true,
+                popoverClass: "custom-tour-popover",
+                overlayOpacity: 0.35,
+                nextBtnText: "Next →",
+                prevBtnText: "← Prev",
+                doneBtnText: "Done ✓",
+                onPopoverRender: (popover) => {           // 👈 ADD THIS — right here, alongside onDestroyed
+                    const style = (el: HTMLElement) => {
+                        el.style.setProperty("background", "var(--primary)", "important");
+                        el.style.setProperty("color", "#ffffff", "important");
+                        el.style.setProperty("opacity", "1", "important");
+                        el.style.setProperty("border", "none", "important");
+                    };
+                    if (popover.nextButton) style(popover.nextButton);
+                    if (popover.previousButton) {
+                        popover.previousButton.style.setProperty("background", "transparent", "important");
+                        popover.previousButton.style.setProperty("color", "var(--text-secondary)", "important");
+                        popover.previousButton.style.setProperty("border", "1px solid var(--border)", "important");
+                    }
+                },
+                onDestroyed: () => {
+                    setShowModal(false);
+                    localStorage.setItem(tourKey, "true");
+                },
+                steps: [
+                    {
+                        element: "#report-issue-btn", popover: {
+                            title: "Report an Issue",
+                            description: "Click this anytime you run into a payment, technical, or delivery problem. Let's walk through it.",
+                            onNextClick: (_el, _step, opts) => {
+                                setShowModal(true);
+                                setTimeout(() => opts.driver.moveNext(), 300);
+                            },
+                        }
+                    },
+                    { element: "#ticket-issue-type", popover: { title: "Issue Type", description: "Choose the category that best matches your issue." } },
+                    { element: "#ticket-select-project", popover: { title: "Select Project", description: "Pick which project this issue relates to." } },
+                    { element: "#ticket-target", popover: { title: "Target", description: "Choose whether this is about the platform itself, or your assigned engineer." } },
+                    { element: "#ticket-description", popover: { title: "Description", description: "Describe the issue in detail so our team can resolve it quickly." } },
+                    { element: "#ticket-upload-images", popover: { title: "Upload Images", description: "Attach screenshots if helpful — PNG, JPG, JPEG supported." } },
+                    {
+                        element: "#ticket-actions", popover: {
+                            title: "Submit Your Ticket",
+                            description: "Once you're done, hit Submit. You can track its status anytime from this page.",
+                            onNextClick: (_el, _step, opts) => {
+                                setShowModal(false);
+                                opts.driver.moveNext();
+                            },
+                        }
+                    },
+                    {
+                        element: "#tab-me",
+                        popover: {
+                            title: "ME",
+                            description: "Tickets you personally raised. Track their status here and update it if you reported the issue.",
+                        },
+                    },
+                    {
+                        element: "#tab-engineer",
+                        popover: {
+                            title: "ENGINEER",
+                            description: "Issues raised by the engineer working on this project — useful for staying aware of any blockers on their end.",
+                        },
+                    },
+                    {
+                        element: `#tab-${roleTabs[2].toLowerCase()}`,
+                        popover: {
+                            title: roleTabs[2],
+                            description: roleTabs[2] === "ADMIN"
+                                ? "Tickets raised by your admin team, kept here so you have full visibility into all reported issues across the project."
+                                : "Issues raised by clients on this project — helps you track concerns coming directly from them.",
+                        },
+                    },
+                    {
+                        element: "#ticket-status-badge",                                                      
+                        popover: {
+                            title: "Tracking Ticket Status",
+                            description:
+                                "Each ticket shows its current status as a colored badge (e.g. RESOLVED). If you raised the ticket, click the badge to open a dropdown and change its status — Open, In Progress, Resolved, or Closed.",
+                        },
+                    },
+                ],
+            });
+
+            driverObj.drive();
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, [currentUserId]);
+
+
 
     const inputCls = "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)]  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
 
-    const currentUserId = session?.user?.id;
+
 
     const filteredTickets = tickets.filter((ticket) => {
         const raisedRole = ticket.raisedBy?.role?.toUpperCase()?.trim() || "";
@@ -240,6 +346,7 @@ const ClientReportIssue = () => {
                         </div>
 
                         <button
+                            id="report-issue-btn"
                             onClick={() => setShowModal(true)}
                             className="cursor-pointer group relative overflow-hidden rounded-xl px-5 py-2.5 font-semibold text-white transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
                             style={{
@@ -278,6 +385,7 @@ const ClientReportIssue = () => {
 
                 {/* Tickets Section Here */}
                 <div
+                    id="issue-guidelines"
                     className="rounded-lg p-4 border"
                     style={{ background: "var(--primary-light)", borderColor: "#ffd9a8" }}
                 >
@@ -304,7 +412,7 @@ const ClientReportIssue = () => {
                 <div className="flex flex-col lg:flex-row gap-6 mt-2">
                     {/* Sidebar */}
                     <div className="w-full shrink-0">
-                        <div className="bg-white rounded-xl border border-[var(--border)] p-2 mb-3">
+                        <div id="role-tabs" className="bg-white rounded-xl border border-[var(--border)] p-2 mb-3">
                             <div className="flex gap-2 overflow-x-auto">
                                 {roleTabs.map((tab) => {
                                     const count = tickets.filter((ticket) => {
@@ -325,6 +433,7 @@ const ClientReportIssue = () => {
 
                                     return (
                                         <button
+                                            id={`tab-${tab.toLowerCase()}`}
                                             key={tab}
                                             onClick={() => setActiveTab(tab)}
                                             className={`flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${activeTab === tab
@@ -374,7 +483,7 @@ const ClientReportIssue = () => {
                                 )
                             ) : (
                                 <div className="space-y-3">
-                                    {sortedTickets.map((report: any) => {
+                                    {sortedTickets.map((report: any, index: number) => {
                                         return (
                                             <div
                                                 key={report.id}
@@ -401,6 +510,7 @@ const ClientReportIssue = () => {
                                                             {/* ✅ Status Dropdown */}
                                                             <div className="relative">
                                                                 <button
+                                                                    id={index === 0 ? "ticket-status-badge" : undefined}
                                                                     disabled={updating}
                                                                     onClick={() => {
                                                                         if (updating) return;
@@ -477,16 +587,13 @@ const ClientReportIssue = () => {
             {showModal && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
                     <div className="bg-white text-black! w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg">
-                        <h3
-                            className="text-lg font-semibold  mb-4"
-                            style={{ color: "var(--text-primary)" }}
-                        >
+                        <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--text-primary)" }}>
                             Raise a Ticket
                         </h3>
 
                         <div className="space-y-4">
                             {/* Ticket Type */}
-                            <div>
+                            <div id="ticket-issue-type">
                                 <label className="block text-sm font-medium mb-1.5">
                                     Issue Type *
                                 </label>
@@ -509,7 +616,7 @@ const ClientReportIssue = () => {
 
                             {/* select project */}
 
-                            <div className="">
+                            <div id="ticket-select-project" className="">
                                 <select
                                     value={selectedProjectId}
                                     onChange={(e) => setSelectedProjectId(e.target.value)}
@@ -531,7 +638,7 @@ const ClientReportIssue = () => {
                             </div>
 
                             {/* Target */}
-                            <div>
+                            <div id="ticket-target">
                                 <label className="block text-sm font-medium mb-1.5">
                                     Target *
                                 </label>
@@ -557,7 +664,7 @@ const ClientReportIssue = () => {
                             </div>
 
                             {/* Description */}
-                            <div>
+                            <div id="ticket-description">
                                 <label className="block text-sm font-medium mb-1.5">
                                     Description *
                                 </label>
@@ -574,7 +681,7 @@ const ClientReportIssue = () => {
                             </div>
 
                             {/* Images */}
-                            {/* <div>
+                            {/* <div id="ticket-upload-images">
                 <label className="block text-sm font-medium mb-1.5">
                   Upload Images
                 </label>
@@ -591,7 +698,7 @@ const ClientReportIssue = () => {
                   disabled={creating}
                 />
               </div> */}
-                            <div>
+                            <div id="ticket-upload-images">
                                 <label className="block text-sm font-semibold mb-2 text-[var(--text-primary)]">
                                     Upload Images
                                 </label>
@@ -669,7 +776,7 @@ const ClientReportIssue = () => {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex justify-end gap-3 mt-6">
+                        <div id="ticket-actions" className="flex justify-end gap-3 mt-6">
                             <button
                                 onClick={() => {
                                     setShowModal(false);
@@ -698,7 +805,7 @@ const ClientReportIssue = () => {
                 </div>
             )}
         </div>
-    )
-}
+    );
+};    
 
 export default ClientReportIssue

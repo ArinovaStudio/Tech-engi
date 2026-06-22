@@ -65,15 +65,13 @@ const updates = [
 
 const LatestUpdates = ({ data, }: { data: any; }) => {
   const project = data?.[0];
-
   return (
-    <div className="relative w-full h-[620px] rounded-[24px] border-2 border-[#cfcfcf] bg-[#f5f5f5] p-6 flex flex-col overflow-hidden">
-
-  {/* Header */}
-  <div className="flex items-start justify-between mb-5 shrink-0">
-    <h2 className="text-[30px] leading-none font-black text-black font-id">
-      Latest Task
-    </h2>
+    <div id="latest-task" className="relative w-full h-[620px] rounded-[24px] border-2 border-[#cfcfcf] bg-[#f5f5f5] p-6 flex flex-col overflow-hidden">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-5 shrink-0">
+        <h2 className="text-[30px] leading-none font-black text-black font-id">
+          Latest Task
+        </h2>
 
     <span className="text-[18px] text-[#7d7d7d] font-semibold font-id mt-1">
       {new Date(project?.updatedAt).toLocaleDateString("en-GB", {

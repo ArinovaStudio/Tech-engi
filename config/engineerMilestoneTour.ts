@@ -69,9 +69,15 @@ export function startMilestoneTourIfNew(openModal: () => void) {
   let alreadySeen = false;
   try {
     alreadySeen = window.localStorage.getItem(TOUR_SEEN_KEY) === "true";
-  } catch {}
+  } catch { }
 
-  if (alreadySeen) return;
+  const isHandoff = sessionStorage.getItem("start_milestones_tour") === "true";
+  const forced = sessionStorage.getItem("force_tour") === "true";
+
+  if (alreadySeen && !isHandoff && !forced) return;
+
+  sessionStorage.removeItem("start_milestones_tour");
+  if (forced) sessionStorage.removeItem("force_tour");
 
   injectMilestoneTourStyles();
 
@@ -83,7 +89,10 @@ export function startMilestoneTourIfNew(openModal: () => void) {
     overlayOpacity: 0.55,
     stagePadding: 6,
     stageRadius: 12,
-    onDestroyed: () => markTourSeen(),
+    onDestroyed: () => {
+      markTourSeen();
+      window.dispatchEvent(new CustomEvent("tour-go-to-tab", { detail: "Credentials" }));
+    },
     steps: [
       {
         element: "[data-tour='add-milestone-btn']",
@@ -156,5 +165,5 @@ export function startMilestoneTourIfNew(openModal: () => void) {
 function markTourSeen() {
   try {
     window.localStorage.setItem(TOUR_SEEN_KEY, "true");
-  } catch {}
+  } catch { }
 }

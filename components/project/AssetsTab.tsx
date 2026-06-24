@@ -78,8 +78,6 @@ interface Resource {
   isLocked?: boolean;
 }
 
-// Bump this if you ever change the tour steps and want everyone to see it again
-const ASSETS_TOUR_KEY = "assets_tour_seen_v1";
 
 function AssetsCard({ resource, onDelete, isAdmin }: {
   resource: Resource;
@@ -325,21 +323,26 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
   // modal -> tour continues inside the modal (Title -> Type -> Dropzone ->
   // Upload button) -> destroy + mark as seen on close/finish.
   useEffect(() => {
-    // Don't start until we know the role (so we only show the upload-button
-    // step when canUpload is actually true) and resources have loaded so the
-    // table/row exist in the DOM.
     if (loading) return;
+    if (!session?.user?.id) return;
 
-    const alreadySeen = localStorage.getItem(ASSETS_TOUR_KEY);
-    if (alreadySeen) return;
+    const tourKey = `tour_seen_assets_${session.user.id}`;
 
-    // Nothing to point the row-step at if there are no resources yet.
+    const isHandoff =
+      sessionStorage.getItem("start_assets_tour") === "true";
+
+    const forced =
+      sessionStorage.getItem("force_tour") === "true";
+
+    if (
+      !isHandoff &&
+      !forced &&
+      localStorage.getItem(tourKey)
+    ) {
+      return;
+    }
+
     const hasRow = resources.length > 0;
-
-    const markSeenAndCleanup = () => {
-      localStorage.setItem(ASSETS_TOUR_KEY, "true");
-      tourRef.current = null;
-    };
 
     const steps: DriveStep[] = [
       {
@@ -350,75 +353,86 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
             "This is where every file, image, link, note, and credential shared on this project lives.",
         },
       },
+
       ...(hasRow
         ? [
-            {
-              element: '[data-tour="assets-table-header"]',
-              popover: {
-                title: "Resource List",
-                description:
-                  "Each resource shows its type, who added it, and when it was created.",
-              },
+          {
+            element:
+              '[data-tour="assets-table-header"]',
+            popover: {
+              title: "Resource List",
+              description:
+                "Each resource shows its type, who added it, and when it was created.",
             },
-            {
-              element: '[data-tour="assets-row-0"]',
-              popover: {
-                title: "Take an Action",
-                description:
-                  "View, download, copy, or reveal a resource right from this row, depending on its type.",
-              },
+          },
+          {
+            element:
+              '[data-tour="assets-row-0"]',
+            popover: {
+              title: "Take an Action",
+              description:
+                "View, download, copy, or reveal a resource right from this row.",
             },
-          ]
+          },
+        ]
         : []),
+
       ...(canUpload
         ? [
-            {
-              element: '[data-tour="upload-resource-btn"]',
-              popover: {
-                title: "Add a New Resource",
-                description:
-                  "Click here any time you want to upload an image, file, link, note, or credentials.",
-                onNextClick: () => {
-                  // Open the modal, then wait a tick for it to mount before
-                  // advancing the tour into it.
-                  setOpen(true);
-                  setTimeout(() => {
-                    tourRef.current?.moveNext();
-                  }, 150);
-                },
+          {
+            element:
+              '[data-tour="upload-resource-btn"]',
+            popover: {
+              title: "Add a New Resource",
+              description:
+                "Click here to upload an image, file, link, note, or credentials.",
+
+              onNextClick: (_el: Element | undefined, _step: DriveStep, opts: { driver: Driver }) => {
+                setOpen(true);
+
+                setTimeout(() => {
+                  opts.driver.moveNext();
+                }, 300);
               },
             },
-            {
-              element: '[data-tour="upload-title-input"]',
-              popover: {
-                title: "Name Your Resource",
-                description: "Give it a short, clear title so it's easy to find later.",
-              },
+          },
+          {
+            element:
+              '[data-tour="upload-title-input"]',
+            popover: {
+              title: "Name Your Resource",
+              description:
+                "Give it a clear title.",
             },
-            {
-              element: '[data-tour="upload-type-select"]',
-              popover: {
-                title: "Choose a Type",
-                description:
-                  "Pick Image, File, Link, Text Note, or Credentials. The form below changes to match.",
-              },
+          },
+          {
+            element:
+              '[data-tour="upload-type-select"]',
+            popover: {
+              title: "Choose a Type",
+              description:
+                "Select Image, File, Link, Text Note, or Credentials.",
             },
-            {
-              element: '[data-tour="upload-dropzone-or-content"]',
-              popover: {
-                title: "Add the Content",
-                description:
-                  "Drag & drop a file here, or type/paste your link, note, or credentials, depending on the type you picked.",
-              },
+          },
+          {
+            element:
+              '[data-tour="upload-dropzone-or-content"]',
+            popover: {
+              title: "Add the Content",
+              description:
+                "Upload the file or paste the content.",
             },
-            {
-              element: '[data-tour="upload-submit-btn"]',
-              popover: {
-                title: "You're All Set",
-                description: "Once everything looks good, click Upload to save the resource.",
-              },
+          },
+          {
+            element:
+              '[data-tour="upload-submit-btn"]',
+            popover: {
+              title: "Upload Resource",
+              description:
+                "Click Upload to save the resource.",
             },
-          ]
+          },
+        ]
         : []),
     ];
 
@@ -430,21 +444,52 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
       overlayOpacity: 0.35,
       stagePadding: 6,
       stageRadius: 10,
+
       onDestroyed: () => {
-        markSeenAndCleanup();
+        sessionStorage.removeItem(
+          "start_assets_tour"
+        );
+
+        localStorage.setItem(
+          tourKey,
+          "true"
+        );
+
+        setOpen(false);
+
+        window.dispatchEvent(
+          new CustomEvent(
+            "tour-go-to-tab",
+            {
+              detail: "Report Issue",
+            }
+          )
+        );
+
+        tourRef.current = null;
       },
+
       steps,
     });
 
     tourRef.current = tour;
-    tour.drive();
+
+    const timer = setTimeout(
+      () => tour.drive(),
+      isHandoff ? 0 : 600
+    );
 
     return () => {
+      clearTimeout(timer);
       tour.destroy();
       tourRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, canUpload, resources.length]);
+  }, [
+    loading,
+    canUpload,
+    resources.length,
+    session?.user?.id,
+  ]);
 
   const uploadResource = async () => {
     if (!title) return toast.error("Title is required");

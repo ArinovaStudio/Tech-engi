@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { DollarSign, Wallet, Clock, CheckCircle, CreditCard, Landmark } from "lucide-react";
 import DashboardShell from "@/components/layout/DashboardShell";
 import { startPayoutTourIfNew } from "@/lib/payoutTour";
-
+import { useRouter } from "next/navigation";
 interface Transaction {
   id: string;
   amount: number;
@@ -23,6 +23,7 @@ export default function EngineerPayoutPage() {
   const [stats, setStats] = useState<Stats>({ totalReceived: 0, totalPending: 0 });
   const [hasPayoutDetails, setHasPayoutDetails] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     fetchData();
@@ -31,10 +32,10 @@ export default function EngineerPayoutPage() {
   // Start the one-time onboarding tour once the page has finished
   // loading and the data-tour elements are actually in the DOM.
   useEffect(() => {
-    if (!loading) {
-      startPayoutTourIfNew();
-    }
-  }, [loading]);
+  if (loading) return;
+
+  startPayoutTourIfNew(router);
+}, [loading, router]);
 
   async function fetchData() {
     try {

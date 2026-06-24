@@ -220,12 +220,12 @@ const NewTaskModal: React.FC<{
                       key={priority}
                       onClick={() => setNewTask({ ...newTask, priority })}
                       className={`flex-1 px-4 py-3 rounded-lg border  text-sm capitalize transition-all ${newTask.priority === priority
-                          ? priority === "LOW"
-                            ? "bg-blue-50 text-blue-700 border-blue-300"
-                            : priority === "MEDIUM"
-                              ? "bg-[var(--primary-light)] text-[#b87a2e] border-[#ffd9a8]"
-                              : "bg-red-50 text-red-700 border-red-300"
-                          : "bg-white border-[var(--border)] hover:bg-[var(--bg)]"
+                        ? priority === "LOW"
+                          ? "bg-blue-50 text-blue-700 border-blue-300"
+                          : priority === "MEDIUM"
+                            ? "bg-[var(--primary-light)] text-[#b87a2e] border-[#ffd9a8]"
+                            : "bg-red-50 text-red-700 border-red-300"
+                        : "bg-white border-[var(--border)] hover:bg-[var(--bg)]"
                         }`}
                       style={
                         newTask.priority !== priority
@@ -808,10 +808,19 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
     }
   }, [showNewTaskModal, taskMode, currentUser]);
   // Board-level Kanban tour
+  // Board-level Kanban tour
+// Board-level Kanban tour
 useEffect(() => {
   if (!currentUser?.id || loading) return;
+
   const tourKey = `tour_seen_kanban_${currentUser.id}`;
-  if (localStorage.getItem(tourKey)) return;
+  const isHandoff = sessionStorage.getItem("start_kanban_tour") === "true";
+  const forced = sessionStorage.getItem("force_tour") === "true";
+
+  if (!isHandoff && !forced && localStorage.getItem(tourKey)) return;
+  // Do NOT touch force_tour here — Milestones, Credentials, etc. still need it
+
+  let isHandingOff = false;
 
   const timer = setTimeout(() => {
     const driverObj = driver({
@@ -838,14 +847,21 @@ useEffect(() => {
         }
       },
       onDestroyed: () => {
+        sessionStorage.removeItem("start_kanban_tour");
         localStorage.setItem(tourKey, "true");
+        if (!isHandingOff) {
+          window.dispatchEvent(
+            new CustomEvent("tour-go-to-tab", { detail: "Milestones" })
+          );
+        }
       },
       steps: [
         {
           element: "#kanban-columns",
           popover: {
             title: "Kanban Board",
-            description: "Your tasks are organized into 4 columns — On Hold, Not Started, In Progress, and Completed. Drag and drop any task card between columns to update its status.",
+            description:
+              "Your tasks are organized into 4 columns — On Hold, Not Started, In Progress, and Completed. Drag and drop any task card between columns to update its status.",
           },
         },
         {
@@ -859,9 +875,22 @@ useEffect(() => {
           element: "#kanban-new-task-btn",
           popover: {
             title: "Create a Task",
-            description: "Click here to add a new task to this project. Let's walk through the task form next.",
+            description:
+              "Click here to add a new task to this project. You can fill in the title, description, priority, due date, and tags.",
             onNextClick: (_el: any, _step: any, opts: any) => {
-              setShowNewTaskModal(true);
+              const taskTourKey = `hasSeenNewTaskTour_${currentUser?.id}`;
+              const taskTourAlreadySeen = localStorage.getItem(taskTourKey);
+
+              if (taskTourAlreadySeen) {
+                // Modal tour won't run — isHandingOff stays false so
+                // onDestroyed will dispatch Milestones handoff normally
+                isHandingOff = false;
+              } else {
+                // Modal tour WILL run and dispatches Milestones itself
+                isHandingOff = true;
+                setShowNewTaskModal(true);
+              }
+
               opts.driver.destroy();
             },
           },
@@ -870,11 +899,10 @@ useEffect(() => {
     });
 
     driverObj.drive();
-  }, 1000);
+  }, isHandoff ? 0 : 1000);
 
   return () => clearTimeout(timer);
 }, [currentUser?.id, loading]);
-
   const handleReport = async () => {
     if (!message.trim() || !selectedTask) {
       toast.error("Message cannot be empty");
@@ -1067,12 +1095,12 @@ useEffect(() => {
                   <div className="flex items-center gap-2">
                     <div
                       className={`p-2 rounded-lg ${column.color === "blue"
-                          ? "bg-blue-50 text-blue-600"
-                          : column.color === "yellow"
-                            ? "bg-yellow-50 text-yellow-600"
-                            : column.color === "orange"
-                              ? "bg-orange-50 text-orange-600"
-                              : "bg-green-50 text-green-600"
+                        ? "bg-blue-50 text-blue-600"
+                        : column.color === "yellow"
+                          ? "bg-yellow-50 text-yellow-600"
+                          : column.color === "orange"
+                            ? "bg-orange-50 text-orange-600"
+                            : "bg-green-50 text-green-600"
                         }`}
                     >
                       <Icon className="w-5 h-5" />
@@ -1096,8 +1124,8 @@ useEffect(() => {
                   onDragOver={currentUser?.role !== "CLIENT" ? handleDragOver : undefined}
                   onDrop={currentUser?.role !== "CLIENT" ? () => handleDrop(column.id as Task["status"]) : undefined}
                   className={`flex-1 space-y-3 min-h-[200px] p-1 rounded-lg ${draggedTask && draggedTask.status !== column.id
-                      ? "bg-[var(--bg)]"
-                      : ""
+                    ? "bg-[var(--bg)]"
+                    : ""
                     }`}
                 >
                   {columnTasks.map((task) => (

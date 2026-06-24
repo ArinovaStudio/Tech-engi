@@ -15,61 +15,72 @@ export default function ClientProfile() {
   const router = useRouter();
   const { data, isLoading, mutate } = useSWR("/api/client/profile", fetcher);
   useEffect(() => {
-    if (isLoading || !data?.user?.id) return;
-    const tourKey = `tour_seen_profile_${data.user.id}`;
-    if (localStorage.getItem(tourKey)) return;
+  if (isLoading || !data?.user?.id) return;
 
-    const timer = setTimeout(() => {
-      const driverObj = driver({
-        showProgress: true,
-        animate: true,
-        smoothScroll: true,
-        popoverClass: "custom-tour-popover",
-        overlayOpacity: 0.35,
-        nextBtnText: "Next →",
-        prevBtnText: "← Prev",
-        doneBtnText: "Done ✓",
-        onPopoverRender: (popover) => {
-          const style = (el: HTMLElement) => {
-            el.style.setProperty("background", "var(--primary)", "important");
-            el.style.setProperty("color", "#ffffff", "important");
-            el.style.setProperty("opacity", "1", "important");
-            el.style.setProperty("border", "none", "important");
-          };
-          if (popover.nextButton) style(popover.nextButton);
-          if (popover.previousButton) {
-            popover.previousButton.style.setProperty("background", "transparent", "important");
-            popover.previousButton.style.setProperty("color", "var(--text-secondary)", "important");
-            popover.previousButton.style.setProperty("border", "1px solid var(--border)", "important");
-          }
-        },
-        onDestroyed: () => {
-          localStorage.setItem(tourKey, "true");
-        },
-        steps: [
-          {
-            element: "#profile-photo",
-            popover: {
-              title: "Profile Photo",
-              description: "Click the camera icon to upload or update your profile picture. This is how your team members and engineers will recognize you.",
-            },
+  const tourKey = `tour_seen_profile_${data.user.id}`;
+  const isHandoff = sessionStorage.getItem("start_profile_tour") === "true";
+
+  if (!isHandoff && localStorage.getItem(tourKey)) return;
+
+  const startTour = () => {
+    const photo = document.querySelector("#profile-photo");
+    const payout = document.querySelector("#payout-details");
+    if (!photo || !payout) return;
+
+    const driverObj = driver({
+      showProgress: true,
+      animate: true,
+      smoothScroll: true,
+      popoverClass: "custom-tour-popover",
+      overlayOpacity: 0.35,
+      nextBtnText: "Next →",
+      prevBtnText: "← Prev",
+      doneBtnText: "Done ✓",
+      onPopoverRender: (popover) => {
+        const style = (el: HTMLElement) => {
+          el.style.setProperty("background", "var(--primary)", "important");
+          el.style.setProperty("color", "#ffffff", "important");
+          el.style.setProperty("opacity", "1", "important");
+          el.style.setProperty("border", "none", "important");
+        };
+        if (popover.nextButton) style(popover.nextButton);
+        if (popover.previousButton) {
+          popover.previousButton.style.setProperty("background", "transparent", "important");
+          popover.previousButton.style.setProperty("color", "var(--text-secondary)", "important");
+          popover.previousButton.style.setProperty("border", "1px solid var(--border)", "important");
+        }
+      },
+      onDestroyed: () => {
+        sessionStorage.removeItem("tour_in_progress");
+        sessionStorage.removeItem("start_profile_tour");
+        localStorage.setItem(tourKey, "true");
+      },
+      steps: [
+        {
+          element: "#profile-photo",
+          popover: {
+            title: "Profile Photo",
+            description:
+              "Click the camera icon to upload or update your profile picture. This is how your team members and engineers will recognize you.",
           },
-          {
-            element: "#payout-details",
-            popover: {
-              title: "Payout Details",
-              description: "Set up your UPI ID or bank account here so payments can be processed smoothly. Hit Edit to add or update your details anytime.",
-            },
+        },
+        {
+          element: "#payout-details",
+          popover: {
+            title: "Payout Details",
+            description:
+              "Set up your UPI ID or bank account here so payments can be processed smoothly. Hit Edit to add or update your details anytime.",
           },
-        ],
-      });
+        },
+      ],
+    });
 
-      driverObj.drive();
-    }, 1000);
+    driverObj.drive();
+  };
 
-    return () => clearTimeout(timer);
-  }, [isLoading, data?.user?.id]);
-      
+  const timer = setTimeout(startTour, isHandoff ? 0 : 1000);
+  return () => clearTimeout(timer);
+}, [isLoading, data?.user?.id]);
 
   if (isLoading) return <div className="flex items-center justify-center h-[80vh]"><div className="animate-spin rounded-full h-10 w-10 border-b-2" style={{ borderColor: "var(--primary)" }} /></div>;
 

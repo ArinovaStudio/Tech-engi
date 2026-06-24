@@ -12,8 +12,40 @@ import { startProfileTourIfNew } from "@/config/engineerProfileTour";
 export default function Profile() {
   const { data, isLoading, mutate } = useSWR("/api/engineer/profile", fetcher);
    useEffect(() => {
-    if (data?.user) startProfileTourIfNew();  // 👈 add this
-  }, [data?.user]);
+  if (!data?.user) return;
+
+  const shouldStart =
+    sessionStorage.getItem(
+      "start_engineer_profile_tour"
+    ) === "true";
+
+  const forced =
+    sessionStorage.getItem(
+      "force_tour"
+    ) === "true";
+
+  if (!shouldStart && !forced) return;
+
+  const timer = setTimeout(() => {
+  console.log(
+    "Profile flag:",
+    sessionStorage.getItem(
+      "start_engineer_profile_tour"
+    )
+  );
+
+  console.log(
+    "Force flag:",
+    sessionStorage.getItem(
+      "force_tour"
+    )
+  );
+
+  startProfileTourIfNew();
+}, 400);
+
+  return () => clearTimeout(timer);
+}, [data?.user]);
 
   if (isLoading) {
       return (

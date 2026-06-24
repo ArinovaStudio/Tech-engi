@@ -13,6 +13,7 @@ import TicketCard from "@/components/engineer/dashboard/TicketCard";
 import InvitationCard from "@/components/engineer/dashboard/InvitationCard";
 import DailyScheduleCard from "@/components/engineer/dashboard/DailyScheduleCard";
 import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 
@@ -46,6 +47,7 @@ const statusOrder = {
 type CardKey = "projects" | "revenue" | "received" | "pending";
 
 export default function EngineerDashboardPage() {
+  const router = useRouter();
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [periods, setPeriods] = useState<Record<CardKey, Period>>({
@@ -62,61 +64,99 @@ export default function EngineerDashboardPage() {
   // console.log(invitationsData, "invitationsData");
   const { user } = useAuth();
 
+  // Handoff: Engineer Dashboard → Engineer Projects page
+  const goToProjectsTour = () => {
+    sessionStorage.setItem("tour_in_progress", "true");
+    sessionStorage.setItem("start_engineer_projects_tour", "true");
+    router.push("/engineer/project");
+  };
+
+  const driverConfig = () => ({
+    showProgress: true,
+    animate: true,
+    smoothScroll: true,
+    popoverClass: "custom-tour-popover",
+    overlayOpacity: 0.35,
+    nextBtnText: "Next →",
+    prevBtnText: "← Prev",
+    doneBtnText: "Done ✓",
+    onPopoverRender: (popover: any) => {
+      const style = (el: HTMLElement) => {
+        el.style.setProperty("background", "var(--primary)", "important");
+        el.style.setProperty("color", "#ffffff", "important");
+        el.style.setProperty("opacity", "1", "important");
+        el.style.setProperty("border", "none", "important");
+      };
+      if (popover.nextButton) style(popover.nextButton);
+      if (popover.previousButton) {
+        popover.previousButton.style.setProperty("background", "transparent", "important");
+        popover.previousButton.style.setProperty("color", "var(--text-secondary)", "important");
+        popover.previousButton.style.setProperty("border", "1px solid var(--border)", "important");
+      }
+    },
+  });
+
+  const buildTourSteps = () => [
+    {
+      element: "#engineer-calendar",
+      popover: {
+        title: "Project Calendar",
+        description:
+          "See all your project deadlines plotted on a calendar. Click any date to view which projects are due — hover a project to see its status, progress, and priority.",
+      },
+    },
+    {
+      element: "#engineer-invitations",
+      popover: {
+        title: "Project Invitations",
+        description:
+          "New project matches assigned to you by the admin appear here. Review the project details and earnings, then accept or reject — respond quickly since it's first come, first served.",
+        onNextClick: (_el: any, _step: any, opts: any) => {
+          opts.driver.destroy();
+          goToProjectsTour();
+        },
+      },
+    },
+  ];
+
+  // Auto-run once per user on first visit
   useEffect(() => {
     if (!user?.id || loading) return;
     const tourKey = `tour_seen_engineer_dashboard_${user.id}`;
-    if (localStorage.getItem(tourKey)) return;
+    const forced = sessionStorage.getItem("force_tour") === "true";
+
+    // Skip if already seen AND not force-triggered from Start Tour button
+    if (localStorage.getItem(tourKey) && !forced) return;
+
+    // Clear the force flag — it's consumed now
+    if (forced) sessionStorage.removeItem("force_tour");
 
     const timer = setTimeout(() => {
       const driverObj = driver({
-        showProgress: true,
-        animate: true,
-        smoothScroll: true,
-        popoverClass: "custom-tour-popover",
-        overlayOpacity: 0.35,
-        nextBtnText: "Next →",
-        prevBtnText: "← Prev",
-        doneBtnText: "Done ✓",
-        onPopoverRender: (popover) => {
-          const style = (el: HTMLElement) => {
-            el.style.setProperty("background", "var(--primary)", "important");
-            el.style.setProperty("color", "#ffffff", "important");
-            el.style.setProperty("opacity", "1", "important");
-            el.style.setProperty("border", "none", "important");
-          };
-          if (popover.nextButton) style(popover.nextButton);
-          if (popover.previousButton) {
-            popover.previousButton.style.setProperty("background", "transparent", "important");
-            popover.previousButton.style.setProperty("color", "var(--text-secondary)", "important");
-            popover.previousButton.style.setProperty("border", "1px solid var(--border)", "important");
-          }
-        },
+        ...driverConfig(),
         onDestroyed: () => {
           localStorage.setItem(tourKey, "true");
         },
-        steps: [
-          {
-            element: "#engineer-calendar",
-            popover: {
-              title: "Project Calendar",
-              description: "See all your project deadlines plotted on a calendar. Click any date to view which projects are due — hover a project to see its status, progress, and priority.",
-            },
-          },
-          {
-            element: "#engineer-invitations",
-            popover: {
-              title: "Project Invitations",
-              description: "New project matches assigned to you by the admin appear here. Review the project details and earnings, then accept or reject — respond quickly since it's first come, first served.",
-            },
-          },
-        ],
+        steps: buildTourSteps(),
       });
-
       driverObj.drive();
     }, 1500);
 
     return () => clearTimeout(timer);
   }, [user?.id, loading]);
+
+  // Manual "Start Tour" button trigger — no localStorage gate, always runs
+  useEffect(() => {
+    const handleManualTour = () => {
+      const driverObj = driver({
+        ...driverConfig(),
+        steps: buildTourSteps(),
+      });
+      driverObj.drive();
+    };
+    window.addEventListener("start-engineer-dashboard-tour", handleManualTour);
+    return () => window.removeEventListener("start-engineer-dashboard-tour", handleManualTour);
+  }, []);
 
   const fetchAnalytics = useCallback(async (period: Period) => {
     if (cache[period]) {
@@ -206,6 +246,17 @@ export default function EngineerDashboardPage() {
     <DashboardShell>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold  text-[var(--text-primary)]">Dashboards</h1>
+        <button
+          onClick={() => {
+            sessionStorage.setItem("force_tour", "true");
+            window.dispatchEvent(new Event("start-sidebar-tour"));
+          }
+          }
+          className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
+          style={{ background: "var(--primary)" }}
+        >
+          Start Tour
+        </button>
       </div>
 
       <div className="flex w-full p-1 ">

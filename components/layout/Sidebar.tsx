@@ -1,15 +1,18 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, CreditCard, Users, MessageSquare, LogOut, ChevronLeft, ChevronRight,
   User, UserKeyIcon, FolderKanban, Presentation, Lightbulb, FileUp, Handshake, Bug, Paperclip, Send
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { dashboardTourSteps } from "@/config/dashboardTourSteps";
+import { engineerDashboardTourSteps } from "@/config/engineerDashboardTourSteps";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
+import next from "next";
 
 interface NavItem {
   label: string;
@@ -96,8 +99,169 @@ const NavLink = ({ item, collapsed }: { item: NavItem; collapsed: boolean }) => 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const { isAdmin, isEngineer, isClient, user } = useAuth();
+  const router = useRouter();
   const nav = isAdmin ? ADMIN_NAV : isEngineer ? ENGINEER_NAV : isClient ? CLIENT_NAV : [];
 
+  // Tracks the currently-running driver.js instance so tours can destroy
+  // themselves before handing off to the next page's tour.
+  const activeDriverRef = useRef<ReturnType<typeof driver> | null>(null);
+
+  // Polls for an element to exist in the DOM before dispatching handoff events.
+  // router.push() resolves before the new page's component has mounted, so
+  // we wait for a known anchor element to confirm the page is ready.
+  const waitForElement = (selector: string, timeoutMs = 5000, intervalMs = 100): Promise<boolean> => {
+    return new Promise((resolve) => {
+      const start = Date.now();
+      const check = () => {
+        if (document.querySelector(selector)) {
+          resolve(true);
+          return;
+        }
+        if (Date.now() - start >= timeoutMs) {
+          resolve(false);
+          return;
+        }
+        setTimeout(check, intervalMs);
+      };
+      check();
+    });
+  };
+
+  // Handoff: Dashboard → Report Issue page
+  const goToReportIssueTour = async () => {
+    activeDriverRef.current?.destroy();
+    activeDriverRef.current = null;
+
+    sessionStorage.setItem("tour_in_progress", "true");
+    router.push("/client/reportissue");
+
+    const found = await waitForElement("#report-issue-btn");
+    if (found) {
+      window.dispatchEvent(new Event("start-report-issue-tour"));
+    } else {
+      sessionStorage.removeItem("tour_in_progress");
+    }
+  };
+  // Handoff: Engineer Dashboard → Engineer Projects page
+const goToEngineerProjectsTour = () => {
+  activeDriverRef.current?.destroy();
+  activeDriverRef.current = null;
+
+  sessionStorage.setItem("tour_in_progress", "true");
+  sessionStorage.setItem("start_engineer_projects_tour", "true");
+
+  router.push("/engineer/project");
+};
+
+  // Handoff: Report Issue page → Assets page
+  // Called by the "go-to-assets-tour" event dispatched from ClientReportIssue.
+  const goToAssetsTour = async () => {
+    activeDriverRef.current?.destroy();
+    activeDriverRef.current = null;
+
+    // Keep the flag alive — ClientReportIssue's onDestroyed must NOT have
+    // cleared it when handing off (see isHandingOff ref in that component).
+    sessionStorage.setItem("tour_in_progress", "true");
+    router.push("/client/assets");
+
+    const found = await waitForElement("#upload-assets-btn");
+    if (found) {
+      window.dispatchEvent(new Event("start-assets-tour"));
+    } else {
+      sessionStorage.removeItem("tour_in_progress");
+    }
+  };
+  // Handoff: Assets page → Payout (Account) page
+const goToPayoutTour = () => {
+  activeDriverRef.current?.destroy();
+  activeDriverRef.current = null;
+
+  sessionStorage.setItem("tour_in_progress", "true");
+  sessionStorage.setItem("start_payout_tour", "true");
+
+  router.push("/client/account");
+};
+ const goToProfileTour = () => {
+  activeDriverRef.current?.destroy();
+  activeDriverRef.current = null;
+
+  sessionStorage.setItem("tour_in_progress", "true");
+  sessionStorage.setItem("start_profile_tour", "true");
+
+  router.push("/client/profile");
+};
+  // Sidebar + Dashboard steps only. Report Issue and Assets tours run
+  // inside their own pages via events — don't include their steps here.
+  const buildTourSteps = () => {
+  const roleDashboardSteps = isEngineer ? engineerDashboardTourSteps : dashboardTourSteps;
+  const goToNextPage = isEngineer ? goToEngineerProjectsTour : goToReportIssueTour;
+
+  const dashboardStepsWithHandoff = roleDashboardSteps.map((step, index) => {
+    const isLastStep = index === roleDashboardSteps.length - 1;
+    if (!isLastStep) return step;
+
+    return {
+      ...step,
+      popover: {
+        ...step.popover,
+        onNextClick: (_el: any, _stepArg: any, opts: any) => {
+          activeDriverRef.current = opts.driver;
+          goToNextPage();
+        },
+      },
+    };
+  });
+
+  const sidebarSteps = nav.map((item) => ({
+    element: `#nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`,
+    popover: {
+      title: item.label,
+      description: getSidebarDescription(item.label),
+    },
+  }));
+
+  return [
+    ...sidebarSteps,
+    {
+      element: "#nav-dashboard",
+      popover: {
+        title: "You're Ready! 🎉",
+        description:
+          isEngineer
+            ? "Now click on any project from the dashboard to continue the tour and explore the full project details, tasks, milestones, and more!"
+            : "Now click on any project from the dashboard to continue the tour and explore the full project analytics, budget, design system, and more!",
+      },
+    },
+    ...dashboardStepsWithHandoff,
+  ];
+};
+
+  const driverConfig = () => ({
+    showProgress: true,
+    animate: true,
+    smoothScroll: true,
+    popoverClass: "custom-tour-popover",
+    overlayOpacity: 0.35,
+    nextBtnText: "Next →",
+    prevBtnText: "← Prev",
+    doneBtnText: "Done ✓",
+    onPopoverRender: (popover: any) => {
+      const style = (el: HTMLElement) => {
+        el.style.setProperty("background", "var(--primary)", "important");
+        el.style.setProperty("color", "#ffffff", "important");
+        el.style.setProperty("opacity", "1", "important");
+        el.style.setProperty("border", "none", "important");
+      };
+      if (popover.nextButton) style(popover.nextButton);
+      if (popover.previousButton) {
+        popover.previousButton.style.setProperty("background", "transparent", "important");
+        popover.previousButton.style.setProperty("color", "var(--text-secondary)", "important");
+        popover.previousButton.style.setProperty("border", "1px solid var(--border)", "important");
+      }
+    },
+  });
+
+  // Auto-start tour on first visit
   useEffect(() => {
     if (!user?.id || nav.length === 0) return;
     const tourKey = `tour_seen_sidebar_${user.id}`;
@@ -105,45 +269,56 @@ export default function Sidebar() {
 
     const timer = setTimeout(() => {
       const driverObj = driver({
-        showProgress: true,
-        animate: true,
-        smoothScroll: true,
-        popoverClass: "custom-tour-popover",
-        overlayOpacity: 0.35,
-        nextBtnText: "Next →",
-        prevBtnText: "← Prev",
-        doneBtnText: "Done ✓",
-        onPopoverRender: (popover) => {
-          const style = (el: HTMLElement) => {
-            el.style.setProperty("background", "var(--primary)", "important");
-            el.style.setProperty("color", "#ffffff", "important");
-            el.style.setProperty("opacity", "1", "important");
-            el.style.setProperty("border", "none", "important");
-          };
-          if (popover.nextButton) style(popover.nextButton);
-          if (popover.previousButton) {
-            popover.previousButton.style.setProperty("background", "transparent", "important");
-            popover.previousButton.style.setProperty("color", "var(--text-secondary)", "important");
-            popover.previousButton.style.setProperty("border", "1px solid var(--border)", "important");
-          }
-        },
+        ...driverConfig(),
         onDestroyed: () => {
           localStorage.setItem(tourKey, "true");
         },
-        steps: nav.map((item) => ({
-          element: `#nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`,
-          popover: {
-            title: item.label,
-            description: getSidebarDescription(item.label),
-          },
-        })),
+        steps: buildTourSteps(),
       });
 
+      activeDriverRef.current = driverObj;
       driverObj.drive();
     }, 1500);
 
     return () => clearTimeout(timer);
   }, [user?.id, nav.length]);
+
+  // Manual tour trigger via "Start Tour" button on the dashboard
+  useEffect(() => {
+  const handleManualTour = () => {
+    // Signal all downstream pages to ignore their localStorage gate
+    sessionStorage.setItem("force_tour", "true");
+
+    const driverObj = driver({
+      ...driverConfig(),
+      steps: buildTourSteps(),
+    });
+    activeDriverRef.current = driverObj;
+    driverObj.drive();
+  };
+  window.addEventListener("start-sidebar-tour", handleManualTour);
+  return () => window.removeEventListener("start-sidebar-tour", handleManualTour);
+}, [nav]);
+
+  // Dedicated listener for the Report Issue → Assets handoff event.
+  // Kept in its own effect with empty deps so it is ALWAYS mounted,
+  // regardless of which page the user is currently on.
+  useEffect(() => {
+    const handleGoToAssets = () => goToAssetsTour();
+    window.addEventListener("go-to-assets-tour", handleGoToAssets);
+    return () => window.removeEventListener("go-to-assets-tour", handleGoToAssets);
+  }, []);
+
+  useEffect(() => {
+    const handleGoToPayout = () => goToPayoutTour();
+    window.addEventListener("go-to-payout-tour", handleGoToPayout);
+    return () => window.removeEventListener("go-to-payout-tour", handleGoToPayout);
+  }, []);
+  useEffect(() => {
+  const handleGoToProfile = () => goToProfileTour();
+  window.addEventListener("go-to-profile-tour", handleGoToProfile);
+  return () => window.removeEventListener("go-to-profile-tour", handleGoToProfile);
+}, []);
 
   return (
     <aside

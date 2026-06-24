@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   AlertCircle,
   Plus,
@@ -14,6 +14,10 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { format } from "date-fns";
+import { useRouter } from "next/navigation";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
+
 const statusColors: Record<string, string> = {
   OPEN: "bg-red-100 text-red-600",
   IN_PROGRESS: "bg-yellow-100 text-yellow-700",
@@ -122,6 +126,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
   const [tickets, setTickets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const tourRef = useRef<any>(null);
   const [creating, setCreating] = useState(false);
   const [projectClient, setProjectClient] = useState(null);
   const { data: session, status: sessionStatus } = useSession();
@@ -137,9 +142,8 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
     description: "",
     images: [] as File[],
   });
-
   const [activeTab, setActiveTab] = useState("ME");
-
+  const router = useRouter();
   const roleTabs = role === "ADMIN" ? ["ME", "ENGINEER", "CLIENT"] : role === "CLIENT" ? ["ME", "ENGINEER", "ADMIN"] : ["ME", "ADMIN", "CLIENT"];
 
   const fetchTickets = async () => {
@@ -166,6 +170,168 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
     };
     fetchData();
   }, [projectId]);
+  useEffect(() => {
+  if (loading) return;
+  if (!session?.user?.id) return;
+
+  const tourKey = `tour_seen_report_issue_${session.user.id}`;
+
+  const isHandoff =
+    sessionStorage.getItem(
+      "start_report_issue_tour"
+    ) === "true";
+
+  const forced =
+    sessionStorage.getItem(
+      "force_tour"
+    ) === "true";
+
+  if (
+    !isHandoff &&
+    !forced &&
+    localStorage.getItem(tourKey)
+  ) {
+    return;
+  }
+
+  const tour = driver({
+    showProgress: true,
+    animate: true,
+    smoothScroll: true,
+    overlayOpacity: 0.35,
+    nextBtnText: "Next →",
+    prevBtnText: "← Prev",
+    doneBtnText: "Done ✓",
+
+    steps: [
+      {
+        element: '[data-tour="report-heading"]',
+        popover: {
+          title: "Report an Issue",
+          description:
+            "This section allows you to raise and manage project issues.",
+        },
+      },
+      {
+        element: '[data-tour="report-guidelines"]',
+        popover: {
+          title: "Issue Guidelines",
+          description:
+            "Read these guidelines before raising an issue.",
+        },
+      },
+      {
+        element: '[data-tour="report-tabs"]',
+        popover: {
+          title: "Issue Categories",
+          description:
+            "View issues raised by you, admins, clients, and engineers.",
+        },
+      },
+      {
+        element: '[data-tour="report-btn"]',
+        popover: {
+          title: "Raise a Ticket",
+          description:
+            "Click here to report a new issue.",
+
+          onNextClick: (
+            _el: Element | undefined,
+            _step: any,
+            opts: any
+          ) => {
+            setShowModal(true);
+
+            setTimeout(() => {
+              opts.driver.moveNext();
+            }, 300);
+          },
+        },
+      },
+      {
+        element: '[data-tour="ticket-type"]',
+        popover: {
+          title: "Issue Type",
+          description:
+            "Select the category of the issue.",
+        },
+      },
+      {
+        element: '[data-tour="ticket-target"]',
+        popover: {
+          title: "Issue Target",
+          description:
+            "Choose who this issue should be reported to.",
+        },
+      },
+      {
+        element: '[data-tour="ticket-description"]',
+        popover: {
+          title: "Describe the Issue",
+          description:
+            "Provide detailed information about the problem.",
+        },
+      },
+      {
+        element: '[data-tour="ticket-upload"]',
+        popover: {
+          title: "Upload Images",
+          description:
+            "Attach screenshots or supporting images if necessary.",
+        },
+      },
+      {
+        element: '[data-tour="ticket-submit"]',
+        popover: {
+          title: "Submit Ticket",
+          description:
+            "Submit the ticket once all required information is filled.",
+        },
+      },
+    ],
+
+    onDestroyed: () => {
+  sessionStorage.removeItem(
+    "start_report_issue_tour"
+  );
+
+  localStorage.setItem(
+    tourKey,
+    "true"
+  );
+
+  setShowModal(false);
+
+  sessionStorage.setItem(
+    "start_engineer_payout_tour",
+    "true"
+  );
+
+  router.push("/engineer/payout");
+
+  tourRef.current = null;
+},
+  });
+
+  tourRef.current = tour;
+
+  const timer = setTimeout(
+    () => {
+      tour.drive();
+    },
+    isHandoff ? 0 : 600
+  );
+
+  return () => {
+    clearTimeout(timer);
+
+    tour.destroy();
+    tourRef.current = null;
+  };
+}, [
+  loading,
+  session?.user?.id,
+]);
 
   const handleCreateTicket = async ({ }) => {
     try {
@@ -283,6 +449,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
       <Toaster position="top-right" />
       <div className="flex items-center justify-between">
         <h2
+          data-tour="report-heading"
           className="text-2xl font-bold  flex items-center gap-2"
           style={{ color: "var(--text-primary)" }}
         >
@@ -295,6 +462,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                 <Shield size={14} /> Client Issue
               </button> */}
               <button
+                data-tour="report-btn"
                 onClick={() => setShowModal(true)}
                 className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm"
                 style={{ background: "var(--primary)" }}
@@ -307,6 +475,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
       </div>
 
       <div
+        data-tour="report-guidelines"
         className="rounded-lg p-4 border"
         style={{ background: "var(--primary-light)", borderColor: "#ffd9a8" }}
       >
@@ -333,7 +502,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Sidebar */}
         <div className="w-full shrink-0">
-          <div className="bg-white rounded-xl border border-[var(--border)] p-2 mb-3">
+          <div data-tour="report-tabs" className="bg-white rounded-xl border border-[var(--border)] p-2 mb-3">
             <div className="flex gap-2 overflow-x-auto">
               {roleTabs.map((tab) => {
                 const count = tickets.filter((ticket) => {
@@ -530,7 +699,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white text-black! w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg">
+          <div data-tour="ticket-modal" className="bg-white text-black! w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg">
             <h3
               className="text-lg font-semibold  mb-4"
               style={{ color: "var(--text-primary)" }}
@@ -545,6 +714,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                   Issue Type *
                 </label>
                 <select
+                  data-tour="ticket-type"
                   value={newTicket.issueType}
                   onChange={(e) =>
                     setNewTicket({ ...newTicket, issueType: e.target.value })
@@ -566,7 +736,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                 <label className="block text-sm font-medium mb-1.5">
                   Target *
                 </label>
-                <div className="flex gap-4">
+                <div data-tour="ticket-target" className="flex gap-4">
                   {targetOptions.map((t) => (
                     <label
                       key={t}
@@ -593,6 +763,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                   Description *
                 </label>
                 <textarea
+                  data-tour="ticket-description"
                   value={newTicket.description}
                   onChange={(e) =>
                     setNewTicket({ ...newTicket, description: e.target.value })
@@ -628,6 +799,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                 </label>
 
                 <label
+                  data-tour="ticket-upload"
                   htmlFor="ticket-images"
                   className={` group flex flex-col items-center justify-center w-full min-h-[140px] rounded-2xl border-2 border-dashed border-[#FFD4A6] bg-gradient-to-br from-[#FFF8F1] to-[#FFF3E6] cursor-pointer transition-all duration-300 hover:border-[#FFAE58] hover:shadow-[0_8px_30px_rgba(255,174,88,0.15)]`}>
                   <input
@@ -717,6 +889,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
               </button>
 
               <button
+                data-tour="ticket-submit"
                 onClick={handleCreateTicket}
                 disabled={
                   creating ||

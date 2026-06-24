@@ -4,6 +4,8 @@ import DashboardShell from "@/components/layout/DashboardShell";
 import { Search, Filter, Briefcase, Calendar, Clock, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 
 interface Project {
   id: string;
@@ -146,6 +148,61 @@ export default function EngineerProjectsPage() {
     fetchProjects();
   }, [debouncedSearch, statusFilter, page]);
 
+  useEffect(() => {
+    const isHandoff = sessionStorage.getItem("start_engineer_projects_tour") === "true";
+    if (!isHandoff) return;
+    if (loading || projects.length === 0) return;
+
+    const timer = setTimeout(() => {
+      const driverObj = driver({
+        showProgress: true,
+        animate: true,
+        smoothScroll: true,
+        popoverClass: "custom-tour-popover",
+        overlayOpacity: 0.35,
+        nextBtnText: "Next →",
+        prevBtnText: "← Prev",
+        doneBtnText: "Done ✓",
+        onPopoverRender: (popover) => {
+          const style = (el: HTMLElement) => {
+            el.style.setProperty("background", "var(--primary)", "important");
+            el.style.setProperty("color", "#ffffff", "important");
+            el.style.setProperty("opacity", "1", "important");
+            el.style.setProperty("border", "none", "important");
+          };
+          if (popover.nextButton) style(popover.nextButton);
+          if (popover.previousButton) {
+            popover.previousButton.style.setProperty("background", "transparent", "important");
+            popover.previousButton.style.setProperty("color", "var(--text-secondary)", "important");
+            popover.previousButton.style.setProperty("border", "1px solid var(--border)", "important");
+          }
+        },
+        steps: [
+          {
+            element: "#projects-grid",
+            popover: {
+              title: "Your Projects",
+              description: "Click on any project card to see its full details, tasks, milestones, and more.",
+            },
+          },
+        ],
+      });
+
+      driverObj.drive();
+
+      const grid = document.querySelector("#projects-grid");
+      const handleCardClick = () => {
+        driverObj.destroy();
+        sessionStorage.removeItem("start_engineer_projects_tour");
+        // Signal the Project Detail page to run its tour even if already seen
+        sessionStorage.setItem("force_tour", "true");
+      };
+      grid?.addEventListener("click", handleCardClick, { once: true });
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [loading, projects]);
+
   return (
     <DashboardShell>
       <div className="space-y-6 pb-10">
@@ -161,7 +218,7 @@ export default function EngineerProjectsPage() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-4 mt-4 flex-col md:flex-row"> 
+          <div className="flex items-center gap-4 mt-4 flex-col md:flex-row">
             <div className="relative w-full md:w-64 shrink-0">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
               <input
@@ -246,7 +303,7 @@ export default function EngineerProjectsPage() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div id="projects-grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {projects.map((p) => <ProjectCard key={p.id} project={p} />)}
             </div>
 

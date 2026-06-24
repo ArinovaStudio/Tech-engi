@@ -1,3 +1,13 @@
+export const projectsListTourSteps = [
+  {
+    element: "#nav-dashboard",
+    popover: {
+      title: "Dashboard",
+      description: "Your main hub to view all projects.",
+    },
+  },
+];
+
 export const dashboardTourSteps = [
   {
     element: "#dashboard-title",

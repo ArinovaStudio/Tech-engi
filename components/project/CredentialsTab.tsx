@@ -212,66 +212,121 @@ const CredentialsTab = ({ projectId }: CredentialsTabProps) => {
   }, [projectId]);
 
   // ── 2. Tour — runs once after loading completes ───────────
-  useEffect(() => {
-    if (loading) return;
-    if (!isPrivileged) return;
+  // ── 2. Credentials Tour ─────────────────────────────────────
+useEffect(() => {
+  if (loading) return;
+  if (!isPrivileged) return;
+  if (!session?.user?.id) return;
 
-    const tourKey = `credentials_tour_${projectId}`;
-    if (localStorage.getItem(tourKey)) return;
-    const styleEl = document.createElement("style");
+  const tourKey = `tour_seen_credentials_${session.user.id}`;
+
+  const isHandoff =
+    sessionStorage.getItem("start_credentials_tour") === "true";
+
+  const forced =
+    sessionStorage.getItem("force_tour") === "true";
+
+  if (
+    !isHandoff &&
+    !forced &&
+    localStorage.getItem(tourKey)
+  ) {
+    return;
+  }
+
+  const styleEl = document.createElement("style");
   styleEl.id = "driver-tour-styles";
+
   if (!document.getElementById("driver-tour-styles")) {
     styleEl.textContent = tourStyles;
     document.head.appendChild(styleEl);
   }
 
+  const driverObj = driver({
+    showProgress: true,
+    animate: true,
+    smoothScroll: true,
+    popoverClass: "custom-tour-popover",
+    overlayOpacity: 0.35,
+    nextBtnText: "Next →",
+    prevBtnText: "← Prev",
+    doneBtnText: "Done ✓",
 
-    const driverObj = driver({
-      showProgress: true,
-      steps: [
-        {
-          element: "#cred-header",
-          popover: {
-            title: "Project Credentials",
-            description:
-              "All your project credentials — hosting logins, database passwords, URLs — are stored here securely.",
-            side: "bottom",
-            align: "start",
-          },
+    steps: [
+      {
+        element: "#cred-header",
+        popover: {
+          title: "Project Credentials",
+          description:
+            "All your project credentials — hosting logins, database passwords, URLs — are stored here securely.",
+          side: "bottom",
+          align: "start",
         },
-        {
-          element: "#add-credential-btn",
-          popover: {
-            title: "Add a Credential",
-            description: "Click this to securely store a new credential for your team.",
-            side: "left",
-            align: "start",
-            onNextClick: () => {
-              setShowAddModal(true);
-              setTimeout(() => driverObj.moveNext(), 350);
-            },
-          },
-        },
-        {
-          element: "#credential-modal",
-          popover: {
-            title: "Fill in the Details",
-            description:
-              "Give it a title and paste in the credentials (username, password, URL, etc.). Hit Add Credential when done.",
-            side: "top",
-            align: "center",
-          },
-        },
-      ],
-      onDestroyStarted: () => {
-        localStorage.setItem(tourKey, "true");
-        setShowAddModal(false);
-        driverObj.destroy();
       },
-    });
+      {
+        element: "#add-credential-btn",
+        popover: {
+          title: "Add a Credential",
+          description:
+            "Click this to securely store a new credential for your team.",
+          side: "left",
+          align: "start",
 
-    setTimeout(() => driverObj.drive(), 600);
-  }, [loading]);
+          onNextClick: (_el, _step, opts) => {
+            setShowAddModal(true);
+
+            setTimeout(() => {
+              opts.driver.moveNext();
+            }, 350);
+          },
+        },
+      },
+      {
+        element: "#credential-modal",
+        popover: {
+          title: "Fill in the Details",
+          description:
+            "Give it a title and paste in the credentials. Hit Add Credential when done.",
+          side: "top",
+          align: "center",
+        },
+      },
+    ],
+
+    onDestroyed: () => {
+      sessionStorage.removeItem(
+        "start_credentials_tour"
+      );
+
+      localStorage.setItem(
+        tourKey,
+        "true"
+      );
+
+      setShowAddModal(false);
+
+      window.dispatchEvent(
+        new CustomEvent(
+          "tour-go-to-tab",
+          {
+            detail: "Assets",
+          }
+        )
+      );
+    },
+  });
+
+  const timer = setTimeout(
+    () => driverObj.drive(),
+    isHandoff ? 0 : 600
+  );
+
+  return () => clearTimeout(timer);
+}, [
+  loading,
+  isPrivileged,
+  session?.user?.id,
+]);
 
   // ─────────────────────────────────────────────────────────
   const isUnlocked =

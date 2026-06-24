@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { DollarSign, CreditCard, TrendingUp, Clock, CheckCircle, Wallet, AlertCircle, Loader2 } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth"; 
+import { useAuth } from "@/hooks/useAuth";
 import { usePayment } from "@/hooks/usePayment";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
@@ -38,7 +38,7 @@ export default function ClientAccountPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [pendingProjects, setPendingProjects] = useState<PendingProject[]>([]);
-  const [paying, setPaying] = useState<string | null>(null); 
+  const [paying, setPaying] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
 
@@ -53,9 +53,9 @@ export default function ClientAccountPage() {
 
       if (historyRes.ok) {
         const data = await historyRes.json();
-        if (data.success) { 
-          setTransactions(data.transactions || []); 
-          setStats(data.stats); 
+        if (data.success) {
+          setTransactions(data.transactions || []);
+          setStats(data.stats);
           setPendingProjects(data.pendingProjects || []);
         }
       }
@@ -66,11 +66,19 @@ export default function ClientAccountPage() {
     }
   }
   useEffect(() => {
-    if (!user?.id || loading) return;
-    const tourKey = `tour_seen_account_${user.id}`;
-    if (localStorage.getItem(tourKey)) return;
+    if (!user?.id) return;
+    if (loading) return;
 
-    const timer = setTimeout(() => {
+    const tourKey = `tour_seen_account_${user.id}`;
+    const isHandoff = sessionStorage.getItem("start_payout_tour") === "true";
+
+    if (!isHandoff && localStorage.getItem(tourKey)) return;
+
+    const startTour = () => {
+      const history = document.querySelector("#payment-history-section");
+      const activity = document.querySelector("#new-activity-section");
+      if (!history || !activity) return;
+
       const driverObj = driver({
         showProgress: true,
         animate: true,
@@ -95,6 +103,8 @@ export default function ClientAccountPage() {
           }
         },
         onDestroyed: () => {
+          sessionStorage.removeItem("tour_in_progress");
+          sessionStorage.removeItem("start_payout_tour");
           localStorage.setItem(tourKey, "true");
         },
         steps: [
@@ -102,29 +112,34 @@ export default function ClientAccountPage() {
             element: "#payment-history-section",
             popover: {
               title: "Payment History",
-              description: "Every transaction across all your projects lives here — advance payments, final payments, and refunds — each with its status and date.",
+              description:
+                "Every transaction across all your projects lives here — advance payments, final payments, and refunds — each with its status and date.",
             },
           },
           {
             element: "#new-activity-section",
             popover: {
               title: "New Activity",
-              description: "Any pending payments you owe show up here, with the exact amount due. Hit Pay Now to settle an advance or final payment directly.",
+              description:
+                "Any pending payments you owe show up here, with the exact amount due. Hit Pay Now to settle an advance or final payment directly.",
+              onNextClick: (_el, _step, opts) => {
+                opts.driver.destroy();
+                window.dispatchEvent(new Event("go-to-profile-tour"));
+              },
             },
           },
         ],
       });
 
       driverObj.drive();
-    }, 1000);
+    };
 
+    const timer = setTimeout(startTour, isHandoff ? 0 : 1000);
     return () => clearTimeout(timer);
   }, [user?.id, loading]);
-
-
   async function handlePay(project: PendingProject) {
     setPaying(project.id);
-    
+
     const isAdvance = project.status === "DRAFT";
     const description = isAdvance ? "Advance Payment (40%)" : "Final Payment (60%)";
 

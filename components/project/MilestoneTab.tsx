@@ -19,7 +19,9 @@ import {
   Pencil,
   Delete,
 } from "lucide-react";
+
 import toast from "react-hot-toast";
+import { driver } from "driver.js";
 import { startMilestoneTourIfNew } from "@/config/engineerMilestoneTour";
 
 export default function MilestoneTab({ projectId }: any) {
@@ -85,6 +87,7 @@ export default function MilestoneTab({ projectId }: any) {
       fetchCurrentUser();
     }
   }, [projectId]);
+  // Replace the startMilestoneTourIfNew call's useEffect with this:
   useEffect(() => {
   if (!loading) {
     startMilestoneTourIfNew(() => setOpen(true));
@@ -503,6 +506,7 @@ export default function MilestoneTab({ projectId }: any) {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2
+          data-tour="milestones-heading"
           className="text-2xl font-bold "
           style={{ color: "var(--text-primary)" }}
         >

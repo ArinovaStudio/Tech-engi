@@ -81,12 +81,30 @@ export function startProfileTourIfNew() {
   if (typeof window === "undefined") return;
 
   let alreadySeen = false;
-  try {
-    alreadySeen = window.localStorage.getItem(TOUR_SEEN_KEY) === "true";
-  } catch {}
+try {
+  alreadySeen =
+    window.localStorage.getItem(
+      TOUR_SEEN_KEY
+    ) === "true";
+} catch {}
 
-  if (alreadySeen) return;
+const isHandoff =
+  sessionStorage.getItem(
+    "start_engineer_profile_tour"
+  ) === "true";
 
+const forced =
+  sessionStorage.getItem(
+    "force_tour"
+  ) === "true";
+
+if (
+  alreadySeen &&
+  !isHandoff &&
+  !forced
+) {
+  return;
+}
   injectProfileTourStyles();
 
   const config: Config = {
@@ -97,7 +115,28 @@ export function startProfileTourIfNew() {
     overlayOpacity: 0.55,
     stagePadding: 6,
     stageRadius: 12,
-    onDestroyed: () => markTourSeen(),
+    onDestroyed: () => {
+  markTourSeen();
+
+  const isOnboarding =
+    sessionStorage.getItem(
+      "start_engineer_profile_tour"
+    ) === "true";
+
+  if (!isOnboarding) return;
+
+  sessionStorage.removeItem(
+    "start_engineer_profile_tour"
+  );
+
+  sessionStorage.removeItem(
+    "force_tour"
+  );
+
+  sessionStorage.removeItem(
+    "tour_in_progress"
+  );
+},
     steps: [
       {
         element: "[data-tour='profile-photo']",
@@ -123,11 +162,13 @@ export function startProfileTourIfNew() {
   };
 
   const tourInstance = driver(config);
-  tourInstance.drive();
-}
 
+setTimeout(() => {
+  tourInstance.drive();
+}, isHandoff ? 500 : 0);
 function markTourSeen() {
   try {
     window.localStorage.setItem(TOUR_SEEN_KEY, "true");
   } catch {}
+}
 }

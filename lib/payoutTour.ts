@@ -1,5 +1,5 @@
 "use client";
-
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { driver, type Config } from "driver.js";
 import "driver.js/dist/driver.css";
 
@@ -91,7 +91,9 @@ function injectPayoutTourStyles() {
  * Safe to call on every page load — it no-ops if the tour was
  * already seen on this browser (localStorage flag).
  */
-export function startPayoutTourIfNew() {
+export function startPayoutTourIfNew(
+  router?: AppRouterInstance
+) {
   if (typeof window === "undefined") return;
 
   let alreadySeen = false;
@@ -101,8 +103,17 @@ export function startPayoutTourIfNew() {
     // localStorage unavailable (e.g. private mode) — just don't persist,
     // but still allow the tour to run once for this session.
   }
+  const isHandoff =
+  sessionStorage.getItem(
+    "start_engineer_payout_tour"
+  ) === "true";
 
-  if (alreadySeen) return;
+const forced =
+  sessionStorage.getItem(
+    "force_tour"
+  ) === "true";
+
+  if (alreadySeen && !isHandoff) return;
 
   injectPayoutTourStyles();
 
@@ -114,7 +125,34 @@ export function startPayoutTourIfNew() {
     overlayOpacity: 0.55,
     stagePadding: 6,
     stageRadius: 12,
-    onDestroyed: () => markTourSeen(),
+    
+    onDestroyed: () => {
+  const isOnboarding =
+    sessionStorage.getItem(
+      "start_engineer_payout_tour"
+    ) === "true";
+
+  markTourSeen();
+
+  if (!isOnboarding) return;
+
+  sessionStorage.removeItem(
+    "start_engineer_payout_tour"
+  );
+
+  sessionStorage.setItem(
+    "start_engineer_profile_tour",
+    "true"
+  );
+
+  if (router) {
+    router.push("/engineer/profile");
+  } else {
+    window.location.href =
+      "/engineer/profile";
+  }
+},
+
     steps: [
       {
         element: "[data-tour='total-earnings']",
@@ -180,6 +218,7 @@ export function startPayoutTourIfNew() {
   };
 
   const tourInstance = driver(config);
+  console.log("PAYOUT TOUR STARTING");
   tourInstance.drive();
 }
 

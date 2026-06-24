@@ -30,11 +30,6 @@ interface User {
   email: string;
 }
 
-const PRIORITY_COLOR: Record<string, string> = {
-  HIGH: 'bg-red-500/20 text-red-500 border-red-200 dark:border-red-800',
-  MEDIUM: 'bg-yellow-500/20 text-yellow-500 border-yellow-200 dark:border-yellow-800',
-  LOW: 'bg-green-500/20 text-green-500 border-green-200 dark:border-green-800',
-};
 const ProjectAnalyticsView = ({ projectAnalytics, projectId, setShowProjects, user }: any) => {
   useTour(user?.id ?? '');
   return (
@@ -136,9 +131,7 @@ const ClientAnalyticsDashboard = () => {
         <AlertCircle className="text-red-500 mx-auto mb-4" size={48} />
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Error Loading</h2>
         <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
-        <button onClick={() => window.location.reload()} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-          Try Again
-        </button>
+        <button onClick={() => window.location.reload()} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Try Again</button>
       </div>
     </div>
   );
@@ -150,18 +143,18 @@ const ClientAnalyticsDashboard = () => {
           <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">My Projects</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">Select a project to view analytics</p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-          <div className="relative flex-1 sm:flex-none">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+        <div className="flex flex-row items-center gap-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
             <input type="text" placeholder="Search projects..." value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
           <div className="relative">
-            <Filter size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+            <Filter size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
             <select value={priorityFilter} onChange={e => setPriorityFilter(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white appearance-none cursor-pointer"
+              className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm appearance-none cursor-pointer"
             >
               <option value="ALL">All Priority</option>
               <option value="HIGH">High Priority</option>
@@ -169,7 +162,16 @@ const ClientAnalyticsDashboard = () => {
               <option value="LOW">Low Priority</option>
             </select>
           </div>
-          <button onClick={() => setShowCreate(true)} className="px-4 py-2 text-white rounded-lg flex items-center gap-2 text-sm font-semibold hover:bg-[#e89b45] transition-colors" style={{ background: 'var(--primary)' }}>
+          <button
+            onClick={() => window.dispatchEvent(new Event("start-sidebar-tour"))}
+            className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2 whitespace-nowrap"
+          >
+            🧭 Start Tour
+          </button>
+          <button onClick={() => setShowCreate(true)}
+            className="px-4 py-2 text-white rounded-lg flex items-center gap-2 text-sm font-semibold hover:bg-[#e89b45] transition-colors whitespace-nowrap"
+            style={{ background: 'var(--primary)' }}
+          >
             <Plus size={15} /> New Project
           </button>
         </div>
@@ -241,25 +243,22 @@ const ClientAnalyticsDashboard = () => {
     </div>
   );
 
-
-return (
-  <ProjectAnalyticsView
-    projectAnalytics={projectAnalytics}
-    projectId={projectId}
-    setShowProjects={setShowProjects}
-    user={user}
-  />
-);
+  return (
+    <ProjectAnalyticsView
+      projectAnalytics={projectAnalytics}
+      projectId={projectId}
+      setShowProjects={setShowProjects}
+      user={user}
+    />
+  );
 };
 
 const ClientPage = () => (
-  <Suspense
-    fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader className="animate-spin text-blue-500" size={40} />
-      </div>
-    }
-  >
+  <Suspense fallback={
+    <div className="min-h-screen flex items-center justify-center">
+      <Loader className="animate-spin text-blue-500" size={40} />
+    </div>
+  }>
     <ClientAnalyticsDashboard />
   </Suspense>
 );

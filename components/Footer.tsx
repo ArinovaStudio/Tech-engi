@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import toast from "react-hot-toast";
-
 const Footer = () => {
   const [email, setEmail] = useState("");
 
@@ -18,7 +17,7 @@ const Footer = () => {
 
   return (
     <footer className="w-full bg-white font-inter overflow-hidden">
-
+      
       {/* TOP SECTION */}
       <div
         className="w-full mx-auto px-4 sm:px-8 lg:px-16 pt-12 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-10 lg:gap-8 " >

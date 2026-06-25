@@ -5,6 +5,7 @@ import Start from "@/components/Start";
 import Stats from "@/components/Stats";
 import HowItWorks from "@/components/HowItWorks";
 import WhatWeOffer from "@/components/WhatWeOffer";
+import TrustIndicator from "@/components/TrustIndicator";
 
 export default function Home() {
   return (
@@ -12,6 +13,7 @@ export default function Home() {
       <Start />
       <HowItWorks />
       <WhatWeOffer />
+      <TrustIndicator />
       <BrowserCategory />
       <Stats />
       <AboutUs />

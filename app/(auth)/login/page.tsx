@@ -9,6 +9,90 @@ import Image from "next/image";
 
 const testimonials = [
   {
+    text: "Client ke perspective se bolun toh yeh platform engineers aur clients ko connect karne ke liye really smooth hai. Communication clear raha aur delivery time pe mila.",
+    avatar: "/users/image copy 8.png",
+    name: "Baisakhi",
+    role: "Startup Founder",
+  },
+  {
+    text: "From an engineer's perspective, the platform is well-structured. Requirements are clear, and it's easy to collaborate with clients without unnecessary confusion.",
+    avatar: "/users/image copy 9.png",
+    name: "Sarah Khan",
+    role: "Software Engineer",
+  },
+  {
+    text: "We needed quick technical support for a prototype. The matching process was fast and we got someone who understood the requirements immediately.",
+    avatar: "/users/image copy 3.png",
+    name: "Ankit Sharma",
+    role: "Product Manager",
+  },
+  {
+    text: "I've worked on multiple projects here. The client expectations are clear, and payments and communication are handled smoothly.",
+    avatar: "/users/image copy 10.png",
+    name: "Neha Verma",
+    role: "Freelance Developer",
+  },
+  {
+    text: "I collaborated on a simulation project and the requirements were very well explained. It saved a lot of back-and-forth time.",
+    avatar: "/users/image copy 5.png",
+    name: "Rohit Mehta",
+    role: "Mechanical Engineer",
+  },
+  {
+    text: "Good platform for freelance engineers. The projects feel structured and clients are generally responsive and clear.",
+    avatar: "/users/image copy 11.png",
+    name: "Priya Nair",
+    role: "Full Stack Developer",
+  },
+  {
+    text: "I helped a client with structural analysis work. Everything from scope to delivery was properly defined, which made execution easier.",
+    avatar: "/users/image copy 6.png",
+    name: "Aditya Kulkarni",
+    role: "Civil Engineer",
+  },
+  {
+    text: "Even for design-related technical work, the collaboration was smooth. Feedback cycles were quick and clear.",
+    avatar: "/users/image copy 13.png",
+    name: "Simran Kaur",
+    role: "UI/UX Designer",
+  },
+  {
+    text: "APIs and backend tasks were well documented by clients. It made development faster and less frustrating.",
+    avatar: "/users/image copy 18.png",
+    name: "Vikram Singh",
+    role: "Backend Engineer",
+  },
+  {
+    text: "I worked on a data visualization project. The requirements were specific, and I was able to deliver exactly what was needed.",
+    avatar: "/users/image copy 14.png",
+    name: "Ishita Roy",
+    role: "Data Analyst",
+  },
+  {
+    text: "IoT project collaboration was smooth. I got clear instructions and minimal confusion during implementation.",
+    avatar: "/users/image copy 19.png",
+    name: "Karan Malhotra",
+    role: "Electronics Engineer",
+  },
+  {
+    text: "Worked on a machine learning project. The dataset and goals were clearly defined, which helped a lot in model training.",
+    avatar: "/users/image copy 15.png",
+    name: "Ayesha Khan",
+    role: "AI/ML Engineer",
+  },
+  {
+    text: "Good experience working with startups through this platform. Requirements are usually practical and well thought out.",
+    avatar: "/users/image copy 20.png",
+    name: "Manish Gupta",
+    role: "Technical Consultant",
+  },
+  {
+    text: "UI implementation tasks were easy to understand. Clients gave clear references which made execution faster.",
+    avatar: "/users/image copy 16.png",
+    name: "Jiya Shankar",
+    role: "Frontend Developer",
+  },
+  {
     text: "Dude, your stuff is the bomb! House rent is the real deal! I STRONGLY recommend house rent to EVERYONE interested in running a successful online business!",
     avatar: "https://i.pravatar.cc/100?img=32",
     name: "Lana Bernier",
@@ -302,7 +386,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <style dangerouslySetInnerHTML={{ __html: "@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } } .animate-marquee { animation: marquee 18s linear infinite; } .animate-marquee:hover { animation-play-state: paused; }" }} />
+      <style dangerouslySetInnerHTML={{ __html: "@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } } .animate-marquee { animation: marquee 50s linear infinite; } .animate-marquee:hover { animation-play-state: paused; }" }} />
     </>
   );
 }

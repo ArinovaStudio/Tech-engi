@@ -83,7 +83,7 @@ const Start = () => {
             {/* LOGO */}
             <span
               className=" text-[22px] font-benz tracking-tight text-black lg:mr-4 lg:border-r-2 lg:border-gray-300 lg:pr-4 " >
-              TECH ENGI
+              <Image src="/imagelogodiffcrop.png" alt="logo" width={150} height={150} />
             </span>
 
             {/* DESKTOP NAV */}

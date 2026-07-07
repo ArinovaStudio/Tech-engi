@@ -729,13 +729,12 @@ export default function EngineerFormPage() {
 
           <div className="mt-20">
             {/* Logo */}
-            <div className="w-24 h-24 bg-white rounded-sm flex items-center justify-center text-black font-bold text-sm shadow-xl">
+            <div className="relative w-24 h-24 bg-white rounded-sm shadow-xl overflow-hidden">
               <Image
-                src="/logo.png"
-                alt="logo"
-                width={100}
-                height={100}
-                className="rounded-sm"
+                src="/logoImagediff2.PNG"
+                alt="Logo"
+                fill
+                className="object-cover rounded-sm"
               />
             </div>
 

@@ -405,6 +405,26 @@ model KanbanReport {
   task       KanbanTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
 
+model Lead {
+  id String @id @default(cuid())
+
+  userType String
+  domain   String
+  blocker  String @db.Text
+  stage    String
+  budget   String
+  timeline String
+
+  name  String
+  email String
+  phone String?
+
+  goal String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 enum Role {
   ADMIN
   CLIENT

@@ -13,6 +13,7 @@ import { engineerDashboardTourSteps } from "@/config/engineerDashboardTourSteps"
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import next from "next";
+import Image from "next/image";
 
 interface NavItem {
   label: string;
@@ -326,7 +327,9 @@ const goToPayoutTour = () => {
       className="h-screen flex flex-col bg-white border-r border-[var(--border)] transition-all duration-300 shrink-0 relative"
     >
       <div className="flex items-center justify-center h-20 border-b border-[var(--border)]">
-        {!collapsed && <span className="font-bold text-xl text-[var(--text-primary)] tracking-tight">TECH ENGI</span>}
+        {!collapsed && <span className="font-bold text-xl text-[var(--text-primary)] tracking-tight">
+          <Image src="/imagelogodiff.PNG" alt="logo" width={300} height={300} />
+          </span>}
         {collapsed && <span className="font-bold text-xl text-[var(--text-primary)] tracking-tight">TE</span>}
       </div>
 

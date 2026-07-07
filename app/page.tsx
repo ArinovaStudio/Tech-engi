@@ -186,7 +186,7 @@ export default function Home() {
       </div>
 
       {showWelcome && (
-        <div className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm overflow-y-auto">
+        <div  style={{ fontFamily: "var(--font-inter)" }} className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm overflow-y-auto">
           <div className="min-h-screen flex items-center justify-center py-10 px-4">
 
             <div className="relative w-full max-w-3xl rounded-3xl bg-white shadow-2xl border border-zinc-200">
@@ -204,8 +204,8 @@ export default function Home() {
               <div className="border-b p-8">
 
                 <h2 className="text-4xl text-zinc-900">
-                  Welcome to
-                  <span className="text-[#fb9b34] font-bold"> TECH-ENGI</span>
+                  Analyse my project for
+                  <span className="text-[#fb9b34] font-bold"> Free</span>
                 </h2>
 
                 <p className="mt-3 text-zinc-600">
@@ -215,186 +215,186 @@ export default function Home() {
 
               </div>
 
-             <form
-  onSubmit={(e) => {
-    e.preventDefault();
-    handleSubmit();
-  }}
-  className="space-y-6 p-8"
->
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSubmit();
+                }}
+                className="space-y-6 p-8"
+              >
 
-  {/* Row 1: User + Domain */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-    <div>
-      <label className="mb-2 block font-semibold">Who are you?</label>
-      <select
-        name="userType"
-        value={formData.userType}
-        onChange={handleChange}
-        className="w-full rounded-xl border p-3"
-      >
-        <option value="">Choose</option>
-        {userTypes.map((item) => (
-          <option key={item}>{item}</option>
-        ))}
-      </select>
-    </div>
+                {/* Row 1: User + Domain */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div>
+                    <label className="mb-2 block font-semibold">Who are you?</label>
+                    <select
+                      name="userType"
+                      value={formData.userType}
+                      onChange={handleChange}
+                      className="w-full rounded-xl border p-3"
+                    >
+                      <option value="">Choose</option>
+                      {userTypes.map((item) => (
+                        <option key={item}>{item}</option>
+                      ))}
+                    </select>
+                  </div>
 
-    <div>
-      <label className="mb-2 block font-semibold">Project Domain</label>
-      <select
-        name="domain"
-        value={formData.domain}
-        onChange={handleChange}
-        className="w-full rounded-xl border p-3"
-      >
-        <option value="">Choose</option>
-        {domains.map((item) => (
-          <option key={item}>{item}</option>
-        ))}
-      </select>
-    </div>
-  </div>
+                  <div>
+                    <label className="mb-2 block font-semibold">Project Domain</label>
+                    <select
+                      name="domain"
+                      value={formData.domain}
+                      onChange={handleChange}
+                      className="w-full rounded-xl border p-3"
+                    >
+                      <option value="">Choose</option>
+                      {domains.map((item) => (
+                        <option key={item}>{item}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
 
-  {/* Row 2: Stage + Budget */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-    <div>
-      <label className="mb-2 block font-semibold">Project Stage</label>
-      <select
-        name="stage"
-        value={formData.stage}
-        onChange={handleChange}
-        className="w-full rounded-xl border p-3"
-      >
-        <option value="">Choose</option>
-        {stages.map((item) => (
-          <option key={item}>{item}</option>
-        ))}
-      </select>
-    </div>
+                {/* Row 2: Stage + Budget */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div>
+                    <label className="mb-2 block font-semibold">Project Stage</label>
+                    <select
+                      name="stage"
+                      value={formData.stage}
+                      onChange={handleChange}
+                      className="w-full rounded-xl border p-3"
+                    >
+                      <option value="">Choose</option>
+                      {stages.map((item) => (
+                        <option key={item}>{item}</option>
+                      ))}
+                    </select>
+                  </div>
 
-    <div>
-      <label className="mb-2 block font-semibold">Budget</label>
-      <select
-        name="budget"
-        value={formData.budget}
-        onChange={handleChange}
-        className="w-full rounded-xl border p-3"
-      >
-        <option value="">Choose</option>
-        {budgets.map((item) => (
-          <option key={item}>{item}</option>
-        ))}
-      </select>
-    </div>
-  </div>
+                  <div>
+                    <label className="mb-2 block font-semibold">Budget</label>
+                    <select
+                      name="budget"
+                      value={formData.budget}
+                      onChange={handleChange}
+                      className="w-full rounded-xl border p-3"
+                    >
+                      <option value="">Choose</option>
+                      {budgets.map((item) => (
+                        <option key={item}>{item}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
 
-  {/* Row 3: Timeline + Goal */}
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-    <div>
-      <label className="mb-2 block font-semibold">Timeline</label>
-      <select
-        name="timeline"
-        value={formData.timeline}
-        onChange={handleChange}
-        className="w-full rounded-xl border p-3"
-      >
-        <option value="">Choose</option>
-        {timelines.map((item) => (
-          <option key={item}>{item}</option>
-        ))}
-      </select>
-    </div>
+                {/* Row 3: Timeline + Goal */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div>
+                    <label className="mb-2 block font-semibold">Timeline</label>
+                    <select
+                      name="timeline"
+                      value={formData.timeline}
+                      onChange={handleChange}
+                      className="w-full rounded-xl border p-3"
+                    >
+                      <option value="">Choose</option>
+                      {timelines.map((item) => (
+                        <option key={item}>{item}</option>
+                      ))}
+                    </select>
+                  </div>
 
-    <div>
-      <label className="mb-2 block font-semibold">What do you want to achieve?</label>
-      <select
-        name="goal"
-        value={formData.goal}
-        onChange={handleChange}
-        className="w-full rounded-xl border p-3"
-      >
-        <option value="">Choose</option>
-        {goals.map((item) => (
-          <option key={item}>{item}</option>
-        ))}
-      </select>
-    </div>
-  </div>
+                  <div>
+                    <label className="mb-2 block font-semibold">What do you want to achieve?</label>
+                    <select
+                      name="goal"
+                      value={formData.goal}
+                      onChange={handleChange}
+                      className="w-full rounded-xl border p-3"
+                    >
+                      <option value="">Choose</option>
+                      {goals.map((item) => (
+                        <option key={item}>{item}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
 
-  {/* Blocker - full width, needs room to type */}
-  <div>
-    <label className="mb-2 block font-semibold">What is stopping your project?</label>
-    <textarea
-      rows={3}
-      name="blocker"
-      value={formData.blocker}
-      onChange={handleChange}
-      placeholder="Tell us about your challenge..."
-      className="w-full rounded-xl border p-3 resize-none"
-    />
-  </div>
+                {/* Blocker - full width, needs room to type */}
+                <div>
+                  <label className="mb-2 block font-semibold">What is stopping your project?</label>
+                  <textarea
+                    rows={3}
+                    name="blocker"
+                    value={formData.blocker}
+                    onChange={handleChange}
+                    placeholder="Tell us about your challenge..."
+                    className="w-full rounded-xl border p-3 resize-none"
+                  />
+                </div>
 
-  {/* Contact - full width */}
-  <div className="space-y-3">
-    <label className="block font-semibold">Contact Details</label>
+                {/* Contact - full width */}
+                <div className="space-y-3">
+                  <label className="block font-semibold">Contact Details</label>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-      <input
-        type="text"
-        name="name"
-        value={formData.name}
-        onChange={handleChange}
-        placeholder="Full Name"
-        className="w-full rounded-xl border border-zinc-300 p-3 outline-none focus:ring-2 focus:ring-[#fb9b34]"
-      />
-      <input
-        type="email"
-        name="email"
-        value={formData.email}
-        onChange={handleChange}
-        placeholder="Email Address"
-        className="w-full rounded-xl border border-zinc-300 p-3 outline-none focus:ring-2 focus:ring-[#fb9b34]"
-      />
-    </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="Full Name"
+                      className="w-full rounded-xl border border-zinc-300 p-3 outline-none focus:ring-2 focus:ring-[#fb9b34]"
+                    />
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="Email Address"
+                      className="w-full rounded-xl border border-zinc-300 p-3 outline-none focus:ring-2 focus:ring-[#fb9b34]"
+                    />
+                  </div>
 
-    <input
-      type="tel"
-      name="phone"
-      value={formData.phone}
-      onChange={handleChange}
-      placeholder="Phone Number"
-      className="w-full rounded-xl border border-zinc-300 p-3 outline-none focus:ring-2 focus:ring-[#fb9b34]"
-    />
-  </div>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="Phone Number"
+                    className="w-full rounded-xl border border-zinc-300 p-3 outline-none focus:ring-2 focus:ring-[#fb9b34]"
+                  />
+                </div>
 
-  {/* Buttons */}
-  <div className="flex justify-end gap-4 pt-2">
-    <button
-      type="button"
-      onClick={() => setShowWelcome(false)}
-      className="rounded-xl border px-6 py-3 font-medium hover:bg-zinc-100"
-    >
-      Skip
-    </button>
+                {/* Buttons */}
+                <div className="flex justify-end gap-4 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowWelcome(false)}
+                    className="rounded-xl border px-6 py-3 font-medium hover:bg-zinc-100"
+                  >
+                    Skip
+                  </button>
 
-    <button
-      type="submit"
-      disabled={loading}
-      className="inline-flex min-w-[150px] items-center justify-center gap-2 rounded-xl bg-[#fa9122] px-7 py-3 font-semibold text-white shadow-lg shadow-orange-200 transition-all duration-200 hover:bg-[#fb8405] hover:shadow-xl hover:shadow-orange-300 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-orange-300 disabled:shadow-none"
-    >
-      {loading ? (
-        <>
-          <Loader2 className="h-5 w-5 animate-spin" />
-          Submitting...
-        </>
-      ) : (
-        "Continue"
-      )}
-    </button>
-  </div>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="inline-flex min-w-[150px] items-center justify-center gap-2 rounded-xl bg-[#fa9122] px-7 py-3 font-semibold text-white shadow-lg shadow-orange-200 transition-all duration-200 hover:bg-[#fb8405] hover:shadow-xl hover:shadow-orange-300 active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-orange-300 disabled:shadow-none"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        Analyzing...
+                      </>
+                    ) : (
+                      "Analyse my project"
+                    )}
+                  </button>
+                </div>
 
-</form>
+              </form>
 
             </div>
 

@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter, Montserrat, Space_Grotesk, DM_Serif_Display} from "next/font/google";
+import Script from "next/script";
+import {
+  Geist,
+  Geist_Mono,
+  Inter,
+  Montserrat,
+  Space_Grotesk,
+  DM_Serif_Display,
+} from "next/font/google";
 import localFont from "next/font/local";
+
 import "./globals.css";
 import Providers from "@/components/Providers";
 import SocketAnnouncer from "@/components/SocketAnnouncer";
@@ -22,9 +31,7 @@ const idGrotesk = localFont({
 });
 
 const benzGrotesk = localFont({
-  src: [
-    { path: "../public/font/Benz-Grotesk.ttf", weight: "400" },
-  ],
+  src: [{ path: "../public/font/Benz-Grotesk.ttf", weight: "400" }],
   variable: "--font-benz",
 });
 
@@ -41,30 +48,14 @@ const inter = Inter({
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-spacegrotesk",
   subsets: ["latin"],
-})
-
-// const dmSerif = localFont({
-//   src: [
-//     {
-//       path: "../public/font/DMSerifDisplay-Regular.ttf",
-//       weight: "400",
-//       style: "normal",
-//     },
-//     {
-//       path: "../public/font/DMSerifDisplay-Italic.ttf",
-//       weight: "400",
-//       style: "italic",
-//     },
-//   ],
-//   variable: "--font-dmserif",
-// });
+});
 
 const dmSerif = DM_Serif_Display({
   variable: "--font-dmserif",
   weight: ["400"],
   subsets: ["latin"],
   style: ["normal", "italic"],
-})
+});
 
 export const metadata: Metadata = {
   title: "TECH ENGI",
@@ -76,15 +67,41 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   const { user } = await getUser();
 
   return (
-    <html
-      lang="en"
-      className={`h-full antialiased`}
-    >
-      <body className={`min-h-full flex flex-col ${geistSans.variable} ${spaceGrotesk.variable} ${geistMono.variable} ${montserrat.variable} ${idGrotesk.variable} ${benzGrotesk.variable} ${inter.variable} ${dmSerif.variable}`}>
+    <html lang="en" className="h-full antialiased">
+      <body
+        className={`min-h-full flex flex-col ${geistSans.variable} ${spaceGrotesk.variable} ${geistMono.variable} ${montserrat.variable} ${idGrotesk.variable} ${benzGrotesk.variable} ${inter.variable} ${dmSerif.variable}`}
+      >
+        {/* Facebook Meta Pixel */}
+        <Script id="facebook-pixel" strategy="afterInteractive">
+          {`
+            !function(f,b,e,v,n,t,s)
+            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)}
+            (window, document,'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+
+            fbq('init', '888842877025528');
+            fbq('track', 'PageView');
+          `}
+        </Script>
+
+        <noscript>
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            src="https://www.facebook.com/tr?id=888842877025528&ev=PageView&noscript=1"
+            alt=""
+          />
+        </noscript>
+
         <SocketAnnouncer userId={user?.id} />
         <Providers>{children}</Providers>
       </body>

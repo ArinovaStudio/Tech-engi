@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
                 goal,
             },
         });
-        
+
         return NextResponse.json(
             {
                 success: true,
@@ -72,4 +72,45 @@ export async function POST(req: NextRequest) {
             { status: 500 }
         );
     }
+}
+
+export async function GET(req: NextRequest) {
+    try {
+        const sp = req.nextUrl.searchParams;
+        const leadId = sp.get("id");
+
+        if (leadId) {
+            const lead = await prisma.lead.findUnique({
+                where: {
+                    id: leadId,
+                },
+            });
+
+            return NextResponse.json({ success: true, lead }, { status: 200 });
+        }
+
+        const leads = await prisma.lead.findMany();
+        return NextResponse.json({ success: true, leads }, { status: 200 });
+    } catch (error) {
+        return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
+    }
+}
+
+export async function DELETE(req: NextRequest) {
+    try {
+        const sp = req.nextUrl.searchParams;
+        const leadId = sp.get("id");
+
+        if (leadId) {
+            const lead = await prisma.lead.delete({
+                where: {
+                    id: leadId,
+                },
+            });
+
+            return NextResponse.json({ success: true, lead }, { status: 200 });
+        }
+    } catch (error) {
+        return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
+    };
 }

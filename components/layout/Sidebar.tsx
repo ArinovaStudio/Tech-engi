@@ -5,7 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, CreditCard, Users, MessageSquare, LogOut, ChevronLeft, ChevronRight,
-  User, UserKeyIcon, FolderKanban, Presentation, Lightbulb, FileUp, Handshake, Bug, Paperclip, Send
+  User, UserKeyIcon, FolderKanban, Presentation, Lightbulb, FileUp, Handshake, Bug, Paperclip, Send,
+  Headset
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { dashboardTourSteps } from "@/config/dashboardTourSteps";
@@ -28,6 +29,7 @@ const ADMIN_NAV: NavItem[] = [
   { label: "Client Management", icon: <User size={20} />, href: "/admin/client-management" },
   { label: "Engineer Management", icon: <UserKeyIcon size={20} />, href: "/admin/engineer-management" },
   { label: "Invitations Management", icon: <Send size={20} />, href: "/admin/invitations-management" },
+   { label: "Leads", icon: <Headset size={20} />, href: "/admin/leads" },
   { label: "Message", icon: <MessageSquare size={20} />, href: "/admin/message" },
 ];
 

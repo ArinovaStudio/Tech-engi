@@ -343,6 +343,7 @@ const Start = () => {
 
           {/* Background rounded layer */}
           <div className="absolute inset-0 rounded-2xl bg-[#FFAE58] lg:h-[600px] md:h-[400px] mt-10 lg:mt-0 h-[225px]" />
+          <div className="absolute inset-0 rounded-2xl bg-[#ffffff] lg:hidden md:hidden mt-66 lg:mt-0 h-[50px] z-10" />
 
           {/* Two guys image — desktop only, scales with viewport ✅ */}
           <div

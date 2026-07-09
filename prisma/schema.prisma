@@ -406,21 +406,14 @@ model KanbanReport {
 }
 
 model Lead {
-  id String @id @default(cuid())
-
-  userType String
-  domain   String
-  blocker  String @db.Text
-  stage    String
-  budget   String
-  timeline String
-
-  name  String
-  email String
-  phone String?
-
-  goal String
-
+  id        String   @id @default(cuid())
+  userType  String
+  domain    String
+  stage     String
+  goal      String
+  challenge String   @db.Text
+  name      String
+  email     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

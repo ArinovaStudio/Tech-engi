@@ -1,19 +1,12 @@
 export interface Lead {
   id: string;
-
   userType: string;
   domain: string;
-  blocker: string;
   stage: string;
-  budget: string;
-  timeline: string;
-
+  goal: string;
+  challenge: string;
   name: string;
   email: string;
-  phone?: string | null;
-
-  goal: string;
-
   createdAt: string;
   updatedAt: string;
 }

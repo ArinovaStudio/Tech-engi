@@ -6,15 +6,11 @@ import {
     ArrowLeft,
     Briefcase,
     Calendar,
-    Clock,
-    IndianRupee,
     Loader2,
     Mail,
-    Phone,
+    MessageSquare,
     Target,
     Trash2,
-    TriangleAlert,
-    User,
     X,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
@@ -148,9 +144,9 @@ export default function LeadDetailPage() {
                             <div className="flex flex-col gap-3 text-sm">
                                 <InfoRow icon={Mail} label="Email" value={lead.email} />
                                 <InfoRow
-                                    icon={Phone}
-                                    label="Phone"
-                                    value={lead.phone || "Not provided"}
+                                    icon={Briefcase}
+                                    label="Domain"
+                                    value={lead.domain}
                                 />
                                 <InfoRow
                                     icon={Calendar}
@@ -167,25 +163,6 @@ export default function LeadDetailPage() {
 
                         {/* Right: Details */}
                         <div className="flex flex-col gap-6 lg:col-span-2">
-                            {/* Stats row */}
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                                <StatCard
-                                    icon={Briefcase}
-                                    label="Domain"
-                                    value={lead.domain}
-                                />
-                                <StatCard
-                                    icon={IndianRupee}
-                                    label="Budget"
-                                    value={lead.budget}
-                                />
-                                <StatCard
-                                    icon={Clock}
-                                    label="Timeline"
-                                    value={lead.timeline}
-                                />
-                            </div>
-
                             {/* Goal */}
                             <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
                                 <div className="mb-3 flex items-center gap-2">
@@ -199,16 +176,16 @@ export default function LeadDetailPage() {
                                 </p>
                             </div>
 
-                            {/* Blocker */}
+                            {/* Challenge */}
                             <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
                                 <div className="mb-3 flex items-center gap-2">
-                                    <TriangleAlert className="h-4 w-4 text-orange-500" />
+                                    <MessageSquare className="h-4 w-4 text-orange-500" />
                                     <h3 className="text-sm font-semibold text-gray-900">
-                                        Blocker
+                                        Challenge
                                     </h3>
                                 </div>
                                 <p className="whitespace-pre-line text-sm leading-relaxed text-gray-600">
-                                    {lead.blocker || "No blocker mentioned."}
+                                    {lead.challenge || "No challenge mentioned."}
                                 </p>
                             </div>
                         </div>
@@ -301,28 +278,6 @@ function InfoRow({
                 <p className="text-xs text-gray-400">{label}</p>
                 <p className="truncate text-sm text-gray-700">{value}</p>
             </div>
-        </div>
-    );
-}
-
-function StatCard({
-    icon: Icon,
-    label,
-    value,
-}: {
-    icon: React.ElementType;
-    label: string;
-    value: string;
-}) {
-    return (
-        <div className="flex flex-col gap-2 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-            <div className="flex items-center gap-2 text-xs text-gray-400">
-                <Icon className="h-3.5 w-3.5" />
-                {label}
-            </div>
-            <p className="truncate text-sm font-semibold text-gray-800">
-                {value}
-            </p>
         </div>
     );
 }

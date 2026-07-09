@@ -5,11 +5,11 @@ import { Lead } from "@/lib/types/lead";
 import {
     Briefcase,
     Clock,
-    IndianRupee,
     Loader2,
     Mail,
-    Phone,
+    MessageSquare,
     Search,
+    Target,
     User,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -150,7 +150,7 @@ export default function LeadsPage() {
                                 key={lead.id}
                                 lead={lead}
                                 onClick={() =>
-                                    router.push(`/admin//leads/${lead.id}`)
+                                    router.push(`/admin/leads/${lead.id}`)
                                 }
                             />
                         ))}
@@ -174,6 +174,13 @@ function LeadCard({
         .slice(0, 2)
         .join("")
         .toUpperCase();
+
+    const createdLabel = lead.createdAt
+        ? new Date(lead.createdAt).toLocaleDateString("en-IN", {
+              day: "numeric",
+              month: "short",
+          })
+        : "";
 
     return (
         <button
@@ -205,30 +212,32 @@ function LeadCard({
                 <span className="truncate">{lead.domain}</span>
             </div>
 
-            {/* Contact */}
-            <div className="flex flex-col gap-1.5 text-xs text-gray-500">
-                <div className="flex items-center gap-2">
-                    <Mail className="h-3.5 w-3.5 text-gray-400" />
-                    <span className="truncate">{lead.email}</span>
+            {/* Challenge preview */}
+            {lead.challenge && (
+                <div className="flex items-start gap-2 text-xs text-gray-500">
+                    <MessageSquare className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gray-400" />
+                    <span className="line-clamp-2">{lead.challenge}</span>
                 </div>
-                {lead.phone && (
-                    <div className="flex items-center gap-2">
-                        <Phone className="h-3.5 w-3.5 text-gray-400" />
-                        <span>{lead.phone}</span>
-                    </div>
-                )}
+            )}
+
+            {/* Contact */}
+            <div className="flex items-center gap-2 text-xs text-gray-500">
+                <Mail className="h-3.5 w-3.5 text-gray-400" />
+                <span className="truncate">{lead.email}</span>
             </div>
 
             {/* Footer */}
             <div className="mt-1 flex items-center justify-between border-t border-gray-100 pt-3 text-xs text-gray-500">
                 <div className="flex items-center gap-1.5">
-                    <IndianRupee className="h-3.5 w-3.5 text-gray-400" />
-                    <span>{lead.budget}</span>
+                    <Target className="h-3.5 w-3.5 text-gray-400" />
+                    <span className="truncate">{lead.goal}</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                    <Clock className="h-3.5 w-3.5 text-gray-400" />
-                    <span>{lead.timeline}</span>
-                </div>
+                {createdLabel && (
+                    <div className="flex items-center gap-1.5">
+                        <Clock className="h-3.5 w-3.5 text-gray-400" />
+                        <span>{createdLabel}</span>
+                    </div>
+                )}
             </div>
         </button>
     );

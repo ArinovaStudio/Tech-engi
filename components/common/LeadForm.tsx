@@ -1,8 +1,19 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, X, CheckCircle2, ShieldCheck, Zap, Wrench } from "lucide-react";
+import { Loader2, X, CheckCircle2, ShieldCheck, Zap, Wrench, ChevronDown } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import toast from "react-hot-toast";
+import {CustomSelect} from "../ui/select";
+
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/s";
+
 
 /* ---------------------------------- */
 /* Types                              */
@@ -90,47 +101,20 @@ function cx(...classes: Array<string | false | null | undefined>) {
 /* Small reusable field components    */
 /* ---------------------------------- */
 
-function SelectField({
+function FieldWrapper({
   label,
-  name,
-  value,
-  onChange,
-  options,
-  placeholder,
   error,
+  children,
 }: {
   label: string;
-  name: keyof ProjectReviewFormData;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  options: string[];
-  placeholder: string;
   error?: string;
+  children: React.ReactNode;
 }) {
   return (
     <div className="space-y-2">
-      <label htmlFor={name} className="block text-sm font-medium text-slate-800">
-        {label}
-      </label>
-      <select
-        id={name}
-        name={name}
-        value={value}
-        onChange={onChange}
-        className={cx(
-          "w-full rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 outline-none transition",
-          "focus:border-orange-400 focus:ring-4 focus:ring-orange-100",
-          error ? "border-red-400" : "border-slate-200"
-        )}
-      >
-        <option value="">{placeholder}</option>
-        {options.map((item) => (
-          <option key={item} value={item}>
-            {item}
-          </option>
-        ))}
-      </select>
-      {error ? <p className="text-xs text-red-600">{error}</p> : null}
+      <label className="text-sm font-medium text-slate-900">{label}</label>
+      {children}
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
     </div>
   );
 }
@@ -230,6 +214,7 @@ export default function ProjectReviewModal({
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof ProjectReviewFormData, string>>>({});
+  const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -241,6 +226,7 @@ export default function ProjectReviewModal({
     setLoading(false);
     setFormError(null);
     setFieldErrors({});
+    setShowDetails(false);
 
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -405,238 +391,277 @@ export default function ProjectReviewModal({
 
   return (
     <div
-      className="fixed inset-0 z-[9999] bg-slate-950/70 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[9999] overflow-y-auto bg-slate-950/70 backdrop-blur-sm"
       style={{ fontFamily: "Inter, sans-serif" }}
       onClick={() => {
         if (!loading) onClose();
       }}
     >
-      <div className="flex min-h-full items-center justify-center">
+      <div className="flex min-h-full items-start justify-center p-4 py-6 lg:items-center">
         <div
           className="relative w-full max-w-6xl overflow-hidden rounded-3xl bg-white shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Close button */}
+          {/* Close button - solid bg so it stays visible over either panel */}
           <button
             type="button"
             onClick={onClose}
             disabled={loading}
             aria-label="Close modal"
-            className="absolute right-4 top-4 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20 disabled:cursor-not-allowed"
+            className="absolute right-4 top-4 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-white bg-slate-800 shadow-lg backdrop-blur transition hover:bg-slate-900 disabled:cursor-not-allowed"
           >
             <X className="h-5 w-5" />
           </button>
 
           <div className="grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr]">
-            {/* Left panel */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 px-6 py-8 text-white sm:px-8 lg:px-10 lg:py-10">
-              <div className="absolute -left-16 top-10 h-40 w-40 rounded-full bg-orange-500/20 blur-3xl" />
-              <div className="absolute -right-16 bottom-10 h-52 w-52 rounded-full bg-blue-400/20 blur-3xl" />
+            {/* Left panel: order-2 on mobile (shown after the form), order-1 on desktop */}
+            <div className="relative order-1 overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 px-6 py-6 pt-20 text-white sm:px-8 lg:order-1 lg:px-10 lg:py-10">
+              <div className="pointer-events-none absolute -left-16 top-10 h-40 w-40 rounded-full bg-orange-500/20 blur-3xl" />
+              <div className="pointer-events-none absolute -right-16 bottom-10 h-52 w-52 rounded-full bg-blue-400/20 blur-3xl" />
 
               <div className="relative z-10">
-                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-white/90">
-                  <Zap className="h-3.5 w-3.5 text-orange-300" />
-                  Free engineering review
-                </div>
-
-                <h2 className="max-w-xl text-3xl font-semibold leading-tight sm:text-4xl">
-                  Stuck on an engineering project?
-                </h2>
-
-                <p className="mt-4 max-w-xl text-sm leading-7 text-slate-300 sm:text-[15px]">
-                  Tell us what you’re building, where you’re stuck, and what outcome you need.
-                  Our team will review it and send practical next steps within 24 hours.
-                </p>
-
-                <div className="mt-8 grid gap-3">
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <div className="flex items-start gap-3">
-                      <div className="rounded-xl bg-orange-500/15 p-2 text-orange-300">
-                        <Wrench className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-semibold">Possible root cause</h3>
-                        <p className="mt-1 text-sm text-slate-300">
-                          We identify what’s actually blocking the project technically.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <div className="flex items-start gap-3">
-                      <div className="rounded-xl bg-blue-500/15 p-2 text-blue-300">
-                        <CheckCircle2 className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-semibold">Suggested solution path</h3>
-                        <p className="mt-1 text-sm text-slate-300">
-                          You’ll get actionable recommendations, not generic advice.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <div className="flex items-start gap-3">
-                      <div className="rounded-xl bg-emerald-500/15 p-2 text-emerald-300">
-                        <ShieldCheck className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-semibold">Right expert if needed</h3>
-                        <p className="mt-1 text-sm text-slate-300">
-                          If the problem needs hands-on help, we’ll point you to the right engineer.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-8 rounded-2xl border border-orange-400/20 bg-orange-500/10 p-4">
-                  <h4 className="text-sm font-semibold text-orange-200">What happens next</h4>
-                  <ol className="mt-3 space-y-2 text-sm text-orange-50/90">
-                    <li>1. Submit your challenge and current project details.</li>
-                    <li>2. Our engineers review it within 24 hours.</li>
-                    <li>3. You receive practical recommendations and next steps.</li>
-                    <li>4. If needed, we connect you with the right engineering expert.</li>
-                  </ol>
-                </div>
-              </div>
-            </div>
-
-            {/* Right panel */}
-            <div className="bg-slate-50 px-6 py-8 sm:px-8 lg:px-10 lg:py-10">
-              <div className="mx-auto max-w-2xl">
-                <div className="mb-6">
-                  <h3 className="text-2xl font-semibold tracking-tight text-slate-950">
-                    Project review request
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Fill in the details below and we’ll get back to you with a review of your engineering challenge.
-                  </p>
-                </div>
-
-                <form onSubmit={handleLeadSubmit} className="space-y-5" noValidate>
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <SelectField
-                      label="Who are you?"
-                      name="userType"
-                      value={formData.userType}
-                      onChange={handleChange}
-                      options={USER_TYPES}
-                      placeholder="Select user type"
-                      error={fieldErrors.userType}
-                    />
-
-                    <SelectField
-                      label="Project domain"
-                      name="domain"
-                      value={formData.domain}
-                      onChange={handleChange}
-                      options={DOMAINS}
-                      placeholder="Select domain"
-                      error={fieldErrors.domain}
-                    />
-
-                    <SelectField
-                      label="Project stage"
-                      name="stage"
-                      value={formData.stage}
-                      onChange={handleChange}
-                      options={STAGES}
-                      placeholder="Select stage"
-                      error={fieldErrors.stage}
-                    />
-
-                    <SelectField
-                      label="Goal"
-                      name="goal"
-                      value={formData.goal}
-                      onChange={handleChange}
-                      options={GOALS}
-                      placeholder="Select goal"
-                      error={fieldErrors.goal}
-                    />
-                  </div>
-
-                  <TextareaField
-                    label="Describe your challenge"
-                    name="challenge"
-                    value={formData.challenge}
-                    onChange={handleChange}
-                    placeholder={challengePlaceholder}
-                    error={fieldErrors.challenge}
+                {/* Mobile-only toggle header for the collapsible details */}
+                <button
+                  type="button"
+                  onClick={() => setShowDetails((v) => !v)}
+                  aria-expanded={showDetails}
+                  className="flex w-full items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-left transition hover:bg-white/10 lg:hidden"
+                >
+                  <span className="flex items-center gap-2 text-sm font-medium text-white">
+                    <Zap className="h-4 w-4 text-orange-300" />
+                    Why request a free review?
+                  </span>
+                  <ChevronDown
+                    className={cx(
+                      "h-4 w-4 flex-shrink-0 text-white/70 transition-transform",
+                      showDetails && "rotate-180"
+                    )}
                   />
+                </button>
 
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <InputField
-                      label="Your name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      placeholder="Enter your full name"
-                      error={fieldErrors.name}
-                    />
-
-                    <InputField
-                      label="Email address"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      placeholder="Enter your email"
-                      error={fieldErrors.email}
-                    />
-                  </div>
-
-                  <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                    <div className="flex flex-wrap gap-2 text-xs text-slate-600">
-                      <span className="rounded-full bg-slate-100 px-3 py-1.5">
-                        🔒 Your information stays confidential
-                      </span>
-                      <span className="rounded-full bg-slate-100 px-3 py-1.5">
-                        ⚡ No payment required
-                      </span>
-                      <span className="rounded-full bg-slate-100 px-3 py-1.5">
-                        👨‍💻 Reviewed by experienced engineers
-                      </span>
-                    </div>
-                  </div>
-
-                  {formError ? (
-                    <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                      {formError}
-                    </div>
-                  ) : null}
-
-                  <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
-                    <button
-                      type="button"
-                      onClick={onClose}
-                      disabled={loading}
-                      className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      Maybe later
-                    </button>
-
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="inline-flex min-w-[220px] items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-70"
-                    >
-                      {loading ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Submitting...
-                        </>
-                      ) : (
-                        "Get My Free Engineering Review"
+                {/* Collapsible on mobile, always visible on desktop */}
+                <AnimatePresence initial={false}>
+                  {(showDetails || true) && (
+                    <motion.div
+                      key="details-content"
+                      initial={false}
+                      animate={{
+                        height: "auto",
+                        opacity: 1,
+                      }}
+                      className={cx(
+                        "overflow-hidden lg:!block lg:!h-auto lg:!opacity-100",
+                        !showDetails && "hidden lg:block"
                       )}
-                    </button>
-                  </div>
-                </form>
+                    >
+                      <div className="pt-4 lg:pt-0">
+                        <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-medium text-white/90">
+                          <Zap className="h-3.5 w-3.5 text-orange-300" />
+                          Free engineering review
+                        </div>
+
+                        <h2 className="max-w-xl text-3xl font-semibold leading-tight sm:text-4xl">
+                          Stuck on an engineering project?
+                        </h2>
+
+                        <p className="mt-4 max-w-xl text-sm leading-7 text-slate-300 sm:text-[15px]">
+                          Tell us what you’re building, where you’re stuck, and what outcome you need.
+                          Our team will review it and send practical next steps within 24 hours.
+                        </p>
+
+                        <div className="mt-8 grid gap-3">
+                          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                            <div className="flex items-start gap-3">
+                              <div className="rounded-xl bg-orange-500/15 p-2 text-orange-300">
+                                <Wrench className="h-5 w-5" />
+                              </div>
+                              <div>
+                                <h3 className="text-sm font-semibold">Possible root cause</h3>
+                                <p className="mt-1 text-sm text-slate-300">
+                                  We identify what’s actually blocking the project technically.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                            <div className="flex items-start gap-3">
+                              <div className="rounded-xl bg-blue-500/15 p-2 text-blue-300">
+                                <CheckCircle2 className="h-5 w-5" />
+                              </div>
+                              <div>
+                                <h3 className="text-sm font-semibold">Suggested solution path</h3>
+                                <p className="mt-1 text-sm text-slate-300">
+                                  You’ll get actionable recommendations, not generic advice.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                            <div className="flex items-start gap-3">
+                              <div className="rounded-xl bg-emerald-500/15 p-2 text-emerald-300">
+                                <ShieldCheck className="h-5 w-5" />
+                              </div>
+                              <div>
+                                <h3 className="text-sm font-semibold">Right expert if needed</h3>
+                                <p className="mt-1 text-sm text-slate-300">
+                                  If the problem needs hands-on help, we’ll point you to the right engineer.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="mt-8 rounded-2xl border border-orange-400/20 bg-orange-500/10 p-4">
+                          <h4 className="text-sm font-semibold text-orange-200">What happens next</h4>
+                          <ol className="mt-3 space-y-2 text-sm text-orange-50/90">
+                            <li>1. Submit your challenge and current project details.</li>
+                            <li>2. Our engineers review it within 24 hours.</li>
+                            <li>3. You receive practical recommendations and next steps.</li>
+                            <li>4. If needed, we connect you with the right engineering expert.</li>
+                          </ol>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
+
+            {/* Right panel: order-1 on mobile (shown first), order-2 on desktop */}
+<div className="order-1 bg-slate-50 px-6 py-8 sm:px-8 lg:order-2 lg:px-10 lg:py-10">
+  <div className="mx-auto max-w-2xl">
+    <div className="mb-8">
+      <h3 className="text-2xl font-semibold tracking-tight text-slate-950">
+        Project review request
+      </h3>
+      <p className="mt-2 text-sm leading-6 text-slate-600">
+        Fill in the details below and we’ll get back to you with a review of your engineering challenge.
+      </p>
+    </div>
+
+    <form onSubmit={handleLeadSubmit} className="space-y-6" noValidate>
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <CustomSelect
+          label="Who are you?"
+          name="userType"
+          value={formData.userType}
+          onChange={handleChange}
+          options={USER_TYPES}
+          placeholder="Select user type"
+          error={fieldErrors.userType}
+        />
+
+        <CustomSelect
+          label="Project domain"
+          name="domain"
+          value={formData.domain}
+          onChange={handleChange}
+          options={DOMAINS}
+          placeholder="Select domain"
+          error={fieldErrors.domain}
+        />
+
+        <CustomSelect
+          label="Project stage"
+          name="stage"
+          value={formData.stage}
+          onChange={handleChange}
+          options={STAGES}
+          placeholder="Select stage"
+          error={fieldErrors.stage}
+        />
+
+        <CustomSelect
+          label="Goal"
+          name="goal"
+          value={formData.goal}
+          onChange={handleChange}
+          options={GOALS}
+          placeholder="Select goal"
+          error={fieldErrors.goal}
+        />
+      </div>
+
+      <TextareaField
+        label="Describe your challenge"
+        name="challenge"
+        value={formData.challenge}
+        onChange={handleChange}
+        placeholder={challengePlaceholder}
+        error={fieldErrors.challenge}
+      />
+
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <InputField
+          label="Your name"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="Enter your full name"
+          error={fieldErrors.name}
+        />
+
+        <InputField
+          label="Email address"
+          name="email"
+          type="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="Enter your email"
+          error={fieldErrors.email}
+        />
+      </div>
+
+      <div className="rounded-2xl border border-slate-200 bg-white p-5">
+        <div className="flex flex-wrap gap-2.5 text-xs text-slate-600">
+          <span className="rounded-full bg-slate-100 px-3 py-1.5">
+            🔒 Your information stays confidential
+          </span>
+          <span className="rounded-full bg-slate-100 px-3 py-1.5">
+            ⚡ No payment required
+          </span>
+          <span className="rounded-full bg-slate-100 px-3 py-1.5">
+            👨‍💻 Reviewed by experienced engineers
+          </span>
+        </div>
+      </div>
+
+      {formError ? (
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {formError}
+        </div>
+      ) : null}
+
+      <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
+        <button
+          type="button"
+          onClick={onClose}
+          disabled={loading}
+          className="inline-flex h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          Maybe later
+        </button>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="inline-flex h-12 min-w-[220px] items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Submitting...
+            </>
+          ) : (
+            "Get My Free Engineering Review"
+          )}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
           </div>
         </div>
       </div>

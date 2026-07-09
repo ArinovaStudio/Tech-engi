@@ -342,7 +342,7 @@ const Start = () => {
         <div className="relative min-h-[420px] lg:min-h-[600px]">
 
           {/* Background rounded layer */}
-          <div className="absolute inset-0 rounded-2xl bg-[#FFAE58] lg:h-[600px] md:h-[400px] mt-10 lg:mt-0 h-[225px]" />
+          <div className="absolute inset-0 sm:top-1/4 rounded-2xl bg-[#FFAE58] lg:h-[450px] md:h-[400px] mt-10 lg:mt-0 h-[225px]" />
           <div className="absolute inset-0 rounded-2xl bg-[#ffffff] lg:hidden md:hidden mt-66 lg:mt-0 h-[50px] z-10" />
 
           {/* Two guys image — desktop only, scales with viewport ✅ */}
@@ -373,7 +373,7 @@ const Start = () => {
               alt="Student and builder shaking hands"
               width={6000}
               height={6000}
-              className="w-full max-w-[400px] h-[260px] md:max-w-[400px] md:h-[545px] scale-125 object-contain"
+              className="w-full max-w-[400px] h-[300px] md:max-w-[400px] md:h-[545px] scale-125 object-contain"
               priority
             />
           </div>

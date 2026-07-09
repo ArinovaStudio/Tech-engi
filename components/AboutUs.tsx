@@ -30,6 +30,12 @@ const faqs = [
 
 const testimonials = [
   {
+    name: "Ranjith Gowda",
+    role: "Robotic Engineer",
+    image: "/users/ranjith.jpg",
+    text: "The web interface is too good, easy and simple makes it attractive.Mainly the concept is too Good to create a network and connect clients with builders. It will be best flat form for people willing to do freelancing."
+  },
+  {
     name: "Baisakhi",
     role: "Startup Founder",
     image: "/users/image copy 8.png",

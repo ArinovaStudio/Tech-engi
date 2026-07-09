@@ -87,28 +87,6 @@ export default function Home() {
     goal: "",
   });
 
-const handleLeadSubmit = async (data: ProjectReviewFormData) => {
-  try {
-    const response = await fetch("/api/leads", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.message || "Failed to submit form.");
-    }
-
-    toast.success("Your request has been submitted successfully!");
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Something went wrong. Please try again.";
-    toast.error(message);
-    throw error; // re-throw so the modal keeps the form open and shows the inline error
-  }
-};
 
   useEffect(() => {
     const hasShown = sessionStorage.getItem("welcome-popup");
@@ -142,9 +120,7 @@ const handleLeadSubmit = async (data: ProjectReviewFormData) => {
         <AboutUs />
         <Footer />
       </div>
-
         <LeadForm 
-        onSubmit={(e) => {handleLeadSubmit(e)}}
         isOpen={showWelcome}
         onClose={() => setShowWelcome(false)} 
         />

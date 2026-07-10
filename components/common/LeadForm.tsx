@@ -1,10 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, X, CheckCircle2, ShieldCheck, Zap, Wrench, ChevronDown } from "lucide-react";
+import {
+  Loader2,
+  X,
+  CheckCircle2,
+  ShieldCheck,
+  Zap,
+  Wrench,
+  ChevronDown,
+} from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import toast from "react-hot-toast";
-import {CustomSelect} from "../ui/select";
+import { CustomSelect } from "../ui/select";
 
 // import {
 //   Select,
@@ -14,19 +22,18 @@ import {CustomSelect} from "../ui/select";
 //   SelectValue,
 // } from "@/components/ui/s";
 
-
 /* ---------------------------------- */
 /* Types                              */
 /* ---------------------------------- */
 
 export interface ProjectReviewFormData {
-  userType: string;
-  domain: string;
-  stage: string;
-  goal: string;
-  challenge: string;
   name: string;
   email: string;
+  number: string;
+  domain: string;
+  challenge: string;
+  timeline: string;
+  hear: string;
 }
 
 export interface ProjectReviewModalProps {
@@ -39,7 +46,13 @@ export interface ProjectReviewModalProps {
 /* Static options                     */
 /* ---------------------------------- */
 
-const USER_TYPES = ["Student", "Freelancer", "Startup", "Company", "Researcher"];
+const USER_TYPES = [
+  "Student",
+  "Freelancer",
+  "Startup",
+  "Company",
+  "Researcher",
+];
 
 const DOMAINS = [
   "Embedded Systems",
@@ -53,6 +66,24 @@ const DOMAINS = [
   "Drone",
 ];
 
+const TIMELINE = [
+  "Today",
+  "Within 3 Days",
+  "This Week",
+  "This Month",
+  "No Hurry",
+];
+
+const HEAR = [
+  "Instagram",
+  "Facebook",
+  "Linkedin",
+  "YouTube",
+  "Google",
+  "Friend",
+  "Other",
+];
+
 const STAGES = ["Idea", "Prototype", "Development", "Testing", "Manufacturing"];
 
 const GOALS = [
@@ -64,13 +95,13 @@ const GOALS = [
 ];
 
 const EMPTY_FORM: ProjectReviewFormData = {
-  userType: "",
-  domain: "",
-  stage: "",
-  goal: "",
-  challenge: "",
   name: "",
   email: "",
+  number: "",
+  domain: "",
+  challenge: "",
+  timeline: "",
+  hear: "",
 };
 
 /* ---------------------------------- */
@@ -82,10 +113,9 @@ function validateEmail(email: string) {
 }
 
 function validateForm(data: ProjectReviewFormData) {
-  if (!data.userType) return "Please select who you are.";
   if (!data.domain) return "Please select your project domain.";
-  if (!data.stage) return "Please select your project stage.";
-  if (!data.goal) return "Please select your goal.";
+  if (!data.number) return "Please provide your Number.";
+  if (!data.hear) return "Please select about hear.";
   if (!data.challenge.trim()) return "Please describe your challenge.";
   if (!data.name.trim()) return "Please enter your name.";
   if (!data.email.trim()) return "Please enter your email address.";
@@ -101,24 +131,6 @@ function cx(...classes: Array<string | false | null | undefined>) {
 /* Small reusable field components    */
 /* ---------------------------------- */
 
-function FieldWrapper({
-  label,
-  error,
-  children,
-}: {
-  label: string;
-  error?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium text-slate-900">{label}</label>
-      {children}
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
-    </div>
-  );
-}
-
 function InputField({
   label,
   name,
@@ -126,6 +138,7 @@ function InputField({
   onChange,
   placeholder,
   type = "text",
+  isRequired = true,
   error,
 }: {
   label: string;
@@ -133,28 +146,48 @@ function InputField({
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder: string;
-  type?: string;
+  type?: "text" | "email" | "tel" | "number";
   error?: string;
+  isRequired?: boolean;
 }) {
+  const isPhone = type === "tel" || type === "number";
+  const isEmail = type === "email";
+
   return (
     <div className="space-y-2">
-      <label htmlFor={name} className="block text-sm font-medium text-slate-800">
+      <label
+        htmlFor={name}
+        className="block text-sm font-medium text-slate-800"
+      >
         {label}
       </label>
+
       <input
         id={name}
-        type={type}
         name={name}
+        type={isPhone ? "tel" : type}
+        required={isRequired}
         value={value}
         onChange={onChange}
         placeholder={placeholder}
+        autoComplete={isEmail ? "email" : isPhone ? "tel" : undefined}
+        inputMode={isPhone ? "numeric" : undefined}
+        pattern={
+          isPhone
+            ? "^[0-9]{10}$"
+            : isEmail
+              ? "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+              : undefined
+        }
+        maxLength={isPhone ? 10 : undefined}
         className={cx(
           "w-full rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 outline-none transition",
           "focus:border-orange-400 focus:ring-4 focus:ring-orange-100",
-          error ? "border-red-400" : "border-slate-200"
+          error ? "border-red-400" : "border-slate-200",
         )}
       />
-      {error ? <p className="text-xs text-red-600">{error}</p> : null}
+
+      {error && <p className="text-xs text-red-600">{error}</p>}
     </div>
   );
 }
@@ -176,7 +209,10 @@ function TextareaField({
 }) {
   return (
     <div className="space-y-2">
-      <label htmlFor={name} className="block text-sm font-medium text-slate-800">
+      <label
+        htmlFor={name}
+        className="block text-sm font-medium text-slate-800"
+      >
         {label}
       </label>
       <textarea
@@ -189,7 +225,7 @@ function TextareaField({
         className={cx(
           "w-full resize-none rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 outline-none transition",
           "focus:border-orange-400 focus:ring-4 focus:ring-orange-100",
-          error ? "border-red-400" : "border-slate-200"
+          error ? "border-red-400" : "border-slate-200",
         )}
       />
       {error ? <p className="text-xs text-red-600">{error}</p> : null}
@@ -213,7 +249,9 @@ export default function ProjectReviewModal({
 
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof ProjectReviewFormData, string>>>({});
+  const [fieldErrors, setFieldErrors] = useState<
+    Partial<Record<keyof ProjectReviewFormData, string>>
+  >({});
   const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
@@ -262,7 +300,7 @@ export default function ProjectReviewModal({
         "• Need prototype before investor meeting",
         "• Looking for Embedded Engineer",
       ].join("\n"),
-    []
+    [],
   );
 
   if (!isOpen) return null;
@@ -282,19 +320,24 @@ export default function ProjectReviewModal({
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
-    const { name, value } = e.target;
+    let { name, value, type } = e.target;
+    if (type === "number") {
+      value = value.replace(/\D/g, "").slice(0, 10);
+    }
     setSingleField(name as keyof ProjectReviewFormData, value);
   };
 
   const buildFieldErrors = (data: ProjectReviewFormData) => {
     const errors: Partial<Record<keyof ProjectReviewFormData, string>> = {};
 
-    if (!data.userType) errors.userType = "Required";
+    if (!data.hear) errors.hear = "Required";
     if (!data.domain) errors.domain = "Required";
-    if (!data.stage) errors.stage = "Required";
-    if (!data.goal) errors.goal = "Required";
+    if (!data.number) errors.number = "Required";
+    if (!data.timeline) errors.timeline = "Required";
     if (!data.challenge.trim()) errors.challenge = "Required";
     if (!data.name.trim()) errors.name = "Required";
     if (!data.email.trim()) {
@@ -327,10 +370,10 @@ export default function ProjectReviewModal({
 
     try {
       const payload: ProjectReviewFormData = {
-        userType: formData.userType.trim(),
+        number: formData.number.trim(),
         domain: formData.domain.trim(),
-        stage: formData.stage.trim(),
-        goal: formData.goal.trim(),
+        timeline: formData.timeline.trim(),
+        hear: formData.hear.trim(),
         challenge: formData.challenge.trim(),
         name: formData.name.trim(),
         email: formData.email.trim(),
@@ -434,7 +477,7 @@ export default function ProjectReviewModal({
                   <ChevronDown
                     className={cx(
                       "h-4 w-4 flex-shrink-0 text-white/70 transition-transform",
-                      showDetails && "rotate-180"
+                      showDetails && "rotate-180",
                     )}
                   />
                 </button>
@@ -451,7 +494,7 @@ export default function ProjectReviewModal({
                       }}
                       className={cx(
                         "overflow-hidden lg:!block lg:!h-auto lg:!opacity-100",
-                        !showDetails && "hidden lg:block"
+                        !showDetails && "hidden lg:block",
                       )}
                     >
                       <div className="pt-4 lg:pt-0">
@@ -465,8 +508,9 @@ export default function ProjectReviewModal({
                         </h2>
 
                         <p className="mt-4 max-w-xl text-sm leading-7 text-slate-300 sm:text-[15px]">
-                          Tell us what you’re building, where you’re stuck, and what outcome you need.
-                          Our team will review it and send practical next steps within 24 hours.
+                          Tell us what you’re building, where you’re stuck, and
+                          what outcome you need. Our team will review it and
+                          send practical next steps within 24 hours.
                         </p>
 
                         <div className="mt-8 grid gap-3">
@@ -476,9 +520,12 @@ export default function ProjectReviewModal({
                                 <Wrench className="h-5 w-5" />
                               </div>
                               <div>
-                                <h3 className="text-sm font-semibold">Possible root cause</h3>
+                                <h3 className="text-sm font-semibold">
+                                  Possible root cause
+                                </h3>
                                 <p className="mt-1 text-sm text-slate-300">
-                                  We identify what’s actually blocking the project technically.
+                                  We identify what’s actually blocking the
+                                  project technically.
                                 </p>
                               </div>
                             </div>
@@ -490,9 +537,12 @@ export default function ProjectReviewModal({
                                 <CheckCircle2 className="h-5 w-5" />
                               </div>
                               <div>
-                                <h3 className="text-sm font-semibold">Suggested solution path</h3>
+                                <h3 className="text-sm font-semibold">
+                                  Suggested solution path
+                                </h3>
                                 <p className="mt-1 text-sm text-slate-300">
-                                  You’ll get actionable recommendations, not generic advice.
+                                  You’ll get actionable recommendations, not
+                                  generic advice.
                                 </p>
                               </div>
                             </div>
@@ -504,9 +554,12 @@ export default function ProjectReviewModal({
                                 <ShieldCheck className="h-5 w-5" />
                               </div>
                               <div>
-                                <h3 className="text-sm font-semibold">Right expert if needed</h3>
+                                <h3 className="text-sm font-semibold">
+                                  Right expert if needed
+                                </h3>
                                 <p className="mt-1 text-sm text-slate-300">
-                                  If the problem needs hands-on help, we’ll point you to the right engineer.
+                                  If the problem needs hands-on help, we’ll
+                                  point you to the right engineer.
                                 </p>
                               </div>
                             </div>
@@ -514,12 +567,23 @@ export default function ProjectReviewModal({
                         </div>
 
                         <div className="mt-8 rounded-2xl border border-orange-400/20 bg-orange-500/10 p-4">
-                          <h4 className="text-sm font-semibold text-orange-200">What happens next</h4>
+                          <h4 className="text-sm font-semibold text-orange-200">
+                            What happens next
+                          </h4>
                           <ol className="mt-3 space-y-2 text-sm text-orange-50/90">
-                            <li>1. Submit your challenge and current project details.</li>
+                            <li>
+                              1. Submit your challenge and current project
+                              details.
+                            </li>
                             <li>2. Our engineers review it within 24 hours.</li>
-                            <li>3. You receive practical recommendations and next steps.</li>
-                            <li>4. If needed, we connect you with the right engineering expert.</li>
+                            <li>
+                              3. You receive practical recommendations and next
+                              steps.
+                            </li>
+                            <li>
+                              4. If needed, we connect you with the right
+                              engineering expert.
+                            </li>
                           </ol>
                         </div>
                       </div>
@@ -530,138 +594,143 @@ export default function ProjectReviewModal({
             </div>
 
             {/* Right panel: order-1 on mobile (shown first), order-2 on desktop */}
-<div className="order-1 bg-slate-50 px-6 py-8 sm:px-8 lg:order-2 lg:px-10 lg:py-10">
-  <div className="mx-auto max-w-2xl">
-    <div className="mb-8">
-      <h3 className="text-2xl font-semibold tracking-tight text-slate-950">
-        Project review request
-      </h3>
-      <p className="mt-2 text-sm leading-6 text-slate-600">
-        Fill in the details below and we’ll get back to you with a review of your engineering challenge.
-      </p>
-    </div>
+            <div className="order-1 bg-slate-50 px-6 py-8 sm:px-8 lg:order-2 lg:px-10 lg:py-10">
+              <div className="mx-auto max-w-2xl">
+                <div className="mb-8">
+                  <h3 className="text-2xl font-semibold tracking-tight text-slate-950">
+                    Project review request
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    Fill in the details below and we’ll get back to you with a
+                    review of your engineering challenge.
+                  </p>
+                </div>
 
-    <form onSubmit={handleLeadSubmit} className="space-y-6" noValidate>
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        <CustomSelect
-          label="Who are you?"
-          name="userType"
-          value={formData.userType}
-          onChange={handleChange}
-          options={USER_TYPES}
-          placeholder="Select user type"
-          error={fieldErrors.userType}
-        />
+                <form
+                  onSubmit={handleLeadSubmit}
+                  className="space-y-6"
+                  noValidate
+                >
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    <InputField
+                      label="Your name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="Enter your full name"
+                      error={fieldErrors.name}
+                    />
 
-        <CustomSelect
-          label="Project domain"
-          name="domain"
-          value={formData.domain}
-          onChange={handleChange}
-          options={DOMAINS}
-          placeholder="Select domain"
-          error={fieldErrors.domain}
-        />
+                    <InputField
+                      label="Whatsapp Number"
+                      name="number"
+                      type="number"
+                      value={formData.number}
+                      onChange={handleChange}
+                      placeholder="Enter your Whatsapp Number"
+                      error={fieldErrors.number}
+                    />
+                    <InputField
+                      label="Email address (optional)"
+                      isRequired={false}
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="Enter your email"
+                      error={fieldErrors.email}
+                    />
 
-        <CustomSelect
-          label="Project stage"
-          name="stage"
-          value={formData.stage}
-          onChange={handleChange}
-          options={STAGES}
-          placeholder="Select stage"
-          error={fieldErrors.stage}
-        />
+                    <CustomSelect
+                      label="What are you Building?"
+                      name="domain"
+                      value={formData.domain}
+                      onChange={handleChange}
+                      options={DOMAINS}
+                      placeholder="Choose"
+                      error={fieldErrors.domain}
+                    />
+                  </div>
 
-        <CustomSelect
-          label="Goal"
-          name="goal"
-          value={formData.goal}
-          onChange={handleChange}
-          options={GOALS}
-          placeholder="Select goal"
-          error={fieldErrors.goal}
-        />
-      </div>
+                  <TextareaField
+                    label="Describe your challenge"
+                    name="challenge"
+                    value={formData.challenge}
+                    onChange={handleChange}
+                    placeholder={challengePlaceholder}
+                    error={fieldErrors.challenge}
+                  />
 
-      <TextareaField
-        label="Describe your challenge"
-        name="challenge"
-        value={formData.challenge}
-        onChange={handleChange}
-        placeholder={challengePlaceholder}
-        error={fieldErrors.challenge}
-      />
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    <CustomSelect
+                      label="When do you need help?"
+                      name="timeline"
+                      value={formData.timeline}
+                      onChange={handleChange}
+                      options={TIMELINE}
+                      placeholder="Select Timeline"
+                      error={fieldErrors.timeline}
+                    />
 
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        <InputField
-          label="Your name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="Enter your full name"
-          error={fieldErrors.name}
-        />
+                    <CustomSelect
+                      label="How did you hear about us?"
+                      name="hear"
+                      value={formData.hear}
+                      onChange={handleChange}
+                      options={HEAR}
+                      placeholder="Choose Source"
+                      error={fieldErrors.hear}
+                    />
+                  </div>
 
-        <InputField
-          label="Email address"
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="Enter your email"
-          error={fieldErrors.email}
-        />
-      </div>
+                  <div className="rounded-2xl border border-slate-200 bg-white p-5">
+                    <div className="flex flex-wrap gap-2.5 text-xs text-slate-600">
+                      <span className="rounded-full bg-slate-100 px-3 py-1.5">
+                        🔒 Your information stays confidential
+                      </span>
+                      <span className="rounded-full bg-slate-100 px-3 py-1.5">
+                        ⚡ No payment required
+                      </span>
+                      <span className="rounded-full bg-slate-100 px-3 py-1.5">
+                        👨‍💻 Reviewed by experienced engineers
+                      </span>
+                    </div>
+                  </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-5">
-        <div className="flex flex-wrap gap-2.5 text-xs text-slate-600">
-          <span className="rounded-full bg-slate-100 px-3 py-1.5">
-            🔒 Your information stays confidential
-          </span>
-          <span className="rounded-full bg-slate-100 px-3 py-1.5">
-            ⚡ No payment required
-          </span>
-          <span className="rounded-full bg-slate-100 px-3 py-1.5">
-            👨‍💻 Reviewed by experienced engineers
-          </span>
-        </div>
-      </div>
+                  {formError ? (
+                    <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                      {formError}
+                    </div>
+                  ) : null}
 
-      {formError ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {formError}
-        </div>
-      ) : null}
+                  <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      disabled={loading}
+                      className="inline-flex h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      Maybe later
+                    </button>
 
-      <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
-        <button
-          type="button"
-          onClick={onClose}
-          disabled={loading}
-          className="inline-flex h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          Maybe later
-        </button>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="inline-flex h-12 min-w-[220px] items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-70"
-        >
-          {loading ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Submitting...
-            </>
-          ) : (
-            "Get My Free Engineering Review"
-          )}
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="inline-flex h-12 min-w-[220px] items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 text-sm font-semibold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Submitting...
+                        </>
+                      ) : (
+                        "Get My Free Engineering Review"
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
           </div>
         </div>
       </div>

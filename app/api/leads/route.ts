@@ -4,16 +4,16 @@ import { prisma } from "@/lib/prisma";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { userType, domain, stage, goal, challenge, name, email } = body;
+    const { name, number, email, domain, challenge, timeline, hear } = body;
 
     if (
-      !userType?.trim() ||
-      !domain?.trim() ||
-      !stage?.trim() ||
-      !goal?.trim() ||
-      !challenge?.trim() ||
       !name?.trim() ||
-      !email?.trim()
+      !number?.trim() ||
+      !email?.trim() ||
+      !domain?.trim() ||
+      !challenge?.trim() ||
+      !timeline?.trim() ||
+      !hear?.trim()
     ) {
       return NextResponse.json(
         {
@@ -26,13 +26,13 @@ export async function POST(req: NextRequest) {
 
     const lead = await prisma.lead.create({
       data: {
-        userType,
-        domain,
-        stage,
-        goal,
-        challenge,
-        name,
-        email,
+        name: name.trim(),
+        number: number.trim(),
+        email: email.trim(),
+        domain: domain.trim(),
+        challenge: challenge.trim(),
+        timeline: timeline.trim(),
+        hear: hear.trim(),
       },
     });
 
@@ -67,15 +67,46 @@ export async function GET(req: NextRequest) {
           id: leadId,
         },
       });
-      return NextResponse.json({ success: true, lead }, { status: 200 });
+
+      if (!lead) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Lead not found.",
+          },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json(
+        {
+          success: true,
+          lead,
+        },
+        { status: 200 }
+      );
     }
 
-    const leads = await prisma.lead.findMany();
-    return NextResponse.json({ success: true, leads }, { status: 200 });
+    const leads = await prisma.lead.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return NextResponse.json(
+      {
+        success: true,
+        leads,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Lead Fetch Error:", error);
     return NextResponse.json(
-      { success: false, message: "Internal Server Error" },
+      {
+        success: false,
+        message: "Internal Server Error.",
+      },
       { status: 500 }
     );
   }
@@ -86,23 +117,53 @@ export async function DELETE(req: NextRequest) {
     const sp = req.nextUrl.searchParams;
     const leadId = sp.get("id");
 
-    if (leadId) {
-      const lead = await prisma.lead.delete({
-        where: {
-          id: leadId,
+    if (!leadId) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Lead id is required.",
         },
-      });
-      return NextResponse.json({ success: true, lead }, { status: 200 });
+        { status: 400 }
+      );
     }
 
+    const existingLead = await prisma.lead.findUnique({
+      where: {
+        id: leadId,
+      },
+    });
+
+    if (!existingLead) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Lead not found.",
+        },
+        { status: 404 }
+      );
+    }
+
+    const lead = await prisma.lead.delete({
+      where: {
+        id: leadId,
+      },
+    });
+
     return NextResponse.json(
-      { success: false, message: "Lead id is required." },
-      { status: 400 }
+      {
+        success: true,
+        message: "Lead deleted successfully.",
+        lead,
+      },
+      { status: 200 }
     );
   } catch (error) {
     console.error("Lead Deletion Error:", error);
     return NextResponse.json(
-      { success: false, message: "Internal Server Error" },
+      {
+        success: false,
+        message: "Internal Server Error.",
+      },
       { status: 500 }
     );
   }

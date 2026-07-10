@@ -58,7 +58,7 @@ export function CustomSelect({
           disabled={disabled}
           required={required}
           className={cn(
-            "h-12 w-full appearance-none rounded-xl border bg-white px-4 pr-11 text-sm text-slate-900 shadow-sm outline-none transition",
+            "h-12 w-full appearance-none rounded-xl border bg-white px-4 pr-11 text-sm text-slate-900 outline-none transition",
             "focus:border-orange-500 focus:ring-4 focus:ring-orange-100",
             "disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400",
             hasError

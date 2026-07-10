@@ -1,3 +1,5 @@
+"use client";
+
 import DashboardShell from "@/components/layout/DashboardShell";
 import { Lead } from "@/lib/types/lead";
 import {

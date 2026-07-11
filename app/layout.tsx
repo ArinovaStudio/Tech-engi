@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import { Toaster } from "react-hot-toast";
 import {
   Geist,
   Geist_Mono,
@@ -68,6 +69,13 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const { user } = await getUser();
+
+  <Toaster
+    position="top-center"
+    toastOptions={{
+      duration: 4000,
+    }}
+  />
 
   return (
     <html lang="en" className="h-full antialiased">

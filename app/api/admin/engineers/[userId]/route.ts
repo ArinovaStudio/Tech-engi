@@ -21,26 +21,35 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ us
     }
 
     const { status, subject, customMessage } = validation.data;
+    const engineer = await prisma.engineerProfile.findUnique({
+      where: {
+        userId,
+      },
+    });
+
+    if(!engineer) return NextResponse.json({success:false, message:"Engineer profile Missing"},{status:400})
+
 
     const updatedEngineer = await prisma.engineerProfile.update({
-      where: { userId: userId }, 
-      data: { 
-        status, 
-        rejectionReason: status === "REJECTED" ? customMessage : null 
+      where: { userId: userId },
+      data: {
+        status,
+        rejectionReason: status === "REJECTED" ? customMessage : null
       },
       include: { user: { select: { email: true, name: true } } }
     });
 
-    if (status !== "PENDING"){
-      const emailHtml = status === "APPROVED" 
-      ? engineerApprovalTemplate(updatedEngineer.user.name || "Engineer", customMessage) 
-      : engineerRejectionTemplate(updatedEngineer.user.name || "Engineer", customMessage);
+    if (status !== "PENDING") {
+      const emailHtml = status === "APPROVED"
+        ? engineerApprovalTemplate(updatedEngineer.user.name || "Engineer", customMessage)
+        : engineerRejectionTemplate(updatedEngineer.user.name || "Engineer", customMessage);
 
-       await sendEmail(updatedEngineer.user.email, subject, emailHtml);
+      await sendEmail(updatedEngineer.user.email, subject, emailHtml);
     }
 
     return NextResponse.json({ success: true }, { status: 200 });
-  } catch {
-    return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
+  } catch (error: any) {
+
+    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
   }
 }

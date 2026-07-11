@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Send, ShieldAlert, AlertCircle } from "lucide-react";
 import { engineerStatusData } from "@/lib/engineerReasons";
+import { toast } from "react-hot-toast";
 
 interface Props {
   isOpen: boolean;
@@ -37,13 +38,13 @@ export default function EngineerStatusModal({ isOpen, user, onClose, onSuccess, 
     setSelectedReasonIndex(index);
     setSelectedTagIndex(-1);
     setCustomMessage("");
-    setSubject(currentOptions[index].reason); 
+    setSubject(currentOptions[index].reason);
   };
 
   const handleTagClick = (tagIndex: number, tag: any) => {
     setSelectedTagIndex(tagIndex);
     setCustomMessage(tag.message);
-    setSubject(`${currentReason?.reason} - ${tag.label}`); 
+    setSubject(`${currentReason?.reason} - ${tag.label}`);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,17 +55,24 @@ export default function EngineerStatusModal({ isOpen, user, onClose, onSuccess, 
 
     setIsProcessing(true);
     try {
-      const payload = status === "PENDING" 
-        ? { status } 
+      const payload = status === "PENDING"
+        ? { status }
         : { status, customMessage, subject };
-        
+
       const res = await fetch(`/api/admin/engineers/${user.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       if (res.ok) { onSuccess(); onClose(); }
-    } catch (err) { console.error(err); } finally { setIsProcessing(false); }
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Something went wrong";
+
+      toast.error(message);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (!isOpen || !user) return null;
@@ -72,7 +80,7 @@ export default function EngineerStatusModal({ isOpen, user, onClose, onSuccess, 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 text-black">
       <div className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl flex flex-col h-[85vh] max-h-[800px] border border-gray-200">
-        
+
         <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-b border-gray-200">
           <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2 font-inter">
             <ShieldAlert size={18} className="text-[var(--primary)]" /> Manage Approval
@@ -81,51 +89,51 @@ export default function EngineerStatusModal({ isOpen, user, onClose, onSuccess, 
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
-          
+
           <div className="bg-gray-50/50 border-b border-gray-100 px-6 py-4 space-y-4">
-             {/* STATUS SELECTOR */}
-             <div className="flex items-center">
-                <span className="w-20 text-sm font-semibold text-gray-400">Status</span>
-                <select 
-                  value={status} 
-                  onChange={(e) => { setStatus(e.target.value as any); setSelectedReasonIndex(-1); }} 
+            {/* STATUS SELECTOR */}
+            <div className="flex items-center">
+              <span className="w-20 text-sm font-semibold text-gray-400">Status</span>
+              <select
+                value={status}
+                onChange={(e) => { setStatus(e.target.value as any); setSelectedReasonIndex(-1); }}
+                className="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none focus:border-[var(--primary)] shadow-sm"
+              >
+                <option value="PENDING">Pending</option>
+                <option value="APPROVED">Approved</option>
+                <option value="REJECTED">Rejected</option>
+              </select>
+            </div>
+
+            {/* REASON SELECTOR (Only if Approved or Rejected) */}
+            {status !== "PENDING" && (
+              <div className="flex items-center animate-fadeIn">
+                <span className="w-20 text-sm font-semibold text-gray-400">Reason</span>
+                <select
+                  required
+                  value={selectedReasonIndex}
+                  onChange={(e) => handleReasonChange(Number(e.target.value))}
                   className="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none focus:border-[var(--primary)] shadow-sm"
                 >
-                  <option value="PENDING">Pending</option>
-                  <option value="APPROVED">Approved</option>
-                  <option value="REJECTED">Rejected</option>
+                  <option value="-1" disabled>Select category...</option>
+                  {currentOptions.map((item, idx) => <option key={idx} value={idx}>{item.reason}</option>)}
                 </select>
               </div>
+            )}
 
-              {/* REASON SELECTOR (Only if Approved or Rejected) */}
-              {status !== "PENDING" && (
-                <div className="flex items-center animate-fadeIn">
-                  <span className="w-20 text-sm font-semibold text-gray-400">Reason</span>
-                  <select 
-                    required
-                    value={selectedReasonIndex}
-                    onChange={(e) => handleReasonChange(Number(e.target.value))}
-                    className="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 outline-none focus:border-[var(--primary)] shadow-sm"
-                  >
-                    <option value="-1" disabled>Select category...</option>
-                    {currentOptions.map((item, idx) => <option key={idx} value={idx}>{item.reason}</option>)}
-                  </select>
+            {/* TAGS */}
+            {currentReason && (
+              <div className="flex items-start animate-fadeIn">
+                <span className="w-20 text-sm font-semibold text-gray-400 mt-2">Tag</span>
+                <div className="flex-1 flex flex-wrap gap-2">
+                  {currentReason.tags.map((tag, tIdx) => (
+                    <button type="button" key={tIdx} onClick={() => handleTagClick(tIdx, tag)} className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-all ${selectedTagIndex === tIdx ? "bg-[var(--primary)] border-[var(--primary)] text-white" : "bg-white border-gray-200 text-gray-600 hover:bg-gray-100"}`}>
+                      {tag.label}
+                    </button>
+                  ))}
                 </div>
-              )}
-
-              {/* TAGS */}
-              {currentReason && (
-                <div className="flex items-start animate-fadeIn">
-                  <span className="w-20 text-sm font-semibold text-gray-400 mt-2">Tag</span>
-                  <div className="flex-1 flex flex-wrap gap-2">
-                    {currentReason.tags.map((tag, tIdx) => (
-                      <button type="button" key={tIdx} onClick={() => handleTagClick(tIdx, tag)} className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-all ${selectedTagIndex === tIdx ? "bg-[var(--primary)] border-[var(--primary)] text-white" : "bg-white border-gray-200 text-gray-600 hover:bg-gray-100"}`}>
-                        {tag.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+              </div>
+            )}
           </div>
 
           {/* EMAIL COMPOSER (Hidden if Pending) */}

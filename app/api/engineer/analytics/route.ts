@@ -31,6 +31,10 @@ export async function GET(req: NextRequest) {
     const engineerId = engineerProfile?.id;
     const userId = user.id;
 
+    if (!engineerId) {
+     return NextResponse.json({ success: false, message: "Engineer missing" }, { status: 400 });
+    }
+
     const [allProjects, periodProjects, invitations, allTransactions, periodTransactions] = await Promise.all([
       engineerId
         ? prisma.project.findMany({

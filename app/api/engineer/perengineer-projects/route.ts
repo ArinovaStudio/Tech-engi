@@ -9,6 +9,10 @@ export async function GET(req: NextRequest) {
         const engineerId = engineerProfile?.id;
         const userId = user?.id;
 
+        if (!engineerId) {
+          return NextResponse.json({success:false, message: "Somthing went Wrong"}, {status:400})
+        }
+
         const projects = await prisma.project.findMany({
   where: {
     engineerId: engineerId,

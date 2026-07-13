@@ -171,167 +171,167 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
     fetchData();
   }, [projectId]);
   useEffect(() => {
-  if (loading) return;
-  if (!session?.user?.id) return;
+    if (loading) return;
+    if (!session?.user?.id) return;
 
-  const tourKey = `tour_seen_report_issue_${session.user.id}`;
+    const tourKey = `tour_seen_report_issue_${session.user.id}`;
 
-  const isHandoff =
-    sessionStorage.getItem(
-      "start_report_issue_tour"
-    ) === "true";
+    const isHandoff =
+      sessionStorage.getItem(
+        "start_report_issue_tour"
+      ) === "true";
 
-  const forced =
-    sessionStorage.getItem(
-      "force_tour"
-    ) === "true";
+    const forced =
+      sessionStorage.getItem(
+        "force_tour"
+      ) === "true";
 
-  if (
-    !isHandoff &&
-    !forced &&
-    localStorage.getItem(tourKey)
-  ) {
-    return;
-  }
+    if (
+      !isHandoff &&
+      !forced &&
+      localStorage.getItem(tourKey)
+    ) {
+      return;
+    }
 
-  const tour = driver({
-    showProgress: true,
-    animate: true,
-    smoothScroll: true,
-    overlayOpacity: 0.35,
-    nextBtnText: "Next →",
-    prevBtnText: "← Prev",
-    doneBtnText: "Done ✓",
+    const tour = driver({
+      showProgress: true,
+      animate: true,
+      smoothScroll: true,
+      overlayOpacity: 0.35,
+      nextBtnText: "Next →",
+      prevBtnText: "← Prev",
+      doneBtnText: "Done ✓",
 
-    steps: [
-      {
-        element: '[data-tour="report-heading"]',
-        popover: {
-          title: "Report an Issue",
-          description:
-            "This section allows you to raise and manage project issues.",
-        },
-      },
-      {
-        element: '[data-tour="report-guidelines"]',
-        popover: {
-          title: "Issue Guidelines",
-          description:
-            "Read these guidelines before raising an issue.",
-        },
-      },
-      {
-        element: '[data-tour="report-tabs"]',
-        popover: {
-          title: "Issue Categories",
-          description:
-            "View issues raised by you, admins, clients, and engineers.",
-        },
-      },
-      {
-        element: '[data-tour="report-btn"]',
-        popover: {
-          title: "Raise a Ticket",
-          description:
-            "Click here to report a new issue.",
-
-          onNextClick: (
-            _el: Element | undefined,
-            _step: any,
-            opts: any
-          ) => {
-            setShowModal(true);
-
-            setTimeout(() => {
-              opts.driver.moveNext();
-            }, 300);
+      steps: [
+        {
+          element: '[data-tour="report-heading"]',
+          popover: {
+            title: "Report an Issue",
+            description:
+              "This section allows you to raise and manage project issues.",
           },
         },
-      },
-      {
-        element: '[data-tour="ticket-type"]',
-        popover: {
-          title: "Issue Type",
-          description:
-            "Select the category of the issue.",
+        {
+          element: '[data-tour="report-guidelines"]',
+          popover: {
+            title: "Issue Guidelines",
+            description:
+              "Read these guidelines before raising an issue.",
+          },
         },
-      },
-      {
-        element: '[data-tour="ticket-target"]',
-        popover: {
-          title: "Issue Target",
-          description:
-            "Choose who this issue should be reported to.",
+        {
+          element: '[data-tour="report-tabs"]',
+          popover: {
+            title: "Issue Categories",
+            description:
+              "View issues raised by you, admins, clients, and engineers.",
+          },
         },
-      },
-      {
-        element: '[data-tour="ticket-description"]',
-        popover: {
-          title: "Describe the Issue",
-          description:
-            "Provide detailed information about the problem.",
+        {
+          element: '[data-tour="report-btn"]',
+          popover: {
+            title: "Raise a Ticket",
+            description:
+              "Click here to report a new issue.",
+
+            onNextClick: (
+              _el: Element | undefined,
+              _step: any,
+              opts: any
+            ) => {
+              setShowModal(true);
+
+              setTimeout(() => {
+                opts.driver.moveNext();
+              }, 300);
+            },
+          },
         },
-      },
-      {
-        element: '[data-tour="ticket-upload"]',
-        popover: {
-          title: "Upload Images",
-          description:
-            "Attach screenshots or supporting images if necessary.",
+        {
+          element: '[data-tour="ticket-type"]',
+          popover: {
+            title: "Issue Type",
+            description:
+              "Select the category of the issue.",
+          },
         },
-      },
-      {
-        element: '[data-tour="ticket-submit"]',
-        popover: {
-          title: "Submit Ticket",
-          description:
-            "Submit the ticket once all required information is filled.",
+        {
+          element: '[data-tour="ticket-target"]',
+          popover: {
+            title: "Issue Target",
+            description:
+              "Choose who this issue should be reported to.",
+          },
         },
+        {
+          element: '[data-tour="ticket-description"]',
+          popover: {
+            title: "Describe the Issue",
+            description:
+              "Provide detailed information about the problem.",
+          },
+        },
+        {
+          element: '[data-tour="ticket-upload"]',
+          popover: {
+            title: "Upload Images",
+            description:
+              "Attach screenshots or supporting images if necessary.",
+          },
+        },
+        {
+          element: '[data-tour="ticket-submit"]',
+          popover: {
+            title: "Submit Ticket",
+            description:
+              "Submit the ticket once all required information is filled.",
+          },
+        },
+      ],
+
+      onDestroyed: () => {
+        sessionStorage.removeItem(
+          "start_report_issue_tour"
+        );
+
+        localStorage.setItem(
+          tourKey,
+          "true"
+        );
+
+        setShowModal(false);
+
+        sessionStorage.setItem(
+          "start_engineer_payout_tour",
+          "true"
+        );
+
+        router.push("/engineer/payout");
+
+        tourRef.current = null;
       },
-    ],
+    });
 
-    onDestroyed: () => {
-  sessionStorage.removeItem(
-    "start_report_issue_tour"
-  );
+    tourRef.current = tour;
 
-  localStorage.setItem(
-    tourKey,
-    "true"
-  );
+    const timer = setTimeout(
+      () => {
+        tour.drive();
+      },
+      isHandoff ? 0 : 600
+    );
 
-  setShowModal(false);
+    return () => {
+      clearTimeout(timer);
 
-  sessionStorage.setItem(
-    "start_engineer_payout_tour",
-    "true"
-  );
-
-  router.push("/engineer/payout");
-
-  tourRef.current = null;
-},
-  });
-
-  tourRef.current = tour;
-
-  const timer = setTimeout(
-    () => {
-      tour.drive();
-    },
-    isHandoff ? 0 : 600
-  );
-
-  return () => {
-    clearTimeout(timer);
-
-    tour.destroy();
-    tourRef.current = null;
-  };
-}, [
-  loading,
-  session?.user?.id,
-]);
+      tour.destroy();
+      tourRef.current = null;
+    };
+  }, [
+    loading,
+    session?.user?.id,
+  ]);
 
   const handleCreateTicket = async ({ }) => {
     try {
@@ -443,6 +443,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
   const targetOptions = role === "ADMIN" ? ["Engineer", "Client"] : role === "ENGINEER" ? ["Platform", "Client"] : ["Engineer", "Platform"];
 
   const statusChange = {}
+  const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB
 
   return (
     <div className="space-y-6">
@@ -809,12 +810,24 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                     accept="image/*"
                     disabled={creating}
                     className="hidden"
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []);
+
+                      const oversizedFiles = files.filter(
+                        (file) => file.size > MAX_FILE_SIZE
+                      );
+
+                      if (oversizedFiles.length > 0) {
+                        toast.error("Each file must be less than 20 MB.");
+                        e.target.value = "";
+                        return;
+                      }
+
                       setNewTicket({
                         ...newTicket,
-                        images: Array.from(e.target.files || []),
-                      })
-                    }
+                        images: files,
+                      });
+                    }}
                   />
 
                   <div className="w-12 h-12 rounded-2xl bg-[#FFAE58]/15 flex items-center justify-center mb-3">

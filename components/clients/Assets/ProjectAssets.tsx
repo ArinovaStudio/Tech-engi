@@ -255,6 +255,8 @@ const ProjectAssets = () => {
         return searchMatch && projectMatch && typeMatch;
     });
 
+    const MAX_FILE_SIZE = 200 * 1024 * 1024;
+
     if (loading)
         return (
             <div className="flex items-center justify-center py-12 w-full h-screen">
@@ -433,6 +435,9 @@ const ProjectAssets = () => {
 
                             <div id="asset-resource-type">
                                 <label className="block text-sm font-semibold mb-2">Resource Type</label>
+                                <p className="text-xs text-gray-500 mb-2">
+                                    Maximum upload file size: <span className="font-medium">200 MB</span> (for File and Image resources).
+                                </p>
                                 <select
                                     value={resource.type}
                                     onChange={(e) => setResource({ ...resource, type: e.target.value, content: "" })}
@@ -452,7 +457,19 @@ const ProjectAssets = () => {
                                     <input
                                         type="file"
                                         accept={resource.type === "IMAGE" ? "image/*" : "*"}
-                                        onChange={(e) => { const file = e.target.files?.[0]; if (file) setSelectedFile(file); }}
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+
+                                            if (!file) return;
+
+                                            if (file.size > MAX_FILE_SIZE) {
+                                                toast.error("File size must not exceed 200 MB.");
+                                                e.target.value = ""; // Clear the input
+                                                return;
+                                            }
+
+                                            setSelectedFile(file);
+                                        }}
                                         className="w-full"
                                     />
                                     {selectedFile && (

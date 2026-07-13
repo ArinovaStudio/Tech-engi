@@ -307,6 +307,7 @@ const ClientReportIssue = () => {
         );
 
     const targetOptions = role === "ADMIN" ? ["Engineer"] : ["PLATFORM", "ENGINEER"];
+    const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB
 
     return (
         <div className="h-full w-full">
@@ -533,7 +534,24 @@ const ClientReportIssue = () => {
                                         accept="image/*"
                                         disabled={creating}
                                         className="hidden"
-                                        onChange={(e) => setNewTicket({ ...newTicket, images: Array.from(e.target.files || []) })}
+                                        onChange={(e) => {
+                                            const files = Array.from(e.target.files || []);
+
+                                            const oversizedFiles = files.filter(
+                                                (file) => file.size > MAX_FILE_SIZE
+                                            );
+
+                                            if (oversizedFiles.length > 0) {
+                                                toast.error("Each file must be less than 20 MB.");
+                                                e.target.value = "";
+                                                return;
+                                            }
+
+                                            setNewTicket({
+                                                ...newTicket,
+                                                images: files,
+                                            });
+                                        }}
                                     />
                                     <div className="w-12 h-12 rounded-2xl bg-[#FFAE58]/15 flex items-center justify-center mb-3">
                                         <Upload className="w-6 h-6 text-[#FFAE58]" />

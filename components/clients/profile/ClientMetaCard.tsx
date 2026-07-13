@@ -2,19 +2,25 @@
 
 import { Camera, Loader2 } from "lucide-react";
 import React, { useRef, useState } from "react";
+import toast from "react-hot-toast";
 
 export default function ClientMetaCard({ user }: { user: any }) {
   if (!user) return null;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [image, setImage] = useState(user?.image);
   const [imageLoader, setImageLoader] = useState(false);
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
-  const handleUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
     if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("Image size must not exceed 5 MB.");
+      e.target.value = "";
+      return;
+    }
 
     try {
       setImageLoader(true);

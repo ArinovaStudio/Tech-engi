@@ -10,7 +10,7 @@ import {
 import bcrypt from "bcryptjs";
 
 async function main() {
-  console.log("Starting database seed...");
+  // console.log("Starting database seed...");
 
   const hashedPassword = await bcrypt.hash("password123", 10);
 
@@ -213,7 +213,7 @@ async function main() {
 
   console.log("Seeding finished.");
 }*/
-console.log("Creating Aditya's engineer account...");
+// console.log("Creating Aditya's engineer account...");
 
 await prisma.user.upsert({
   where: { email: "aditya.engineer@gmail.com" },

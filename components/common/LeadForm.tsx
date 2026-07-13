@@ -378,9 +378,7 @@ export default function ProjectReviewModal({
         name: formData.name.trim(),
         email: formData.email.trim(),
       };
-
-      console.log("Submitting lead payload:", payload);
-
+      
       const response = await fetch("/api/leads", {
         method: "POST",
         headers: {

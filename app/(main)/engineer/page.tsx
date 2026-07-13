@@ -16,6 +16,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
+import toast from "react-hot-toast";
 
 interface AnalyticsData {
   overview: { totalAssigned: number; completedProjects: number; newInvitations: number };
@@ -50,6 +51,9 @@ export default function EngineerDashboardPage() {
   const router = useRouter();
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [engineerprofile, setEngineerProfile] = useState(null);
+  const [banner, setBanner] = useState(false);
+  const [bannerMsg, setbannerMsg] = useState("");
   const [periods, setPeriods] = useState<Record<CardKey, Period>>({
     projects: "monthly",
     revenue: "monthly",
@@ -61,9 +65,40 @@ export default function EngineerDashboardPage() {
 
   const { data: projectsData, isLoading: projectsLoading, mutate } = useSWR("/api/engineer/perengineer-projects", fetcher);
   const { data: invitationsData } = useSWR("/api/engineer/invitation-engineer", fetcher);
+
+  useEffect(() => {
+    const fetchEngineerProfile = async () => {
+      try {
+        const response = await fetch("/api/engineer/engineerprofile");
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          toast.error(result.error || "Failed to fetch engineer profile");
+          if (result.error === "Please complete your profile first") {
+            setbannerMsg("Please complete your Engineer profile to unlock all features.");
+            setBanner(true);
+          }
+          if (result.error === "Account is pending Admin approval") {
+            setbannerMsg("Your Engineer profile is pending Admin approval. Please wait for approval to unlock all features.");
+            setBanner(true);
+          }
+          return;
+        }
+
+        setEngineerProfile(result.data);
+      } catch (error: any) {
+        toast.error(error.message || "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEngineerProfile();
+  }, []);
+
   // console.log(invitationsData, "invitationsData");
   const { user } = useAuth();
-
   // Handoff: Engineer Dashboard → Engineer Projects page
   const goToProjectsTour = () => {
     sessionStorage.setItem("tour_in_progress", "true");
@@ -244,6 +279,21 @@ export default function EngineerDashboardPage() {
 
   return (
     <DashboardShell>
+      {banner && (
+        <div className="flex items-center justify-between mb-6 px-5 py-4 rounded-xl border border-yellow-300 bg-yellow-50 text-yellow-800">
+          <p className="text-sm font-medium">
+            {bannerMsg}
+          </p>
+
+          <button
+            onClick={() => setBanner(false)}
+            className="ml-4 text-xl font-bold text-yellow-700 hover:text-yellow-900"
+            aria-label="Close banner"
+          >
+            ×
+          </button>
+        </div>
+      )}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold  text-[var(--text-primary)]">Dashboards</h1>
         <button

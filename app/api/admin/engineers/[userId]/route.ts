@@ -27,7 +27,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ us
       },
     });
 
-    if(!engineer) return NextResponse.json({success:false, message:"Engineer profile Missing"},{status:400})
+    if(!engineer) return NextResponse.json({success:false, message:"Engineer Profile Incomplete"},{status:400})
 
 
     const updatedEngineer = await prisma.engineerProfile.update({

@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
         }
         const user = await prisma.user.findUnique({
           where: {
-            email: credentials.email ,
+            email: credentials.email,
           },
           include: {
             engineerProfile: true,
@@ -42,11 +42,11 @@ export const authOptions: NextAuthOptions = {
         if (user.password === null) throw new Error("Password is not set, please login with Google");
         const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
         if (!isPasswordValid) throw new Error("Invalid password or email");
-        if (user.role === "ENGINEER" &&
-          user.engineerProfile &&
-          user.engineerProfile.status !== "APPROVED") {
-          throw new Error("Only approved engineers can login with email and password");
-        }
+        // if (user.role === "ENGINEER" &&
+        //   user.engineerProfile &&
+        //   user.engineerProfile.status !== "APPROVED") {
+        //   throw new Error("Only approved engineers can login with email and password");
+        // }
         return user;
       }
     })

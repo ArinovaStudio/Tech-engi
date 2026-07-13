@@ -16,6 +16,105 @@ import {
   ArrowLeft
 } from "lucide-react";
 
+const testimonials = [
+  {
+    text: "Client ke perspective se bolun toh yeh platform engineers aur clients ko connect karne ke liye really smooth hai. Communication clear raha aur delivery time pe mila.",
+    avatar: "/users/image copy 8.png",
+    name: "Baisakhi",
+    role: "Startup Founder",
+  },
+  {
+    text: "From an engineer's perspective, the platform is well-structured. Requirements are clear, and it's easy to collaborate with clients without unnecessary confusion.",
+    avatar: "/users/image copy 9.png",
+    name: "Sarah Khan",
+    role: "Software Engineer",
+  },
+  {
+    text: "We needed quick technical support for a prototype. The matching process was fast and we got someone who understood the requirements immediately.",
+    avatar: "/users/image copy 3.png",
+    name: "Ankit Sharma",
+    role: "Product Manager",
+  },
+  {
+    text: "I've worked on multiple projects here. The client expectations are clear, and payments and communication are handled smoothly.",
+    avatar: "/users/image copy 10.png",
+    name: "Neha Verma",
+    role: "Freelance Developer",
+  },
+  {
+    text: "I collaborated on a simulation project and the requirements were very well explained. It saved a lot of back-and-forth time.",
+    avatar: "/users/image copy 5.png",
+    name: "Rohit Mehta",
+    role: "Mechanical Engineer",
+  },
+  {
+    text: "Good platform for freelance engineers. The projects feel structured and clients are generally responsive and clear.",
+    avatar: "/users/image copy 11.png",
+    name: "Priya Nair",
+    role: "Full Stack Developer",
+  },
+  {
+    text: "I helped a client with structural analysis work. Everything from scope to delivery was properly defined, which made execution easier.",
+    avatar: "/users/image copy 6.png",
+    name: "Aditya Kulkarni",
+    role: "Civil Engineer",
+  },
+  {
+    text: "Even for design-related technical work, the collaboration was smooth. Feedback cycles were quick and clear.",
+    avatar: "/users/image copy 13.png",
+    name: "Simran Kaur",
+    role: "UI/UX Designer",
+  },
+  {
+    text: "APIs and backend tasks were well documented by clients. It made development faster and less frustrating.",
+    avatar: "/users/image copy 18.png",
+    name: "Vikram Singh",
+    role: "Backend Engineer",
+  },
+  {
+    text: "I worked on a data visualization project. The requirements were specific, and I was able to deliver exactly what was needed.",
+    avatar: "/users/image copy 14.png",
+    name: "Ishita Roy",
+    role: "Data Analyst",
+  },
+  {
+    text: "IoT project collaboration was smooth. I got clear instructions and minimal confusion during implementation.",
+    avatar: "/users/image copy 19.png",
+    name: "Karan Malhotra",
+    role: "Electronics Engineer",
+  },
+  {
+    text: "Worked on a machine learning project. The dataset and goals were clearly defined, which helped a lot in model training.",
+    avatar: "/users/image copy 15.png",
+    name: "Ayesha Khan",
+    role: "AI/ML Engineer",
+  },
+  {
+    text: "Good experience working with startups through this platform. Requirements are usually practical and well thought out.",
+    avatar: "/users/image copy 20.png",
+    name: "Manish Gupta",
+    role: "Technical Consultant",
+  },
+  {
+    text: "UI implementation tasks were easy to understand. Clients gave clear references which made execution faster.",
+    avatar: "/users/image copy 16.png",
+    name: "Jiya Shankar",
+    role: "Frontend Developer",
+  },
+  {
+    text: "Dude, your stuff is the bomb! House rent is the real deal! I STRONGLY recommend house rent to EVERYONE interested in running a successful online business!",
+    avatar: "https://i.pravatar.cc/100?img=32",
+    name: "Lana Bernier",
+    role: "Senior Paradigm Strategist",
+  },
+  {
+    text: "Dude, your stuff is the bomb! House rent is the real deal! I STRONGLY recommend house rent to EVERYONE interested in running a successful online business!",
+    avatar: "https://i.pravatar.cc/100?img=12",
+    name: "Lana Bernier",
+    role: "Senior Paradigm Strategist",
+  },
+];
+
 export default function RegisterPage() {
   const router = useRouter();
   const [step, setStep] = useState<1 | 2>(1);
@@ -477,82 +576,46 @@ export default function RegisterPage() {
           <div className="mt-auto pt-28">
 
             {/* Testimonials */}
-            <div className="flex gap-6 overflow-hidden">
-
-              {/* Card 1 */}
-              <div
-                className="
-        min-w-[420px]
-        rounded-3xl
-        border
-        border-white/20
-        bg-white/[0.12]
-        backdrop-blur-2xl
-        p-6
-        shadow-[0_10px_40px_rgba(255,190,40,0.15)]
-      "
-              >
-                <p className="text-white/90 text-sm leading-relaxed font-medium">
-                  Dude, your stuff is the bomb! House rent is the real deal! I
-                  STRONGLY recommend house rent to EVERYONE interested in running a
-                  successful online business!
-                </p>
-
-                <div className="flex items-center gap-3 mt-6">
-                  <img
-                    src="https://i.pravatar.cc/100?img=32"
-                    alt=""
-                    className="w-10 h-10 rounded-full object-cover border border-white/30"
-                  />
-
-                  <div>
-                    <h4 className="text-white font-semibold text-sm">
-                      Lana Bernier
-                    </h4>
-
-                    <p className="text-white/70 text-xs">
-                      Senior Paradigm Strategist
+            <div className="relative w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+              <div className="flex gap-6 w-max animate-marquee">
+                {[...testimonials, ...testimonials].map((t, i) => (
+                  <div
+                    key={i}
+                    className="
+                        min-w-[420px] max-w-[420px]
+                        h-auto min-h-[150px]
+                        rounded-[28px]
+                        border border-white/15
+                        bg-white/[0.08]
+                        backdrop-blur-xl
+                        p-5
+                        shrink-0
+                        flex flex-col justify-between
+                      "
+                  >
+                    <p className="text-white/90 text-sm leading-relaxed font-medium line-clamp-3">
+                      {t.text}
                     </p>
+
+                    <div className="flex items-center gap-3 mt-4">
+                      <img
+                        src={t.avatar}
+                        alt=""
+                        className="w-10 h-10 rounded-full object-cover border border-white/30"
+                      />
+
+                      <div>
+                        <h4 className="text-white font-semibold text-sm">
+                          {t.name}
+                        </h4>
+
+                        <p className="text-white/70 text-xs">
+                          {t.role}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Card 2 */}
-              <div
-                className="
-        min-w-[420px]
-        rounded-3xl
-        border
-        border-white/20
-        bg-white/[0.12]
-        backdrop-blur-2xl
-        p-6
-        shadow-[0_10px_40px_rgba(255,190,40,0.15)]
-      "
-              >
-                <p className="text-white/90 text-sm leading-relaxed font-medium">
-                  Dude, your stuff is the bomb! House rent is the real deal! I
-                  STRONGLY recommend house rent to EVERYONE interested in running a
-                  successful online business!
-                </p>
-
-                <div className="flex items-center gap-3 mt-6">
-                  <img
-                    src="https://i.pravatar.cc/100?img=12"
-                    alt=""
-                    className="w-10 h-10 rounded-full object-cover border border-white/30"
-                  />
-
-                  <div>
-                    <h4 className="text-white font-semibold text-sm">
-                      Lana Bernier
-                    </h4>
-
-                    <p className="text-white/70 text-xs">
-                      Senior Paradigm Strategist
-                    </p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
@@ -567,6 +630,8 @@ export default function RegisterPage() {
           </div>
         </div>
       </div>
+
+      <style dangerouslySetInnerHTML={{ __html: "@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } } .animate-marquee { animation: marquee 50s linear infinite; } .animate-marquee:hover { animation-play-state: paused; }" }} />
     </div>
   );
 }

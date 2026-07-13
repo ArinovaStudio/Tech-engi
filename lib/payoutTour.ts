@@ -218,7 +218,7 @@ const forced =
   };
 
   const tourInstance = driver(config);
-  console.log("PAYOUT TOUR STARTING");
+  // console.log("PAYOUT TOUR STARTING");
   tourInstance.drive();
 }
 

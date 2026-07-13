@@ -49,27 +49,42 @@ export default function EngineerStatusModal({ isOpen, user, onClose, onSuccess, 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user?.id) {
-      return;
-    }
+
+    if (!user?.id) return;
 
     setIsProcessing(true);
+
     try {
-      const payload = status === "PENDING"
-        ? { status }
-        : { status, customMessage, subject };
+      const payload =
+        status === "PENDING"
+          ? { status }
+          : { status, subject, customMessage };
 
       const res = await fetch(`/api/admin/engineers/${user.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(payload),
       });
-      if (res.ok) { onSuccess(); onClose(); }
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Something went wrong";
 
-      toast.error(message);
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.message || "Failed to update engineer.");
+        return;
+      }
+
+      toast.success(data.message || "Engineer updated successfully.");
+
+      onSuccess();
+      onClose();
+    } catch (err) {
+      console.error(err);
+
+      toast.error(
+        err instanceof Error ? err.message : "Something went wrong."
+      );
     } finally {
       setIsProcessing(false);
     }

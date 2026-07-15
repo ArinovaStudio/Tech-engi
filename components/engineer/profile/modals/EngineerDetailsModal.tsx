@@ -60,7 +60,7 @@ export default function EngineerDetailsModal({ isOpen, onClose, profile, onUpdat
       setCertInput("");
       setCertFile(null);
 
-      setAchievements(profile?.achievements || "");
+      setAchievements(profile?.achievements || []);
       setGithub(profile?.github || "");
       setLinkedin(profile?.linkedin || "");
       setPortfolio(profile?.portfolio || "");
@@ -169,9 +169,9 @@ export default function EngineerDetailsModal({ isOpen, onClose, profile, onUpdat
         <form onSubmit={handleSave} className="grid grid-cols-2 gap-6">
 
           <div className="w-[200%]">
-            <div className="flex justify-between ga-4">
+            <div className="grid grid-cols-2 gap-6 w-full mt-3">
               {/* Basics */}
-              <div className="col-span-2 md:col-span-1 space-y-4">
+              <div className="col-span-2 md:col-span-3 space-y-4">
                 <div>
                   <label className="block text-sm font-semibold text-[var(--text-secondary)] mb-1.5">Qualification *</label>
                   <select value={qualification} onChange={e => setQualification(e.target.value)} className="w-full border border-[var(--border)] rounded-lg p-3 outline-none focus:border-[var(--primary)] bg-gray-50/50">

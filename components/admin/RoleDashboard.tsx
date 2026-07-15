@@ -236,7 +236,7 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
           <div className="flex-1 min-w-0">
 
             {/* NAME */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-start gap-2">
               <span
                 className={`text-[15px] font-semibold ${u.isSuspended ? "text-red-500" : "text-[#050A30]"
                   }`}
@@ -246,6 +246,7 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
 
               {role === "ENGINEER" && (
                 <span
+                className="rounded-full"
                   style={s.badge(
                     u.status === "PENDING"
                       ? "#f59e0b"

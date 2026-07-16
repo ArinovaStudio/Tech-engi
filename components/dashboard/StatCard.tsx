@@ -50,7 +50,7 @@ export default function StatCard({ title, value, change, changeType, subtitle, h
        
         ${highlighted
           ? "bg-gradient-to-br from-[#FF7A00] via-[#FFAE58] to-[#FFE0B8] border-transparent text-white"
-          : "bg-[#ffffff] border-[#E7E7E7] text-black"
+          : "bg-white dark:bg-card border-[#E7E7E7] dark:border-slate-800 text-black dark:text-white"
         }
       `}
     >
@@ -58,7 +58,7 @@ export default function StatCard({ title, value, change, changeType, subtitle, h
       <div className="flex items-start justify-between ">
         <div>
           <p
-            className={`text-[1.1rem] font-medium ${highlighted ? "text-white/90" : "text-[#111]"
+            className={`text-[1.1rem] font-medium ${highlighted ? "text-white/90" : "text-[#111] dark:text-slate-100"
               }`}
           >
             {title}
@@ -69,7 +69,7 @@ export default function StatCard({ title, value, change, changeType, subtitle, h
         <div className={`w-10 h-10 rounded-full flex items-center justify-center border
             ${highlighted
               ? "bg-white text-black border-white/20"
-              : "bg-white text-black border-[#DADADA]"
+              : "bg-white dark:bg-slate-800 text-black dark:text-white border-[#DADADA] dark:border-slate-700"
             }
           `}
         >
@@ -79,7 +79,7 @@ export default function StatCard({ title, value, change, changeType, subtitle, h
 
       {/* Value */}
       <div className="mt-2 mb-8">
-        <h2 className={`text-[36px] leading-none font-medium tracking-tight ${highlighted ? "text-white" : "text-black"
+        <h2 className={`text-[36px] leading-none font-medium tracking-tight ${highlighted ? "text-white" : "text-black dark:text-white"
             }`}
         >
           {value || "0"}
@@ -108,7 +108,7 @@ export default function StatCard({ title, value, change, changeType, subtitle, h
             <span>{change}</span>
           </div>
         ) : (
-          <span className={`text-[13px] ${highlighted ? "text-white/80" : "text-[#6B6B6B]"
+          <span className={`text-[13px] ${highlighted ? "text-white/80" : "text-[#6B6B6B] dark:text-slate-400"
               }`}
           >
             {subtitle}
@@ -123,7 +123,7 @@ export default function StatCard({ title, value, change, changeType, subtitle, h
               className={`flex items-center gap-1 rounded-lg px-2 py-1 text-xs capitalize
                 ${highlighted
                   ? "bg-white/10 text-white"
-                  : "bg-white text-[#444]"
+                  : "bg-white dark:bg-slate-800 text-[#444] dark:text-slate-300"
                 }
               `}
             >
@@ -132,7 +132,7 @@ export default function StatCard({ title, value, change, changeType, subtitle, h
             </button>
 
             {open && (
-              <div className="absolute right-0 bottom-12 w-[110px] overflow-hidden rounded-xl border border-[#E5E5E5] bg-white z-50">
+              <div className="absolute right-0 bottom-12 w-[110px] overflow-hidden rounded-xl border border-[#E5E5E5] dark:border-slate-800 bg-white dark:bg-card z-50">
                 {PERIODS.map((p) => (
                   <button
                     key={p}
@@ -140,10 +140,10 @@ export default function StatCard({ title, value, change, changeType, subtitle, h
                       onPeriodChange(p);
                       setOpen(false);
                     }}
-                    className={`w-full px-3 py-2 text-left text-sm capitalize transition-colors hover:bg-[#F5F5F5]
+                    className={`w-full px-3 py-2 text-left text-sm capitalize transition-colors hover:bg-[#F5F5F5] dark:hover:bg-slate-800
                       ${p === period
                         ? "font-semibold text-[#177A47]"
-                        : "text-[#444]"
+                        : "text-[#444] dark:text-slate-300"
                       }
                     `}
                   >

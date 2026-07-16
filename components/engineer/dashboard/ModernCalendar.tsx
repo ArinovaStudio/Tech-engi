@@ -142,34 +142,34 @@ export default function ModernCalendar({
   }, [projects, currentDate]);
 
   return (
-    <div className="w-[450px] h-105 rounded-[28px] bg-white p-5 shadow-sm">
+    <div className="w-[450px] h-105 rounded-[28px] bg-white dark:bg-card p-5 shadow-sm">
       {/* Header */}
       <div className="mb-5 flex items-center justify-between">
         <button
           onClick={prevMonth}
-          className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F5F5F7] transition hover:bg-[#ECECEF]"
+          className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F5F5F7] dark:bg-slate-700 transition hover:bg-[#ECECEF] dark:hover:bg-slate-600"
         >
-          <ChevronLeft className="h-4 w-4 text-[#1F1F1F]" />
+          <ChevronLeft className="h-4 w-4 text-[#1F1F1F] dark:text-slate-200" />
         </button>
 
-        <h2 className="text-[18px] font-semibold text-[#111111]">
+        <h2 className="text-[18px] font-semibold text-[#111111] dark:text-white">
           {month}, {year}
         </h2>
 
         <button
           onClick={nextMonth}
-          className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F5F5F7] transition hover:bg-[#ECECEF]"
+          className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F5F5F7] dark:bg-slate-700 transition hover:bg-[#ECECEF] dark:hover:bg-slate-600"
         >
-          <ChevronRight className="h-4 w-4 text-[#1F1F1F]" />
+          <ChevronRight className="h-4 w-4 text-[#1F1F1F] dark:text-slate-200" />
         </button>
       </div>
 
       {/* Week Days */}
-      <div className="mb-5 grid grid-cols-7 rounded-2xl bg-[#F5F5F7] p-3">
+      <div className="mb-5 grid grid-cols-7 rounded-2xl bg-[#F5F5F7] dark:bg-slate-800 p-3">
         {days.map((day, index) => (
           <div
             key={`${day}-${index}`}
-            className="flex h-7 items-center justify-center text-[12px] font-medium text-[#7A7A7A]"
+            className="flex h-7 items-center justify-center text-[12px] font-medium text-[#7A7A7A] dark:text-slate-400"
           >
             {day}
           </div>
@@ -205,8 +205,8 @@ export default function ModernCalendar({
                   className={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-[13px] font-medium transition
                     ${
                       isHighlighted
-                        ? "bg-[#FFAE58] text-[#111111]"
-                        : "text-[#4A4A4A] hover:bg-[#F5F5F7]"
+                        ? "bg-[#FFAE58] text-[#111111] dark:text-slate-900"
+                        : "text-[#4A4A4A] dark:text-slate-300 hover:bg-[#F5F5F7] dark:hover:bg-slate-700"
                     }
                   `}
                 >

@@ -190,10 +190,10 @@ export default function RevenueChart({
   return (
     <div
       className="
-        bg-white
+        bg-white dark:bg-card
         p-4 sm:p-5 xl:p-6
         rounded-[28px]
-        border border-[#EAEAEA]
+        border border-[#EAEAEA] dark:border-slate-800
         w-full
         h-full
         overflow-hidden
@@ -215,12 +215,12 @@ export default function RevenueChart({
         <div className="min-w-0">
 
           <h3
-            className=" text-[1rem] sm:text-[1.1rem] xl:text-[1.3rem] font-semibold text-black">
+            className=" text-[1rem] sm:text-[1.1rem] xl:text-[1.3rem] font-semibold text-black dark:text-slate-100">
             Revenue Overview
           </h3>
 
           <h1
-            className=" text-[18px] sm:text-[32px] xl:text-[35px] font-medium leading-none mt-3 text-black tracking-[-1px] xl:tracking-[-1.5px] mb-5 break-all">
+            className=" text-[18px] sm:text-[32px] xl:text-[35px] font-medium leading-none mt-3 text-black dark:text-slate-100 tracking-[-1px] xl:tracking-[-1.5px] mb-5 break-all">
             ₹
             {totalRevenue?.toLocaleString() ||
               "0"}
@@ -247,8 +247,8 @@ export default function RevenueChart({
             sm:h-[42px]
             px-3 sm:px-4
             rounded-xl
-            border border-[#E5E5E5]
-            bg-white
+            border border-[#E5E5E5] dark:border-slate-700
+            bg-white dark:bg-slate-800
             flex items-center
             gap-2
             text-[12px]
@@ -256,6 +256,7 @@ export default function RevenueChart({
             font-semibold
             capitalize
             shrink-0
+            dark:text-slate-200
           "
         >
 
@@ -293,10 +294,11 @@ export default function RevenueChart({
               h-[34px]
               sm:h-[40px]
               rounded-full
-              border border-[#E5E5E5]
+              border border-[#E5E5E5] dark:border-slate-700
               flex items-center justify-center
               disabled:opacity-40
               shrink-0
+              dark:text-slate-300
             "
           >
             <ChevronLeft size={18} />
@@ -360,8 +362,8 @@ export default function RevenueChart({
                         absolute
                         -top-16
                         z-20
-                        bg-white
-                        border border-[#ECECEC]
+                        bg-white dark:bg-slate-800
+                        border border-[#ECECEC] dark:border-slate-700
                         rounded-2xl
                         px-4 py-3
                         min-w-[120px]
@@ -369,11 +371,11 @@ export default function RevenueChart({
                       "
                     >
 
-                      <p className="text-[13px] font-semibold text-black">
+                      <p className="text-[13px] font-semibold text-black dark:text-slate-100">
                         {item?.name}
                       </p>
 
-                      <p className="text-[12px] text-[#777] mt-1">
+                      <p className="text-[12px] text-[#777] dark:text-slate-400 mt-1">
                         Revenue : ₹
                         {Number(
                           item?.revenue ||
@@ -468,7 +470,7 @@ export default function RevenueChart({
                 itemsPerView >=
               activeData.length
             }
-            className="min-w-[34px] sm:min-w-[40px] h-[34px] sm:h-[40px] rounded-full border border-[#E5E5E5] flex items-center justify-center disabled:opacity-40 shrink-0">
+            className="min-w-[34px] sm:min-w-[40px] h-[34px] sm:h-[40px] rounded-full border border-[#E5E5E5] dark:border-slate-700 dark:text-slate-300 flex items-center justify-center disabled:opacity-40 shrink-0">
             <ChevronRight size={18} />
           </button>
         )}

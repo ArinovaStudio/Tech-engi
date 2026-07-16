@@ -42,13 +42,13 @@ export default function DirectMessageUI() {
   const isLoadingInitialData = !data && isValidating;
 
   return (
-    <div className="flex h-[90vh] w-full bg-white overflow-hidden relative">
+    <div className="flex h-[90vh] w-full bg-white dark:bg-background overflow-hidden relative">
 
       {/* ✅ MOBILE TOP BAR */}
       <div className="md:hidden absolute top-2 left-2 z-30">
         <button
           onClick={() => setSidebarOpen(true)}
-          className="p-2 bg-white shadow rounded"
+          className="p-2 bg-white dark:bg-card dark:text-slate-200 shadow rounded"
         >
           <Menu size={18} />
         </button>

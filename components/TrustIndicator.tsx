@@ -41,10 +41,10 @@ export default function TrustIndicatorCarousel() {
   const [active, setActive] = useState<number | null>(null);
 
   return (
-    <section className="w-full bg-white py-20 px-6">
+    <section className="w-full bg-background py-20 px-6 transition-colors duration-300">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col items-center justify-center leading-none mb-14">
-          <h2 className="text-[50px] lg:text-[85px] font-semibold text-black text-center mb-2 font-sans">
+          <h2 className="text-[50px] lg:text-[85px] font-semibold text-black dark:text-white text-center mb-2 font-sans">
             Why clients
           </h2>
           <span className="text-[#FFAE58] font-semibold text-[3rem] lg:text-[5rem] leading-none font-sans">

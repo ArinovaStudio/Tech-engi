@@ -16,14 +16,14 @@ const Footer = () => {
   };
 
   return (
-    <footer className="w-full bg-white font-inter overflow-hidden">
+    <footer className="w-full bg-background font-inter overflow-hidden transition-colors duration-300">
       
       {/* TOP SECTION */}
       <div
         className="w-full mx-auto px-4 sm:px-8 lg:px-16 pt-12 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-10 lg:gap-8 " >
         {/* COLUMN 1 */}
         <div>
-          <h2 className="leading-tight text-black font-id">
+          <h2 className="leading-tight text-black dark:text-white font-id">
             <span
               className=" text-[24px] sm:text-[26px] lg:text-[29px] font-extrabold">
               Connecting Engineering
@@ -47,31 +47,31 @@ const Footer = () => {
         {/* COLUMN 2 */}
         <div>
           <p
-            className=" text-[18px] sm:text-[20px] lg:text-[22px] font-bold tracking-[0.15em] lg:tracking-[0.2em] text-black uppercase mb-4 font-id ">
+            className=" text-[18px] sm:text-[20px] lg:text-[22px] font-bold tracking-[0.15em] lg:tracking-[0.2em] text-black dark:text-white uppercase mb-4 font-id ">
             Company
           </p>
 
           <ul className="space-y-2">
             <li>
-              <a href="#Services" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 hover:text-black font-id flex items-center gap-1 " >
+              <a href="#Services" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 dark:text-slate-400 hover:text-black dark:hover:text-white font-id flex items-center gap-1 " >
                 <span className="text-gray-400">›</span>
                 Services
               </a>
             </li>
             <li>
-              <a href="/register/engineer" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 hover:text-black font-id flex items-center gap-1 " >
+              <a href="/register/engineer" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 dark:text-slate-400 hover:text-black dark:hover:text-white font-id flex items-center gap-1 " >
                 <span className="text-gray-400">›</span>
                 Join as Builder
               </a>
             </li>
             <li>
-              <a href="/register/client" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 hover:text-black font-id flex items-center gap-1 " >
+              <a href="/register/client" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 dark:text-slate-400 hover:text-black dark:hover:text-white font-id flex items-center gap-1 " >
                 <span className="text-gray-400">›</span>
                 Start a Project
               </a>
             </li>
             <li>
-              <a href="#howitworks" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 hover:text-black font-id flex items-center gap-1 " >
+              <a href="#howitworks" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 dark:text-slate-400 hover:text-black dark:hover:text-white font-id flex items-center gap-1 " >
                 <span className="text-gray-400">›</span>
                 How it works
               </a>
@@ -82,7 +82,7 @@ const Footer = () => {
         {/* COLUMN 3 */}
         <div>
           <p
-            className=" text-[18px] sm:text-[20px] lg:text-[22px] font-bold tracking-[0.15em] lg:tracking-[0.2em] text-black uppercase mb-4 font-id " >
+            className=" text-[18px] sm:text-[20px] lg:text-[22px] font-bold tracking-[0.15em] lg:tracking-[0.2em] text-black dark:text-white uppercase mb-4 font-id " >
             Contact Info
           </p>
 
@@ -95,7 +95,7 @@ const Footer = () => {
             ].map((item) => (
               <li
                 key={item}
-                className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 font-id flex items-start gap-1 break-words " >
+                className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 dark:text-slate-400 font-id flex items-start gap-1 break-words " >
                 <span className="text-gray-400 shrink-0">›</span>
                 {item}
               </li>
@@ -106,7 +106,7 @@ const Footer = () => {
         {/* COLUMN 4 */}
         <div className="">
           <p
-            className=" text-[18px] sm:text-[20px] lg:text-[22px] font-bold tracking-[0.15em] lg:tracking-[0.2em] text-black uppercase mb-4 text-left xl:text-right font-id " >
+            className=" text-[18px] sm:text-[20px] lg:text-[22px] font-bold tracking-[0.15em] lg:tracking-[0.2em] text-black dark:text-white uppercase mb-4 text-left xl:text-right font-id " >
             Release Letter
           </p>
 
@@ -118,7 +118,7 @@ const Footer = () => {
               type="email"
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className=" w-full px-4 py-4 text-[13px] outline-none font-id placeholder-gray-400 bg-[#F0F0F focus:ring-2 focus:ring-blue-500 focus:border-blue-500 " />
+              className=" w-full px-4 py-4 text-[13px] outline-none font-id placeholder-gray-400 bg-gray-100 dark:bg-slate-800 text-black dark:text-white border border-transparent dark:border-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 " />
 
             <button
               onClick={() => {
@@ -143,7 +143,7 @@ const Footer = () => {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-[#8A8A8A] hover:text-black"
+                className="text-[#8A8A8A] hover:text-black dark:hover:text-white"
               >
                 <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
                 <rect x="2" y="9" width="4" height="12" />
@@ -162,7 +162,7 @@ const Footer = () => {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-[#8A8A8A] hover:text-black"
+                className="text-[#8A8A8A] hover:text-black dark:hover:text-white"
               >
                 <rect
                   x="2"
@@ -245,7 +245,7 @@ const Footer = () => {
       </div>
 
       {/* BOTTOM BAR */}
-      <div className="bg-gray-100 border-t border-gray-200 font-inter text-[#878787]">
+      <div className="bg-gray-100 dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 font-inter text-[#878787] transition-colors duration-300">
         <div
           className=" max-w-[1600px] mx-auto px-4 sm:px-6 py-6 sm:py-10 flex flex-col lg:flex-row items-center justify-between gap-4 text-center lg:text-left">
           <p className="text-[14px] sm:text-[15px]">

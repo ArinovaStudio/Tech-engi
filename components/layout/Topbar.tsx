@@ -1,12 +1,14 @@
 "use client";
 
-import { Bell } from "lucide-react";
+import { Bell, Sun, Moon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "@/components/ThemeProvider";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Topbar() {
   const { user, role, isLoading } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const router = useRouter();
   const [projects, setProjects] = useState<any[]>([]);
   const [open, setOpen] = useState(false);
@@ -41,14 +43,23 @@ export default function Topbar() {
   };
 
   return (
-    <header className="h-17 bg-white border-b border-[var(--border)] flex items-center px-6 gap-4 shrink-0 relative">
+    <header className="h-17 bg-card border-b border-[var(--border)] flex items-center px-6 gap-4 shrink-0 relative transition-colors duration-300">
       <div className="flex-1" />
+
+      {/* THEME TOGGLE */}
+      <button
+        onClick={toggleTheme}
+        className="w-9 h-9 flex items-center justify-center text-gray-400 dark:text-slate-300 hover:bg-[#fff4e6] dark:hover:bg-[#2c1e11] hover:text-[#FFAE58] transition-all"
+        title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+      >
+        {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
+      </button>
 
       {/* NOTIFICATION */}
       <div className="relative">
         <button
           onClick={() => setOpen(!open)}
-          className="w-9 h-9 flex items-center justify-center text-gray-400 hover:bg-[#fff4e6] hover:text-[#FFAE58] transition-all relative"
+          className="w-9 h-9 flex items-center justify-center text-gray-400 dark:text-slate-400 hover:bg-[#fff4e6] dark:hover:bg-[#2c1e11] hover:text-[#FFAE58] transition-all relative"
         >
           <Bell size={18} />
 
@@ -62,15 +73,15 @@ export default function Topbar() {
 
         {/* DROPDOWN */}
         {open && (
-          <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
+          <div className="absolute right-0 mt-2 w-80 bg-card border border-[var(--border)] rounded-xl shadow-lg z-50 text-[var(--text-primary)]">
 
-            <div className="p-3 border-b text-sm font-semibold">
+            <div className="p-3 border-b border-[var(--border)] text-sm font-semibold">
               Projects ({projects.length})
             </div>
 
             <div className="max-h-80 overflow-y-auto">
               {projects.length === 0 ? (
-                <p className="p-3 text-sm text-gray-500">
+                <p className="p-3 text-sm text-[var(--text-muted)]">
                   No projects found
                 </p>
               ) : (
@@ -80,12 +91,12 @@ export default function Topbar() {
                     onClick={() => {
                       window.location.href = `/client?projectId=${project.id}`;
                     }}
-                    className="w-full text-left p-3 hover:bg-gray-50 border-b last:border-b-0 transition"
+                    className="w-full text-left p-3 hover:bg-gray-50 dark:hover:bg-slate-800/50 border-b border-[var(--border)] last:border-b-0 transition"
                   >
-                    <p className="text-sm font-medium">
+                    <p className="text-sm font-medium text-[var(--text-primary)]">
                       {project.title}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-[var(--text-muted)]">
                       Status: {project.status}
                     </p>
                   </button>
@@ -107,8 +118,8 @@ export default function Topbar() {
         <div className="text-left">
           {isLoading ? (
             <>
-              <div className="w-20 h-3 bg-gray-200 animate-pulse rounded mb-1" />
-              <div className="w-12 h-2.5 bg-gray-200 animate-pulse rounded" />
+              <div className="w-20 h-3 bg-gray-200 dark:bg-slate-800 animate-pulse rounded mb-1" />
+              <div className="w-12 h-2.5 bg-gray-200 dark:bg-slate-800 animate-pulse rounded" />
             </>
           ) : (
             <>

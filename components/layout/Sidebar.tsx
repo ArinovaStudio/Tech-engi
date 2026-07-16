@@ -77,16 +77,16 @@ const NavLink = ({ item, collapsed }: { item: NavItem; collapsed: boolean }) => 
       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative
         ${isActive
           ? "bg-[#FFAE58] text-white shadow-sm font-semibold text-[15px]"
-          : "text-gray-500 hover:bg-[#fff4e6] hover:text-[#FFAE58] text-[15px]"
+          : "text-gray-500 dark:text-slate-400 hover:bg-[#fff4e6] dark:hover:bg-[#2c1e11] hover:text-[#FFAE58] text-[15px]"
         }`}
     >
-      <span className={`shrink-0 transition-colors ${isActive ? "text-white" : "text-gray-400 group-hover:text-[#FFAE58]"}`}>
+      <span className={`shrink-0 transition-colors ${isActive ? "text-white" : "text-gray-400 dark:text-slate-500 group-hover:text-[#FFAE58]"}`}>
         {item.icon}
       </span>
       {!collapsed && <span className="flex-1 text-left">{item.label}</span>}
       {!collapsed && item.badge && (
         <span className={`text-xs px-2 py-0.5 font-bold rounded-full
-          ${typeof item.badge === "number" ? "bg-white text-[#FFAE58]" : "bg-black text-white"}`}>
+          ${typeof item.badge === "number" ? "bg-white dark:bg-slate-800 text-[#FFAE58]" : "bg-black dark:bg-white text-white dark:text-black"}`}>
           {item.badge}
         </span>
       )}
@@ -326,30 +326,30 @@ const goToPayoutTour = () => {
   return (
     <aside
       style={{ width: collapsed ? 80 : 250 }}
-      className="h-screen flex flex-col bg-white border-r border-[var(--border)] transition-all duration-300 shrink-0 relative"
+      className="h-screen flex flex-col bg-sidebar border-r border-[var(--sidebar-border)] transition-all duration-300 shrink-0 relative"
     >
-      <div className="flex items-center justify-center h-20 border-b border-[var(--border)]">
+      <div className="flex items-center justify-center h-20 border-b border-[var(--sidebar-border)] bg-sidebar">
         {!collapsed && <span className="font-bold text-xl text-[var(--text-primary)] tracking-tight">
-          <Image src="/imagelogodiff.PNG" alt="logo" width={300} height={300} />
+          <Image src="/imagelogodiff.PNG" alt="logo" width={300} height={300} className="dark:brightness-110" />
           </span>}
         {collapsed && <span className="font-bold text-xl text-[var(--text-primary)] tracking-tight">TE</span>}
       </div>
 
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-7 w-6 h-6 bg-white border border-[var(--border)] rounded-full flex items-center justify-center shadow-sm hover:shadow-md transition-all z-10 text-gray-400 hover:text-[#FFAE58]"
+        className="absolute -right-3 top-7 w-6 h-6 bg-sidebar border border-[var(--sidebar-border)] rounded-full flex items-center justify-center shadow-sm hover:shadow-md transition-all z-10 text-gray-400 dark:text-slate-350 hover:text-[#FFAE58]"
       >
         {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
       </button>
 
-      <nav className="flex-1 overflow-y-auto px-3 py-6 flex flex-col gap-2 no-scrollbar">
+      <nav className="flex-1 overflow-y-auto px-3 py-6 flex flex-col gap-2 no-scrollbar bg-sidebar">
         {nav.map((item) => <NavLink key={item.label} item={item} collapsed={collapsed} />)}
       </nav>
 
-      <div className="border-t border-[var(--border)] p-4">
+      <div className="border-t border-[var(--sidebar-border)] p-4 bg-sidebar">
         <button
           onClick={() => signOut({ callbackUrl: "/login" })}
-          className={`w-full flex items-center font-semibold gap-3 px-4 py-3 rounded-xl text-[15px] text-red-500 hover:bg-red-50 transition-all ${collapsed ? "justify-center px-0" : ""}`}
+          className={`w-full flex items-center font-semibold gap-3 px-4 py-3 rounded-xl text-[15px] text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all ${collapsed ? "justify-center px-0" : ""}`}
         >
           <LogOut size={20} className="shrink-0" />
           {!collapsed && <span>Logout</span>}

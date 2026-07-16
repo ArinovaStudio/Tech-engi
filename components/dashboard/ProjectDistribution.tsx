@@ -44,8 +44,8 @@ const ProjectDistribution: React.FC<Props> = ({ data = [], }) => {
   let cumulativePercent = 0;
 
   return (
-    <div className="w-full rounded-3xl border border-[#ECECEC] bg-white p-5">
-      <h2 className="mb-6 text-xl font-semibold text-[#111827]">
+    <div className="w-full rounded-3xl border border-[#ECECEC] dark:border-slate-800 bg-white dark:bg-card p-5">
+      <h2 className="mb-6 text-xl font-semibold text-[#111827] dark:text-slate-100">
         Project Distribution
       </h2>
 
@@ -121,11 +121,11 @@ const ProjectDistribution: React.FC<Props> = ({ data = [], }) => {
 
           {/* Center */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className="text-4xl font-bold text-[#111827]">
+            <div className="text-4xl font-bold text-[#111827] dark:text-slate-100">
               {total}
             </div>
 
-            <div className="text-sm text-[#6B7280]">
+            <div className="text-sm text-[#6B7280] dark:text-slate-400">
               Total Projects
             </div>
           </div>
@@ -151,11 +151,11 @@ const ProjectDistribution: React.FC<Props> = ({ data = [], }) => {
                 />
 
                 <div className="flex flex-1 items-center justify-between mr-2">
-                  <span className="line-clamp-2 text-sm font-medium text-[#374151]">
+                  <span className="line-clamp-2 text-sm font-medium text-[#374151] dark:text-slate-300">
                     {item.name}
                   </span>
 
-                  <span className="text-sm font-semibold text-[#111827]">
+                  <span className="text-sm font-semibold text-[#111827] dark:text-slate-100">
                     {Math.round(
                       (item.value /
                         total) *

@@ -90,20 +90,20 @@ export default function TicketIssuesCard({ projects, }: TicketIssuesCardProps) {
     );
 
     return (
-        <div className="bg-white w-full  self-start rounded-[28px] border border-[#ECECEC] p-5 h-screen overflow-hidden flex flex-col">
+        <div className="bg-white dark:bg-card w-full  self-start rounded-[28px] border border-[#ECECEC] dark:border-slate-800 p-5 h-screen overflow-hidden flex flex-col">
             {/* HEADER */}
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h2 className="text-[1.4rem] font-semibold text-[#111]">
+                    <h2 className="text-[1.4rem] font-semibold text-[#111] dark:text-slate-100">
                         Recent issue reported
                     </h2>
 
-                    <p className="text-[13px] text-[#8B8B8B] mt-1">
+                    <p className="text-[13px] text-[#8B8B8B] dark:text-slate-400 mt-1">
                         active tickets {allTickets.length}
                     </p>
                 </div>
 
-                <div className="w-10 h-10 rounded-full border border-[#E5E5E5] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full border border-[#E5E5E5] dark:border-slate-700 dark:text-slate-300 flex items-center justify-center">
                     <ArrowUpRight size={18} />
                 </div>
             </div>

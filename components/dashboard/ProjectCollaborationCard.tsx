@@ -411,11 +411,11 @@ export default function ProjectCollaborationCard({
   return (
     <div
       className="
-        bg-white
+        bg-white dark:bg-card
         w-full
         h-full
         rounded-[28px]
-        border border-[#ECECEC]
+        border border-[#ECECEC] dark:border-slate-800
         p-5
         overflow-hidden
       "
@@ -426,11 +426,11 @@ export default function ProjectCollaborationCard({
       <div className="flex items-center justify-between mb-5">
 
         <div>
-          <h2 className="text-[1.1rem] font-semibold text-[#111]">
+          <h2 className="text-[1.1rem] font-semibold text-[#111] dark:text-slate-100">
             Latest Projects
           </h2>
 
-          <p className="text-[12px] text-[#8A8A8A] mt-1">
+          <p className="text-[12px] text-[#8A8A8A] dark:text-slate-400 mt-1">
             Recently created
           </p>
         </div>
@@ -439,10 +439,10 @@ export default function ProjectCollaborationCard({
           className="
             px-3 py-1.5
             rounded-full
-            bg-[#F7F7F7]
+            bg-[#F7F7F7] dark:bg-slate-800
             text-[12px]
             font-medium
-            text-[#111]
+            text-[#111] dark:text-slate-100
           "
         >
           {latestProjects.length}
@@ -466,11 +466,11 @@ export default function ProjectCollaborationCard({
               key={project.id}
               className="
                 group
-                border border-[#F1F1F1]
+                border border-[#F1F1F1] dark:border-slate-800
                 rounded-[18px]
                 p-4
                 transition-all
-                hover:border-[#E4E4E4]
+                hover:border-[#E4E4E4] dark:hover:border-slate-700
                 hover:shadow-sm
               "
             >
@@ -501,7 +501,7 @@ export default function ProjectCollaborationCard({
                       className="
                         text-[14px]
                         font-semibold
-                        text-[#111]
+                        text-[#111] dark:text-slate-100
                         truncate
                       "
                     >
@@ -531,7 +531,7 @@ export default function ProjectCollaborationCard({
 
                     {/* PROGRESS */}
 
-                    <p className="text-[11px] text-[#777]">
+                    <p className="text-[11px] text-[#777] dark:text-slate-400">
                       {project.progress}%
                     </p>
 
@@ -545,7 +545,7 @@ export default function ProjectCollaborationCard({
                   className="
                     w-8 h-8
                     rounded-full
-                    border border-[#ECECEC]
+                    border border-[#ECECEC] dark:border-slate-700
                     flex items-center justify-center
                     opacity-0
                     group-hover:opacity-100
@@ -567,7 +567,7 @@ export default function ProjectCollaborationCard({
                     w-full
                     h-1.5
                     rounded-full
-                    bg-[#F1F1F1]
+                    bg-[#F1F1F1] dark:bg-slate-700
                     overflow-hidden
                   "
                 >

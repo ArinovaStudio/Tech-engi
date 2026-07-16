@@ -36,7 +36,7 @@ const HowItWorks = () => {
             <span className="text-lg">•</span>
           </div>
 
-          <h2 className="text-[2.5rem] lg:text-7xl font-id font-semibold text-slate-950">
+          <h2 className="text-[2.5rem] lg:text-7xl font-id font-semibold text-slate-950 dark:text-white">
             How we make everything<br />easy for you?
           </h2>
         </div>
@@ -58,10 +58,10 @@ const HowItWorks = () => {
 
                 {/* MAIN CARD */}
                 <div
-                  className=" relative z-10 min-h-[340px] sm:min-h-[360px] lg:min-h-[370px] w-full bg-white rounded-3xl p-6 sm:p-8 border border-slate-200">
+                  className=" relative z-10 min-h-[340px] sm:min-h-[360px] lg:min-h-[370px] w-full bg-white dark:bg-[#13141f] rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 transition-colors duration-300">
                   {/* ICON */}
                   <div className="mt-8 sm:mt-10 flex justify-center">
-                    <div className="relative border-4 border-gray-200 rounded-2xl">
+                    <div className="relative border-4 border-gray-200 dark:border-slate-800 rounded-2xl">
 
                       {/* GLOW */}
                       <div
@@ -83,12 +83,12 @@ const HowItWorks = () => {
                   <div
                     className=" mt-10 sm:mt-12 flex flex-col items-center text-center space-y-4">
                     <h3
-                      className=" text-[18px] sm:text-[20px] font-semibold text-slate-950">
+                      className=" text-[18px] sm:text-[20px] font-semibold text-slate-950 dark:text-white">
                       {step.title}
                     </h3>
 
                     <p
-                      className=" text-slate-500 text-[15px] sm:text-[17px] font-medium leading-relaxed">
+                      className=" text-slate-500 dark:text-slate-400 text-[15px] sm:text-[17px] font-medium leading-relaxed">
                       {step.description}
                     </p>
                   </div>

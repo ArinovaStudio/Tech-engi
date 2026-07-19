@@ -70,7 +70,7 @@ const RiskBlockage = ({ tickets = [] }: { tickets: any[] }) => {
   .map((ticket) => (
     <div
       key={ticket.id}
-      className="bg-white rounded-[18px] p-5 border border-[#ececec] shadow-[0_4px_18px_rgba(0,0,0,0.05)]"
+      className="bg-white rounded-[18px] p-5 border border-[#ececec] shadow-[0_4px_18px_rgba(0,0,0,0.05)] dark:bg-card"
     >
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
@@ -78,7 +78,7 @@ const RiskBlockage = ({ tickets = [] }: { tickets: any[] }) => {
             <AlertTriangle className="w-5 h-5 text-[#f5a300]" />
           </div>
 
-          <span className="text-[18px] font-semibold text-black font-id">
+          <span className="text-[18px] font-semibold text-black font-id dark:text-white">
             {ticket.issueType}
           </span>
         </div>

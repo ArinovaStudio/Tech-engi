@@ -92,7 +92,7 @@ export default function ChatSidebar({
         {/* SEARCH */}
         <div className="p-3">
           <div className="relative">
-            <Search className="absolute left-3 top-3 text-gray-400" size={18} />
+            <Search className="absolute left-3 top-3 text-gray-400 dark:text-slate-500" size={18} />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -187,7 +187,7 @@ export default function ChatSidebar({
           {/* loader */}
           <div ref={observerTarget} className="h-6 flex justify-center">
             {isValidating && !isLoading && (
-              <Loader2 size={16} className="animate-spin text-gray-400" />
+              <Loader2 size={16} className="animate-spin text-gray-400 dark:text-slate-500" />
             )}
           </div>
         </div>

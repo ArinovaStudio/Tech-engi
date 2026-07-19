@@ -358,7 +358,7 @@ const ClientReportIssue = () => {
                 <div className="flex flex-col lg:flex-row gap-6 mt-2">
                     <div className="w-full shrink-0">
                         {/* Role Tabs */}
-                        <div id="role-tabs" className="bg-white rounded-xl border border-[var(--border)] p-2 mb-3">
+                        <div id="role-tabs" className="bg-white rounded-xl border border-[var(--border)] p-2 mb-3 dark:bg-card">
                             <div className="flex gap-2 overflow-x-auto">
                                 {roleTabs.map((tab) => {
                                     const count = tickets.filter((ticket) => {
@@ -401,13 +401,13 @@ const ClientReportIssue = () => {
                             ) : (
                                 <div className="space-y-3">
                                     {sortedTickets.map((report: any, index: number) => (
-                                        <div key={report.id} className="bg-white rounded-xl border border-[var(--border)] p-5">
+                                        <div key={report.id} className="bg-white rounded-xl border border-[var(--border)] p-5 dark:bg-card">
                                             <div className="flex items-start gap-3">
                                                 <AlertCircle size={18} className="text-red-500" style={{ marginTop: 2 }} />
                                                 <div className="flex-1">
                                                     <div className="flex items-center justify-between">
                                                         <div className="flex gap-4">
-                                                            <span className="text-xs uppercase font-semibold px-2.5 py-0.5 rounded-full border bg-gray-100 text-gray-700 border-gray-200">
+                                                            <span className="text-xs uppercase font-semibold px-2.5 py-0.5 rounded-full border bg-gray-100 text-gray-700 border-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-800">
                                                                 {report.issueType}
                                                             </span>
                                                         </div>
@@ -454,7 +454,7 @@ const ClientReportIssue = () => {
             {/* Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white text-black w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg">
+                    <div className="bg-white text-black w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg dark:bg-card dark:text-white">
                         <h3 className="text-lg font-semibold mb-4" style={{ color: "var(--text-primary)" }}>
                             Raise a Ticket
                         </h3>
@@ -480,7 +480,7 @@ const ClientReportIssue = () => {
                                 <select
                                     value={selectedProjectId}
                                     onChange={(e) => setSelectedProjectId(e.target.value)}
-                                    className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                                    className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] dark:bg-card"
                                 >
                                     <option value="" disabled>Select Project</option>
                                     {projects.map((project) => (
@@ -556,12 +556,12 @@ const ClientReportIssue = () => {
                                     <div className="w-12 h-12 rounded-2xl bg-[#FFAE58]/15 flex items-center justify-center mb-3">
                                         <Upload className="w-6 h-6 text-[#FFAE58]" />
                                     </div>
-                                    <p className="text-sm font-semibold text-gray-800">Click to upload images</p>
-                                    <p className="text-xs text-gray-500 mt-1">PNG, JPG, JPEG • Multiple files supported</p>
+                                    <p className="text-sm font-semibold text-gray-800 dark:text-slate-200">Click to upload images</p>
+                                    <p className="text-xs text-gray-500 mt-1 dark:text-slate-400">PNG, JPG, JPEG • Multiple files supported</p>
                                     {newTicket.images.length > 0 && (
                                         <div className="mt-5 grid grid-cols-3 gap-3 w-full px-4">
                                             {newTicket.images.map((file, index) => (
-                                                <div key={index} className="relative group overflow-hidden rounded-xl border border-[#FFD4A6] bg-white">
+                                                <div key={index} className="relative group overflow-hidden rounded-xl border border-[#FFD4A6] bg-white dark:bg-card">
                                                     <img src={URL.createObjectURL(file)} alt={file.name} className="h-24 w-full object-cover" />
                                                     <div className="absolute bottom-0 left-0 right-0 bg-black/50 px-2 py-1">
                                                         <p className="text-white text-[10px] truncate">{file.name}</p>

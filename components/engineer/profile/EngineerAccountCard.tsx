@@ -21,7 +21,7 @@ export default function EngineerAccountCard() {
 
   return (
     <>
-      <div id="payout-details" className="p-6 border border-[var(--border)] rounded-2xl bg-white">
+      <div id="payout-details" className="p-6 border border-[var(--border)] rounded-2xl bg-white dark:bg-card">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-[var(--border)] pb-4">
           <h4 className="text-lg font-bold font-inter text-[var(--text-primary)]">Payout Details</h4>
           <button onClick={() => setIsOpen(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[var(--border)] text-sm font-semibold hover:bg-gray-50 transition-colors">
@@ -30,7 +30,7 @@ export default function EngineerAccountCard() {
         </div>
 
         {!payoutData ? (
-          <div data-tour="bank-account" className="bg-gray-50 border border-[var(--border)] rounded-xl p-8 flex flex-col items-center justify-center text-center">
+          <div data-tour="bank-account" className="bg-gray-50 border border-[var(--border)] rounded-xl p-8 flex flex-col items-center justify-center text-center dark:bg-background">
             <CreditCard size={32} className="text-gray-300 mb-3" />
             <h5 className="font-semibold text-[var(--text-primary)]">No payout methods added</h5>
             <p className="text-sm text-[var(--text-muted)] mt-1 max-w-sm">Setup your UPI or Bank details to receive your project earnings.</p>
@@ -40,7 +40,7 @@ export default function EngineerAccountCard() {
             <div className={`p-5 border-2 rounded-xl relative ${payoutData.preferredMethod === "UPI" ? "border-[var(--primary)] bg-[#fff4e6]/40" : "border-[var(--border)] bg-gray-50/50"}`}>
               {payoutData.preferredMethod === "UPI" && <span className="absolute top-3 right-3 text-[10px] bg-[var(--primary)] text-white px-2 py-0.5 rounded font-bold uppercase">Preferred</span>}
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-full bg-white border border-[var(--border)] flex items-center justify-center text-[var(--primary)] shadow-sm"><CreditCard size={14}/></div>
+                <div className="w-8 h-8 rounded-full bg-white border border-[var(--border)] flex items-center justify-center text-[var(--primary)] shadow-sm dark:bg-card"><CreditCard size={14}/></div>
                 <p className="font-bold text-sm text-[var(--text-primary)]">UPI ID</p>
               </div>
               <p className="font-mono text-sm text-[var(--text-secondary)]">{payoutData.upiId || "—"}</p>
@@ -49,7 +49,7 @@ export default function EngineerAccountCard() {
             <div data-tour="bank-account"  className={`p-5 border-2 rounded-xl relative ${payoutData.preferredMethod === "BANK" ? "border-[var(--primary)] bg-[#fff4e6]/40" : "border-[var(--border)] bg-gray-50/50"}`}>
               {payoutData.preferredMethod === "BANK" && <span className="absolute top-3 right-3 text-[10px] bg-[var(--primary)] text-white px-2 py-0.5 rounded font-bold uppercase">Preferred</span>}
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-full bg-white border border-[var(--border)] flex items-center justify-center text-[var(--primary)] shadow-sm"><Building2 size={14}/></div>
+                <div className="w-8 h-8 rounded-full bg-white border border-[var(--border)] flex items-center justify-center text-[var(--primary)] shadow-sm dark:bg-card"><Building2 size={14}/></div>
                 <p className="font-bold text-sm text-[var(--text-primary)]">Bank Account</p>
               </div>
               <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-sm font-inter text-[var(--text-secondary)]">

@@ -45,7 +45,7 @@ export default function AdminClientDetailsCard({ profile, user, onUpdate }: { pr
 
   return (
     <>
-      <div className="p-6 border border-[var(--border)] rounded-2xl bg-white">
+      <div className="p-6 border border-[var(--border)] rounded-2xl bg-white dark:bg-card">
         <div className="flex justify-between items-center mb-6 border-b border-[var(--border)] pb-4">
           <h4 className="text-lg font-bold font-inter text-[var(--text-primary)]">Client Details</h4>
           <button onClick={() => setIsOpen(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[var(--border)] text-sm font-semibold hover:bg-gray-50 transition-colors">
@@ -61,8 +61,8 @@ export default function AdminClientDetailsCard({ profile, user, onUpdate }: { pr
             <p className="text-xs text-[var(--text-muted)] font-semibold mb-2 uppercase tracking-wider">Areas of Expertise / Industry</p>
             <div className="flex flex-wrap gap-2">
               {profile?.expertise?.length > 0 
-                ? profile.expertise.map((s: string) => <span key={s} className="bg-gray-100 border border-[var(--border)] text-[var(--text-secondary)] text-xs font-semibold px-3 py-1.5 rounded-md shadow-sm">{s}</span>)
-                : <span className="text-sm text-gray-400 italic">None added</span>}
+                ? profile.expertise.map((s: string) => <span key={s} className="bg-gray-100 border border-[var(--border)] text-[var(--text-secondary)] text-xs font-semibold px-3 py-1.5 rounded-md shadow-sm dark:bg-slate-800">{s}</span>)
+                : <span className="text-sm text-gray-400 italic dark:text-slate-500">None added</span>}
             </div>
           </div>
         </div>

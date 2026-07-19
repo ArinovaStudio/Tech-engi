@@ -274,7 +274,7 @@ export default function RegisterPage() {
     <div className="flex w-full h-screen">
       <div className="w-[50%] h-screen">
         <div className="min-h-screen flex flex-col justify-center items-center p-4 font-sans relative">
-          <div className="w-full max-w-[420px] bg-white p-8 sm:p-10 relative overflow-hidden">
+          <div className="w-full max-w-[420px] bg-white p-8 sm:p-10 relative overflow-hidden dark:bg-card">
 
             {/* Step 1: Registration Form */}
             {step === 1 && (
@@ -287,13 +287,13 @@ export default function RegisterPage() {
                   <h1 className="text-2xl font-bold text-[#0f172a] tracking-tight">
                     Create Account
                   </h1>
-                  <p className="text-gray-500 mt-2 text-sm">
+                  <p className="text-gray-500 mt-2 text-sm dark:text-slate-400">
                     Join our platform to get started
                   </p>
                 </div>
 
                 {/* Role Tabs */}
-                <div className="flex p-1 mb-6 bg-gray-50 rounded-xl border border-gray-100">
+                <div className="flex p-1 mb-6 bg-gray-50 rounded-xl border border-gray-100 dark:bg-background dark:border-slate-800">
                   <button
                     type="button"
                     onClick={() => setRole("CLIENT")}
@@ -325,10 +325,10 @@ export default function RegisterPage() {
                 <form onSubmit={handleRegister} className="space-y-4">
                   {/* Name */}
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-gray-700 ml-1">Full Name</label>
+                    <label className="text-sm font-medium text-gray-700 ml-1 dark:text-slate-300">Full Name</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                        <User className="h-5 w-5 text-gray-400" />
+                        <User className="h-5 w-5 text-gray-400 dark:text-slate-500" />
                       </div>
                       <input
                         type="text"
@@ -336,17 +336,17 @@ export default function RegisterPage() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="John Doe"
-                        className="w-full pl-11 pr-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
+                        className="w-full pl-11 pr-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
                       />
                     </div>
                   </div>
 
                   {/* Email */}
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-gray-700 ml-1">Email Address</label>
+                    <label className="text-sm font-medium text-gray-700 ml-1 dark:text-slate-300">Email Address</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                        <Mail className="h-5 w-5 text-gray-400" />
+                        <Mail className="h-5 w-5 text-gray-400 dark:text-slate-500" />
                       </div>
                       <input
                         type="email"
@@ -354,17 +354,17 @@ export default function RegisterPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="you@example.com"
-                        className="w-full pl-11 pr-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
+                        className="w-full pl-11 pr-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
                       />
                     </div>
                   </div>
 
                   {/* Password */}
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-gray-700 ml-1">Password</label>
+                    <label className="text-sm font-medium text-gray-700 ml-1 dark:text-slate-300">Password</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                        <Lock className="h-5 w-5 text-gray-400" />
+                        <Lock className="h-5 w-5 text-gray-400 dark:text-slate-500" />
                       </div>
                       <input
                         type={showPassword ? "text" : "password"}
@@ -372,12 +372,12 @@ export default function RegisterPage() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
-                        className="w-full pl-11 pr-11 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
+                        className="w-full pl-11 pr-11 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-[#f0b31e] transition-colors"
+                        className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-[#f0b31e] transition-colors dark:text-slate-500"
                       >
                         {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                       </button>
@@ -386,10 +386,10 @@ export default function RegisterPage() {
 
                   {/* Confirm Password */}
                   <div className="space-y-1.5">
-                    <label className="text-sm font-medium text-gray-700 ml-1">Confirm Password</label>
+                    <label className="text-sm font-medium text-gray-700 ml-1 dark:text-slate-300">Confirm Password</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                        <Lock className="h-5 w-5 text-gray-400" />
+                        <Lock className="h-5 w-5 text-gray-400 dark:text-slate-500" />
                       </div>
                       <input
                         type={showConfirmPassword ? "text" : "password"}
@@ -397,12 +397,12 @@ export default function RegisterPage() {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder="••••••••"
-                        className="w-full pl-11 pr-11 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
+                        className="w-full pl-11 pr-11 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
                       />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-[#f0b31e] transition-colors"
+                        className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-[#f0b31e] transition-colors dark:text-slate-500"
                       >
                         {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                       </button>
@@ -421,10 +421,10 @@ export default function RegisterPage() {
                 {/* Divider */}
                 <div className="relative my-7">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-100"></div>
+                    <div className="w-full border-t border-gray-100 dark:border-slate-800"></div>
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-4 bg-white text-gray-400 text-xs uppercase tracking-wider font-medium">
+                    <span className="px-4 bg-white text-gray-400 text-xs uppercase tracking-wider font-medium dark:bg-card dark:text-slate-500">
                       Or continue with
                     </span>
                   </div>
@@ -434,7 +434,7 @@ export default function RegisterPage() {
                 <button
                   onClick={handleGoogleSignIn}
                   disabled={isLoading}
-                  className="w-full h-12 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                  className="w-full h-12 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-3 disabled:opacity-50 dark:bg-card dark:border-slate-800 dark:text-slate-300"
                 >
                   <svg className="h-5 w-5" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -446,7 +446,7 @@ export default function RegisterPage() {
                 </button>
 
                 <div className="mt-6 text-center">
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 dark:text-slate-400">
                     Already have an account?{" "}
                     <Link href="/login" className="text-[#f0b31e] font-semibold hover:underline">
                       Log In
@@ -461,7 +461,7 @@ export default function RegisterPage() {
               <div className="animate-in fade-in slide-in-from-right-8 duration-500 pt-4">
                 <button
                   onClick={() => setStep(1)}
-                  className="absolute top-6 left-6 p-2 bg-gray-50 rounded-full text-gray-400 hover:text-[#f0b31e] hover:bg-yellow-50 transition-colors"
+                  className="absolute top-6 left-6 p-2 bg-gray-50 rounded-full text-gray-400 hover:text-[#f0b31e] hover:bg-yellow-50 transition-colors dark:bg-background dark:text-slate-500"
                 >
                   <ArrowLeft className="h-5 w-5" />
                 </button>
@@ -474,9 +474,9 @@ export default function RegisterPage() {
                   <h1 className="text-2xl font-bold text-[#0f172a] tracking-tight">
                     Verify your email
                   </h1>
-                  <p className="text-gray-500 mt-2 text-sm px-4">
+                  <p className="text-gray-500 mt-2 text-sm px-4 dark:text-slate-400">
                     We&apos;ve sent a 6-digit verification code to<br />
-                    <span className="font-semibold text-gray-700">{email}</span>
+                    <span className="font-semibold text-gray-700 dark:text-slate-300">{email}</span>
                   </p>
                 </div>
 
@@ -496,7 +496,7 @@ export default function RegisterPage() {
                         value={otpCode}
                         onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                         placeholder="••••••"
-                        className="w-full text-center tracking-[1em] text-2xl font-bold h-16 rounded-xl border-2 border-gray-100 bg-gray-50 focus:bg-white focus:border-[#f0b31e] focus:ring-4 focus:ring-[#f0b31e]/10 outline-none transition-all text-gray-800"
+                        className="w-full text-center tracking-[1em] text-2xl font-bold h-16 rounded-xl border-2 border-gray-100 bg-gray-50 focus:bg-white focus:border-[#f0b31e] focus:ring-4 focus:ring-[#f0b31e]/10 outline-none transition-all text-gray-800 dark:border-slate-800 dark:bg-background dark:text-slate-200"
                       />
                     </div>
                   </div>
@@ -511,7 +511,7 @@ export default function RegisterPage() {
                 </form>
 
                 <div className="mt-8 text-center">
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 dark:text-slate-400">
                     Didn&apos;t receive the code?{" "}
                     <button
                       onClick={handleResendOtp}
@@ -553,7 +553,7 @@ export default function RegisterPage() {
 
           <div className="mt-20">
             {/* Logo */}
-            <div className="w-24 h-24 bg-white rounded-sm flex items-center justify-center text-black font-bold text-sm shadow-xl">
+            <div className="w-24 h-24 bg-white rounded-sm flex items-center justify-center text-black font-bold text-sm shadow-xl dark:bg-card dark:text-white">
               LOGO
             </div>
 

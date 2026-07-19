@@ -68,13 +68,13 @@ export default function LatestUpdates({ projectId }: { projectId: string }) {
     return (
       <div className="w-full h-[50vh] flex justify-center items-center">
         <LucideLoader className='animate-spin text-blue-300' size={40} />
-         <p className="p-4 animate-pulse text-gray-500">Loading updates...</p>
+         <p className="p-4 animate-pulse text-gray-500 dark:text-slate-400">Loading updates...</p>
       </div>
     )
   }
 
   return (
-    <div className="bg-white p-5 rounded-xl text-black! dark:border-gray-700">
+    <div className="bg-white p-5 rounded-xl text-black! dark:border-gray-700 dark:bg-card">
       <h3 className="text-lg font-semibold mb-4 dark:text-white text-black!">Latest Updates</h3>
 
       {updates.length === 0 ? (
@@ -100,7 +100,7 @@ export default function LatestUpdates({ projectId }: { projectId: string }) {
                     {task.status === "pending" && "Pending"}
                   </p>
 
-                  <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                  <p className="text-xs text-gray-500 mt-1 flex items-center gap-1 dark:text-slate-400">
                     <Clock size={12} />{" "}
                     {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No date'}
                   </p>

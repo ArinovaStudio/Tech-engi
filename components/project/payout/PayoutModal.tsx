@@ -77,8 +77,8 @@ export default function PaymentModal({ isOpen, onClose, transaction, onSuccess }
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl w-full max-w-2xl p-6 relative max-h-[95vh] overflow-y-auto shadow-2xl">
-        <button onClick={onClose} className="absolute top-5 right-5 text-gray-400 hover:text-gray-700 bg-gray-100 rounded-full p-1.5 transition-colors">
+      <div className="bg-white rounded-2xl w-full max-w-2xl p-6 relative max-h-[95vh] overflow-y-auto shadow-2xl dark:bg-card">
+        <button onClick={onClose} className="absolute top-5 right-5 text-gray-400 hover:text-gray-700 bg-gray-100 rounded-full p-1.5 transition-colors dark:text-slate-500 dark:bg-slate-800">
           <X size={18} />
         </button>
         
@@ -129,19 +129,19 @@ export default function PaymentModal({ isOpen, onClose, transaction, onSuccess }
             <label className="block font-semibold text-[var(--text-secondary)] mb-2">Payment Proof Image</label>
             
             <div className="flex flex-col md:flex-row gap-4 items-start">
-              <label className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-6 cursor-pointer hover:bg-gray-50 hover:border-[var(--primary)] transition-all h-40">
-                <Upload size={24} className="text-gray-400 mb-2" />
-                <span className="text-gray-600 font-medium">Click to upload proof</span>
-                <span className="text-xs text-gray-400 mt-1">PNG, JPG, WebP allowed</span>
+              <label className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-6 cursor-pointer hover:bg-gray-50 hover:border-[var(--primary)] transition-all h-40 dark:border-slate-700">
+                <Upload size={24} className="text-gray-400 mb-2 dark:text-slate-500" />
+                <span className="text-gray-600 font-medium dark:text-slate-400">Click to upload proof</span>
+                <span className="text-xs text-gray-400 mt-1 dark:text-slate-500">PNG, JPG, WebP allowed</span>
                 <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
               </label>
 
               {/* Image Preview Box */}
-              <div className="w-full md:w-40 h-40 border border-[var(--border)] rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center shrink-0 relative">
+              <div className="w-full md:w-40 h-40 border border-[var(--border)] rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center shrink-0 relative dark:bg-background">
                 {previewUrl ? (
                   <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="text-center text-gray-400">
+                  <div className="text-center text-gray-400 dark:text-slate-500">
                     <ImageIcon size={24} className="mx-auto mb-1 opacity-50" />
                     <span className="text-xs">No image</span>
                   </div>

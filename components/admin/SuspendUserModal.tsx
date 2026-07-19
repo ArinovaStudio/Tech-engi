@@ -85,7 +85,7 @@ export default function SuspendUserModal({ isOpen, user, onClose, onSuccess }: S
               <><AlertCircle size={18} className="text-red-500" /> Issue Suspension Notice</>
             )}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-700 dark:hover:text-slate-200 transition-colors p-1 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700">
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-700 dark:hover:text-slate-200 transition-colors p-1 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700 dark:text-slate-500">
             <X size={20} />
           </button>
         </div>

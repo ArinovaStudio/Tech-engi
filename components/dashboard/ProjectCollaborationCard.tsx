@@ -66,14 +66,7 @@
 
 //   return (
 //     <div
-//       className="
-//         bg-white
-//         rounded-[30px]
-//         border border-[#ECECEC]
-//         p-6
-//         w-full
-//         h-full
-//       "
+//       className=" // bg-white // rounded-[30px] // border border-[#ECECEC] // p-6 // w-full // h-full //  dark:bg-card"
 //     >
 //       {/* HEADER */}
 

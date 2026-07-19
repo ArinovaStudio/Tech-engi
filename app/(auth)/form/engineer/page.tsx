@@ -729,7 +729,7 @@ export default function EngineerFormPage() {
 
           <div className="mt-20">
             {/* Logo */}
-            <div className="relative w-24 h-24 bg-white rounded-sm shadow-xl overflow-hidden">
+            <div className="relative w-24 h-24 bg-white rounded-sm shadow-xl overflow-hidden dark:bg-card">
               <Image
                 src="/logoImagediff2.PNG"
                 alt="Logo"

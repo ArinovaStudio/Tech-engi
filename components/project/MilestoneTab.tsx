@@ -688,7 +688,7 @@ export default function MilestoneTab({ projectId }: any) {
       {/* Add/Edit Milestone Modal */}
       {open && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white p-6 rounded-xl max-w-md w-full border border-[var(--border)] shadow-lg">
+          <div className="bg-white p-6 rounded-xl max-w-md w-full border border-[var(--border)] shadow-lg dark:bg-card">
             {/* HEADER */}
             <div className="flex justify-between items-center mb-4">
               <h2
@@ -715,7 +715,7 @@ export default function MilestoneTab({ projectId }: any) {
             </div>
 
             {/* FORM */}
-            <div className="space-y-4 text-black">
+            <div className="space-y-4 text-black dark:text-white">
               {/* TITLE */}
               <div>
                 <label className="block text-sm font-medium  mb-1.5">
@@ -931,25 +931,25 @@ export default function MilestoneTab({ projectId }: any) {
                       />
 
                       <div>
-                        <p className="text-sm font-medium text-black">
+                        <p className="text-sm font-medium text-black dark:text-white">
                           Drag & drop file here
                         </p>
 
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-gray-500 mt-1 dark:text-slate-400">
                           or click to browse
                         </p>
                       </div>
 
                       {file && (
-                        <div className="relative mt-4 w-full rounded-xl border bg-white p-3">
+                        <div className="relative mt-4 w-full rounded-xl border bg-white p-3 dark:bg-card">
 
                           {/* REMOVE BUTTON */}
                           <button
                             type="button"
                             onClick={() => setFile(null)}
-                            className="absolute top-2 right-2 rounded-full bg-gray-100 p-1 hover:bg-red-100 transition"
+                            className="absolute top-2 right-2 rounded-full bg-gray-100 p-1 hover:bg-red-100 transition dark:bg-slate-800"
                           >
-                            <X size={14} className="text-gray-600 hover:text-red-600" />
+                            <X size={14} className="text-gray-600 hover:text-red-600 dark:text-slate-400" />
                           </button>
 
                           {/* IMAGE PREVIEW */}
@@ -961,7 +961,7 @@ export default function MilestoneTab({ projectId }: any) {
                                 className="max-h-52 w-full object-cover rounded-lg border"
                               />
 
-                              <div className="text-xs text-gray-600 break-all">
+                              <div className="text-xs text-gray-600 break-all dark:text-slate-400">
                                 {file.name}
                               </div>
                             </div>
@@ -969,16 +969,16 @@ export default function MilestoneTab({ projectId }: any) {
                             /* FILE PREVIEW */
                             <div className="flex items-center gap-3">
 
-                              <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
-                                <Paperclip size={18} className="text-gray-600" />
+                              <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center dark:bg-slate-800">
+                                <Paperclip size={18} className="text-gray-600 dark:text-slate-400" />
                               </div>
 
                               <div className="flex-1 overflow-hidden">
-                                <p className="text-sm font-medium text-black truncate">
+                                <p className="text-sm font-medium text-black truncate dark:text-white">
                                   {file.name}
                                 </p>
 
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-gray-500 dark:text-slate-400">
                                   {(file.size / 1024 / 1024).toFixed(2)} MB
                                 </p>
                               </div>
@@ -1055,16 +1055,16 @@ export default function MilestoneTab({ projectId }: any) {
       {deleteModal.open && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
 
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-gray-200">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-gray-200 dark:bg-card dark:border-slate-800">
 
             {/* HEADER */}
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-black">
+                <h2 className="text-xl font-semibold text-black dark:text-white">
                   Delete Confirmation
                 </h2>
 
-                <p className="mt-2 text-sm text-gray-500 leading-6">
+                <p className="mt-2 text-sm text-gray-500 leading-6 dark:text-slate-400">
                   Are you sure you want to delete this{" "}
                   {deleteModal.type}?
                   This action cannot be undone.
@@ -1096,7 +1096,7 @@ export default function MilestoneTab({ projectId }: any) {
                     type: "milestone",
                   })
                 }
-                className="px-4 py-2 rounded-xl border border-gray-300 text-sm font-medium hover:bg-gray-100"
+                className="px-4 py-2 rounded-xl border border-gray-300 text-sm font-medium hover:bg-gray-100 dark:border-slate-700"
               >
                 Cancel
               </button>

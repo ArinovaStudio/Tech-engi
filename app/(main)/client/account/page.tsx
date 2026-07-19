@@ -207,7 +207,7 @@ export default function ClientAccountPage() {
         </div>
 
         {/* 2. Total Spent */}
-        <div className="rounded-xl p-5 text-white col-span-1 bg-white border border-[var(--border)]">
+        <div className="rounded-xl p-5 text-white col-span-1 bg-white border border-[var(--border)] dark:bg-card">
           <Wallet size={28} className="text-green-400 mb-3" />
           <p className="text-xs text-[var(--text-muted)] ">Total Spent</p>
           <p className="text-2xl font-bold text-[var(--text-primary)]  mt-0.5">₹{(stats?.totalSpent || 0).toLocaleString()}</p>
@@ -215,7 +215,7 @@ export default function ClientAccountPage() {
         </div>
 
         {/* 3. Pending Amount */}
-        <div className="rounded-xl p-5 bg-white border border-[var(--border)]">
+        <div className="rounded-xl p-5 bg-white border border-[var(--border)] dark:bg-card">
           <Clock size={28} className="text-yellow-400 mb-3" />
           <p className="text-xs text-[var(--text-muted)] ">Remaining to Pay</p>
           <p className="text-2xl font-bold text-[var(--text-primary)]  mt-0.5">
@@ -225,7 +225,7 @@ export default function ClientAccountPage() {
         </div>
 
         {/* 4. Total Payments */}
-        <div className="rounded-xl p-5 bg-white border border-[var(--border)]">
+        <div className="rounded-xl p-5 bg-white border border-[var(--border)] dark:bg-card">
           <CreditCard size={28} className="text-blue-400 mb-3" />
           <p className="text-xs text-[var(--text-muted)] ">Total Payments</p>
           <p className="text-2xl font-bold text-[var(--text-primary)]  mt-0.5">
@@ -235,7 +235,7 @@ export default function ClientAccountPage() {
         </div>
 
         {/* 5. Total Projects */}
-        <div className="rounded-xl p-5 bg-white border border-[var(--border)]">
+        <div className="rounded-xl p-5 bg-white border border-[var(--border)] dark:bg-card">
           <TrendingUp size={28} className="text-green-400 mb-3" />
           <p className="text-xs text-[var(--text-muted)] ">Total Projects</p>
           <p className="text-2xl font-bold text-[var(--text-primary)]  mt-0.5">
@@ -245,7 +245,7 @@ export default function ClientAccountPage() {
         </div>
 
         {/* 6. Last Payment */}
-        <div className="rounded-xl p-5 bg-white border border-[var(--border)]">
+        <div className="rounded-xl p-5 bg-white border border-[var(--border)] dark:bg-card">
           <CheckCircle size={28} className="text-green-500 mb-3" />
           <p className="text-xs text-[var(--text-muted)] ">Last Payment</p>
           {lastTxn ? (
@@ -269,7 +269,7 @@ export default function ClientAccountPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Transaction History */}
-        <div id="payment-history-section" className="col-span-1 lg:col-span-2 bg-white rounded-xl border border-[var(--border)] h-[600px] flex flex-col">
+        <div id="payment-history-section" className="col-span-1 lg:col-span-2 bg-white rounded-xl border border-[var(--border)] h-[600px] flex flex-col dark:bg-card">
           <div className="p-5 border-b border-[var(--border)]">
             <h2 className="text-lg font-bold " style={{ color: "var(--text-primary)" }}>Payment History</h2>
             <p className="text-sm  mt-0.5" style={{ color: "var(--text-muted)" }}>All your transactions</p>
@@ -315,7 +315,7 @@ export default function ClientAccountPage() {
         </div>
 
         {/* New Activity */}
-        <div id="new-activity-section" className="col-span-1 lg:col-span-1 bg-white rounded-xl border border-[var(--border)] h-[600px] flex flex-col">
+        <div id="new-activity-section" className="col-span-1 lg:col-span-1 bg-white rounded-xl border border-[var(--border)] h-[600px] flex flex-col dark:bg-card">
           <div className="p-5 border-b border-[var(--border)] flex items-center justify-between">
             <div>
               <h2 className="text-lg font-bold " style={{ color: "var(--text-primary)" }}>New Activity</h2>

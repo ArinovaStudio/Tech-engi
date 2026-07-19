@@ -145,16 +145,16 @@ const ClientAnalyticsDashboard = () => {
         </div>
         <div className="flex flex-row items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500" size={16} />
             <input type="text" placeholder="Search projects..." value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:border-slate-700"
             />
           </div>
           <div className="relative">
-            <Filter size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
+            <Filter size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none dark:text-slate-400" />
             <select value={priorityFilter} onChange={e => setPriorityFilter(e.target.value)}
-              className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm appearance-none cursor-pointer"
+              className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm appearance-none cursor-pointer dark:border-slate-700"
             >
               <option value="ALL">All Priority</option>
               <option value="HIGH">High Priority</option>
@@ -164,7 +164,7 @@ const ClientAnalyticsDashboard = () => {
           </div>
           <button
             onClick={() => window.dispatchEvent(new Event("start-sidebar-tour"))}
-            className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2 whitespace-nowrap"
+            className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2 whitespace-nowrap dark:border-slate-700 dark:text-slate-300"
           >
             🧭 Start Tour
           </button>
@@ -179,7 +179,7 @@ const ClientAnalyticsDashboard = () => {
 
       {filteredProjects.length === 0 ? (
         <div className="text-center py-12">
-          <AlertCircle className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+          <AlertCircle className="mx-auto h-12 w-12 text-gray-400 mb-4 dark:text-slate-500" />
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No Projects</h3>
           <p className="text-gray-600 dark:text-gray-400">No projects match your search criteria.</p>
         </div>
@@ -220,12 +220,12 @@ const ClientAnalyticsDashboard = () => {
                   <span className={`ml-2 px-2 py-1 text-xs font-medium rounded-full border whitespace-nowrap ${statusColor}`}>{displayStatus}</span>
                 </div>
                 <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">{project.description || 'No summary available'}</p>
-                <div className="flex items-center gap-1 text-sm text-gray-500 mb-3">
+                <div className="flex items-center gap-1 text-sm text-gray-500 mb-3 dark:text-slate-400">
                   <Calendar size={16} />
                   <span>{new Date(project.createdAt).toLocaleDateString()}</span>
                 </div>
                 <div className="mb-3">
-                  <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                  <div className="flex items-center justify-between text-xs text-gray-500 mb-1 dark:text-slate-400">
                     <span>Progress</span>
                     <span className="font-semibold">{project.progress}%</span>
                   </div>

@@ -311,11 +311,11 @@ export default function ScheduleMeet() {
         <div className="grid gap-4">
           <div className="grid gap-4">
             {loadingfetch ? (
-              <p className="text-center text-sm text-gray-500">
+              <p className="text-center text-sm text-gray-500 dark:text-slate-400">
                 Loading meetings...
               </p>
             ) : meetings.length === 0 ? (
-              <p className="text-center text-sm text-gray-500">
+              <p className="text-center text-sm text-gray-500 dark:text-slate-400">
                 No meetings found
               </p>
             ) : (
@@ -326,14 +326,14 @@ export default function ScheduleMeet() {
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-gray-400 dark:text-slate-500">
                         {m?.project?.name}
                       </p>
                       <h3 className="text-lg font-medium text-gray-900 dark:text-white mt-1">
                         {m.reason}
                       </h3>
                       {m.client && (
-                        <span className="text-sm text-gray-500 block mt-1">
+                        <span className="text-sm text-gray-500 block mt-1 dark:text-slate-400">
                           By {m?.createdBy ? m.createdBy : m.client.name}
                         </span>
                       )}

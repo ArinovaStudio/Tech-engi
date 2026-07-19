@@ -9,7 +9,7 @@ type CardProps = { id: string; description: string; createdBy: string; date: str
 
 export function MinimalCard({ id, description, createdBy, date, onDelete }: CardProps) {
   return (
-    <div className="relative rounded-xl border border-[var(--border)] bg-white p-5 transition-colors">
+    <div className="relative rounded-xl border border-[var(--border)] bg-white p-5 transition-colors dark:bg-card">
       <button onClick={() => onDelete?.(id)} className="absolute right-3 top-3 p-1.5 rounded-lg hover:bg-red-50 transition-colors" style={{ color: "var(--text-muted)" }}>
         <Trash2 size={14} />
       </button>
@@ -72,7 +72,7 @@ function ClientUpdate({ projectId }: { projectId: string }) {
 
       {showAddUpdate && (
         <div className="fixed inset-0 flex items-center justify-center p-4 z-50 bg-black/40">
-          <div className="w-full max-w-md bg-white p-6 rounded-xl border border-[var(--border)] shadow-lg">
+          <div className="w-full max-w-md bg-white p-6 rounded-xl border border-[var(--border)] shadow-lg dark:bg-card">
             <h1 className="text-lg font-semibold  mb-4" style={{ color: "var(--text-primary)" }}>Update to Client</h1>
             <TextArea value={update} onChange={(e) => setUpdate(e)} className="min-h-40 bg-[var(--bg)] resize-none border border-[var(--border)] rounded-lg  text-sm" />
             <div className="flex justify-end gap-3 mt-4">

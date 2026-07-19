@@ -838,13 +838,13 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
       <div className="h-screen w-full bg-[var(--bg)] p-6">
 
         {/* TOP NAV SKELETON */}
-        <div className="flex items-center justify-between mb-6 bg-white border border-[var(--border)] rounded-2xl p-4 animate-pulse">
+        <div className="flex items-center justify-between mb-6 bg-white border border-[var(--border)] rounded-2xl p-4 animate-pulse dark:bg-card">
 
-          <div className="h-11 w-28 rounded-xl bg-gray-200" />
+          <div className="h-11 w-28 rounded-xl bg-gray-200 dark:bg-slate-800" />
 
           <div className="flex flex-col items-center gap-2">
-            <div className="h-6 w-48 rounded-lg bg-gray-200" />
-            <div className="h-4 w-36 rounded-lg bg-gray-100" />
+            <div className="h-6 w-48 rounded-lg bg-gray-200 dark:bg-slate-800" />
+            <div className="h-4 w-36 rounded-lg bg-gray-100 dark:bg-slate-800" />
           </div>
 
           <div className="w-28" />
@@ -856,26 +856,17 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
           {[1, 2, 3, 4].map((col) => (
             <div
               key={col}
-              className="
-              rounded-3xl
-              border
-              border-[var(--border)]
-              bg-white
-              p-4
-              flex
-              flex-col
-              animate-pulse
-            "
+              className=" rounded-3xl border border-[var(--border)] bg-white p-4 flex flex-col animate-pulse  dark:bg-card"
             >
 
               {/* COLUMN HEADER */}
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gray-200" />
-                  <div className="h-5 w-24 rounded-lg bg-gray-200" />
+                  <div className="w-10 h-10 rounded-xl bg-gray-200 dark:bg-slate-800" />
+                  <div className="h-5 w-24 rounded-lg bg-gray-200 dark:bg-slate-800" />
                 </div>
 
-                <div className="h-5 w-6 rounded bg-gray-200" />
+                <div className="h-5 w-6 rounded bg-gray-200 dark:bg-slate-800" />
               </div>
 
               {/* CARDS */}
@@ -884,29 +875,23 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
                 {[1, 2, 3, 4].map((card) => (
                   <div
                     key={card}
-                    className="
-                    rounded-2xl
-                    border
-                    border-gray-100
-                    p-4
-                    bg-[#fafafa]
-                  "
+                    className=" rounded-2xl border border-gray-100 p-4 bg-[#fafafa]  dark:border-slate-800"
                   >
 
                     <div className="flex items-center gap-3">
 
-                      <div className="w-12 h-12 rounded-full bg-gray-200" />
+                      <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-slate-800" />
 
                       <div className="flex-1">
-                        <div className="h-5 w-32 rounded bg-gray-200 mb-2" />
-                        <div className="h-4 w-20 rounded bg-gray-100" />
+                        <div className="h-5 w-32 rounded bg-gray-200 mb-2 dark:bg-slate-800" />
+                        <div className="h-4 w-20 rounded bg-gray-100 dark:bg-slate-800" />
                       </div>
 
                     </div>
 
                     <div className="flex gap-2 mt-4">
-                      <div className="h-7 w-24 rounded-full bg-gray-100" />
-                      <div className="h-7 w-20 rounded-full bg-gray-100" />
+                      <div className="h-7 w-24 rounded-full bg-gray-100 dark:bg-slate-800" />
+                      <div className="h-7 w-20 rounded-full bg-gray-100 dark:bg-slate-800" />
                     </div>
 
                   </div>
@@ -926,7 +911,7 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
       <div className="h-screen w-full flex items-center justify-center bg-[var(--bg)] p-6">
 
         <div
-          className="w-full max-w-md bg-white border border-[var(--border)] rounded-3xl shadow-sm p-8 text-center">
+          className="w-full max-w-md bg-white border border-[var(--border)] rounded-3xl shadow-sm p-8 text-center dark:bg-card">
 
           {/* ICON */}
           <div
@@ -960,7 +945,7 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
 
             <button
               onClick={() => router.back()}
-              className="h-11 px-5 rounded-xl border border-[var(--border)] bg-white hover:bg-gray-50 transition-all text-sm font-medium"
+              className="h-11 px-5 rounded-xl border border-[var(--border)] bg-white hover:bg-gray-50 transition-all text-sm font-medium dark:bg-card"
               style={{
                 color: "var(--text-primary)",
               }}
@@ -1089,16 +1074,16 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
 
         {inviting && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <div className="flex flex-col items-center gap-3 rounded-2xl bg-white px-6 py-5 shadow-xl">
+            <div className="flex flex-col items-center gap-3 rounded-2xl bg-white px-6 py-5 shadow-xl dark:bg-card">
               {/* Spinner */}
-              <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-red-600" />
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-red-600 dark:border-slate-800" />
 
               {/* Text */}
-              <p className="text-sm font-medium text-gray-700">
+              <p className="text-sm font-medium text-gray-700 dark:text-slate-300">
                 Updating invitation...
               </p>
 
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-gray-400 dark:text-slate-500">
                 Please wait while we process changes
               </p>
             </div>
@@ -1117,7 +1102,7 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
                   setSearch(e.target.value)
                 }
                 placeholder="Search by name, skill, experience..."
-                className=" w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:ring-2 focus:ring-cyan-500" />
+                className=" w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:ring-2 focus:ring-cyan-500 dark:border-slate-800 dark:bg-card" />
 
             </div>
 
@@ -1125,7 +1110,7 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
 
               <button
                 onClick={() => setShowFilters(true)}
-                className=" h-11 px-4 rounded-xl border bg-white flex items-center gap-2">
+                className=" h-11 px-4 rounded-xl border bg-white flex items-center gap-2 dark:bg-card">
                 <SlidersHorizontal size={16} />
                 Filters
 
@@ -1147,7 +1132,7 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
           >
             <button
               onClick={() => router.back()}
-              className="flex items-center justify-center cursor-pointer gap-2 w-full sm:w-auto px-4 h-11 rounded-xl border border-[var(--border)] bg-white hover:bg-gray-50 transition-all shadow-sm text-sm font-medium"
+              className="flex items-center justify-center cursor-pointer gap-2 w-full sm:w-auto px-4 h-11 rounded-xl border border-[var(--border)] bg-white hover:bg-gray-50 transition-all shadow-sm text-sm font-medium dark:bg-card"
               style={{
                 color: "var(--text-primary)",
               }}
@@ -1170,7 +1155,7 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
             className="flex flex-col h-full overflow-hidden"
           >
             {/* HEADER */}
-            <div className="sticky top-0 z-10 flex items-center justify-between rounded-xl mb-4 p-3 bg-white border-b border-[var(--border)]">
+            <div className="sticky top-0 z-10 flex items-center justify-between rounded-xl mb-4 p-3 bg-white border-b border-[var(--border)] dark:bg-card">
               <div className="flex items-center gap-2">
                 <div
                   className={`
@@ -1300,7 +1285,7 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
                               "ALL_USERS"
                             )
                           }
-                          className="bg-white border border-[var(--border)] rounded-2xl p-4 mb-3 cursor-grab active:cursor-grabbing transition-all hover:shadow-sm"
+                          className="bg-white border border-[var(--border)] rounded-2xl p-4 mb-3 cursor-grab active:cursor-grabbing transition-all hover:shadow-sm dark:bg-card"
                         >
                           <div className="flex items-center gap-3">
 
@@ -1438,7 +1423,7 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
                       )
                     }
 
-                    className="bg-white border border-[var(--border)] rounded-2xl p-4 mb-3 transition-all">
+                    className="bg-white border border-[var(--border)] rounded-2xl p-4 mb-3 transition-all dark:bg-card">
 
                     <div className="flex items-center gap-3">
 
@@ -1535,7 +1520,7 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
         <div
           className=" fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
           <div
-            className=" w-[500px] max-w-[95vw] bg-white rounded-2xl p-6 shadow-xl">
+            className=" w-[500px] max-w-[95vw] bg-white rounded-2xl p-6 shadow-xl dark:bg-card">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold">
                 Filters

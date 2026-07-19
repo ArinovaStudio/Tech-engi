@@ -93,9 +93,9 @@ export default function EngineerInvitationsPage() {
             <Loader2 className="animate-spin text-[var(--primary)]" size={40} />
           </div>
         ) : pendingInvitations.length === 0 ? (
-          <div className="bg-white border border-[var(--border)] rounded-2xl p-12 text-center">
+          <div className="bg-white border border-[var(--border)] rounded-2xl p-12 text-center dark:bg-card">
             <CheckCircle size={48} className="mx-auto text-emerald-500 mb-4" />
-            <h3 className="text-lg font-semibold mb-2 text-black">No pending invitations</h3>
+            <h3 className="text-lg font-semibold mb-2 text-black dark:text-white">No pending invitations</h3>
             <p className="text-[var(--text-muted)]">New matching projects will appear here</p>
           </div>
         ) : (
@@ -103,10 +103,10 @@ export default function EngineerInvitationsPage() {
             {pendingInvitations.map((inv) => (
               <div
                 key={inv.id}
-                className="bg-white border border-[var(--border)] rounded-2xl p-6 hover:shadow-md transition-all"
+                className="bg-white border border-[var(--border)] rounded-2xl p-6 hover:shadow-md transition-all dark:bg-card"
               >
                 <div className="flex justify-between items-start mb-4">
-                  <h3 className="font-bold text-lg leading-tight pr-4 text-black">{inv.project.title}</h3>
+                  <h3 className="font-bold text-lg leading-tight pr-4 text-black dark:text-white">{inv.project.title}</h3>
                   <span className="text-[10px] px-3 py-1 bg-blue-100 text-blue-700 rounded-full font-medium">
                     New Match
                   </span>

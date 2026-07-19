@@ -31,7 +31,7 @@ export default function MessageItem({
               <Image src={msg.sender.image} alt={msg.sender.name || "User"} width={32} height={32} className="object-cover w-full h-full" />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-slate-800">
-                <UserIcon size={16} className="text-gray-400" />
+                <UserIcon size={16} className="text-gray-400 dark:text-slate-500" />
               </div>
             )}
           </div>
@@ -43,7 +43,7 @@ export default function MessageItem({
         
         {/* Name Label */}
         {showLabel && (
-          <span className="text-[11px] font-bold text-gray-400 mb-1 px-2 block">
+          <span className="text-[11px] font-bold text-gray-400 mb-1 px-2 block dark:text-slate-500">
             {msg.sender?.name || "User"}
             {msg.sender?.role && msg.sender.role !== "USER" && 
               ` (${msg.sender.role.charAt(0) + msg.sender.role.slice(1).toLowerCase()})`

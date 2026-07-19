@@ -201,9 +201,9 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
 
   if (!selectedContact) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center text-gray-400 bg-[#ffffff] dark:bg-background">
+      <div className="flex-1 flex flex-col items-center justify-center text-gray-400 bg-[#ffffff] dark:bg-background dark:text-slate-500">
         <div className="w-20 h-20 bg-gray-200 dark:bg-slate-700 rounded-full flex items-center justify-center mb-4">
-          <MessageSquare size={32} className="text-gray-400" />
+          <MessageSquare size={32} className="text-gray-400 dark:text-slate-500" />
         </div>
         <h3 className="text-xl font-bold  text-[var(--text-primary)] mb-2">Your Messages</h3>
         <p className=" text-sm">Select a contact to start chatting.</p>
@@ -237,7 +237,7 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
               className="object-cover"
             />
           ) : (
-            <UserIcon size={18} className="text-gray-500" />
+            <UserIcon size={18} className="text-gray-500 dark:text-slate-400" />
           )}
         </div>
 
@@ -312,7 +312,7 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
     >
       {isLoadingMore && (
         <div className="flex justify-center py-2">
-          <Loader2 className="animate-spin text-gray-400" size={18} />
+          <Loader2 className="animate-spin text-gray-400 dark:text-slate-500" size={18} />
         </div>
       )}
 

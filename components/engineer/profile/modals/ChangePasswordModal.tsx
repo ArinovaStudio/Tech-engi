@@ -63,7 +63,7 @@ export default function ChangePasswordModal({ isOpen, onClose, user }: { isOpen:
         {step === 0 && (
           <div className="space-y-4">
             <p className="text-sm font-semibold text-[var(--text-secondary)]">We will send a 6-digit OTP to:</p>
-            <p className="text-sm bg-gray-50 border border-[var(--border)] p-3 rounded-lg font-mono">{user.email}</p>
+            <p className="text-sm bg-gray-50 border border-[var(--border)] p-3 rounded-lg font-mono dark:bg-background">{user.email}</p>
             <button onClick={handleSendOtp} disabled={loading} className="w-full py-2.5 rounded-lg bg-[var(--primary)] text-white font-semibold shadow-md">
               {loading ? "Sending..." : "Send OTP"}
             </button>

@@ -354,7 +354,7 @@ const ProjectAssets = () => {
                                 </span>
                             </div>
                             <div className="col-span-3 truncate text-sm text-gray-700 dark:text-gray-300" title={r.projectTitle}>{r.projectTitle}</div>
-                            <div className="col-span-2 text-sm text-gray-500">{formatDate(r.createdAt)}</div>
+                            <div className="col-span-2 text-sm text-gray-500 dark:text-slate-400">{formatDate(r.createdAt)}</div>
                             <div className="col-span-1 flex justify-end">
                                 {(r.type === "FILE" || r.type === "IMAGE") && (
                                     <a
@@ -397,7 +397,7 @@ const ProjectAssets = () => {
                     ))
                 ) : (
                     <div className="p-8 text-center">
-                        <p className="text-gray-500">No resources found</p>
+                        <p className="text-gray-500 dark:text-slate-400">No resources found</p>
                     </div>
                 )}
             </div>
@@ -405,7 +405,7 @@ const ProjectAssets = () => {
             {/* Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white w-full max-w-2xl rounded-2xl shadow-xl p-6 max-h-[90vh] overflow-y-auto">
+                    <div className="bg-white w-full max-w-2xl rounded-2xl shadow-xl p-6 max-h-[90vh] overflow-y-auto dark:bg-card">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-bold">Create Project Resource</h2>
                             <button onClick={() => setShowModal(false)} className="w-8 h-8 rounded-full hover:bg-gray-100">✕</button>
@@ -435,7 +435,7 @@ const ProjectAssets = () => {
 
                             <div id="asset-resource-type">
                                 <label className="block text-sm font-semibold mb-2">Resource Type</label>
-                                <p className="text-xs text-gray-500 mb-2">
+                                <p className="text-xs text-gray-500 mb-2 dark:text-slate-400">
                                     Maximum upload file size: <span className="font-medium">200 MB</span> (for File and Image resources).
                                 </p>
                                 <select

@@ -503,7 +503,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Sidebar */}
         <div className="w-full shrink-0">
-          <div data-tour="report-tabs" className="bg-white rounded-xl border border-[var(--border)] p-2 mb-3">
+          <div data-tour="report-tabs" className="bg-white rounded-xl border border-[var(--border)] p-2 mb-3 dark:bg-card">
             <div className="flex gap-2 overflow-x-auto">
               {roleTabs.map((tab) => {
                 const count = tickets.filter((ticket) => {
@@ -577,7 +577,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                   return (
                     <div
                       key={report.id}
-                      className="bg-white rounded-xl border border-[var(--border)] p-5"
+                      className="bg-white rounded-xl border border-[var(--border)] p-5 dark:bg-card"
                     >
                       <div className="flex items-start gap-3">
                         <AlertCircle
@@ -590,7 +590,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                           {/* Top Row */}
                           <div className="flex items-center justify-between">
                             {/* Type Badge */}
-                            <span className="text-xs uppercase font-semibold px-2.5 py-0.5 rounded-full border bg-gray-100 text-gray-700 border-gray-200">
+                            <span className="text-xs uppercase font-semibold px-2.5 py-0.5 rounded-full border bg-gray-100 text-gray-700 border-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-800">
                               {report.issueType}
                             </span>
 
@@ -622,7 +622,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                                 openDropdownId === report.id &&
                                 !updating &&
                                 (role === "ADMIN")) && (
-                                  <div className="absolute right-0 mt-1 w-36 bg-white border rounded-lg shadow-md z-10">
+                                  <div className="absolute right-0 mt-1 w-36 bg-white border rounded-lg shadow-md z-10 dark:bg-card">
                                     {["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"].map((status) => (
                                       <button
                                         key={status}
@@ -634,7 +634,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                                             status,
                                           });
                                         }}
-                                        className="w-full text-black text-left px-3 py-2 text-xs hover:bg-gray-100"
+                                        className="w-full text-black text-left px-3 py-2 text-xs hover:bg-gray-100 dark:text-white"
                                       >
                                         {status.replace("_", " ")}
                                       </button>
@@ -700,7 +700,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div data-tour="ticket-modal" className="bg-white text-black! w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg">
+          <div data-tour="ticket-modal" className="bg-white text-black! w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg dark:bg-card">
             <h3
               className="text-lg font-semibold  mb-4"
               style={{ color: "var(--text-primary)" }}
@@ -834,11 +834,11 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                     <Upload className="w-6 h-6 text-[#FFAE58]" />
                   </div>
 
-                  <p className="text-sm font-semibold text-gray-800">
+                  <p className="text-sm font-semibold text-gray-800 dark:text-slate-200">
                     Click to upload images
                   </p>
 
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 mt-1 dark:text-slate-400">
                     PNG, JPG, JPEG • Multiple files supported
                   </p>
 
@@ -847,7 +847,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                       {newTicket.images.map((file, index) => (
                         <div
                           key={index}
-                          className=" relative group overflow-hidden rounded-xl border border-[#FFD4A6] bg-white">
+                          className=" relative group overflow-hidden rounded-xl border border-[#FFD4A6] bg-white dark:bg-card">
                           <img
                             src={URL.createObjectURL(file)}
                             alt={file.name}

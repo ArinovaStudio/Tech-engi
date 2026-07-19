@@ -73,7 +73,7 @@ const Milestones = ({ milestones = [] }: { milestones: any[] }) => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
 
-        <h2 className="text-[30px] leading-none font-black text-black font-id">
+        <h2 className="text-[30px] leading-none font-black text-black font-id dark:text-white">
           Milestones
         </h2>
 
@@ -92,14 +92,14 @@ const Milestones = ({ milestones = [] }: { milestones: any[] }) => {
           milestones.map((m) => (
             <div
               key={m.id}
-              className="bg-white rounded-[18px] p-5 border border-[#e6e6e6] shadow-[0_4px_18px_rgba(0,0,0,0.05)]"
+              className="bg-white rounded-[18px] p-5 border border-[#e6e6e6] shadow-[0_4px_18px_rgba(0,0,0,0.05)] dark:bg-card"
             >
 
               {/* Top */}
               <div className="flex items-start justify-between gap-4">
 
                 <div>
-                  <h3 className="text-[18px] font-bold text-black font-id">
+                  <h3 className="text-[18px] font-bold text-black font-id dark:text-white">
                     {m.title}
                   </h3>
 

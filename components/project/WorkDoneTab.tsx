@@ -102,7 +102,7 @@ export default function WorkDoneTab({ projectId }: any) {
           </div>
         </div>
 
-        <div className="bg-gray-50 border border-[var(--border)] rounded-lg p-4">
+        <div className="bg-gray-50 border border-[var(--border)] rounded-lg p-4 dark:bg-background">
           <div className="flex items-center gap-3">
             <Clock size={24} style={{ color: 'var(--text-secondary)' }} />
             <div>
@@ -120,7 +120,7 @@ export default function WorkDoneTab({ projectId }: any) {
       </div>
 
       {/* Complete Inventory */}
-      <div className="bg-white rounded-lg border border-[var(--border)]">
+      <div className="bg-white rounded-lg border border-[var(--border)] dark:bg-card">
         <div className="p-6 border-b border-[var(--border)]">
           <h3 className="text-lg font-semibold " style={{ color: 'var(--text-primary)' }}>Complete Inventory of Finished Tasks</h3>
           <p className="text-sm  mt-1" style={{ color: 'var(--text-muted)' }}>All tasks completed with assignee information</p>

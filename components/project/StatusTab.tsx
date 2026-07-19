@@ -66,7 +66,7 @@ export default function StatusTab({ projectId }: { projectId: string }) {
         )}
       </div>
 
-      <div className="bg-white rounded-xl border border-[var(--border)] p-6">
+      <div className="bg-white rounded-xl border border-[var(--border)] p-6 dark:bg-card">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold " style={{ color: "var(--text-primary)" }}>Progress Overview</h3>
           <span className="text-2xl font-bold " style={{ color: "var(--text-primary)" }}>{status}%</span>
@@ -84,7 +84,7 @@ export default function StatusTab({ projectId }: { projectId: string }) {
 
       {editing && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg">
+          <div className="bg-white w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg dark:bg-card">
             <h3 className="text-lg font-semibold  mb-4" style={{ color: "var(--text-primary)" }}>Update Project Status</h3>
             <div className="mb-4">
               <label className="block text-sm font-medium  mb-2" style={{ color: "var(--text-secondary)" }}>Progress Percentage</label>
@@ -92,7 +92,7 @@ export default function StatusTab({ projectId }: { projectId: string }) {
                 <input
                   type="number" min="0" max="100" value={newStatus}
                   onChange={(e) => setNewStatus(Math.max(0, Math.min(100, parseInt(e.target.value) || 0)))}
-                  className="w-20 px-3 py-2 border border-[var(--border)] rounded-lg bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                  className="w-20 px-3 py-2 border border-[var(--border)] rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] dark:bg-card"
                   style={{ color: "var(--text-primary)" }}
                   disabled={updating}
                 />

@@ -127,7 +127,7 @@ export default function EngineerPayoutPage() {
           {/* 2. Amount Received */}
           <div
             data-tour="amount-received"
-            className="rounded-xl p-5 bg-white border border-[var(--border)]"
+            className="rounded-xl p-5 bg-white border border-[var(--border)] dark:bg-card"
           >
             <CheckCircle size={28} className="text-green-500 mb-3" />
             <p className="text-xs " style={{ color: "var(--text-muted)" }}>
@@ -142,7 +142,7 @@ export default function EngineerPayoutPage() {
           {/* 3. Amount Pending */}
           <div
             data-tour="amount-pending"
-            className="rounded-xl p-5 bg-white border border-[var(--border)]"
+            className="rounded-xl p-5 bg-white border border-[var(--border)] dark:bg-card"
           >
             <Clock size={28} className="text-yellow-500 mb-3" />
             <p className="text-xs " style={{ color: "var(--text-muted)" }}>
@@ -157,7 +157,7 @@ export default function EngineerPayoutPage() {
           {/* 4. Bank Details Status */}
           <div
             data-tour="bank-details"
-            className="rounded-xl p-5 bg-white border border-[var(--border)]"
+            className="rounded-xl p-5 bg-white border border-[var(--border)] dark:bg-card"
           >
             <Landmark size={28} className={hasPayoutDetails ? "text-blue-500 mb-3" : "text-red-500 mb-3"} />
             <p className="text-xs " style={{ color: "var(--text-muted)" }}>
@@ -174,7 +174,7 @@ export default function EngineerPayoutPage() {
           {/* 5. Last Payment */}
           <div
             data-tour="last-payment"
-            className="rounded-xl p-5 bg-white border border-[var(--border)]"
+            className="rounded-xl p-5 bg-white border border-[var(--border)] dark:bg-card"
           >
             <CreditCard size={28} className="text-purple-500 mb-3" />
             <p className="text-xs " style={{ color: "var(--text-muted)" }}>
@@ -201,7 +201,7 @@ export default function EngineerPayoutPage() {
         </div>
 
         {/* Payout History */}
-        <div data-tour="payout-history" className="bg-white rounded-xl border border-[var(--border)]">
+        <div data-tour="payout-history" className="bg-white rounded-xl border border-[var(--border)] dark:bg-card">
           <div className="p-5 border-b border-[var(--border)]">
             <h2 className="text-lg font-semibold " style={{ color: "var(--text-primary)" }}>
               Payout History

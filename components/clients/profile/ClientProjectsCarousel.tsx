@@ -51,7 +51,7 @@ export default function ClientProjectsCarousel({ projects, onProjectSelect,}: Cl
     };
 
     return (
-        <div className="bg-white rounded-3xl border border-[var(--border)] p-6">
+        <div className="bg-white rounded-3xl border border-[var(--border)] p-6 dark:bg-card">
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h2
@@ -120,7 +120,7 @@ export default function ClientProjectsCarousel({ projects, onProjectSelect,}: Cl
                                         {project.title}
                                     </h3>
 
-                                    <p className="text-xs text-gray-500">
+                                    <p className="text-xs text-gray-500 dark:text-slate-400">
                                         {project.currentPhase || "Planning"}
                                     </p>
                                 </div>
@@ -149,23 +149,23 @@ export default function ClientProjectsCarousel({ projects, onProjectSelect,}: Cl
                         </p>
 
                         <div className="grid grid-cols-2 gap-4 mb-5">
-                            <div className="rounded-xl bg-gray-50 p-3">
-                                <p className="text-xs text-gray-500 mb-1">
+                            <div className="rounded-xl bg-gray-50 p-3 dark:bg-background">
+                                <p className="text-xs text-gray-500 mb-1 dark:text-slate-400">
                                     Budget
                                 </p>
 
-                                <p className="font-bold text-gray-900">
+                                <p className="font-bold text-gray-900 dark:text-slate-100">
                                     ₹
                                     {(project.budget || 0).toLocaleString()}
                                 </p>
                             </div>
 
-                            <div className="rounded-xl bg-gray-50 p-3">
-                                <p className="text-xs text-gray-500 mb-1">
+                            <div className="rounded-xl bg-gray-50 p-3 dark:bg-background">
+                                <p className="text-xs text-gray-500 mb-1 dark:text-slate-400">
                                     Progress
                                 </p>
 
-                                <p className="font-bold text-gray-900">
+                                <p className="font-bold text-gray-900 dark:text-slate-100">
                                     {project.progress || 0}%
                                 </p>
                             </div>
@@ -177,7 +177,7 @@ export default function ClientProjectsCarousel({ projects, onProjectSelect,}: Cl
                                 <span>{project.progress || 0}%</span>
                             </div>
 
-                            <div className="w-full bg-gray-200 rounded-full h-2.5">
+                            <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-slate-800">
                                 <div
                                     className="h-2.5 rounded-full transition-all"
                                     style={{

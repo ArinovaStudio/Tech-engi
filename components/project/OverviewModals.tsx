@@ -359,7 +359,7 @@ export const EditModal = ({ showModel, projectData, userRole }: { showModel: (v:
               </div>
             </div>
 
-            <div className="space-y-5 border rounded-xl p-5 bg-white">
+            <div className="space-y-5 border rounded-xl p-5 bg-white dark:bg-card">
 
               <div className="flex justify-between px-1">
                 {/* Brand Name */}

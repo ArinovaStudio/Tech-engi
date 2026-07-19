@@ -30,7 +30,7 @@ export default function AdminEngInfoCard({ user, onUpdate }: { user: any, onUpda
 
   return (
     <>
-      <div className="p-6 border border-[var(--border)] rounded-2xl bg-white">
+      <div className="p-6 border border-[var(--border)] rounded-2xl bg-white dark:bg-card">
         <div className="flex justify-between items-center mb-6 border-b border-[var(--border)] pb-4">
           <h4 className="text-lg font-bold font-inter text-[var(--text-primary)]">Personal Information</h4>
           <button onClick={() => setIsOpen(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[var(--border)] text-sm font-semibold hover:bg-gray-50 transition-colors">
@@ -71,9 +71,9 @@ export default function AdminEngInfoCard({ user, onUpdate }: { user: any, onUpda
         <div className="p-8">
           <h4 className="text-2xl font-bold font-inter text-[var(--text-primary)] mb-6">Edit Personal Info</h4>
           <form onSubmit={handleSave} className="space-y-4">
-            <div><label className="block text-sm font-semibold mb-1">Full Name</label><input required value={formData.name} onChange={e=>setFormData({...formData, name: e.target.value})} className="w-full border rounded-lg p-3 bg-gray-50" /></div>
-            <div><label className="block text-sm font-semibold mb-1">Phone</label><input value={formData.phone} onChange={e=>setFormData({...formData, phone: e.target.value})} className="w-full border rounded-lg p-3 bg-gray-50" /></div>
-            <div><label className="block text-sm font-semibold mb-1">Bio</label><textarea value={formData.bio} onChange={e=>setFormData({...formData, bio: e.target.value})} rows={3} className="w-full border rounded-lg p-3 bg-gray-50" /></div>
+            <div><label className="block text-sm font-semibold mb-1">Full Name</label><input required value={formData.name} onChange={e=>setFormData({...formData, name: e.target.value})} className="w-full border rounded-lg p-3 bg-gray-50 dark:bg-background" /></div>
+            <div><label className="block text-sm font-semibold mb-1">Phone</label><input value={formData.phone} onChange={e=>setFormData({...formData, phone: e.target.value})} className="w-full border rounded-lg p-3 bg-gray-50 dark:bg-background" /></div>
+            <div><label className="block text-sm font-semibold mb-1">Bio</label><textarea value={formData.bio} onChange={e=>setFormData({...formData, bio: e.target.value})} rows={3} className="w-full border rounded-lg p-3 bg-gray-50 dark:bg-background" /></div>
             <div className="flex justify-end gap-3 pt-4 border-t"><button type="button" onClick={()=>setIsOpen(false)} className="px-5 py-2.5 rounded-lg border font-semibold">Cancel</button><button type="submit" disabled={isSaving} className="px-5 py-2.5 rounded-lg bg-[var(--primary)] text-white font-semibold">{isSaving ? "Saving..." : "Save"}</button></div>
           </form>
         </div>

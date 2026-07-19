@@ -22,7 +22,7 @@ function SummaryCard({
   value: any;
 }) {
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-white p-5">
+    <div className="rounded-xl border border-[var(--border)] bg-white p-5 dark:bg-card">
       <p
         className="text-sm"
         style={{ color: "var(--text-muted)" }}
@@ -114,13 +114,13 @@ export default function PayoutAdmin({ projectId, }: { projectId: string; }) {
 }
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 text-black">
+    <div className="flex flex-col lg:flex-row gap-6 text-black dark:text-white">
 
       {/* SIDEBAR */}
       <div className="flex flex-col gap-6">
 
         {/* CLIENT USERS */}
-        <div className="w-full lg:w-72 border border-[var(--border)] rounded-xl bg-white p-5 space-y-4 h-fit">
+        <div className="w-full lg:w-72 border border-[var(--border)] rounded-xl bg-white p-5 space-y-4 h-fit dark:bg-card">
 
           <h3 className="font-semibold text-lg text-[var(--text-primary)]">
             Client
@@ -159,7 +159,7 @@ export default function PayoutAdmin({ projectId, }: { projectId: string; }) {
         </div>
 
         {/* ENGINEER USERS */}
-        <div className="w-full lg:w-72 border border-[var(--border)] rounded-xl bg-white p-5 space-y-4 h-fit">
+        <div className="w-full lg:w-72 border border-[var(--border)] rounded-xl bg-white p-5 space-y-4 h-fit dark:bg-card">
 
           <h3 className="font-semibold text-lg text-[var(--text-primary)]">
             Engineer
@@ -336,7 +336,7 @@ export default function PayoutAdmin({ projectId, }: { projectId: string; }) {
 
           {/* ENGINEER ONLY ACTIONS */}
           {isEngineerSelected && (
-            <div className="rounded-xl w-full lg:w-80 border border-[var(--border)] bg-white p-6 flex flex-col justify-between h-fit">
+            <div className="rounded-xl w-full lg:w-80 border border-[var(--border)] bg-white p-6 flex flex-col justify-between h-fit dark:bg-card">
 
               <div>
                 <h3 className="text-lg font-semibold mb-4 text-[var(--text-primary)]">

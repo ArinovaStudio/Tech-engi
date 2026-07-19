@@ -69,7 +69,7 @@ const LatestUpdates = ({ data, }: { data: any; }) => {
     <div id="latest-task" className="relative w-full h-[620px] rounded-[24px] border-2 border-[#cfcfcf] bg-[#f5f5f5] p-6 flex flex-col overflow-hidden">
       {/* Header */}
       <div className="flex items-start justify-between mb-5 shrink-0">
-        <h2 className="text-[30px] leading-none font-black text-black font-id">
+        <h2 className="text-[30px] leading-none font-black text-black font-id dark:text-white">
           Latest Task
         </h2>
 
@@ -103,7 +103,7 @@ const LatestUpdates = ({ data, }: { data: any; }) => {
           </span>
 
           {/* Title */}
-          <h3 className="text-[18px] font-semibold text-gray-700 mb-2 pr-24">
+          <h3 className="text-[18px] font-semibold text-gray-700 mb-2 pr-24 dark:text-slate-300">
             {task.title}
           </h3>
 

@@ -40,7 +40,7 @@ function StatusBadge({ status }: { status: string }) {
 function ProjectCard({ project }: { project: Project }) {
   return (
     <Link href={`/engineer/project/${project.id}`}>
-      <div className="bg-white border border-[var(--border)] rounded-xl p-5 hover:shadow-md hover:border-[var(--primary)] transition-all cursor-pointer group">
+      <div className="bg-white border border-[var(--border)] rounded-xl p-5 hover:shadow-md hover:border-[var(--primary)] transition-all cursor-pointer group dark:bg-card">
         <div className="flex items-start justify-between gap-2 mb-2">
           <h3 className="text-sm font-bold  text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--primary)] transition-colors">
             {project.title}
@@ -225,7 +225,7 @@ export default function EngineerProjectsPage() {
                 placeholder="Search projects..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 border border-[var(--border)] rounded-lg text-sm  bg-gray-50 text-[var(--text-primary)] outline-none focus:ring-1 focus:ring-[var(--primary)]"
+                className="w-full pl-9 pr-4 py-2 border border-[var(--border)] rounded-lg text-sm bg-gray-50 text-[var(--text-primary)] outline-none focus:ring-1 focus:ring-[var(--primary)] dark:bg-background"
               />
             </div>
             <div className="relative w-full md:w-auto shrink-0">
@@ -233,7 +233,7 @@ export default function EngineerProjectsPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full md:w-auto pl-8 pr-8 py-2 border border-[var(--border)] rounded-lg text-sm  bg-gray-50 text-[var(--text-primary)] outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[var(--primary)]"
+                className="w-full md:w-auto pl-8 pr-8 py-2 border border-[var(--border)] rounded-lg text-sm bg-gray-50 text-[var(--text-primary)] outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[var(--primary)] dark:bg-background"
               >
                 <option value="ALL">All Status</option>
                 {Object.entries(STATUS_META).map(([k, v]) => (
@@ -251,7 +251,7 @@ export default function EngineerProjectsPage() {
             { label: "Active", value: stats.active, icon: <Clock size={16} />, color: "text-orange-500" },
             { label: "Completed", value: stats.completed, icon: <CheckCircle size={16} />, color: "text-green-600" },
           ].map((s) => (
-            <div key={s.label} className="bg-white border border-[var(--border)] rounded-xl p-4 flex items-center gap-3 shadow-sm">
+            <div key={s.label} className="bg-white border border-[var(--border)] rounded-xl p-4 flex items-center gap-3 shadow-sm dark:bg-card">
               <div className={`${s.color}`}>{s.icon}</div>
               <div>
                 <p className={`text-xl font-bold  ${s.color}`}>{s.value}</p>
@@ -262,14 +262,14 @@ export default function EngineerProjectsPage() {
         </div> */}
 
         {/* Filters */}
-        {/* <div className="flex flex-col md:flex-row items-center gap-3 bg-white p-3 rounded-xl border border-[var(--border)] shadow-sm">
+        {/* <div className="flex flex-col md:flex-row items-center gap-3 bg-white p-3 rounded-xl border border-[var(--border)] shadow-sm dark:bg-card">
           <div className="relative w-full md:w-64 shrink-0">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
             <input
               placeholder="Search projects..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 border border-[var(--border)] rounded-lg text-sm  bg-gray-50 text-[var(--text-primary)] outline-none focus:ring-1 focus:ring-[var(--primary)]"
+              className="w-full pl-9 pr-4 py-2 border border-[var(--border)] rounded-lg text-sm bg-gray-50 text-[var(--text-primary)] outline-none focus:ring-1 focus:ring-[var(--primary)] dark:bg-background"
             />
           </div>
           <div className="relative w-full md:w-auto shrink-0">
@@ -277,7 +277,7 @@ export default function EngineerProjectsPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full md:w-auto pl-8 pr-8 py-2 border border-[var(--border)] rounded-lg text-sm  bg-gray-50 text-[var(--text-primary)] outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[var(--primary)]"
+              className="w-full md:w-auto pl-8 pr-8 py-2 border border-[var(--border)] rounded-lg text-sm bg-gray-50 text-[var(--text-primary)] outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[var(--primary)] dark:bg-background"
             >
               <option value="ALL">All Status</option>
               {Object.entries(STATUS_META).map(([k, v]) => (
@@ -296,7 +296,7 @@ export default function EngineerProjectsPage() {
             <Loader2 className="animate-spin text-[var(--primary)]" size={36} />
           </div>
         ) : projects.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-xl border border-[var(--border)]">
+          <div className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-xl border border-[var(--border)] dark:bg-card">
             <XCircle size={40} className="text-[var(--border)] mb-3" />
             <p className="text-sm  font-semibold text-[var(--text-primary)]">No projects found</p>
             <p className="text-xs  text-[var(--text-muted)] mt-1">Try adjusting your filters</p>
@@ -309,7 +309,7 @@ export default function EngineerProjectsPage() {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-6">
+              <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-6 dark:border-slate-800">
                 <span className="text-sm text-[var(--text-muted)] ">
                   Page <span className="font-semibold text-[var(--text-primary)]">{page}</span> of {totalPages}
                 </span>
@@ -318,14 +318,14 @@ export default function EngineerProjectsPage() {
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="flex items-center gap-1 px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm  font-medium text-[var(--text-secondary)] bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm font-medium text-[var(--text-secondary)] bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dark:bg-card"
                   >
                     <ChevronLeft size={16} /> Prev
                   </button>
                   <button
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page === totalPages}
-                    className="flex items-center gap-1 px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm  font-medium text-[var(--text-secondary)] bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm font-medium text-[var(--text-secondary)] bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dark:bg-card"
                   >
                     Next <ChevronRight size={16} />
                   </button>

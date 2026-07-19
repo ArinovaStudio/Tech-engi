@@ -21,10 +21,10 @@ export default function EngineerModal({ isOpen, onClose, children, className = "
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className={`bg-white rounded-3xl w-full relative max-h-[90vh] overflow-y-auto shadow-2xl ${className}`}>
+      <div className={`bg-white rounded-3xl w-full relative max-h-[90vh] overflow-y-auto shadow-2xl ${className} dark:bg-card`}>
         <button 
           onClick={onClose} 
-          className="absolute top-5 right-5 text-gray-400 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full p-1.5 transition-colors z-10"
+          className="absolute top-5 right-5 text-gray-400 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full p-1.5 transition-colors z-10 dark:text-slate-500 dark:bg-slate-800"
         >
           <X size={18} />
         </button>

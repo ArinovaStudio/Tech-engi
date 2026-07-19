@@ -92,7 +92,7 @@ export default function ResourcesTab({ projectId, role, project }: { projectId: 
           {resources.map((r: any) => {
             const isLocked = r.isLocked && role === "CLIENT" && !project.isFinalPaymentMade;
             return (
-              <div key={r.id} className="bg-white border border-[var(--border)] rounded-xl p-4 flex items-start justify-between gap-3">
+              <div key={r.id} className="bg-white border border-[var(--border)] rounded-xl p-4 flex items-start justify-between gap-3 dark:bg-card">
                 <div className="flex items-start gap-3 flex-1 min-w-0">
                   <div className="mt-0.5 text-[var(--primary)]">{TYPE_ICONS[r.type] ?? <FileText size={14} />}</div>
                   <div className="flex-1 min-w-0">
@@ -129,7 +129,7 @@ export default function ResourcesTab({ projectId, role, project }: { projectId: 
 
       {open && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white p-6 rounded-xl max-w-md w-full border border-[var(--border)] shadow-lg">
+          <div className="bg-white p-6 rounded-xl max-w-md w-full border border-[var(--border)] shadow-lg dark:bg-card">
             <h3 className="text-base font-semibold  mb-4 text-[var(--text-primary)]">Add Resource</h3>
             <div className="space-y-3">
               <input className={inputCls} placeholder="Title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />

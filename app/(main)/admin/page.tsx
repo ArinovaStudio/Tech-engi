@@ -38,7 +38,7 @@ export default function DashboardPage() {
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">Dashboard</h1>
         </div>
         <div className="flex items-center gap-2 ">
-          <button className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-secondary)] bg-white px-4 py-2 border border-[var(--border)] rounded-lg">
+          <button className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-secondary)] bg-white px-4 py-2 border border-[var(--border)] rounded-lg dark:bg-card">
             <Download size={13} /> EXPORT
           </button>
         </div>
@@ -117,7 +117,7 @@ export default function DashboardPage() {
               {/* RIGHT CARD */}
 
               {/* <div
-                className="bg-white w-full lg:w-[36%] rounded-2xl min-h-[320px] flex items-center justify-center border border-[#ECECEC]">
+                className="bg-white w-full lg:w-[36%] rounded-2xl min-h-[320px] flex items-center justify-center border border-[#ECECEC] dark:bg-card">
                 <p className="font-bold text-2xl">
                   hello
                 </p>
@@ -133,7 +133,7 @@ export default function DashboardPage() {
               {/* PROJECT CARD */}
 
               <div
-                className="bg-white w-full lg:w-[59%] rounded-2xl overflow-hidden border border-[#ECECEC]">
+                className="bg-white w-full lg:w-[59%] rounded-2xl overflow-hidden border border-[#ECECEC] dark:bg-card">
                 <ProjectCollaborationCard
                   projects={projectsData?.projects || []}
                 />
@@ -142,7 +142,7 @@ export default function DashboardPage() {
               {/* DISTRIBUTION */}
 
               <div
-                className="bg-white w-full lg:w-[41%] rounded-2xl overflow-hidden border border-[#ECECEC]">
+                className="bg-white w-full lg:w-[41%] rounded-2xl overflow-hidden border border-[#ECECEC] dark:bg-card">
                 <ProjectDistribution
                   data={charts.projectDistribution}
                 />

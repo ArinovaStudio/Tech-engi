@@ -115,7 +115,7 @@ const BudgetModal = ({ isOpen, onClose, clientId, projectId, currentData, onUpda
       <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">Edit Budget & Documents</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 dark:text-slate-400">
             <X size={24} />
           </button>
         </div>

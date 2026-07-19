@@ -100,7 +100,7 @@ export default function EngineerStatusModal({ isOpen, user, onClose, onSuccess, 
           <h2 className="text-lg font-bold text-gray-800 dark:text-slate-100 flex items-center gap-2 font-inter">
             <ShieldAlert size={18} className="text-[var(--primary)]" /> Manage Approval
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-700 dark:hover:text-slate-200 transition-colors p-1 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700"><X size={20} /></button>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-700 dark:hover:text-slate-200 transition-colors p-1 rounded-full hover:bg-gray-200 dark:hover:bg-slate-700 dark:text-slate-500"><X size={20} /></button>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">

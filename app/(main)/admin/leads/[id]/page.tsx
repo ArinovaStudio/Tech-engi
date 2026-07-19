@@ -83,7 +83,7 @@ export default function LeadDetailPage() {
         <div className="flex items-center justify-between">
           <button
             onClick={() => router.push("/admin/leads")}
-            className="flex w-fit items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-orange-600"
+            className="flex w-fit items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-orange-600 dark:text-slate-400"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Leads
@@ -102,7 +102,7 @@ export default function LeadDetailPage() {
 
         {loading && (
           <div className="flex flex-1 items-center justify-center py-24">
-            <div className="flex flex-col items-center gap-3 text-gray-400">
+            <div className="flex flex-col items-center gap-3 text-gray-400 dark:text-slate-500">
               <Loader2 className="h-6 w-6 animate-spin" />
               <span className="text-sm">Fetching lead details...</span>
             </div>
@@ -118,8 +118,8 @@ export default function LeadDetailPage() {
         {!loading && !error && lead && (
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             {/* Left: Profile summary */}
-            <div className="flex flex-col gap-4 rounded-xl border border-gray-100 bg-white p-6 shadow-sm lg:col-span-1">
-              <div className="flex flex-col items-center gap-3 border-b border-gray-100 pb-6 text-center">
+            <div className="flex flex-col gap-4 rounded-xl border border-gray-100 bg-white p-6 shadow-sm lg:col-span-1 dark:border-slate-800 dark:bg-card">
+              <div className="flex flex-col items-center gap-3 border-b border-gray-100 pb-6 text-center dark:border-slate-800">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-orange-100 text-lg font-semibold text-orange-600">
                   {lead.name
                     ?.split(" ")
@@ -130,10 +130,10 @@ export default function LeadDetailPage() {
                 </div>
 
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-900">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
                     {lead.name}
                   </h2>
-                  <p className="text-sm text-gray-500">{lead.email}</p>
+                  <p className="text-sm text-gray-500 dark:text-slate-400">{lead.email}</p>
                 </div>
 
                 {lead.timeline ? (
@@ -171,21 +171,21 @@ export default function LeadDetailPage() {
             {/* Right: Details */}
             <div className="flex flex-col gap-6 lg:col-span-2">
               {/* Challenge */}
-              <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+              <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-card">
                 <div className="mb-3 flex items-center gap-2">
                   <MessageSquare className="h-4 w-4 text-orange-500" />
-                  <h3 className="text-sm font-semibold text-gray-900">
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-slate-100">
                     Challenge / Requirements
                   </h3>
                 </div>
-                <p className="whitespace-pre-line text-sm leading-relaxed text-gray-600">
+                <p className="whitespace-pre-line text-sm leading-relaxed text-gray-600 dark:text-slate-400">
                   {lead.challenge || "No challenge mentioned."}
                 </p>
               </div>
 
               {/* Optional metadata block */}
-              <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-                <h3 className="mb-4 text-sm font-semibold text-gray-900">
+              <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-card">
+                <h3 className="mb-4 text-sm font-semibold text-gray-900 dark:text-slate-100">
                   Lead Summary
                 </h3>
 
@@ -206,7 +206,7 @@ export default function LeadDetailPage() {
       {/* Delete confirmation modal */}
       {showConfirm && lead && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-lg">
+          <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-lg dark:bg-card">
             <div className="flex items-start justify-between">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50">
                 <Trash2 className="h-5 w-5 text-red-500" />
@@ -218,18 +218,18 @@ export default function LeadDetailPage() {
                     setDeleteError(null);
                   }
                 }}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 dark:text-slate-500"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            <h3 className="mt-4 text-base font-semibold text-gray-900">
+            <h3 className="mt-4 text-base font-semibold text-gray-900 dark:text-slate-100">
               Delete this lead?
             </h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
               This will permanently delete{" "}
-              <span className="font-medium text-gray-700">{lead.name}</span>'s
+              <span className="font-medium text-gray-700 dark:text-slate-300">{lead.name}</span>'s
               record. This action cannot be undone.
             </p>
 
@@ -248,7 +248,7 @@ export default function LeadDetailPage() {
                   }
                 }}
                 disabled={deleting}
-                className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-50"
+                className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50 disabled:opacity-50 dark:border-slate-800 dark:text-slate-400"
               >
                 Cancel
               </button>
@@ -279,10 +279,10 @@ function InfoRow({
 }) {
   return (
     <div className="flex items-start gap-3">
-      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
+      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-gray-400 dark:text-slate-500" />
       <div className="min-w-0">
-        <p className="text-xs text-gray-400">{label}</p>
-        <p className="break-words text-sm text-gray-700">
+        <p className="text-xs text-gray-400 dark:text-slate-500">{label}</p>
+        <p className="break-words text-sm text-gray-700 dark:text-slate-300">
           {value || "Not provided"}
         </p>
       </div>
@@ -298,11 +298,11 @@ function SummaryItem({
   value?: string;
 }) {
   return (
-    <div className="rounded-lg border border-gray-100 bg-gray-50 p-4">
-      <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+    <div className="rounded-lg border border-gray-100 bg-gray-50 p-4 dark:border-slate-800 dark:bg-background">
+      <p className="text-xs font-medium uppercase tracking-wide text-gray-400 dark:text-slate-500">
         {label}
       </p>
-      <p className="mt-1 text-sm text-gray-700">{value || "Not provided"}</p>
+      <p className="mt-1 text-sm text-gray-700 dark:text-slate-300">{value || "Not provided"}</p>
     </div>
   );
 }

@@ -82,17 +82,17 @@ export default function PayoutFormPage() {
 
   return (
     <div className="min-h-screen bg-[#f8fafd] flex flex-col justify-center items-center p-4 font-sans">
-      <div className="w-full max-w-[420px] bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8 sm:p-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="w-full max-w-[420px] bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8 sm:p-10 animate-in fade-in slide-in-from-bottom-4 duration-500 dark:bg-card dark:border-slate-800">
         <div className="text-center mb-8">
           <div className="flex h-14 w-14 items-center justify-center rounded-[1rem] bg-[#f0b31e] shadow-lg shadow-yellow-500/30 mx-auto mb-4">
             <Wallet className="h-7 w-7 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-[#0f172a] tracking-tight">Payout Details</h1>
-          <p className="text-gray-500 mt-2 text-sm">Where should we send your payments?</p>
+          <p className="text-gray-500 mt-2 text-sm dark:text-slate-400">Where should we send your payments?</p>
         </div>
 
         {/* Method Toggle */}
-        <div className="flex p-1 mb-6 bg-gray-50 rounded-xl border border-gray-100">
+        <div className="flex p-1 mb-6 bg-gray-50 rounded-xl border border-gray-100 dark:bg-background dark:border-slate-800">
           <button
             type="button"
             onClick={() => { setMethod("UPI"); setError(""); }}
@@ -126,60 +126,60 @@ export default function PayoutFormPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {method === "UPI" ? (
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-gray-700 ml-1">UPI ID</label>
+              <label className="text-sm font-medium text-gray-700 ml-1 dark:text-slate-300">UPI ID</label>
               <input
                 type="text"
                 required
                 value={upiId}
                 onChange={(e) => setUpiId(e.target.value.toLowerCase())}
                 placeholder="yourname@bank"
-                className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
+                className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
               />
             </div>
           ) : (
             <>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700 ml-1">Account Holder Name</label>
+                <label className="text-sm font-medium text-gray-700 ml-1 dark:text-slate-300">Account Holder Name</label>
                 <input
                   type="text"
                   required
                   value={accountHolder}
                   onChange={(e) => setAccountHolder(e.target.value)}
                   placeholder="Full name as on bank account"
-                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
+                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700 ml-1">Account Number</label>
+                <label className="text-sm font-medium text-gray-700 ml-1 dark:text-slate-300">Account Number</label>
                 <input
                   type="text"
                   required
                   value={accountNumber}
                   onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ''))}
                   placeholder="Enter account number"
-                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
+                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700 ml-1">IFSC Code</label>
+                <label className="text-sm font-medium text-gray-700 ml-1 dark:text-slate-300">IFSC Code</label>
                 <input
                   type="text"
                   required
                   value={ifscCode}
                   onChange={(e) => setIfscCode(e.target.value.toUpperCase())}
                   placeholder="e.g. SBIN0001234"
-                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black uppercase"
+                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black uppercase dark:border-slate-800 dark:text-white"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700 ml-1">Bank Name</label>
+                <label className="text-sm font-medium text-gray-700 ml-1 dark:text-slate-300">Bank Name</label>
                 <input
                   type="text"
                   required
                   value={bankName}
                   onChange={(e) => setBankName(e.target.value)}
                   placeholder="e.g. State Bank of India"
-                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
+                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
                 />
               </div>
             </>
@@ -196,7 +196,7 @@ export default function PayoutFormPage() {
           <button
             type="button"
             onClick={() => { window.location.href = "/api/auth/role-redirect"; }}
-            className="w-full h-10 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+            className="w-full h-10 text-sm text-gray-400 hover:text-gray-600 transition-colors dark:text-slate-500"
           >
             Skip for now
           </button>

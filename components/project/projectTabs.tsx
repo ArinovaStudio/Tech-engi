@@ -8,7 +8,7 @@ const TABS = [
 
 export default function ProjectTabs({ activeTab, setActiveTab }: any) {
   return (
-    <div className="flex items-center gap-4 border-b border-[var(--border)] bg-white">
+    <div className="flex items-center gap-4 border-b border-[var(--border)] bg-white dark:bg-card">
       <Link href="/dashboard/project" className="p-2 hover:bg-[var(--primary-light)] rounded-lg transition-colors shrink-0">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4B4B4B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M19 12H5M12 19l-7-7 7-7" />

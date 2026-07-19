@@ -72,7 +72,7 @@ export default function BlockageTab({ projectId }: { projectId: string }) {
       ) : (
         <div className="space-y-3">
           {tickets.map((ticket: any) => (
-            <div key={ticket.id} className="bg-white rounded-xl border border-[var(--border)] p-5">
+            <div key={ticket.id} className="bg-white rounded-xl border border-[var(--border)] p-5 dark:bg-card">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-start gap-3">
                   {getStatusIcon(ticket.status)}
@@ -107,7 +107,7 @@ export default function BlockageTab({ projectId }: { projectId: string }) {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg">
+          <div className="bg-white w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg dark:bg-card">
             <h3 className="text-lg font-semibold  mb-4" style={{ color: "var(--text-primary)" }}>Report Project Blockage</h3>
             <div className="space-y-4">
               {[{ label: "Issue Title *", key: "title", type: "input", placeholder: "e.g., Waiting for design assets" },

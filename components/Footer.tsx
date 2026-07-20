@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import Link from 'next/link'
+
 const Footer = () => {
   const [email, setEmail] = useState("");
 
@@ -53,28 +55,29 @@ const Footer = () => {
 
           <ul className="space-y-2">
             <li>
-              <a href="#Services" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 dark:text-slate-400 hover:text-black dark:hover:text-white font-id flex items-center gap-1 " >
-                <span className="text-gray-400">›</span>
-                Services
-              </a>
-            </li>
-            <li>
-              <a href="/register/engineer" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 dark:text-slate-400 hover:text-black dark:hover:text-white font-id flex items-center gap-1 " >
+              <Link href="/register/engineer" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 dark:text-slate-400 hover:text-black dark:hover:text-white font-id flex items-center gap-1 " >
                 <span className="text-gray-400">›</span>
                 Join as Builder
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="/register/client" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 dark:text-slate-400 hover:text-black dark:hover:text-white font-id flex items-center gap-1 " >
+              <Link href="/register/client" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 dark:text-slate-400 hover:text-black dark:hover:text-white font-id flex items-center gap-1 " >
                 <span className="text-gray-400">›</span>
                 Start a Project
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#howitworks" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 dark:text-slate-400 hover:text-black dark:hover:text-white font-id flex items-center gap-1 " >
+              <Link href="/privacy-policy" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 dark:text-slate-400 hover:text-black dark:hover:text-white font-id flex items-center gap-1 " >
                 <span className="text-gray-400">›</span>
-                How it works
-              </a>
+                Privacy Policy
+              </Link>
+            </li>
+
+            <li>
+              <Link href="/terms-and-conditions" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 dark:text-slate-400 hover:text-black dark:hover:text-white font-id flex items-center gap-1 " >
+                <span className="text-gray-400">›</span>
+                Terms and conditions
+              </Link>
             </li>
           </ul>
         </div>

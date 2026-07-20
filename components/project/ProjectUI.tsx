@@ -48,7 +48,7 @@ export function ProjectCard({ project }: { project: Project }) {
 
   return (
     <Link href={`/client/project/${project.id}`}>
-      <div className="bg-white border border-[var(--border)] rounded-xl p-5 hover:shadow-md hover:border-[var(--primary)] transition-all cursor-pointer group h-full flex flex-col justify-between">
+      <div className="bg-white border border-[var(--border)] rounded-xl p-5 hover:shadow-md hover:border-[var(--primary)] transition-all cursor-pointer group h-full flex flex-col justify-between dark:bg-card">
         <div>
           <div className="flex items-start justify-between gap-2 mb-2">
             <h3 className="text-sm font-bold  text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--primary)] transition-colors">

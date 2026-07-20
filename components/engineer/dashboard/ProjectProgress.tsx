@@ -142,7 +142,7 @@ export default function ProjectProgress({data = [],}: {data: any[];}) {
 
     return (
         <div
-            className="w-full h-90 rounded-[32px] border border-[#ECECEC] bg-white p-4 sm:p-5 overflow-hidden">
+            className="w-full h-90 rounded-[32px] border border-[#ECECEC] dark:border-slate-800 bg-white dark:bg-card p-4 sm:p-5 overflow-hidden">
 
             {/* ================================= */}
             {/* HEADER */}
@@ -151,13 +151,13 @@ export default function ProjectProgress({data = [],}: {data: any[];}) {
             <div className=" flex items-start justify-between gap-4">
 
                 <div>
-                    <h2 className=" text-[20px] font-semibold tracking-[-0.03em] text-[#171725]">
+                    <h2 className=" text-[20px] font-semibold tracking-[-0.03em] text-[#171725] dark:text-slate-100">
                         Project Activity
                     </h2>
 
                     <div className=" flex items-center gap-3 mt-3">
 
-                        <div className=" w-9 h-9 rounded-xl bg-[#F5F7FB] flex items-center justify-center">
+                        <div className=" w-9 h-9 rounded-xl bg-[#F5F7FB] dark:bg-slate-700 flex items-center justify-center">
                             ↗
                         </div>
 
@@ -167,7 +167,7 @@ export default function ProjectProgress({data = [],}: {data: any[];}) {
                                 {safeData.length}
                             </span>
 
-                            <span className=" text-[#8D8D8D] text-sm sm:text-base">
+                            <span className=" text-[#8D8D8D] dark:text-slate-400 text-sm sm:text-base">
                                 Total Projects
                             </span>
 
@@ -189,7 +189,7 @@ export default function ProjectProgress({data = [],}: {data: any[];}) {
                                 : "month"
                         )
                     }
-                    className="h-9 px-4 rounded-full border border-[#EAEAEA] flex items-center gap-2 text-sm font-medium text-[#666] shrink-0">
+                    className="h-9 px-4 rounded-full border border-[#EAEAEA] dark:border-slate-700 flex items-center gap-2 text-sm font-medium text-[#666] dark:text-slate-300 shrink-0">
 
                     {period === "month"
                         ? "Monthly"
@@ -219,10 +219,10 @@ export default function ProjectProgress({data = [],}: {data: any[];}) {
                         (value) => (
                             <div
                                 key={value}
-                                className=" relative border-t border-[#ECECEC]">
+                                className=" relative border-t border-[#ECECEC] dark:border-slate-700">
 
                                 <span
-                                    className=" absolute -left-1 -top-3 text-[#9A9A9A] text-sm font-medium">
+                                    className=" absolute -left-1 -top-3 text-[#9A9A9A] dark:text-slate-500 text-sm font-medium">
                                     {value}
                                 </span>
 
@@ -322,7 +322,7 @@ export default function ProjectProgress({data = [],}: {data: any[];}) {
                                         height: `${height}%`,
                                         background: isActive
                                             ? "#FFAE58"
-                                            : "#171725",
+                                            : "var(--bar-color, #171725)",
                                         minHeight:
                                             item.value > 0
                                                 ? "14px"
@@ -332,7 +332,7 @@ export default function ProjectProgress({data = [],}: {data: any[];}) {
 
                                 {/* LABEL */}
 
-                                <span className=" absolute -bottom-6 text-sm font-medium text-[#8A8A8A]">
+                                <span className=" absolute -bottom-6 text-sm font-medium text-[#8A8A8A] dark:text-slate-400">
                                     {item.label}
                                 </span>
 

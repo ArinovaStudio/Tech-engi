@@ -32,13 +32,13 @@ const WhatWeOffer = () => {
   const rightRef = useScrollAnimation('slideRight')
 
   return (
-    <section id='Services' className="w-full bg-white py-20 px-6">
+    <section id='Services' className="w-full bg-background py-20 px-6 transition-colors duration-300">
       <div className="w-full">
         {/* Title */}
         <div className="flex flex-col items-center justify-center leading-none mb-8">
           <h2
             ref={titleRef}
-            className="text-[50px] lg:text-[85px] font-semibold text-black font-id text-center mb-2"
+            className="text-[50px] lg:text-[85px] font-semibold text-black dark:text-white font-id text-center mb-2"
           >
             What we
           </h2>
@@ -58,7 +58,7 @@ const WhatWeOffer = () => {
             {/* VERTICAL LABEL */}
             <div className="flex items-stretch shrink-0 pr-3 sm:pr-4">
               <p
-                className=" text-[#6F6F6F] font text-[20px] sm:text-[26px] lg:text-[34px] border border-slate-300 py-4 sm:py-5 px-2 flex items-center justify-center"
+                className=" text-[#6F6F6F] dark:text-slate-400 font text-[20px] sm:text-[26px] lg:text-[34px] border border-slate-300 dark:border-slate-800 py-4 sm:py-5 px-2 flex items-center justify-center"
                 style={{
                   writingMode: "vertical-rl",
                   transform: "rotate(180deg)",
@@ -70,14 +70,14 @@ const WhatWeOffer = () => {
 
             {/* CARD */}
             <div
-              className=" border border-slate-300 p-5 sm:p-8 w-full " >
+              className=" border border-slate-300 dark:border-slate-800 bg-card p-5 sm:p-8 w-full transition-colors duration-300 " >
               <div className="space-y-5 sm:space-y-6">
                 {engineersOffers.map((offer, index) => (
                   <div
                     key={index}
-                    className=" pb-4 border-b border-slate-200 last:border-0 " >
+                    className=" pb-4 border-b border-slate-200 dark:border-slate-800 last:border-0 " >
                     <p
-                      className=" text-[15px] sm:text-[18px] leading-relaxed text-black">
+                      className=" text-[15px] sm:text-[18px] leading-relaxed text-black dark:text-slate-200">
                       <span className="font-semibold">
                         {index + 1}.
                       </span>{" "}
@@ -95,15 +95,15 @@ const WhatWeOffer = () => {
             className=" flex flex-row items-stretch gap-0 w-full" >
             {/* CARD */}
             <div
-              className=" border border-slate-300 lg:border-b-1 p-5 sm:p-8 w-full lg:-mb-10 " >
+              className=" border border-slate-300 dark:border-slate-800 lg:border-b-1 bg-card p-5 sm:p-8 w-full lg:-mb-10 transition-colors duration-300 " >
               <div className="space-y-5 sm:space-y-6">
                 {clientsOffers.map((offer, index) => (
                   <div
                     key={index}
-                    className=" pb-4 border-b border-slate-200 last:border-0 "
+                    className=" pb-4 border-b border-slate-200 dark:border-slate-800 last:border-0 "
                   >
                     <p
-                      className=" text-[15px] sm:text-[18px] leading-relaxed text-black "
+                      className=" text-[15px] sm:text-[18px] leading-relaxed text-black dark:text-slate-200 "
                     >
                       <span className="font-semibold">
                         {index + 1}.
@@ -118,7 +118,7 @@ const WhatWeOffer = () => {
             {/* VERTICAL LABEL */}
             <div className="flex items-stretch shrink-0 pl-3 sm:pl-4">
               <p
-                className=" text-[#6F6F6F] font-medium text-[20px] sm:text-[26px] lg:text-[34px] border border-slate-300 py-4 sm:py-5 px-2 flex items-center justify-center "
+                className=" text-[#6F6F6F] dark:text-slate-400 font-medium text-[20px] sm:text-[26px] lg:text-[34px] border border-slate-300 dark:border-slate-800 py-4 sm:py-5 px-2 flex items-center justify-center "
                 style={{
                   writingMode: "vertical-rl",
                 }}

@@ -349,7 +349,7 @@ const InfoItem = ({ label, value, icon }: any) => (
   <div className="flex gap-4 p-4 rounded-lg bg-gray-100 dark:bg-gray-800">
     <div className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700">{icon}</div>
     <div>
-      <p className="text-sm text-gray-500">{label}</p>
+      <p className="text-sm text-gray-500 dark:text-slate-400">{label}</p>
       <p className="font-medium">{value}</p>
     </div>
   </div>

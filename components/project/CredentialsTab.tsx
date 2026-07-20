@@ -102,12 +102,12 @@ interface CredentialsTabProps {
 
 function LockScreen({ status }: { status: UnlockStatus }) {
   return (
-    <div className="relative min-h-[480px] flex items-center justify-center p-8 overflow-hidden bg-gray-50 rounded-2xl">
-      <div className="relative z-10 bg-gray-100 rounded-[20px] px-9 py-10 max-w-[420px] w-full flex flex-col items-center gap-4 shadow-[0_0_0_1px_#ffffff06,0_32px_64px_#00000080]">
+    <div className="relative min-h-[480px] flex items-center justify-center p-8 overflow-hidden bg-gray-50 rounded-2xl dark:bg-background">
+      <div className="relative z-10 bg-gray-100 rounded-[20px] px-9 py-10 max-w-[420px] w-full flex flex-col items-center gap-4 shadow-[0_0_0_1px_#ffffff06,0_32px_64px_#00000080] dark:bg-slate-800">
         <div className="relative w-[72px] h-[72px] flex items-center justify-center mb-1">
           <Lock className="text-[var(--primary)] w-20 h-20 relative z-10" strokeWidth={1.5} />
         </div>
-        <div className="flex items-center gap-2 mt-2 text-[11px] text-black">
+        <div className="flex items-center gap-2 mt-2 text-[11px] text-black dark:text-white">
           <span>Credentials are end-to-end encrypted and auto-unlock on completion</span>
         </div>
       </div>
@@ -127,14 +127,14 @@ function CredentialCard({ cred }: { cred: Credential }) {
   };
 
   return (
-    <div className="bg-white text-black border border-gray-200 rounded-xl p-5 hover:shadow-sm transition-all">
+    <div className="bg-white text-black border border-gray-200 rounded-xl p-5 hover:shadow-sm transition-all dark:bg-card dark:text-white dark:border-slate-800">
       <div className="flex items-start justify-between mb-3">
         <div>
           <div className="flex items-center gap-2">
             <KeyRound size={18} className="text-[var(--primary)]" />
             <span className="font-semibold text-lg">{cred.title}</span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5">Added by {cred.addedBy.name}</p>
+          <p className="text-xs text-slate-500 mt-0.5 dark:text-slate-400">Added by {cred.addedBy.name}</p>
         </div>
         <div className="flex gap-1">
           <button onClick={() => setVisible(!visible)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -150,7 +150,7 @@ function CredentialCard({ cred }: { cred: Credential }) {
           )}
         </div>
       </div>
-      <div className="font-mono text-sm bg-gray-50 border border-gray-200 rounded-lg p-4 break-all min-h-[60px]">
+      <div className="font-mono text-sm bg-gray-50 border border-gray-200 rounded-lg p-4 break-all min-h-[60px] dark:bg-background dark:border-slate-800">
         {visible
           ? cred.content
           : `${cred.content.slice(0, 12)}***************${cred.content.slice(-8)}`}
@@ -388,8 +388,8 @@ useEffect(() => {
         <div className="flex items-center gap-3">
           <ShieldCheck className="w-8 h-8 text-[var(--primary)]" />
           <div>
-            <h2 className="text-2xl font-bold text-black">Project Credentials</h2>
-            <p className="text-sm text-slate-500">
+            <h2 className="text-2xl font-bold text-black dark:text-white">Project Credentials</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               {isPrivileged ? "Full access • You can add credentials" : "Unlocked after final milestone"}
             </p>
           </div>
@@ -409,11 +409,11 @@ useEffect(() => {
 
       {/* Credential list */}
       {credentials.length === 0 ? (
-        <div className="bg-white border border-dashed border-gray-300 rounded-2xl py-20 text-center">
-          <KeyRound size={52} className="mx-auto text-gray-400 mb-4" />
-          <p className="text-lg font-medium text-gray-600">No credentials added yet</p>
+        <div className="bg-white border border-dashed border-gray-300 rounded-2xl py-20 text-center dark:bg-card dark:border-slate-700">
+          <KeyRound size={52} className="mx-auto text-gray-400 mb-4 dark:text-slate-500" />
+          <p className="text-lg font-medium text-gray-600 dark:text-slate-400">No credentials added yet</p>
           {isPrivileged && (
-            <p className="text-sm text-gray-500 mt-1">Click "Add Credential" to get started</p>
+            <p className="text-sm text-gray-500 mt-1 dark:text-slate-400">Click "Add Credential" to get started</p>
           )}
         </div>
       ) : (
@@ -426,8 +426,8 @@ useEffect(() => {
 
       {/* Add Credential Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 text-black bg-black/60 flex items-center justify-center z-50 p-4">
-          <div id="credential-modal" className="bg-white rounded-2xl max-w-md w-full p-6">
+        <div className="fixed inset-0 text-black bg-black/60 flex items-center justify-center z-50 p-4 dark:text-white">
+          <div id="credential-modal" className="bg-white rounded-2xl max-w-md w-full p-6 dark:bg-card">
             <h3 className="text-xl font-semibold mb-4">Add New Credential</h3>
 
             <input
@@ -449,7 +449,7 @@ useEffect(() => {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setShowAddModal(false)}
-                className="flex-1 py-3 border border-gray-300 rounded-xl font-medium hover:bg-gray-50"
+                className="flex-1 py-3 border border-gray-300 rounded-xl font-medium hover:bg-gray-50 dark:border-slate-700"
               >
                 Cancel
               </button>

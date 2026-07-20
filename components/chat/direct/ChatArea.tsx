@@ -201,9 +201,9 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
 
   if (!selectedContact) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center text-gray-400 bg-[#ffffff]">
-        <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-4">
-          <MessageSquare size={32} className="text-gray-400" />
+      <div className="flex-1 flex flex-col items-center justify-center text-gray-400 bg-[#ffffff] dark:bg-background dark:text-slate-500">
+        <div className="w-20 h-20 bg-gray-200 dark:bg-slate-700 rounded-full flex items-center justify-center mb-4">
+          <MessageSquare size={32} className="text-gray-400 dark:text-slate-500" />
         </div>
         <h3 className="text-xl font-bold  text-[var(--text-primary)] mb-2">Your Messages</h3>
         <p className=" text-sm">Select a contact to start chatting.</p>
@@ -212,12 +212,12 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
   }
 
   return (
-     <div className="flex-1 flex flex-col bg-[#f0f2f5] relative h-full">
+     <div className="flex-1 flex flex-col bg-[#f0f2f5] dark:bg-background relative h-full">
     
     {/* HEADER */}
     <div className="
       h-14 sm:h-16
-      shrink-0 bg-white border-b border-[var(--border)]
+      shrink-0 bg-white dark:bg-card border-b border-[var(--border)]
       flex items-center justify-between
       px-3 sm:px-6
       z-10
@@ -227,7 +227,7 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
       <div className="flex items-center gap-3 sm:gap-4 min-w-0">
         
         {/* Avatar */}
-        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gray-200 dark:bg-slate-700 flex items-center justify-center overflow-hidden">
           {selectedContact.image ? (
             <Image
               src={selectedContact.image}
@@ -237,7 +237,7 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
               className="object-cover"
             />
           ) : (
-            <UserIcon size={18} className="text-gray-500" />
+            <UserIcon size={18} className="text-gray-500 dark:text-slate-400" />
           )}
         </div>
 
@@ -272,7 +272,7 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
                 setIsSelectMode(false);
                 setSelectedMessageIds([]);
               }}
-              className="text-xs sm:text-sm text-gray-500 px-2 sm:px-3 py-1.5 rounded-lg"
+              className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 px-2 sm:px-3 py-1.5 rounded-lg"
             >
               Cancel
             </button>
@@ -291,7 +291,7 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
         ) : (
           <button
             onClick={() => setIsSelectMode(true)}
-            className="text-xs sm:text-sm text-gray-500 flex items-center gap-1"
+            className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 flex items-center gap-1"
           >
             <CheckSquare size={16} />
             <span className="hidden sm:inline">Select</span>
@@ -312,7 +312,7 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
     >
       {isLoadingMore && (
         <div className="flex justify-center py-2">
-          <Loader2 className="animate-spin text-gray-400" size={18} />
+          <Loader2 className="animate-spin text-gray-400 dark:text-slate-500" size={18} />
         </div>
       )}
 
@@ -355,7 +355,7 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
     {/* INPUT */}
     <div
       className={`
-        p-3 sm:p-4 bg-white border-t border-[var(--border)]
+        p-3 sm:p-4 bg-white dark:bg-card border-t border-[var(--border)]
         ${isSelectMode ? "opacity-50 pointer-events-none" : ""}
       `}
     >
@@ -372,7 +372,7 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
         onSubmit={handleSubmit}
         className="
           flex items-center gap-2
-          bg-gray-100 rounded-full
+          bg-gray-100 dark:bg-slate-800 rounded-full
           px-3 sm:px-4 py-2
           focus-within:ring-1 focus-within:ring-[#FFAE58]
         "
@@ -385,7 +385,7 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
           className="
             flex-1 bg-transparent border-none
             text-sm focus:outline-none
-            placeholder:text-gray-400 text-gray-800
+            placeholder:text-gray-400 dark:placeholder:text-slate-500 text-gray-800 dark:text-slate-200
           "
         />
 

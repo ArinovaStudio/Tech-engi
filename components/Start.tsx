@@ -3,8 +3,9 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import Link from "next/link";
-import { ArrowRight, Menu, X } from "lucide-react";
+import { ArrowRight, Menu, X, Sun, Moon } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTheme } from "@/components/ThemeProvider";
 
 const heroTestimonials = [
   {
@@ -45,6 +46,7 @@ const heroTestimonials = [
 ];
 
 const Start = () => {
+  const { theme, toggleTheme } = useTheme();
   const navRef = useRef<HTMLElement>(null);
   const taglineRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
@@ -73,22 +75,22 @@ const Start = () => {
   }, []);
 
   return (
-    <div className="lg:min-h-screen p-5 font-sans w-full h-[5vh]:">
+    <div className="lg:min-h-screen p-5 font-sans w-full h-[5vh]: bg-background text-foreground transition-colors duration-300">
       {/* Navbar */}
-      <header className="border-2 border-gray-200 overflow-hidden py-3">
+      <header className="border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-card overflow-hidden py-3 transition-colors duration-300">
         <div
           className=" max-w-full mx-auto px-4 sm:px-6 h-[64p flex items-center justify-between " >
           {/* LEFT */}
           <div className="flex items-center">
             {/* LOGO */}
             <span
-              className=" text-[22px] font-benz tracking-tight text-black lg:mr-4 lg:border-r-2 lg:border-gray-300 lg:pr-4 " >
+              className=" text-[22px] font-benz tracking-tight text-black dark:text-white lg:mr-4 lg:border-r-2 lg:border-gray-300 lg:pr-4 " >
               <Image src="/imagelogodiffcrop.png" alt="logo" width={150} height={150} />
             </span>
 
             {/* DESKTOP NAV */}
             <nav
-              className=" hidden lg:flex items-center gap-8 font-id text-[14px] text-black " >
+              className=" hidden lg:flex items-center gap-8 font-id text-[14px] text-black dark:text-white " >
               <a href="#howitworks">How it works?</a>
               {/* <a href="#">Explore Projects</a> */}
               <a href="#Services">Services</a>
@@ -99,12 +101,12 @@ const Start = () => {
 
           {/* DESKTOP RIGHT */}
           <div
-            className=" hidden lg:flex items-center gap-5 border-l-2 border-gray-300 pl-5
+            className=" hidden lg:flex items-center gap-5 border-l-2 border-gray-300 dark:border-gray-700 pl-5
           "
           >
             {/* SOCIAL */}
             <div
-              className=" flex items-center gap-4 border-r border-gray-200 pr-5 " >
+              className=" flex items-center gap-4 border-r border-gray-200 dark:border-gray-800 pr-5 " >
               {/* LinkedIn */}
               <a href="https://www.linkedin.com/company/tsquarey1" target="_blank" aria-label="LinkedIn">
                 <svg
@@ -115,7 +117,7 @@ const Start = () => {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="text-black"
+                  className="text-black dark:text-white"
                 >
                   <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
                   <rect x="2" y="9" width="4" height="12" />
@@ -136,7 +138,7 @@ const Start = () => {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="text-black"
+                  className="text-black dark:text-white"
                 >
                   <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
                   <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
@@ -160,60 +162,55 @@ const Start = () => {
 
             {/* BUTTONS */}
             <div className="flex items-center gap-3">
-              {/* <Link
-                href="/login"
-                className="
-                inline-flex
-                items-center
-                justify-center
-
-                px-4
-                py-1
-
-                text-[16px]
-
-                font-spacegrotesk
-                border-2
-                border-gray-300
-                text-[#050A30]
-                hover:bg-gray-50
-
-                whitespace-nowrap
-              "
+              <button
+                onClick={toggleTheme}
+                className="w-10 h-10 border-2 border-gray-300 dark:border-gray-700 flex items-center justify-center text-black dark:text-white hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
+                title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
               >
-                BECOME BUILDER
-              </Link> */}
+                {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
+              </button>
 
               <Link
                 href="/login"
-                className=" inline-flex items-center justify-center gap-2 w-50 px-4 py-1 text-[16px] font-inter bg-black text-white hover:bg-gray-800 whitespace-nowrap">
+                className=" inline-flex items-center justify-center gap-2 w-50 px-4 py-1 text-[16px] font-inter bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 whitespace-nowrap">
                 Login
                 <span className="text-base"> <ArrowRight /></span>
               </Link>
             </div>
           </div>
 
-          {/* MOBILE MENU BUTTON */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className=" lg:hidden flex items-center justify-center">
-            {mobileMenuOpen ? (
-              <X className="w-7 h-7 text-black" />
-            ) : (
-              <Menu className="w-7 h-7 text-black" />
-            )}
-          </button>
+          {/* MOBILE RIGHT SECTION */}
+          <div className="lg:hidden flex items-center gap-3">
+            <button
+              onClick={toggleTheme}
+              className="w-9 h-9 border border-gray-300 dark:border-gray-700 flex items-center justify-center text-black dark:text-white rounded-md"
+              title="Toggle Theme"
+            >
+              {theme === "light" ? <Moon size={16} /> : <Sun size={16} />}
+            </button>
+
+            {/* MOBILE MENU BUTTON */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="flex items-center justify-center text-black dark:text-white">
+              {mobileMenuOpen ? (
+                <X className="w-7 h-7" />
+              ) : (
+                <Menu className="w-7 h-7" />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* MOBILE MENU */}
         <div
           className={`lg:hidden overflow-hidden transition-all duration-300
 
-          ${mobileMenuOpen ? "max-h-[500px] border-t border-gray-200" : "max-h-0"}`}
+          ${mobileMenuOpen ? "max-h-[500px] border-t border-gray-200 dark:border-gray-800" : "max-h-0"}`}
         >
-          <div className="px-4 py-5 flex flex-col gap-5 bg-white">
+          <div className="px-4 py-5 flex flex-col gap-5 bg-white dark:bg-card">
             {/* NAV LINKS */}
-            <nav className="flex flex-col gap-4 text-[15px] font-id text-black">
+            <nav className="flex flex-col gap-4 text-[15px] font-id text-black dark:text-white">
               <a href="#Services">Services</a>
               <a href="#Categories">Categories</a>
               <a href="#Testimonials">Testimonials</a>
@@ -231,7 +228,7 @@ const Start = () => {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="text-black"
+                  className="text-black dark:text-white"
                 >
                   <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
                   <rect x="2" y="9" width="4" height="12" />
@@ -252,7 +249,7 @@ const Start = () => {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="text-black"
+                  className="text-black dark:text-white"
                 >
                   <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
                   <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
@@ -278,7 +275,7 @@ const Start = () => {
             <div className="flex flex-col gap-3">
               <Link
                 href="/login"
-                className=" flex items-center justify-center gap-2 px-4 py-3 text-[15px] bg-black text-white">
+                className=" flex items-center justify-center gap-2 px-4 py-3 text-[15px] bg-black dark:bg-white text-white dark:text-black">
                 Login
                 <span><ArrowRight /></span>
               </Link>
@@ -315,7 +312,7 @@ const Start = () => {
             </div>
             <h1
               ref={headlineRef}
-              className="text-[42px] sm:text-[60px] lg:text-[94px] font-benz leading-[1.0] text-black uppercase"
+              className="text-[42px] sm:text-[60px] lg:text-[94px] font-benz leading-[1.0] text-black dark:text-white uppercase"
               style={{ letterSpacing: "-1px" }}
             >
               BUILD FASTER,<br />SUBMIT SMARTER
@@ -324,14 +321,14 @@ const Start = () => {
 
           {/* Right */}
           <div ref={rightRef} className="flex flex-col items-start lg:items-end justify-between gap-6 lg:pt-2 w-full lg:max-w-[41%] text-left lg:text-right">
-            <p className="text-[18px] sm:text-[22px] lg:text-[26px] font-medium font-id text-black">
+            <p className="text-[18px] sm:text-[22px] lg:text-[26px] font-medium font-id text-black dark:text-slate-300">
               Tech-ENGI connects students, startups, and businesses with verified engineering experts for projects, prototyping, product development, and consulting.
             </p>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center font-inter gap-3 w-full sm:w-auto">
-              <Link href={'register/engineer'} className="px-6 py-4 text-[16px] font-bold text-gray-900 bg-[#F4F4F4] whitespace-nowrap text-center">
+              <Link href={'register/engineer'} className="px-6 py-4 text-[16px] font-bold text-gray-900 dark:text-white bg-[#F4F4F4] dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 whitespace-nowrap text-center">
                 BECOME BUILDER
               </Link>
-              <Link href={'register/client'} className="px-6 py-4 text-[16px] font-bold bg-black text-white flex items-center justify-center gap-2 hover:bg-gray-800 whitespace-nowrap">
+              <Link href={'register/client'} className="px-6 py-4 text-[16px] font-bold bg-black dark:bg-white text-white dark:text-black flex items-center justify-center gap-2 hover:bg-gray-800 dark:hover:bg-gray-100 whitespace-nowrap">
                 START MY PROJECT <span>↗</span>
               </Link>
             </div>
@@ -343,7 +340,7 @@ const Start = () => {
 
           {/* Background rounded layer */}
           <div className="absolute inset-0 sm:top-1/4 rounded-2xl bg-[#FFAE58] lg:h-[450px] md:h-[400px] mt-10 lg:mt-0 h-[225px]" />
-          <div className="absolute inset-0 rounded-2xl bg-[#ffffff] lg:hidden md:hidden mt-66 lg:mt-0 h-[50px] z-10" />
+          <div className="absolute inset-0 rounded-2xl bg-[#ffffff] dark:bg-[#0a0b10] lg:hidden md:hidden mt-66 lg:mt-0 h-[50px] z-10 transition-colors duration-300" />
 
           {/* Two guys image — desktop only, scales with viewport ✅ */}
           <div

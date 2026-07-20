@@ -30,7 +30,7 @@ function PayoutRow({
   const isClient = payout.user?.role === "CLIENT";
 
   return (
-    <div className={`flex items-center justify-between border ${borderColor} rounded-xl p-4 mb-3 bg-white`}>
+    <div className={`flex items-center justify-between border ${borderColor} rounded-xl p-4 mb-3 bg-white dark:bg-card`}>
       <div className="space-y-2">
         <div className="flex items-center gap-3">
           <p className=" text-sm">
@@ -148,7 +148,7 @@ export default function PayoutHistory({
 
   return (
     <>
-      <div className="rounded-xl flex-1 border border-[var(--border)] bg-white p-5 h-full">
+      <div className="rounded-xl flex-1 border border-[var(--border)] bg-white p-5 h-full dark:bg-card">
         <h3 className="text-lg font-semibold  mb-4" style={{ color: "var(--text-primary)" }}>
           Payout History
         </h3>
@@ -187,11 +187,11 @@ export default function PayoutHistory({
 
       {proofModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-          <div className="bg-white rounded-xl p-5 max-w-lg w-full shadow-2xl relative">
+          <div className="bg-white rounded-xl p-5 max-w-lg w-full shadow-2xl relative dark:bg-card">
             <h2 className="font-semibold mb-3 " style={{ color: "var(--text-primary)" }}>
               Payment Proof
             </h2>
-            <div className="bg-gray-50 rounded-lg border border-[var(--border)] p-2 flex items-center justify-center overflow-hidden min-h-[200px]">
+            <div className="bg-gray-50 rounded-lg border border-[var(--border)] p-2 flex items-center justify-center overflow-hidden min-h-[200px] dark:bg-background">
               <img
                 src={proofModal}
                 alt="Payment Proof"

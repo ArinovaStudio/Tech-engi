@@ -7,7 +7,7 @@
 //   const [currentSlide, setCurrentSlide] = useState(0);
 
 //   if (!data) return (
-//     <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm text-gray-500 mt-4">
+//     <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl text-sm text-gray-500 mt-4 dark:text-slate-400">
 //       No Design System uploaded yet.
 //     </div>
 //   );
@@ -299,7 +299,7 @@ const DesignOverview = ({ data }: { data: any }) => {
                   </div>
                 ))
               ) : (
-                <span className="text-sm text-gray-400">No colors</span>
+                <span className="text-sm text-gray-400 dark:text-slate-500">No colors</span>
               )}
             </div>
           </div>
@@ -384,7 +384,7 @@ const DesignOverview = ({ data }: { data: any }) => {
 
             {/* Days */}
             <div>
-              <h2 className="text-[30px] leading-none font-black text-black font-id">
+              <h2 className="text-[30px] leading-none font-black text-black font-id dark:text-white">
                 <p
                   className={
                     daysDifference === null
@@ -470,7 +470,7 @@ const DesignOverview = ({ data }: { data: any }) => {
                       {area}
                     </span>
 
-                    <span className="text-[15px] text-black font-semibold font-id text-right capitalize">
+                    <span className="text-[15px] text-black font-semibold font-id text-right capitalize dark:text-white">
                       {techs.join(", ")}
                     </span>
 
@@ -492,15 +492,15 @@ const DesignOverview = ({ data }: { data: any }) => {
         <div>
           <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
             <div
-              className=" w-full max-w-6xl h-[90vh] bg-white rounded-2xl shadow-2xl border overflow-hidden flex flex-col"
+              className=" w-full max-w-6xl h-[90vh] bg-white rounded-2xl shadow-2xl border overflow-hidden flex flex-col dark:bg-card"
             >
               {/* Header */}
-              <div className="sticky top-0 z-10 bg-white border-b px-6 py-4">
-                <h3 className="text-xl font-semibold text-gray-900">
+              <div className="sticky top-0 z-10 bg-white border-b px-6 py-4 dark:bg-card">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100">
                   Design System
                 </h3>
 
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-500 mt-1 dark:text-slate-400">
                   Configure technology stack and design system
                 </p>
               </div>
@@ -829,7 +829,7 @@ const DesignOverview = ({ data }: { data: any }) => {
 
                 </div>
 
-                <div className="space-y-5 border rounded-xl p-5 bg-white">
+                <div className="space-y-5 border rounded-xl p-5 bg-white dark:bg-card">
 
                   <div className="flex justify-between px-1">
 
@@ -1991,7 +1991,7 @@ const DesignOverview = ({ data }: { data: any }) => {
               </div>
 
               {/* Footer */}
-              <div className="sticky bottom-0 bg-white border-t px-6 py-4 flex justify-end gap-3">
+              <div className="sticky bottom-0 bg-white border-t px-6 py-4 flex justify-end gap-3 dark:bg-card">
                 <button
                   onClick={() => setEditModel(false)}
                   type="button"

@@ -79,13 +79,13 @@ export default function ClientFormPage() {
     <div className="flex flex-col lg:flex-row w-full h-screen">
       <div className="w-full lg:w-[50%] h-screen">
         <div className="min-h-screen flex flex-col justify-center items-center p-4 font-sans">
-          <div className="w-full max-w-[420px] rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8 sm:p-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="w-full max-w-[420px] rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8 sm:p-10 animate-in fade-in slide-in-from-bottom-4 duration-500 dark:border-slate-800">
             <div className="text-center mb-8">
               <div className="flex h-14 w-14 items-center justify-center rounded-[1rem] bg-[#f0b31e] shadow-lg shadow-yellow-500/30 mx-auto mb-4">
                 <Briefcase className="h-7 w-7 text-white" />
               </div>
               <h1 className="text-2xl font-bold text-[#0f172a] tracking-tight">Complete Your Profile</h1>
-              <p className="text-gray-500 mt-2 text-sm">Tell us a bit about your project history</p>
+              <p className="text-gray-500 mt-2 text-sm dark:text-slate-400">Tell us a bit about your project history</p>
             </div>
 
             {error && (
@@ -96,31 +96,31 @@ export default function ClientFormPage() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700 ml-1">Total Projects Done</label>
+                <label className="text-sm font-medium text-gray-700 ml-1 dark:text-slate-300">Total Projects Done</label>
                 <input
                   type="number"
                   min="0"
                   value={totalProjects}
                   onChange={(e) => setTotalProjects(e.target.value)}
                   placeholder="e.g. 5"
-                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
+                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700 ml-1">Total Budget Spent (₹)</label>
+                <label className="text-sm font-medium text-gray-700 ml-1 dark:text-slate-300">Total Budget Spent (₹)</label>
                 <input
                   type="number"
                   min="0"
                   value={totalBudget}
                   onChange={(e) => setTotalBudget(e.target.value)}
                   placeholder="e.g. 50000"
-                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
+                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700 ml-1">Areas of Expertise</label>
+                <label className="text-sm font-medium text-gray-700 ml-1 dark:text-slate-300">Areas of Expertise</label>
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -128,7 +128,7 @@ export default function ClientFormPage() {
                     onChange={(e) => setExpertiseInput(e.target.value)}
                     onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addExpertise(); } }}
                     placeholder="e.g. Embedded Systems"
-                    className="flex-1 px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
+                    className="flex-1 px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
                   />
                   <button
                     type="button"
@@ -189,8 +189,8 @@ export default function ClientFormPage() {
 
           <div className="mt-20">
             {/* Logo */}
-            <div className="w-24 h-24 bg-white rounded-sm flex items-center justify-center text-black font-bold text-sm shadow-xl">
-              <div className="relative w-24 h-24 bg-white rounded-sm shadow-xl overflow-hidden">
+            <div className="w-24 h-24 bg-white rounded-sm flex items-center justify-center text-black font-bold text-sm shadow-xl dark:bg-card dark:text-white">
+              <div className="relative w-24 h-24 bg-white rounded-sm shadow-xl overflow-hidden dark:bg-card">
                 <Image
                   src="/logoImagediff2.PNG"
                   alt="Logo"

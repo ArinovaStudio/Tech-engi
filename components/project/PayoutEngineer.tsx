@@ -8,7 +8,7 @@ import PayoutHistory from "./PayoutHistory";
 
 function SummaryCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-white p-5">
+    <div className="rounded-xl border border-[var(--border)] bg-white p-5 dark:bg-card">
       <p className="text-sm " style={{ color: "var(--text-muted)" }}>
         {title}
       </p>

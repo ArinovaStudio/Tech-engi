@@ -55,10 +55,10 @@ export default function EditProfileModal({ isOpen, onClose, user, onUpdate }: { 
 
         <form onSubmit={handleSave} className="space-y-5">
           <div className="flex items-center gap-6 mb-2">
-            <div className="relative w-20 h-20 rounded-full bg-gray-100 border border-[var(--border)] overflow-hidden shrink-0">
-              {preview ? <img src={preview} className="w-full h-full object-cover" alt="Preview"/> : <span className="w-full h-full flex items-center justify-center text-gray-400"><Camera/></span>}
+            <div className="relative w-20 h-20 rounded-full bg-gray-100 border border-[var(--border)] overflow-hidden shrink-0 dark:bg-slate-800">
+              {preview ? <img src={preview} className="w-full h-full object-cover" alt="Preview"/> : <span className="w-full h-full flex items-center justify-center text-gray-400 dark:text-slate-500"><Camera/></span>}
             </div>
-            <label className="bg-white border border-[var(--border)] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer hover:border-[var(--primary)] transition-all">
+            <label className="bg-white border border-[var(--border)] px-4 py-2 rounded-lg text-sm font-medium cursor-pointer hover:border-[var(--primary)] transition-all dark:bg-card">
               Upload new photo
               <input type="file" accept="image/*" className="hidden" onChange={e => {
                 const f = e.target.files?.[0];

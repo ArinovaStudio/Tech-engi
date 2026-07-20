@@ -162,7 +162,7 @@ export default function TeamTab({ projectId }: { projectId: string }) {
         {members.map((m: any) => {
           if (isEmployee && m.role.name === "CLIENT") return null;
           return (
-            <div key={m.id} className="p-5 bg-white border border-[var(--border)] rounded-xl">
+            <div key={m.id} className="p-5 bg-white border border-[var(--border)] rounded-xl dark:bg-card">
               <div className="flex justify-between items-center">
                 <div className="flex-1">
                   <p className="font-semibold " style={{ color: "var(--text-primary)" }}>{m.user.name}</p>
@@ -177,7 +177,7 @@ export default function TeamTab({ projectId }: { projectId: string }) {
                         placeholder="Enter role"
                       />
                       <button onClick={saveRole} className="px-2 py-1 text-white text-xs rounded " style={{ background: "var(--primary)" }}>Save</button>
-                      <button onClick={() => setEditingMember(null)} className="px-2 py-1 bg-gray-100 text-xs rounded " style={{ color: "var(--text-secondary)" }}>Cancel</button>
+                      <button onClick={() => setEditingMember(null)} className="px-2 py-1 bg-gray-100 text-xs rounded  dark:bg-slate-800" style={{ color: "var(--text-secondary)" }}>Cancel</button>
                     </div>
                   ) : (
                     <p className="text-sm " style={{ color: "var(--text-muted)" }}>{m.role?.name || "Not assigned"}</p>
@@ -218,7 +218,7 @@ export default function TeamTab({ projectId }: { projectId: string }) {
 
       {(showAddModal || clientModel) && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg">
+          <div className="bg-white w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg dark:bg-card">
             <h2 className="text-lg font-semibold  mb-4" style={{ color: "var(--text-primary)" }}>
               Add {clientModel ? "Client" : "Team Member"}
             </h2>
@@ -229,7 +229,7 @@ export default function TeamTab({ projectId }: { projectId: string }) {
                   value={selectedUser}
                   onChange={(e) => setSelectedUser(e.target.value)}
                   disabled={usersLoading}
-                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)]  text-sm bg-white focus:outline-none"
+                  className="w-full px-3 py-2 rounded-lg border border-[var(--border)] text-sm bg-white focus:outline-none dark:bg-card"
                   style={{ color: "var(--text-primary)" }}
                 >
                   {usersLoading ? (
@@ -251,7 +251,7 @@ export default function TeamTab({ projectId }: { projectId: string }) {
                   value={clientModel ? "CLIENT" : memberRole}
                   disabled={clientModel}
                   onChange={(e) => setMemberRole(e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)]  text-sm focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)] text-sm focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed dark:bg-card"
                   style={{ color: "var(--text-primary)" }}
                   placeholder="Enter role (e.g., Developer, Designer)"
                 />

@@ -156,7 +156,7 @@ function AssetsCard({ resource, onDelete, isAdmin }: {
   };
 
   return (
-    <div className="relative w-full rounded-2xl border border-[var(--border)] overflow-hidden bg-white" style={{ height: "320px" }}>
+    <div className="relative w-full rounded-2xl border border-[var(--border)] overflow-hidden bg-white dark:bg-card" style={{ height: "320px" }}>
       <Image
         src={previewImage}
         alt={resource.title}
@@ -223,7 +223,7 @@ function AssetsCard({ resource, onDelete, isAdmin }: {
 
               <button
                 onClick={handleAction}
-                className="w-7 h-7 bg-white hover:scale-90 hover:bg-[var(--primary)] transition-all flex items-center justify-center rounded-full"
+                className="w-7 h-7 bg-white hover:scale-90 hover:bg-[var(--primary)] transition-all flex items-center justify-center rounded-full dark:bg-card"
                 style={{ color: "var(--text-primary)" }}
               >
                 {isLink ? <ExternalLink size={12} /> : <Download size={12} />}
@@ -617,14 +617,14 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
           />
         </div>
       ) : resources.length === 0 ? (
-        <div className="text-center py-12 text-sm text-gray-500">
+        <div className="text-center py-12 text-sm text-gray-500 dark:text-slate-400">
           No resources uploaded yet.
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-slate-800 dark:bg-card">
 
           {/* HEADER */}
-          <div data-tour="assets-table-header" className="grid grid-cols-12 gap-4 px-5 py-4 border-b bg-gray-50 font-semibold text-sm text-gray-600">
+          <div data-tour="assets-table-header" className="grid grid-cols-12 gap-4 px-5 py-4 border-b bg-gray-50 font-semibold text-sm text-gray-600 dark:bg-background dark:text-slate-400">
             <div className="col-span-4">Resource</div>
             <div className="col-span-2">Type</div>
             <div className="col-span-2">Added By</div>
@@ -637,13 +637,13 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
             <div
               key={resource.id}
               data-tour={index === 0 ? "assets-row-0" : undefined}
-              className="grid grid-cols-12 gap-4 px-5 py-4 border-b border-gray-100 items-center hover:bg-gray-50 transition"
+              className="grid grid-cols-12 gap-4 px-5 py-4 border-b border-gray-100 items-center hover:bg-gray-50 transition dark:border-slate-800"
             >
 
               {/* RESOURCE */}
               <div className="col-span-4 flex items-center gap-3 min-w-0">
 
-                <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center dark:bg-slate-800">
                   {resource.type === "IMAGE" ? (
                     <ImageIcon size={18} />
                   ) : resource.type === "FILE" ? (
@@ -672,7 +672,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
 
                       {(resource.type === "LINK" ||
                         resource.type === "TEXT") && (
-                          <p className="text-xs text-gray-500 truncate">
+                          <p className="text-xs text-gray-500 truncate dark:text-slate-400">
                             {resource.content}
                           </p>
                         )}
@@ -723,7 +723,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
               </div>
 
               {/* DATE */}
-              <div className="col-span-2 text-sm text-gray-500">
+              <div className="col-span-2 text-sm text-gray-500 dark:text-slate-400">
                 {new Date(resource.createdAt).toLocaleDateString()}
               </div>
 
@@ -850,7 +850,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
           ))}
 
           {resources.length === 0 && (
-            <div className="py-12 text-center text-gray-500">
+            <div className="py-12 text-center text-gray-500 dark:text-slate-400">
               No resources found
             </div>
           )}
@@ -859,8 +859,8 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
 
       {/* Upload Modal - Only show CREDENTIALS option to Admin & Engineer */}
       {open && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50 text-black">
-          <div className="bg-white p-6 rounded-xl max-w-md w-full border border-[var(--border)] shadow-lg">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50 text-black dark:text-white">
+          <div className="bg-white p-6 rounded-xl max-w-md w-full border border-[var(--border)] shadow-lg dark:bg-card">
             <h2 className="text-lg font-semibold  mb-4">Upload Resource</h2>
 
             <input
@@ -938,28 +938,28 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
                   />
 
                   <div>
-                    <p className="text-sm font-medium text-black">
+                    <p className="text-sm font-medium text-black dark:text-white">
                       Drag & drop file here
                     </p>
 
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 mt-1 dark:text-slate-400">
                       or click to browse
                     </p>
                   </div>
 
                   {/* FILE PREVIEW */}
                   {file && (
-                    <div className="relative mt-4 w-full rounded-xl border bg-white p-3">
+                    <div className="relative mt-4 w-full rounded-xl border bg-white p-3 dark:bg-card">
 
                       {/* REMOVE BUTTON */}
                       <button
                         type="button"
                         onClick={() => setFile(null)}
-                        className="absolute top-2 right-2 rounded-full bg-gray-100 p-1 hover:bg-red-100 transition"
+                        className="absolute top-2 right-2 rounded-full bg-gray-100 p-1 hover:bg-red-100 transition dark:bg-slate-800"
                       >
                         <X
                           size={14}
-                          className="text-gray-600 hover:text-red-600"
+                          className="text-gray-600 hover:text-red-600 dark:text-slate-400"
                         />
                       </button>
 
@@ -971,26 +971,26 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
                             className="max-h-52 w-full object-cover rounded-lg border"
                           />
 
-                          <div className="text-xs text-gray-600 break-all">
+                          <div className="text-xs text-gray-600 break-all dark:text-slate-400">
                             {file.name}
                           </div>
                         </div>
                       ) : (
                         <div className="flex items-center gap-3">
 
-                          <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center dark:bg-slate-800">
                             <Paperclip
                               size={18}
-                              className="text-gray-600"
+                              className="text-gray-600 dark:text-slate-400"
                             />
                           </div>
 
                           <div className="flex-1 overflow-hidden">
-                            <p className="text-sm font-medium text-black truncate">
+                            <p className="text-sm font-medium text-black truncate dark:text-white">
                               {file.name}
                             </p>
 
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-gray-500 dark:text-slate-400">
                               {(file.size / 1024 / 1024).toFixed(2)} MB
                             </p>
                           </div>
@@ -1039,16 +1039,16 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
       {deleteModal.open && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
 
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-gray-200">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-gray-200 dark:bg-card dark:border-slate-800">
 
             {/* HEADER */}
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-black">
+                <h2 className="text-xl font-semibold text-black dark:text-white">
                   Delete Resource
                 </h2>
 
-                <p className="mt-2 text-sm text-gray-500 leading-6">
+                <p className="mt-2 text-sm text-gray-500 leading-6 dark:text-slate-400">
                   Are you sure you want to delete this resource?
                   This action cannot be undone.
                 </p>
@@ -1077,7 +1077,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
                     resourceId: null,
                   })
                 }
-                className="px-4 py-2 rounded-xl border border-gray-300 text-sm font-medium hover:bg-gray-100"
+                className="px-4 py-2 rounded-xl border border-gray-300 text-sm font-medium hover:bg-gray-100 dark:border-slate-700"
               >
                 Cancel
               </button>

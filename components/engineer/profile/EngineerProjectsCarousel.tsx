@@ -67,7 +67,7 @@ export default function EngineerProjectsCarousel({ projects, onProjectSelect,}: 
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-[var(--border)] p-6">
+    <div className="bg-white rounded-3xl border border-[var(--border)] p-6 dark:bg-card">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2
@@ -104,8 +104,8 @@ export default function EngineerProjectsCarousel({ projects, onProjectSelect,}: 
       </div>
 
       {projects.length === 0 ? (
-        <div className="h-[250px] flex items-center justify-center rounded-2xl border border-dashed border-gray-300">
-          <p className="text-gray-500">
+        <div className="h-[250px] flex items-center justify-center rounded-2xl border border-dashed border-gray-300 dark:border-slate-700">
+          <p className="text-gray-500 dark:text-slate-400">
             No assigned projects yet
           </p>
         </div>
@@ -143,7 +143,7 @@ export default function EngineerProjectsCarousel({ projects, onProjectSelect,}: 
                       {project.title}
                     </h3>
 
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-slate-400">
                       {getPhase(project.currentPhase)}
                     </p>
                   </div>
@@ -172,23 +172,23 @@ export default function EngineerProjectsCarousel({ projects, onProjectSelect,}: 
               </p>
 
               <div className="grid grid-cols-2 gap-4 mb-5">
-                <div className="rounded-xl bg-gray-50 p-3">
-                  <p className="text-xs text-gray-500 mb-1">
+                <div className="rounded-xl bg-gray-50 p-3 dark:bg-background">
+                  <p className="text-xs text-gray-500 mb-1 dark:text-slate-400">
                     Budget
                   </p>
 
-                  <p className="font-bold text-gray-900">
+                  <p className="font-bold text-gray-900 dark:text-slate-100">
                     ₹
                     {(project.budget || 0).toLocaleString()}
                   </p>
                 </div>
 
-                <div className="rounded-xl bg-gray-50 p-3">
-                  <p className="text-xs text-gray-500 mb-1">
+                <div className="rounded-xl bg-gray-50 p-3 dark:bg-background">
+                  <p className="text-xs text-gray-500 mb-1 dark:text-slate-400">
                     Progress
                   </p>
 
-                  <p className="font-bold text-gray-900">
+                  <p className="font-bold text-gray-900 dark:text-slate-100">
                     {project.progress || 0}%
                   </p>
                 </div>
@@ -200,7 +200,7 @@ export default function EngineerProjectsCarousel({ projects, onProjectSelect,}: 
                   <span>{project.progress || 0}%</span>
                 </div>
 
-                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-slate-800">
                   <div
                     className="h-2.5 rounded-full transition-all"
                     style={{
@@ -212,7 +212,7 @@ export default function EngineerProjectsCarousel({ projects, onProjectSelect,}: 
               </div>
 
               {project.endDate && (
-                <div className="mb-5 text-xs text-gray-500">
+                <div className="mb-5 text-xs text-gray-500 dark:text-slate-400">
                   Due:{" "}
                   {new Date(
                     project.endDate

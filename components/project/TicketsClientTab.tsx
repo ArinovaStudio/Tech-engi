@@ -76,7 +76,7 @@ export default function TicketsClientTab({ projectId }: { projectId: string }) {
       ) : (
         <div className="space-y-3">
           {tickets.map((t: any) => (
-            <div key={t.id} className="bg-white border border-[var(--border)] rounded-xl p-4">
+            <div key={t.id} className="bg-white border border-[var(--border)] rounded-xl p-4 dark:bg-card">
               <div className="flex items-start justify-between gap-2 mb-2">
                 <div className="flex items-center gap-2">
                   <AlertCircle size={15} className="text-[var(--primary)] shrink-0" />
@@ -104,7 +104,7 @@ export default function TicketsClientTab({ projectId }: { projectId: string }) {
 
       {open && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white p-6 rounded-xl max-w-md w-full border border-[var(--border)] shadow-lg">
+          <div className="bg-white p-6 rounded-xl max-w-md w-full border border-[var(--border)] shadow-lg dark:bg-card">
             <h3 className="text-base font-semibold  mb-4 text-[var(--text-primary)]">Raise a Ticket</h3>
             <div className="space-y-3">
               <select className={inputCls} value={form.issueType} onChange={(e) => setForm({ ...form, issueType: e.target.value })}>

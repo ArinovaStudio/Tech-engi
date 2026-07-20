@@ -11,7 +11,7 @@ import "driver.js/dist/driver.css";
 
 function SummaryCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-xl border border-[var(--border)] bg-white p-5">
+    <div className="rounded-xl border border-[var(--border)] bg-white p-5 dark:bg-card">
       <p className="text-sm font-inter" style={{ color: "var(--text-muted)" }}>
         {title}
       </p>
@@ -199,7 +199,7 @@ export default function PayoutClient({ projectId }: Props) {
         </div>
 
         {/* CONDITIONAL PAYMENT BOX */}
-        <div id="payout-pending-action" className="rounded-xl w-full lg:w-96 border border-[var(--border)] bg-white p-6 flex flex-col h-fit">
+        <div id="payout-pending-action" className="rounded-xl w-full lg:w-96 border border-[var(--border)] bg-white p-6 flex flex-col h-fit dark:bg-card">
           <div>
             <h3 className="text-lg font-semibold font-inter mb-4" style={{ color: "var(--text-primary)" }}>
               Pending Action

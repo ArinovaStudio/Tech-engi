@@ -77,11 +77,11 @@ const BudgetAndDocs = ({ data, tasks, projects, }: { data: any; tasks: any[]; pr
                   </div>
 
                   <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-500 dark:text-slate-400">
                       {task.status.replaceAll("_", " ")}
                     </span>
 
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-500 dark:text-slate-400">
                       {new Date(task.dueDate).toLocaleDateString()}
                     </span>
                   </div>
@@ -122,7 +122,7 @@ const BudgetAndDocs = ({ data, tasks, projects, }: { data: any; tasks: any[]; pr
                 {transaction.type.replaceAll("_", " ")}
               </p>
 
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-gray-400 mt-1 dark:text-slate-500">
                 #{transaction.id.slice(0, 8)}
               </p>
             </div>
@@ -151,7 +151,7 @@ const BudgetAndDocs = ({ data, tasks, projects, }: { data: any; tasks: any[]; pr
   ) : (
     <div className="flex-1 flex flex-col items-center justify-center">
       <div className="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-        <Receipt className="w-6 h-6 text-gray-400" />
+        <Receipt className="w-6 h-6 text-gray-400 dark:text-slate-500" />
       </div>
 
       <p className="mt-3 font-medium text-gray-900 dark:text-white">
@@ -193,7 +193,7 @@ const BudgetAndDocs = ({ data, tasks, projects, }: { data: any; tasks: any[]; pr
                 <p className="text-sm">Paid amount</p>
                 <h3 className="text-xl font-bold">₹{paidAmount.toLocaleString()}</h3>
               </div>
-              <span className="bg-white rounded-full bg-opacity-80 p-1">
+              <span className="bg-white rounded-full bg-opacity-80 p-1 dark:bg-card">
                 <Receipt className="w-6 h-6 text-purple-600" />
               </span>
             </div>
@@ -202,7 +202,7 @@ const BudgetAndDocs = ({ data, tasks, projects, }: { data: any; tasks: any[]; pr
                 <p className="text-sm">Remaining amount</p>
                 <h3 className="text-xl font-bold">₹{remainingAmount.toLocaleString()}</h3>
               </div>
-              <span className="bg-white rounded-full bg-opacity-80 p-1">
+              <span className="bg-white rounded-full bg-opacity-80 p-1 dark:bg-card">
                 <Wallet className="w-6 h-6 text-orange-500" />
               </span>
             </div>
@@ -211,7 +211,7 @@ const BudgetAndDocs = ({ data, tasks, projects, }: { data: any; tasks: any[]; pr
                 <p className="text-sm">Total Budget</p>
                 <h3 className="text-xl font-bold">₹{totalBudget.toLocaleString()}</h3>
               </div>
-              <span className="bg-white rounded-full bg-opacity-80 p-1">
+              <span className="bg-white rounded-full bg-opacity-80 p-1 dark:bg-card">
                 <FileText className="w-6 h-6 text-black/90" />
               </span>
             </div>

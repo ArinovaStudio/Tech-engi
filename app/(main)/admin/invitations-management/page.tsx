@@ -82,8 +82,8 @@ export default function InvitationsManagementPage() {
 
           {/* HEADER */}
           <div>
-            <div className="h-8 w-72 rounded-xl bg-gray-200 mb-3" />
-            <div className="h-4 w-96 rounded-lg bg-gray-100" />
+            <div className="h-8 w-72 rounded-xl bg-gray-200 mb-3 dark:bg-slate-800" />
+            <div className="h-4 w-96 rounded-lg bg-gray-100 dark:bg-slate-800" />
           </div>
 
           {/* GRID */}
@@ -92,22 +92,15 @@ export default function InvitationsManagementPage() {
             {[1, 2, 3, 4, 5, 6].map((item) => (
               <div
                 key={item}
-                className="
-                rounded-3xl
-                border
-                border-[var(--border)]
-                bg-white
-                p-6
-                shadow-sm
-              "
+                className=" rounded-3xl border border-[var(--border)] bg-white p-6 shadow-sm  dark:bg-card"
               >
 
                 {/* TOP */}
                 <div className="flex items-center justify-between mb-6">
 
-                  <div className="h-6 w-40 rounded-lg bg-gray-200" />
+                  <div className="h-6 w-40 rounded-lg bg-gray-200 dark:bg-slate-800" />
 
-                  <div className="h-7 w-20 rounded-full bg-gray-100" />
+                  <div className="h-7 w-20 rounded-full bg-gray-100 dark:bg-slate-800" />
 
                 </div>
 
@@ -116,14 +109,7 @@ export default function InvitationsManagementPage() {
                   {[1, 2, 3].map((avatar) => (
                     <div
                       key={avatar}
-                      className="
-                      w-10
-                      h-10
-                      rounded-full
-                      bg-gray-200
-                      border-2
-                      border-white
-                    "
+                      className=" w-10 h-10 rounded-full bg-gray-200 border-2 border-white  dark:bg-slate-800"
                     />
                   ))}
                 </div>
@@ -132,13 +118,13 @@ export default function InvitationsManagementPage() {
                 <div className="space-y-4">
 
                   <div className="flex items-center justify-between">
-                    <div className="h-4 w-20 rounded bg-gray-100" />
-                    <div className="h-4 w-16 rounded bg-gray-200" />
+                    <div className="h-4 w-20 rounded bg-gray-100 dark:bg-slate-800" />
+                    <div className="h-4 w-16 rounded bg-gray-200 dark:bg-slate-800" />
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <div className="h-4 w-32 rounded bg-gray-100" />
-                    <div className="h-4 w-10 rounded bg-gray-200" />
+                    <div className="h-4 w-32 rounded bg-gray-100 dark:bg-slate-800" />
+                    <div className="h-4 w-10 rounded bg-gray-200 dark:bg-slate-800" />
                   </div>
 
                 </div>
@@ -172,7 +158,7 @@ export default function InvitationsManagementPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search projects..."
-              className=" h-11 w-full md:w-80 px-4 rounded-xl border border-[var(--border)] bg-white text-sm outline-none focus:ring-2 focus:ring-orange-400 " />
+              className=" h-11 w-full md:w-80 px-4 rounded-xl border border-[var(--border)] bg-white text-sm outline-none focus:ring-2 focus:ring-orange-400  dark:bg-card" />
           </div>
         </div>
 
@@ -205,7 +191,7 @@ export default function InvitationsManagementPage() {
                       {eng.user.image ? (
                         <AvatarImage src={eng.user.image} className="border bg-blue-200" />
                       ) : (
-                        <AvatarFallback className="border border-[#FCD9B6] bg-gradient-to-r from-[#FFAE58] via-[#FFBE73] to-[#FFD8A8] text-gray-800">
+                        <AvatarFallback className="border border-[#FCD9B6] bg-gradient-to-r from-[#FFAE58] via-[#FFBE73] to-[#FFD8A8] text-gray-800 dark:text-slate-200">
                           {eng.user.name?.[0]}
                         </AvatarFallback>
                       )}

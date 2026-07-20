@@ -39,7 +39,7 @@ export default function AdminEngAccountCard({ payoutData, userId, onUpdate }: { 
 
   return (
     <>
-      <div className="p-6 border border-[var(--border)] rounded-2xl bg-white">
+      <div className="p-6 border border-[var(--border)] rounded-2xl bg-white dark:bg-card">
         <div className="flex justify-between items-center mb-6 border-b border-[var(--border)] pb-4">
           <h4 className="text-lg font-bold font-inter text-[var(--text-primary)]">Payout Details</h4>
           <button onClick={() => setIsOpen(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[var(--border)] text-sm font-semibold hover:bg-gray-50 transition-colors">
@@ -48,7 +48,7 @@ export default function AdminEngAccountCard({ payoutData, userId, onUpdate }: { 
         </div>
 
         {!payoutData ? (
-          <div className="bg-gray-50 border border-[var(--border)] rounded-xl p-8 flex flex-col items-center justify-center text-center">
+          <div className="bg-gray-50 border border-[var(--border)] rounded-xl p-8 flex flex-col items-center justify-center text-center dark:bg-background">
             <CreditCard size={32} className="text-gray-300 mb-3" />
             <h5 className="font-semibold text-[var(--text-primary)]">No payout methods added</h5>
           </div>
@@ -56,13 +56,13 @@ export default function AdminEngAccountCard({ payoutData, userId, onUpdate }: { 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className={`p-5 border-2 rounded-xl relative ${payoutData.preferredMethod === "UPI" ? "border-[var(--primary)] bg-[#fff4e6]/40" : "border-[var(--border)] bg-gray-50/50"}`}>
               {payoutData.preferredMethod === "UPI" && <span className="absolute top-3 right-3 text-[10px] bg-[var(--primary)] text-white px-2 py-0.5 rounded font-bold uppercase">Preferred</span>}
-              <div className="flex items-center gap-2 mb-3"><div className="w-8 h-8 rounded-full bg-white border flex items-center justify-center text-[var(--primary)] shadow-sm"><CreditCard size={14}/></div><p className="font-bold text-sm text-[var(--text-primary)]">UPI ID</p></div>
+              <div className="flex items-center gap-2 mb-3"><div className="w-8 h-8 rounded-full bg-white border flex items-center justify-center text-[var(--primary)] shadow-sm dark:bg-card"><CreditCard size={14}/></div><p className="font-bold text-sm text-[var(--text-primary)]">UPI ID</p></div>
               <p className="font-mono text-sm text-[var(--text-secondary)]">{payoutData.upiId || "—"}</p>
             </div>
 
             <div className={`p-5 border-2 rounded-xl relative ${payoutData.preferredMethod === "BANK" ? "border-[var(--primary)] bg-[#fff4e6]/40" : "border-[var(--border)] bg-gray-50/50"}`}>
               {payoutData.preferredMethod === "BANK" && <span className="absolute top-3 right-3 text-[10px] bg-[var(--primary)] text-white px-2 py-0.5 rounded font-bold uppercase">Preferred</span>}
-              <div className="flex items-center gap-2 mb-3"><div className="w-8 h-8 rounded-full bg-white border flex items-center justify-center text-[var(--primary)] shadow-sm"><Building2 size={14}/></div><p className="font-bold text-sm text-[var(--text-primary)]">Bank Account</p></div>
+              <div className="flex items-center gap-2 mb-3"><div className="w-8 h-8 rounded-full bg-white border flex items-center justify-center text-[var(--primary)] shadow-sm dark:bg-card"><Building2 size={14}/></div><p className="font-bold text-sm text-[var(--text-primary)]">Bank Account</p></div>
               <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-sm font-inter text-[var(--text-secondary)]">
                 <div><span className="font-semibold text-[var(--text-primary)] text-xs block">Holder</span> {payoutData.accountHolder || "—"}</div>
                 <div><span className="font-semibold text-[var(--text-primary)] text-xs block">Bank</span> {payoutData.bankName || "—"}</div>
@@ -85,12 +85,12 @@ export default function AdminEngAccountCard({ payoutData, userId, onUpdate }: { 
                   <label className="flex items-center gap-2 font-semibold text-sm cursor-pointer"><input type="radio" checked={formData.preferredMethod === "BANK"} onChange={() => setFormData({...formData, preferredMethod: "BANK"})} className="accent-[var(--primary)]" /> Bank Account</label>
                </div>
             </div>
-            <div><label className="block text-sm font-semibold mb-1">UPI ID</label><input value={formData.upiId} onChange={e=>setFormData({...formData, upiId: e.target.value})} className="w-full border rounded-lg p-3 bg-gray-50" /></div>
+            <div><label className="block text-sm font-semibold mb-1">UPI ID</label><input value={formData.upiId} onChange={e=>setFormData({...formData, upiId: e.target.value})} className="w-full border rounded-lg p-3 bg-gray-50 dark:bg-background" /></div>
             <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-dashed">
-              <div className="col-span-2"><label className="block text-xs font-semibold mb-1">Account Holder</label><input value={formData.accountHolder} onChange={e=>setFormData({...formData, accountHolder: e.target.value})} className="w-full border rounded-lg p-3 bg-gray-50" /></div>
-              <div className="col-span-1"><label className="block text-xs font-semibold mb-1">Account Number</label><input value={formData.accountNumber} onChange={e=>setFormData({...formData, accountNumber: e.target.value})} className="w-full border rounded-lg p-3 bg-gray-50" /></div>
-              <div className="col-span-1"><label className="block text-xs font-semibold mb-1">IFSC</label><input value={formData.ifscCode} onChange={e=>setFormData({...formData, ifscCode: e.target.value.toUpperCase()})} className="w-full border rounded-lg p-3 bg-gray-50" /></div>
-              <div className="col-span-2"><label className="block text-xs font-semibold mb-1">Bank Name</label><input value={formData.bankName} onChange={e=>setFormData({...formData, bankName: e.target.value})} className="w-full border rounded-lg p-3 bg-gray-50" /></div>
+              <div className="col-span-2"><label className="block text-xs font-semibold mb-1">Account Holder</label><input value={formData.accountHolder} onChange={e=>setFormData({...formData, accountHolder: e.target.value})} className="w-full border rounded-lg p-3 bg-gray-50 dark:bg-background" /></div>
+              <div className="col-span-1"><label className="block text-xs font-semibold mb-1">Account Number</label><input value={formData.accountNumber} onChange={e=>setFormData({...formData, accountNumber: e.target.value})} className="w-full border rounded-lg p-3 bg-gray-50 dark:bg-background" /></div>
+              <div className="col-span-1"><label className="block text-xs font-semibold mb-1">IFSC</label><input value={formData.ifscCode} onChange={e=>setFormData({...formData, ifscCode: e.target.value.toUpperCase()})} className="w-full border rounded-lg p-3 bg-gray-50 dark:bg-background" /></div>
+              <div className="col-span-2"><label className="block text-xs font-semibold mb-1">Bank Name</label><input value={formData.bankName} onChange={e=>setFormData({...formData, bankName: e.target.value})} className="w-full border rounded-lg p-3 bg-gray-50 dark:bg-background" /></div>
             </div>
             <div className="flex justify-end gap-3 pt-6 border-t mt-4"><button type="button" onClick={()=>setIsOpen(false)} className="px-5 py-2.5 rounded-lg border font-semibold">Cancel</button><button type="submit" disabled={isSaving} className="px-5 py-2.5 rounded-lg bg-[var(--primary)] text-white font-semibold">{isSaving ? "Saving..." : "Save"}</button></div>
           </form>

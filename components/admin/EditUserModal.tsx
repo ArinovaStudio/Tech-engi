@@ -116,31 +116,31 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-lg bg-white rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-[#e5e5e5] bg-white rounded-t-2xl">
-          <h2 className="text-xl font-bold text-[#050A30] ">
+      <div className="relative w-full max-w-lg bg-white dark:bg-card rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b border-[#e5e5e5] dark:border-slate-700 bg-white dark:bg-card rounded-t-2xl">
+          <h2 className="text-xl font-bold text-[#050A30] dark:text-white ">
             Edit {user.role === "ENGINEER" ? "Engineer" : "Client"}
           </h2>
-          <button onClick={onClose} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
+          <button onClick={onClose} className="p-2 text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">
             <X size={20} />
           </button>
         </div>
 
         <div className="p-6 space-y-5">
           <div>
-            <label className="block text-sm font-semibold text-[#4B4B4B] mb-1 ">Name</label>
+            <label className="block text-sm font-semibold text-[#4B4B4B] dark:text-slate-300 mb-1 ">Name</label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2 rounded-lg border border-[#e5e5e5] text-sm focus:outline-none focus:ring-2 focus:ring-[#FFAE58]"
+              className="w-full px-4 py-2 rounded-lg border border-[#e5e5e5] dark:border-slate-700 text-sm dark:text-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-[#FFAE58] dark:placeholder-slate-500"
             />
           </div>
 
           {/* Client: Expertise Tags */}
           {user.role === "CLIENT" && (
             <div>
-              <label className="block text-sm font-semibold text-[#4B4B4B] mb-2 ">Expertise</label>
+              <label className="block text-sm font-semibold text-[#4B4B4B] dark:text-slate-300 mb-2 ">Expertise</label>
               
               <div className="flex flex-wrap gap-2 mb-3">
                 {formData.expertise.map((exp, idx) => (
@@ -159,13 +159,13 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
                   value={expertiseInput}
                   onChange={(e) => setExpertiseInput(e.target.value)}
                   onKeyDown={handleAddExpertise}
-                  className="flex-1 px-4 py-2 rounded-lg border border-[#e5e5e5] text-sm focus:outline-none focus:ring-2 focus:ring-[#FFAE58]"
+                  className="flex-1 px-4 py-2 rounded-lg border border-[#e5e5e5] dark:border-slate-700 text-sm dark:text-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-[#FFAE58] dark:placeholder-slate-500"
                   placeholder="e.g. Fintech, E-commerce, AI (Press Enter)"
                 />
                 <button
                   type="button"
                   onClick={handleAddExpertise}
-                  className="px-3 py-2 bg-gray-100 text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-200"
+                  className="px-3 py-2 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 border border-gray-200 dark:border-slate-600 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600"
                 >
                   <Plus size={18} />
                 </button>
@@ -177,7 +177,7 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
           {user.role === "ENGINEER" && (
             <>
               <div>
-                <label className="block text-sm font-semibold text-[#4B4B4B] mb-2 ">Skills</label>
+                <label className="block text-sm font-semibold text-[#4B4B4B] dark:text-slate-300 mb-2 ">Skills</label>
                 
                 <div className="flex flex-wrap gap-2 mb-3">
                   {formData.skills.map((skill, idx) => (
@@ -196,13 +196,13 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
                     value={skillInput}
                     onChange={(e) => setSkillInput(e.target.value)}
                     onKeyDown={handleAddSkill}
-                    className="flex-1 px-4 py-2 rounded-lg border border-[#e5e5e5] text-sm focus:outline-none focus:ring-2 focus:ring-[#FFAE58]"
+                    className="flex-1 px-4 py-2 rounded-lg border border-[#e5e5e5] dark:border-slate-700 text-sm dark:text-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-[#FFAE58] dark:placeholder-slate-500"
                     placeholder="e.g. React, Node.js (Press Enter)"
                   />
                   <button
                     type="button"
                     onClick={handleAddSkill}
-                    className="px-3 py-2 bg-gray-100 text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-200"
+                    className="px-3 py-2 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 border border-gray-200 dark:border-slate-600 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600"
                   >
                     <Plus size={18} />
                   </button>
@@ -211,11 +211,11 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-[#4B4B4B] mb-1 ">Qualification</label>
+                   <label className="block text-sm font-semibold text-[#4B4B4B] dark:text-slate-300 mb-1 ">Qualification</label>
                   <select
                     value={formData.qualification}
                     onChange={(e) => setFormData({ ...formData, qualification: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border border-[#e5e5e5] text-sm focus:outline-none focus:ring-2 focus:ring-[#FFAE58]"
+                    className="w-full px-4 py-2 rounded-lg border border-[#e5e5e5] dark:border-slate-700 text-sm dark:text-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-[#FFAE58]"
                   >
                     <option value="UG">Undergraduate</option>
                     <option value="EMPLOYED">Employed</option>
@@ -223,11 +223,11 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-[#4B4B4B] mb-1 ">Status</label>
+                   <label className="block text-sm font-semibold text-[#4B4B4B] dark:text-slate-300 mb-1 ">Status</label>
                   <select
                     value={formData.approvalStatus}
                     onChange={(e) => setFormData({ ...formData, approvalStatus: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border border-[#e5e5e5] text-sm focus:outline-none focus:ring-2 focus:ring-[#FFAE58]"
+                    className="w-full px-4 py-2 rounded-lg border border-[#e5e5e5] dark:border-slate-700 text-sm dark:text-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-[#FFAE58]"
                   >
                     <option value="PENDING">Pending</option>
                     <option value="APPROVED">Approved</option>
@@ -238,11 +238,11 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
 
               {formData.approvalStatus === "REJECTED" && (
                 <div>
-                  <label className="block text-sm font-semibold text-[#4B4B4B] mb-1 ">Rejection Reason</label>
+                   <label className="block text-sm font-semibold text-[#4B4B4B] dark:text-slate-300 mb-1 ">Rejection Reason</label>
                   <textarea
                     value={formData.rejectionReason}
                     onChange={(e) => setFormData({ ...formData, rejectionReason: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border border-[#e5e5e5] text-sm focus:outline-none focus:ring-2 focus:ring-[#FFAE58]"
+                    className="w-full px-4 py-2 rounded-lg border border-[#e5e5e5] dark:border-slate-700 text-sm dark:text-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-[#FFAE58]"
                     rows={2}
                   />
                 </div>
@@ -251,8 +251,8 @@ export default function EditUserModal({ isOpen, user, onClose, onSuccess }: Edit
           )}
         </div>
 
-        <div className="sticky bottom-0 z-10 flex gap-3 px-6 py-4 border-t border-[#e5e5e5] bg-white rounded-b-2xl">
-          <button onClick={onClose} className="flex-1 px-4 py-2 rounded-lg  text-sm bg-gray-100 text-gray-700 hover:bg-gray-200">
+        <div className="sticky bottom-0 z-10 flex gap-3 px-6 py-4 border-t border-[#e5e5e5] dark:border-slate-700 bg-white dark:bg-card rounded-b-2xl">
+          <button onClick={onClose} className="flex-1 px-4 py-2 rounded-lg  text-sm bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-600">
             Cancel
           </button>
           <button

@@ -217,7 +217,7 @@ export default function EngineerDetailsModal({ isOpen, onClose, profile, onUpdat
 
                 {/* Real-time Document Preview Box */}
                 {idPreview && (
-                  <div className="h-[200px] w-full rounded-xl overflow-hidden shadow-sm border border-[var(--border)] bg-gray-100">
+                  <div className="h-[200px] w-full rounded-xl overflow-hidden shadow-sm border border-[var(--border)] bg-gray-100 dark:bg-slate-800">
                     <DocumentViewer url={idPreview} altText="ID Document Preview" className="w-full h-full border-none" fileType={file ? file.type : undefined} />
                   </div>
                 )}
@@ -279,7 +279,7 @@ export default function EngineerDetailsModal({ isOpen, onClose, profile, onUpdat
                   {achievements.map((item, index) => (
                     <div
                       key={index}
-                      className=" group flex items-center justify-between rounded-xl border border-[var(--border)] bg-white px-4 py-3 shadow-sm hover:shadow-md hover:border-[var(--primary)]/30 transition-all duration-200">
+                      className=" group flex items-center justify-between rounded-xl border border-[var(--border)] bg-white px-4 py-3 shadow-sm hover:shadow-md hover:border-[var(--primary)]/30 transition-all duration-200 dark:bg-card">
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="h-2 w-2 rounded-full bg-[var(--primary)] flex-shrink-0" />
 
@@ -347,11 +347,11 @@ export default function EngineerDetailsModal({ isOpen, onClose, profile, onUpdat
                 value={certInput}
                 onChange={(e) => setCertInput(e.target.value)}
                 placeholder="Certificate Name"
-                className="flex-1 px-4 rounded-xl border border-[var(--border)] bg-gray-50/50 focus:bg-white focus:border-[var(--primary)] outline-none text-sm text-black"
+                className="flex-1 px-4 rounded-xl border border-[var(--border)] bg-gray-50/50 focus:bg-white focus:border-[var(--primary)] outline-none text-sm text-black dark:text-white"
               />
               <label className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--border)] bg-gray-50/50 hover:border-[var(--primary)] cursor-pointer px-4 truncate">
-                <FileText className="h-4 w-4 text-gray-400 shrink-0" />
-                <span className="text-sm text-gray-500 truncate">
+                <FileText className="h-4 w-4 text-gray-400 shrink-0 dark:text-slate-500" />
+                <span className="text-sm text-gray-500 truncate dark:text-slate-400">
                   {certFile ? certFile.name : "Upload Proof"}
                 </span>
                 <input type="file" accept="image/*,.pdf" className="hidden" onChange={(e) => setCertFile(e.target.files?.[0] || null)} />
@@ -359,7 +359,7 @@ export default function EngineerDetailsModal({ isOpen, onClose, profile, onUpdat
               <button
                 type="button"
                 onClick={handleAddCert}
-                className="h-[46px] w-[46px] shrink-0 flex items-center justify-center rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                className="h-[46px] w-[46px] shrink-0 flex items-center justify-center rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors dark:bg-slate-800 dark:text-slate-400"
               >
                 <Plus className="h-5 w-5" />
               </button>
@@ -372,14 +372,14 @@ export default function EngineerDetailsModal({ isOpen, onClose, profile, onUpdat
                   const previewUrl = cert.file ? URL.createObjectURL(cert.file) : cert.fileUrl;
 
                   return (
-                    <div key={index} className="flex flex-col bg-white border border-[var(--border)] rounded-xl overflow-hidden shadow-sm relative group">
-                      <div className="p-2 border-b border-[var(--border)] bg-gray-50 flex items-center justify-between">
+                    <div key={index} className="flex flex-col bg-white border border-[var(--border)] rounded-xl overflow-hidden shadow-sm relative group dark:bg-card">
+                      <div className="p-2 border-b border-[var(--border)] bg-gray-50 flex items-center justify-between dark:bg-background">
                         <span className="font-semibold text-xs text-[var(--text-primary)] truncate pr-2" title={cert.name}>{cert.name}</span>
-                        <button type="button" onClick={() => removeCert(index)} className="text-gray-400 hover:text-red-500 bg-white rounded-md p-1 shadow-sm border border-gray-100">
+                        <button type="button" onClick={() => removeCert(index)} className="text-gray-400 hover:text-red-500 bg-white rounded-md p-1 shadow-sm border border-gray-100 dark:text-slate-500 dark:bg-card dark:border-slate-800">
                           <X className="h-3 w-3" />
                         </button>
                       </div>
-                      <div className="h-28 bg-gray-100">
+                      <div className="h-28 bg-gray-100 dark:bg-slate-800">
                         {previewUrl && <DocumentViewer url={previewUrl} altText={cert.name} className="w-full h-full border-none rounded-none" fileType={cert.file ? cert.file.type : undefined} />}
                       </div>
                     </div>

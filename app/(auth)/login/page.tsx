@@ -151,19 +151,19 @@ export default function LoginPage() {
           <div className="">
             <button
               onClick={() => router.push('/')}
-              className="flex items-center cursor-pointer gap-2 text-sm text-gray-500 hover:text-gray-800 transition-colors m-5"
+              className="flex items-center cursor-pointer gap-2 text-sm text-gray-500 hover:text-gray-800 transition-colors m-5 dark:text-slate-400"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
             </button>
           </div>
           <div className="min-h-screen flex items-center justify-center p-4">
-            <div className="w-130 bg-white h-full  p-8">
+            <div className="w-130 bg-white h-full p-8 dark:bg-card">
               <div className="text-center mb-8">
 
 
                 <h1 className="text-2xl font-bold text-[#0f172a] tracking-tight">Welcome Back <span>👋</span></h1>
-                <p className="text-sm text-gray-500 mt-2">Log in to your TECH ENGI account</p>
+                <p className="text-sm text-gray-500 mt-2 dark:text-slate-400">Log in to your TECH ENGI account</p>
               </div>
 
               {error && (
@@ -175,19 +175,19 @@ export default function LoginPage() {
               <form onSubmit={handleCredentialsLogin} className="space-y-5">
                 {/* Email Field */}
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-gray-700 ml-1">
+                  <label className="text-sm font-medium text-gray-700 ml-1 dark:text-slate-300">
                     Email Address
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <Mail className="h-5 w-5 text-gray-400" />
+                      <Mail className="h-5 w-5 text-gray-400 dark:text-slate-500" />
                     </div>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full pl-11 pr-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
+                      className="w-full pl-11 pr-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
                       placeholder="you@example.com"
                     />
                   </div>
@@ -196,26 +196,26 @@ export default function LoginPage() {
                 {/* Password Field */}
                 <div className="space-y-1.5">
                   <div className="flex justify-between items-center mb-1">
-                    <label className="text-sm font-medium text-gray-700 ml-1">
+                    <label className="text-sm font-medium text-gray-700 ml-1 dark:text-slate-300">
                       Password
                     </label>
                   </div>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-gray-400" />
+                      <Lock className="h-5 w-5 text-gray-400 dark:text-slate-500" />
                     </div>
                     <input
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full pl-11 pr-11 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black"
+                      className="w-full pl-11 pr-11 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
                       placeholder="••••••••"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-[#f0b31e] transition-colors"
+                      className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-[#f0b31e] transition-colors dark:text-slate-500"
                     >
                       {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
@@ -238,14 +238,14 @@ export default function LoginPage() {
               </form>
 
               <div className="mt-8 flex items-center justify-center space-x-4">
-                <div className="h-px bg-gray-100 w-full"></div>
-                <span className="text-xs text-gray-400 uppercase tracking-wider font-medium">OR</span>
-                <div className="h-px bg-gray-100 w-full"></div>
+                <div className="h-px bg-gray-100 w-full dark:bg-slate-800"></div>
+                <span className="text-xs text-gray-400 uppercase tracking-wider font-medium dark:text-slate-500">OR</span>
+                <div className="h-px bg-gray-100 w-full dark:bg-slate-800"></div>
               </div>
 
               <button
                 onClick={handleGoogleLogin}
-                className="mt-6 w-full h-12 flex items-center justify-center space-x-3 border border-gray-200 bg-white text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all text-sm"
+                className="mt-6 w-full h-12 flex items-center justify-center space-x-3 border border-gray-200 bg-white text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all text-sm dark:border-slate-800 dark:bg-card dark:text-slate-300"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
@@ -268,7 +268,7 @@ export default function LoginPage() {
                 <span>Sign up with Google</span>
               </button>
 
-              <p className="mt-8 text-center text-sm text-gray-500">
+              <p className="mt-8 text-center text-sm text-gray-500 dark:text-slate-400">
                 Don&apos;t have an account?{" "}
                 <Link href="/register/client" className="text-[#f0b31e] hover:underline font-semibold">
                   Register here
@@ -303,7 +303,7 @@ export default function LoginPage() {
 
             <div className="mt-8">
               {/* Logo */}
-              <div className="relative w-24 h-24 bg-white rounded-sm shadow-xl overflow-hidden">
+              <div className="relative w-24 h-24 bg-white rounded-sm shadow-xl overflow-hidden dark:bg-card">
                 <Image
                   src="/logoImagediff2.PNG"
                   alt="Logo"

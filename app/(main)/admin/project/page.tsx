@@ -50,11 +50,11 @@ function ProjectCard({ project }: { project: Project }) {
           e.preventDefault();
         }
       }}>
-      <div className="relative bg-white border border-[var(--border)] rounded-xl p-5 hover:shadow-md hover:border-[var(--primary)] transition-all cursor-pointer group overflow-hidden">
+      <div className="relative bg-white border border-[var(--border)] rounded-xl p-5 hover:shadow-md hover:border-[var(--primary)] transition-all cursor-pointer group overflow-hidden dark:bg-card">
 
         {!project.advancePaid && (
           <div className="absolute inset-0 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 backdrop-blur-lg bg-white/40 border border-white/50 flex flex-col items-center justify-center gap-3 rounded-xl">
-            <span className="text-sm font-medium text-gray-800 text-center px-4">
+            <span className="text-sm font-medium text-gray-800 text-center px-4 dark:text-slate-200">
               Advance payment is pending for this project
             </span>
           </div>
@@ -182,7 +182,7 @@ export default function ProjectsPage() {
             { label: "Active", value: stats.active, icon: <Clock size={16} />, color: "text-green-600" },
             { label: "Completed", value: stats.completed, icon: <CheckCircle size={16} />, color: "text-blue-600" },
           ].map((s) => (
-            <div key={s.label} className="bg-white border border-[var(--border)] rounded-xl p-4 flex items-center gap-3 shadow-sm">
+            <div key={s.label} className="bg-white border border-[var(--border)] rounded-xl p-4 flex items-center gap-3 shadow-sm dark:bg-card">
               <div className={`${s.color}`}>{s.icon}</div>
               <div>
                 <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
@@ -218,7 +218,7 @@ export default function ProjectsPage() {
         placeholder="Search projects..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full pl-9 pr-4 py-2 border border-[var(--border)] rounded-lg text-sm bg-gray-50 text-[var(--text-primary)] outline-none focus:ring-1 focus:ring-[var(--primary)]"
+        className="w-full pl-9 pr-4 py-2 border border-[var(--border)] rounded-lg text-sm bg-gray-50 text-[var(--text-primary)] outline-none focus:ring-1 focus:ring-[var(--primary)] dark:bg-background"
       />
     </div>
 
@@ -231,7 +231,7 @@ export default function ProjectsPage() {
       <select
         value={statusFilter}
         onChange={(e) => setStatusFilter(e.target.value)}
-        className="w-full pl-8 pr-8 py-2 border border-[var(--border)] rounded-lg text-sm bg-gray-50 text-[var(--text-primary)] outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[var(--primary)]"
+        className="w-full pl-8 pr-8 py-2 border border-[var(--border)] rounded-lg text-sm bg-gray-50 text-[var(--text-primary)] outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[var(--primary)] dark:bg-background"
       >
         <option value="ALL">All Status</option>
         {Object.entries(STATUS_META).map(([k, v]) => (
@@ -255,7 +255,7 @@ export default function ProjectsPage() {
             <Loader2 className="animate-spin text-[var(--primary)]" size={36} />
           </div>
         ) : projects.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-xl border border-[var(--border)]">
+          <div className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-xl border border-[var(--border)] dark:bg-card">
             <XCircle size={40} className="text-[var(--border)] mb-3" />
             <p className="text-sm font-semibold text-[var(--text-primary)]">No projects found</p>
             <p className="text-xs text-[var(--text-muted)] mt-1">Try adjusting your filters</p>
@@ -272,7 +272,7 @@ export default function ProjectsPage() {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-6">
+              <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-6 dark:border-slate-800">
                 <span className="text-sm text-[var(--text-muted)]">
                   Page <span className="font-semibold text-[var(--text-primary)]">{page}</span> of {totalPages}
                 </span>
@@ -281,14 +281,14 @@ export default function ProjectsPage() {
                   <button
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="flex items-center gap-1 px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm font-medium text-[var(--text-secondary)] bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm font-medium text-[var(--text-secondary)] bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dark:bg-card"
                   >
                     <ChevronLeft size={16} /> Prev
                   </button>
                   <button
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page === totalPages}
-                    className="flex items-center gap-1 px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm font-medium text-[var(--text-secondary)] bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm font-medium text-[var(--text-secondary)] bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors dark:bg-card"
                   >
                     Next <ChevronRight size={16} />
                   </button>

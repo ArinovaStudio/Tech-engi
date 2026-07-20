@@ -18,7 +18,7 @@ export default function DocumentViewer({ url, altText = "Document", className = 
 
   if (isImage) {
     return (
-      <div className={`overflow-hidden rounded-lg border border-[var(--border)] bg-gray-50 flex items-center justify-center relative group ${className}`}>
+      <div className={`overflow-hidden rounded-lg border border-[var(--border)] bg-gray-50 flex items-center justify-center relative group ${className} dark:bg-background`}>
         <img src={url} alt={altText} className="w-full h-full object-contain" />
         <a href={url} target="_blank" rel="noopener noreferrer" className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white gap-2 text-sm font-semibold backdrop-blur-sm">
           <ExternalLink size={16} /> Open Full
@@ -39,10 +39,10 @@ export default function DocumentViewer({ url, altText = "Document", className = 
   }
   
   return (
-    <div className={`flex flex-col items-center justify-center bg-gray-50 border border-[var(--border)] rounded-lg p-6 ${className}`}>
-      <FileText size={32} className="text-gray-400 mb-2" />
+    <div className={`flex flex-col items-center justify-center bg-gray-50 border border-[var(--border)] rounded-lg p-6 ${className} dark:bg-background`}>
+      <FileText size={32} className="text-gray-400 mb-2 dark:text-slate-500" />
       <p className="text-sm font-semibold text-[var(--text-secondary)] mb-3">{altText}</p>
-      <a href={url} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-white border border-[var(--border)] rounded-md text-sm font-semibold hover:bg-gray-100 transition-colors flex items-center gap-2">
+      <a href={url} target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-white border border-[var(--border)] rounded-md text-sm font-semibold hover:bg-gray-100 transition-colors flex items-center gap-2 dark:bg-card">
         <ExternalLink size={14} /> View Document
       </a>
     </div>

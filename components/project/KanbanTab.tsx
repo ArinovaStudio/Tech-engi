@@ -113,8 +113,8 @@ const NewTaskModal: React.FC<{
           className="absolute inset-0 bg-black/50 backdrop-blur-sm"
           onClick={onClose}
         />
-        <div className="relative w-full max-w-2xl rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto bg-white">
-          <div className="sticky top-0 z-10 border-b px-6 py-4 border-[var(--border)] bg-white">
+        <div className="relative w-full max-w-2xl rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto bg-white dark:bg-card">
+          <div className="sticky top-0 z-10 border-b px-6 py-4 border-[var(--border)] bg-white dark:bg-card">
             <div className="flex items-center justify-between">
               <h2
                 className="text-xl font-bold "
@@ -146,7 +146,7 @@ const NewTaskModal: React.FC<{
                   setNewTask({ ...newTask, title: e.target.value })
                 }
                 placeholder="Enter task title..."
-                className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] dark:bg-card"
                 style={{ color: "var(--text-primary)" }}
               />
             </div>
@@ -202,7 +202,7 @@ const NewTaskModal: React.FC<{
                     onChange={(e) =>
                       setNewTask({ ...newTask, dueDate: e.target.value })
                     }
-                    className="w-full pl-10 pr-4 py-3 rounded-lg border border-[var(--border)] bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                    className="w-full pl-10 pr-4 py-3 rounded-lg border border-[var(--border)] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] dark:bg-card"
                     style={{ color: "var(--text-primary)" }}
                   />
                 </div>
@@ -253,7 +253,7 @@ const NewTaskModal: React.FC<{
                       status: e.target.value as Task["status"],
                     })
                   }
-                  className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                  className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] dark:bg-card"
                   style={{ color: "var(--text-primary)" }}
                 >
                   <option value="NOT_STARTED">Assigned</option>
@@ -296,7 +296,7 @@ const NewTaskModal: React.FC<{
                     e.currentTarget.value = "";
                   }
                 }}
-                className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                className="w-full px-4 py-3 rounded-lg border border-[var(--border)] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] dark:bg-card"
                 style={{ color: "var(--text-primary)" }}
               />
             </div>
@@ -365,7 +365,7 @@ const NewTaskModal: React.FC<{
                 {newTask.attachments?.map((file, index) => (
                   <div
                     key={`${file.name}-${index}`}
-                    className="flex items-center justify-between text-sm px-4 pr-3 py-3.5 rounded-lg bg-white border border-[var(--border)] "
+                    className="flex items-center justify-between text-sm px-4 pr-3 py-3.5 rounded-lg bg-white border border-[var(--border)]  dark:bg-card"
                     style={{ color: "var(--text-primary)" }}
                   >
                     <span className="truncate max-w-[80%]">{file.name}</span>
@@ -1041,7 +1041,7 @@ useEffect(() => {
   }
   return (
     <div className="min-h-screen transition-colors duration-200">
-      <div className="border-b border-[var(--border)] sticky top-0 z-10 bg-white">
+      <div className="border-b border-[var(--border)] sticky top-0 z-10 bg-white dark:bg-card">
         <div className="max-w-[1600px] mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <h1
@@ -1063,7 +1063,7 @@ useEffect(() => {
                   placeholder="Search tasks..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4 py-2 rounded-lg border border-[var(--border)] bg-white  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] w-80"
+                  className="pl-10 pr-4 py-2 rounded-lg border border-[var(--border)] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] w-80 dark:bg-card"
                   style={{ color: "var(--text-primary)" }}
                 />
               </div>
@@ -1134,8 +1134,7 @@ useEffect(() => {
                       draggable={currentUser?.role !== "CLIENT"}
                       onDragStart={currentUser?.role !== "CLIENT" ? () => handleDragStart(task) : undefined}
                       onClick={() => setSelectedTask(task)}
-                      className={`p-4 rounded-xl border cursor-pointer transition-all bg-white border-[var(--border)] hover:shadow-md ${draggedTask?.id === task.id ? "opacity-50" : ""
-                        }`}
+                      className={`p-4 rounded-xl border cursor-pointer transition-all bg-white border-[var(--border)] hover:shadow-md ${draggedTask?.id === task.id ? "opacity-50" : "" } dark:bg-card`}
                     >
                       <div className="flex flex-col gap-4 items-start justify-between mb-3">
                         <h3

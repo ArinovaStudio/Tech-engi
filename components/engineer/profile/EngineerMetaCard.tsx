@@ -51,7 +51,7 @@ export default function EngineerMetaCard({ user, }: { user: any; }) {
   };
 
   return (
-    <div className="p-6 border border-[var(--border)] rounded-2xl bg-white flex flex-col md:flex-row items-center md:items-start gap-6 shadow-sm">
+    <div className="p-6 border border-[var(--border)] rounded-2xl bg-white flex flex-col md:flex-row items-center md:items-start gap-6 shadow-sm dark:bg-card">
       {/* Avatar */}
       <div className="relative shrink-0">
         <div className="w-24 h-24 rounded-full border-4 border-gray-50 bg-[var(--primary)] text-white flex items-center justify-center text-3xl font-bold overflow-hidden shadow-sm">
@@ -70,7 +70,7 @@ export default function EngineerMetaCard({ user, }: { user: any; }) {
           data-tour="profile-photo"
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white border shadow flex items-center justify-center hover:bg-gray-50"
+          className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white border shadow flex items-center justify-center hover:bg-gray-50 dark:bg-card"
         >
           <Camera size={14} />
         </button>

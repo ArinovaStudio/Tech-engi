@@ -76,7 +76,7 @@ export default function TicketCard({ ticket, onStatusUpdated, }: TicketCardProps
     const action = actionConfig[ticket.status as keyof typeof actionConfig];
 
     return (
-        <div className="flex items-center justify-between rounded-[26px] border border-[#F1F1F1] bg-white px-5 py-4 shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0_10px_40px_rgba(0,0,0,0.06)]">
+        <div className="flex items-center justify-between rounded-[26px] border border-[#F1F1F1] dark:border-slate-800 bg-white dark:bg-card px-5 py-4 shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0_10px_40px_rgba(0,0,0,0.06)]">
 
             {/* Left */}
             <div className="flex items-center gap-4">
@@ -92,7 +92,7 @@ export default function TicketCard({ ticket, onStatusUpdated, }: TicketCardProps
                 {/* Content */}
                 <div>
                     <div className="flex gap-4 items-center">
-                        <h3 className="max-w-[220px] truncate text-[17px] font-semibold text-[#18181B]">
+                        <h3 className="max-w-[220px] truncate text-[17px] font-semibold text-[#18181B] dark:text-slate-100">
                             {ticket.issueType.replaceAll("_", " ")}
                         </h3>
                         <div
@@ -108,11 +108,11 @@ export default function TicketCard({ ticket, onStatusUpdated, }: TicketCardProps
 
                     </div>
 
-                    <p className="mt-1 max-w-[320px] truncate text-[13px] text-[#71717A]">
+                    <p className="mt-1 max-w-[320px] truncate text-[13px] text-[#71717A] dark:text-slate-400">
                         {ticket.description}
                     </p>
 
-                    <div className="mt-2 flex items-center gap-2 text-[12px] text-[#A1A1AA]">
+                    <div className="mt-2 flex items-center gap-2 text-[12px] text-[#A1A1AA] dark:text-slate-500">
                         <Clock3 size={13} />
 
                         <span>

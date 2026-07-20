@@ -11,7 +11,7 @@ export default function EngineerInfoCard({ user, onUpdate }: { user: any, onUpda
 
   return (
     <>
-      <div className="p-6 border border-[var(--border)] rounded-2xl bg-white">
+      <div className="p-6 border border-[var(--border)] rounded-2xl bg-white dark:bg-card">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-[var(--border)] pb-4">
           <h4 className="text-lg font-bold font-inter text-[var(--text-primary)]">Personal Information</h4>
           <div className="flex gap-2">

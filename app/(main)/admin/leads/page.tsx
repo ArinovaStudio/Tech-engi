@@ -82,8 +82,8 @@ export default function LeadsPage() {
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Leads</h1>
-            <p className="mt-1 text-sm text-gray-500">
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-slate-100">Leads</h1>
+            <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
               {loading
                 ? "Loading leads..."
                 : `${filteredLeads.length} lead${
@@ -95,13 +95,13 @@ export default function LeadsPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search name, email, domain, number..."
-                className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-4 text-sm text-gray-700 placeholder:text-gray-400 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-100 sm:w-80"
+                className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-4 text-sm text-gray-700 placeholder:text-gray-400 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-100 sm:w-80 dark:border-slate-800 dark:bg-card dark:text-slate-300"
               />
             </div>
 
@@ -109,7 +109,7 @@ export default function LeadsPage() {
             <select
               value={timelineFilter}
               onChange={(e) => setTimelineFilter(e.target.value)}
-              className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-100"
+              className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-100 dark:border-slate-800 dark:bg-card dark:text-slate-300"
             >
               {timelines.map((timeline) => (
                 <option key={timeline} value={timeline}>
@@ -123,7 +123,7 @@ export default function LeadsPage() {
         {/* Loading state */}
         {loading && (
           <div className="flex flex-1 items-center justify-center py-24">
-            <div className="flex flex-col items-center gap-3 text-gray-400">
+            <div className="flex flex-col items-center gap-3 text-gray-400 dark:text-slate-500">
               <Loader2 className="h-6 w-6 animate-spin" />
               <span className="text-sm">Fetching leads...</span>
             </div>
@@ -139,12 +139,12 @@ export default function LeadsPage() {
 
         {/* Empty state */}
         {!loading && !error && filteredLeads.length === 0 && (
-          <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-gray-100 bg-gray-50 py-24 text-center">
+          <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-gray-100 bg-gray-50 py-24 text-center dark:border-slate-800 dark:bg-background">
             <User className="h-8 w-8 text-gray-300" />
-            <p className="text-sm font-medium text-gray-500">
+            <p className="text-sm font-medium text-gray-500 dark:text-slate-400">
               No leads found
             </p>
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-400 dark:text-slate-500">
               Try adjusting your search or filters
             </p>
           </div>
@@ -192,7 +192,7 @@ function LeadCard({
   return (
     <button
       onClick={onClick}
-      className="group flex flex-col gap-4 rounded-xl border border-gray-100 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-md"
+      className="group flex flex-col gap-4 rounded-xl border border-gray-100 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-md dark:border-slate-800 dark:bg-card"
     >
       {/* Top row */}
       <div className="flex items-start justify-between gap-3">
@@ -201,8 +201,8 @@ function LeadCard({
             {initials || "?"}
           </div>
           <div className="min-w-0">
-            <p className="truncate font-medium text-gray-900">{lead.name}</p>
-            <p className="truncate text-xs text-gray-500">{lead.email}</p>
+            <p className="truncate font-medium text-gray-900 dark:text-slate-100">{lead.name}</p>
+            <p className="truncate text-xs text-gray-500 dark:text-slate-400">{lead.email}</p>
           </div>
         </div>
 
@@ -210,46 +210,46 @@ function LeadCard({
       </div>
 
       {/* Domain */}
-      <div className="flex items-center gap-2 text-sm text-gray-600">
-        <Briefcase className="h-4 w-4 shrink-0 text-gray-400" />
+      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
+        <Briefcase className="h-4 w-4 shrink-0 text-gray-400 dark:text-slate-500" />
         <span className="truncate">{lead.domain}</span>
       </div>
 
       {/* Phone */}
       {lead.number && (
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <Phone className="h-4 w-4 shrink-0 text-gray-400" />
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-slate-400">
+          <Phone className="h-4 w-4 shrink-0 text-gray-400 dark:text-slate-500" />
           <span className="truncate">{lead.number}</span>
         </div>
       )}
 
       {/* Challenge preview */}
       {lead.challenge && (
-        <div className="flex items-start gap-2 text-xs text-gray-500">
-          <MessageSquare className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gray-400" />
+        <div className="flex items-start gap-2 text-xs text-gray-500 dark:text-slate-400">
+          <MessageSquare className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gray-400 dark:text-slate-500" />
           <span className="line-clamp-3">{lead.challenge}</span>
         </div>
       )}
 
       {/* Footer info */}
-      <div className="mt-1 flex flex-col gap-2 border-t border-gray-100 pt-3 text-xs text-gray-500">
+      <div className="mt-1 flex flex-col gap-2 border-t border-gray-100 pt-3 text-xs text-gray-500 dark:border-slate-800 dark:text-slate-400">
         {lead.timeline && (
           <div className="flex items-center gap-1.5">
-            <CalendarClock className="h-3.5 w-3.5 text-gray-400" />
+            <CalendarClock className="h-3.5 w-3.5 text-gray-400 dark:text-slate-500" />
             <span className="truncate">Timeline: {lead.timeline}</span>
           </div>
         )}
 
         {lead.hear && (
           <div className="flex items-center gap-1.5">
-            <Megaphone className="h-3.5 w-3.5 text-gray-400" />
+            <Megaphone className="h-3.5 w-3.5 text-gray-400 dark:text-slate-500" />
             <span className="truncate">Source: {lead.hear}</span>
           </div>
         )}
 
         {createdLabel && (
           <div className="flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5 text-gray-400" />
+            <Clock className="h-3.5 w-3.5 text-gray-400 dark:text-slate-500" />
             <span>{createdLabel}</span>
           </div>
         )}

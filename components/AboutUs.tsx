@@ -135,12 +135,12 @@ const AboutUs = () => {
       {/* ── SECTION 1: TESTIMONIAL ── */}
       <section
         ref={testimonialRef}
-        className="relative bg-white overflow-hidden border-b border-gray-200"
+        className="relative bg-background overflow-hidden border-b border-gray-200 dark:border-slate-800 transition-colors duration-300"
       >
         {/* ORANGE CIRCLE */}
         <div
           className=" absolute w-[700px] h-[700px] sm:w-[900px] sm:h-[900px] lg:w-[1275px] lg:h-[1275px] rounded-full bg-[#FFAE58] -top-40 -left-60 sm:-top-52 sm:-left-80 lg:-top-60 lg:-left-200 p-[120px] sm:p-[160px] lg:p-[200px] " >
-          <div className="w-full h-full rounded-full bg-white" />
+          <div className="w-full h-full rounded-full bg-background transition-colors duration-300" />
         </div>
 
         <div
@@ -160,23 +160,23 @@ const AboutUs = () => {
                 className="w-full h-[420px] sm:h-[520px] lg:h-[631px] object-cover object-top"
               />
 
-              <div className="relative xl:absolute xl:left-80 w-full max-w-[569px] border border-gray-300 font-inter bg-white shadow-lg p-5 sm:p-6 mt-6 xl:mt-8">
-                <h3 className="text-[28px] sm:text-[40px] font-bold text-black">
+              <div className="relative xl:absolute xl:left-80 w-full max-w-[569px] border border-gray-300 dark:border-slate-800 font-inter bg-card shadow-lg p-5 sm:p-6 mt-6 xl:mt-8 transition-colors duration-300">
+                <h3 className="text-[28px] sm:text-[40px] font-bold text-black dark:text-white">
                   {current.name}
                 </h3>
 
-                <p className="text-[14px] text-gray-400 mb-4">
+                <p className="text-[14px] text-gray-400 dark:text-slate-400 mb-4">
                   {current.role}
                 </p>
 
-                <p className="text-[16px] sm:text-[20px] text-black leading-relaxed">
+                <p className="text-[16px] sm:text-[20px] text-black dark:text-slate-200 leading-relaxed">
                   {current.text}
                 </p>
               </div>
 
               {/* STARS */}
               <div
-                className=" relative xl:absolute xl:left-80 xl:bottom-10 flex items-center gap-2 sm:gap-4 bg-white border border-gray-200 px-4 sm:px-6 py-3 sm:py-4 shadow-lg mt-6 " >
+                className=" relative xl:absolute xl:left-80 xl:bottom-10 flex items-center gap-2 sm:gap-4 bg-card border border-gray-200 dark:border-slate-800 px-4 sm:px-6 py-3 sm:py-4 shadow-lg mt-6 transition-colors duration-300 " >
                 {[...Array(5)].map((_, i) => (
                   <span
                     key={i}
@@ -191,7 +191,7 @@ const AboutUs = () => {
             <div
               className=" flex-1 text-center xl:text-right " >
               <h2
-                className=" leading-tight text-black text-[42px] sm:text-[58px] lg:text-[72px] font-[700] " >
+                className=" leading-tight text-black dark:text-white text-[42px] sm:text-[58px] lg:text-[72px] font-[700] " >
                 What others{" "}
                 <span className="text-orange-400">think</span>
                 <br />
@@ -200,7 +200,7 @@ const AboutUs = () => {
 
               {/* QUOTE */}
               <div
-                className=" mt-4 xl:mt-6 mx-auto xl:ml-auto xl:mr-0 w-fit text-[70px] sm:text-[100px] leading-none font-black text-gray-100 select-none "
+                className=" mt-4 xl:mt-6 mx-auto xl:ml-auto xl:mr-0 w-fit text-[70px] sm:text-[100px] leading-none font-black text-gray-100 dark:text-slate-800 select-none "
                 style={{ fontFamily: "Georgia, serif" }}
               >
                 "
@@ -214,7 +214,7 @@ const AboutUs = () => {
                       prev === 0 ? testimonials.length - 1 : prev - 1
                     )
                   }
-                  className="w-14 h-14 sm:w-20 sm:h-20 border-2 border-gray-300 text-gray-500 flex items-center justify-center hover:bg-gray-50"
+                  className="w-14 h-14 sm:w-20 sm:h-20 border-2 border-gray-300 dark:border-slate-800 text-gray-500 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-slate-800/50"
                 >
                   <ChevronLeft size={20} />
                 </button>
@@ -223,7 +223,7 @@ const AboutUs = () => {
                   onClick={() =>
                     setIndex((prev) => (prev + 1) % testimonials.length)
                   }
-                  className="w-14 h-14 sm:w-20 sm:h-20 border-2 border-gray-300 text-black flex items-center justify-center hover:bg-gray-50"
+                  className="w-14 h-14 sm:w-20 sm:h-20 border-2 border-gray-300 dark:border-slate-800 text-black dark:text-white flex items-center justify-center hover:bg-gray-50 dark:hover:bg-slate-800/50"
                 >
                   <ChevronRight size={20} />
                 </button>
@@ -234,16 +234,16 @@ const AboutUs = () => {
       </section>
 
       {/* ── SECTION 2: FAQ ── */}
-      <section ref={faqRef} className="bg-white font-inter">
+      <section ref={faqRef} className="bg-background font-inter transition-colors duration-300">
         <div className="max-w-[1600px] mx-auto">
 
           {/* TOP */}
           <div
-            className=" flex flex-col lg:flex-row items-center lg:items-start justify-between gap-10 bg-orange-300/10 px-4 sm:px-8 lg:px-20 pt-10 " >
+            className=" flex flex-col lg:flex-row items-center lg:items-start justify-between gap-10 bg-orange-300/10 dark:bg-orange-400/5 px-4 sm:px-8 lg:px-20 pt-10 " >
             {/* HEADING */}
             <div className="flex">
               <h2
-                className=" text-[36px] sm:text-[48px] lg:text-[60px] font-medium text-black leading-tight text-center lg:text-left " >
+                className=" text-[36px] sm:text-[48px] lg:text-[60px] font-medium text-black dark:text-white leading-tight text-center lg:text-left " >
                 Things,{" "}
                 <span
                   className=" inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#FFAE58] text-white text-[18px] sm:text-[20px] font-bold " >
@@ -270,7 +270,7 @@ const AboutUs = () => {
           <div
             className=" mt-8 max-w-[1200px] mx-auto px-4 sm:px-8 lg:px-20 space-y-4 pb-12 " >
             {faqs.map((faq, i) => (
-              <div key={i} className="border border-gray-200">
+              <div key={i} className="border border-gray-200 dark:border-slate-800 bg-card transition-colors duration-300">
                 <button
                   className=" w-full flex items-center justify-between gap-5 py-5 sm:py-6 px-4 sm:px-5 text-left
               "
@@ -281,8 +281,8 @@ const AboutUs = () => {
                   <span
                     className={` text-[15px] sm:text-[16px]
                   ${openIndex === i
-                        ? "font-semibold text-black"
-                        : "text-gray-600"
+                        ? "font-semibold text-black dark:text-white"
+                        : "text-gray-600 dark:text-slate-300"
                       }
                 `}
                   >
@@ -299,7 +299,7 @@ const AboutUs = () => {
 
                 {openIndex === i && faq.answer && (
                   <p
-                    className=" pb-4 px-4 sm:px-5 text-[13px] text-gray-500 leading-relaxed">
+                    className=" pb-4 px-4 sm:px-5 text-[13px] text-gray-500 dark:text-slate-400 leading-relaxed">
                     {faq.answer}
                   </p>
                 )}

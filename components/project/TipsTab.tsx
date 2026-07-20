@@ -57,7 +57,7 @@ export default function UsefulTipsTab({ projectId }: { projectId: string }) {
       ) : (
         <div className="space-y-3">
           {tips.map((tip: any) => (
-            <div key={tip.id} className="bg-white rounded-xl border border-[var(--border)] p-5">
+            <div key={tip.id} className="bg-white rounded-xl border border-[var(--border)] p-5 dark:bg-card">
               <div className="flex items-start gap-3">
                 <Lightbulb size={18} style={{ color: "var(--primary)", marginTop: 2 }} />
                 <div className="flex-1">
@@ -75,9 +75,9 @@ export default function UsefulTipsTab({ projectId }: { projectId: string }) {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div className="bg-white w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg">
+          <div className="bg-white w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg dark:bg-card">
             <h3 className="text-lg font-semibold  mb-4" style={{ color: "var(--text-primary)" }}>Share a Useful Tip</h3>
-            <textarea value={newTip.tip} onChange={(e) => setNewTip({ tip: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)]  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] resize-none" rows={4} placeholder="Share your insight..." disabled={creating} />
+            <textarea value={newTip.tip} onChange={(e) => setNewTip({ tip: e.target.value })} className="w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] resize-none dark:bg-card" rows={4} placeholder="Share your insight..." disabled={creating} />
             <div className="flex justify-end gap-3 mt-4">
               <button onClick={() => { setShowModal(false); setNewTip({ tip: "" }); }} className="px-4 py-2 bg-[var(--bg)] border border-[var(--border)] rounded-lg  text-sm" style={{ color: "var(--text-secondary)" }}>Cancel</button>
               <button onClick={createTip} disabled={creating || !newTip.tip.trim()} className="px-4 py-2 text-white rounded-lg  text-sm disabled:opacity-40" style={{ background: "var(--primary)" }}>

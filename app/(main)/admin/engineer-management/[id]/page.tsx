@@ -57,10 +57,10 @@ export default function AdminEngineerProfile({ params }: { params: Promise<{ id:
     <DashboardShell>
     <div className="space-y-6 pb-10 max-w-6xl mx-auto">
       {/* TOP ACTION BAR */}
-      <div className="bg-white border border-[var(--border)] rounded-2xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm">
+      <div className="bg-white border border-[var(--border)] rounded-2xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-sm dark:bg-card">
         <div className="flex items-center gap-4">
-          <button onClick={() => router.back()} className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors">
-            <ArrowLeft size={18} className="text-gray-600" />
+          <button onClick={() => router.back()} className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors dark:bg-slate-800">
+            <ArrowLeft size={18} className="text-gray-600 dark:text-slate-400" />
           </button>
           <div>
             <h2 className="text-xl font-bold font-inter text-[var(--text-primary)]">Manage Engineer</h2>

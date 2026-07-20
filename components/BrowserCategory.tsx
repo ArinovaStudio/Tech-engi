@@ -121,7 +121,7 @@ const BrowserCategory = () => {
   }, []);
 
   return (
-    <section id="Categories" className="w-full bg-white py-12 sm:py-16 lg:py-20 px-4 sm:px-6 font-id">
+    <section id="Categories" className="w-full bg-background py-12 sm:py-16 lg:py-20 px-4 sm:px-6 font-id transition-colors duration-300">
       <div className="max-w-[1600px] mx-auto">
 
         {/* HEADER */}
@@ -131,22 +131,22 @@ const BrowserCategory = () => {
           {/* LEFT */}
           <div>
             <p
-              className=" text-[42px] sm:text-[54px] lg:text-[64px] font-black leading-[1.0] text-black " >
+              className=" text-[42px] sm:text-[54px] lg:text-[64px] font-black leading-[1.0] text-black dark:text-white " >
               Browse by
             </p>
 
             <div className="flex items-center gap-3 sm:gap-4">
-              <div className="h-[3px] w-10 sm:w-16 bg-black" />
+              <div className="h-[3px] w-10 sm:w-16 bg-black dark:bg-white" />
 
               <p
-                className=" text-[42px] sm:text-[54px] lg:text-[64px] font-black leading-[1.0] text-black " >
+                className=" text-[42px] sm:text-[54px] lg:text-[64px] font-black leading-[1.0] text-black dark:text-white " >
                 Category
               </p>
             </div>
           </div>
 
           {/* RIGHT */}
-          <p className="text-[6px] sm:text-[10px] lg:text-[18px] font-medium text-gray-500 text-left lg:text-right font-inter lg:mt-4 leading-none">
+          <p className="text-[6px] sm:text-[10px] lg:text-[18px] font-medium text-gray-500 dark:text-slate-400 text-left lg:text-right font-inter lg:mt-4 leading-none">
             Find projects and talent across key
             <br className="hidden sm:block" />
             engineering disciplines
@@ -173,8 +173,8 @@ const BrowserCategory = () => {
                   className={` flex items-center gap-3 sm:gap-5 px-4 sm:px-6 py-4 sm:py-5 border transition-all duration-300 rounded-none cursor-pointer text-left
 
                 ${active
-                      ? "bg-black text-white border-black"
-                      : "bg-white text-black border-gray-300 hover:border-black"
+                      ? "bg-black dark:bg-white text-white dark:text-black border-black dark:border-white"
+                      : "bg-white dark:bg-card text-black dark:text-white border-gray-300 dark:border-slate-800 hover:border-black dark:hover:border-white"
                     }
               `}
                 >
@@ -197,12 +197,12 @@ const BrowserCategory = () => {
 
             {/* TITLE */}
             <h3
-              className=" text-[34px] sm:text-[42px] lg:text-[50px] font-extrabold text-black text-left lg:text-right leading-tight">
+              className=" text-[34px] sm:text-[42px] lg:text-[50px] font-extrabold text-black dark:text-white text-left lg:text-right leading-tight">
               {selectedCategory.title}
             </h3>
 
             <h4
-              className="text-[14px] sm:text-[15px] lg:text-[17px] text-gray-700 text-left lg:text-right mb-1 font-inter leading-relaxed">
+              className="text-[14px] sm:text-[15px] lg:text-[17px] text-gray-700 dark:text-slate-300 text-left lg:text-right mb-1 font-inter leading-relaxed">
               {selectedCategory.description1}
             </h4>
 

@@ -105,16 +105,16 @@ export default function DailyScheduleCard({projectsData,}: DailyScheduleCardProp
   };
 
   return (
-    <div className="rounded-[32px] bg-white h-92 p-6">
+    <div className="rounded-[32px] bg-white dark:bg-card h-92 p-6">
 
       {/* Header */}
       <div className="mb-7 flex items-center justify-between">
 
-        <h3 className="text-[25px] font-semibold tracking-[-1px] text-[#111111]">
+        <h3 className="text-[25px] font-semibold tracking-[-1px] text-[#111111] dark:text-white">
           Daily Schedule
         </h3>
 
-        <div className="flex h-11 min-w-11 items-center justify-center rounded-full bg-[#F5F5F5] px-4 text-[15px] font-semibold text-[#666666]">
+        <div className="flex h-11 min-w-11 items-center justify-center rounded-full bg-[#F5F5F5] dark:bg-slate-700 px-4 text-[15px] font-semibold text-[#666666] dark:text-slate-300">
           {tasks.length}
         </div>
       </div>
@@ -126,7 +126,7 @@ export default function DailyScheduleCard({projectsData,}: DailyScheduleCardProp
           tasks.map((task: KanbanTask) => (
             <div
               key={task.id}
-              className="flex items-center justify-between rounded-[28px] bg-[#FAFAFA] p-4 transition-all duration-200 hover:bg-[#F5F5F5]"
+              className="flex items-center justify-between rounded-[28px] bg-[#FAFAFA] dark:bg-slate-800 p-4 transition-all duration-200 hover:bg-[#F5F5F5] dark:hover:bg-slate-700"
             >
 
               {/* Left */}
@@ -145,7 +145,7 @@ export default function DailyScheduleCard({projectsData,}: DailyScheduleCardProp
                 <div className="min-w-0 flex items-center gap-4 justify-between w-full">
 
                   <div>
-                    <h4 className="truncate text-[18px] font-semibold text-[#18181B]">
+                    <h4 className="truncate text-[18px] font-semibold text-[#18181B] dark:text-slate-100">
                     {task.title}
                   </h4>
                   </div>
@@ -162,7 +162,7 @@ export default function DailyScheduleCard({projectsData,}: DailyScheduleCardProp
                     </span>
 
                     {/* Date */}
-                    <p className="text-[15px] text-[#71717A]">
+                    <p className="text-[15px] text-[#71717A] dark:text-slate-400">
                       {new Date(
                         task.dueDate
                       ).toLocaleDateString(
@@ -188,20 +188,20 @@ export default function DailyScheduleCard({projectsData,}: DailyScheduleCardProp
             </div>
           ))
         ) : (
-          <div className="flex h-[300px] flex-col items-center justify-center rounded-[28px] bg-[#FAFAFA]">
+          <div className="flex h-[300px] flex-col items-center justify-center rounded-[28px] bg-[#FAFAFA] dark:bg-slate-800">
 
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-sm">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white dark:bg-slate-700 shadow-sm">
               <Clock3
                 size={28}
-                className="text-[#999999]"
+                className="text-[#999999] dark:text-slate-400"
               />
             </div>
 
-            <h4 className="mt-5 text-[20px] font-semibold text-[#222222]">
+            <h4 className="mt-5 text-[20px] font-semibold text-[#222222] dark:text-slate-100">
               No Tasks Available
             </h4>
 
-            <p className="mt-1 text-[14px] text-[#8A8A8A]">
+            <p className="mt-1 text-[14px] text-[#8A8A8A] dark:text-slate-400">
               No kanban tasks found
             </p>
           </div>

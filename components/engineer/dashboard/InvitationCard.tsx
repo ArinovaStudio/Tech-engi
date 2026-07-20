@@ -58,11 +58,11 @@ export default function InvitationCard({ invitationsData, onAccept, onReject, }:
 
             {/* Header */}
             <div className="mb-3 flex items-center justify-between">
-                <h3 className="text-[25px] font-semibold tracking-[-1px] text-[#111111]">
+                <h3 className="text-[25px] font-semibold tracking-[-1px] text-[#111111] dark:text-white">
                     Invitations
                 </h3>
 
-                <span className="flex h-11 min-w-11 items-center justify-center rounded-full bg-[#F5F5F5] px-4 text-[15px] font-semibold text-[#666666]">
+                <span className="flex h-11 min-w-11 items-center justify-center rounded-full bg-[#F5F5F5] dark:bg-slate-700 px-4 text-[15px] font-semibold text-[#666666] dark:text-slate-300">
                     {invitationsData?.total || 0}
                 </span>
             </div>
@@ -75,7 +75,7 @@ export default function InvitationCard({ invitationsData, onAccept, onReject, }:
                         (invitation: Invitation) => (
                             <div
                                 key={invitation.id}
-                                className="rounded-[30px] bg-[#f5f2f2] p-5 transition-all duration-200 hover:bg-[#F6F6F6]"
+                                className="rounded-[30px] bg-[#f5f2f2] dark:bg-slate-800 p-5 transition-all duration-200 hover:bg-[#F6F6F6] dark:hover:bg-slate-700"
                             >
 
                                 {/* Top */}
@@ -93,11 +93,11 @@ export default function InvitationCard({ invitationsData, onAccept, onReject, }:
 
                                         {/* Content */}
                                         <div className="min-w-0">
-                                            <h4 className="truncate text-[22px] font-semibold text-[#18181B]">
+                                            <h4 className="truncate text-[22px] font-semibold text-[#18181B] dark:text-slate-100">
                                                 {invitation.project.title}
                                             </h4>
 
-                                            <p className="mt-2 text-[15px] text-[#71717A]">
+                                            <p className="mt-2 text-[15px] text-[#71717A] dark:text-slate-400">
                                                 {new Date(
                                                     invitation.createdAt
                                                 ).toLocaleDateString(
@@ -157,7 +157,7 @@ export default function InvitationCard({ invitationsData, onAccept, onReject, }:
                                             onClick={() =>
                                                 handleUpdate(invitation.id, "ACCEPTED")
                                             }
-                                            className="flex-1 cursor-pointer rounded-2xl bg-[#D7F266] px-5 py-3 text-[15px] font-semibold text-[#111111] transition-all hover:bg-[#CBEF4E] disabled:cursor-not-allowed disabled:opacity-50"
+                                            className="flex-1 cursor-pointer rounded-2xl bg-[#D7F266] px-5 py-3 text-[15px] font-semibold text-[#111111] dark:text-slate-900 transition-all hover:bg-[#CBEF4E] disabled:cursor-not-allowed disabled:opacity-50"
                                         >
                                             {loadingId === invitation.id
                                                 ? "Loading..."
@@ -170,7 +170,7 @@ export default function InvitationCard({ invitationsData, onAccept, onReject, }:
                                             onClick={() =>
                                                 handleUpdate(invitation.id, "REJECTED")
                                             }
-                                            className="flex-1 cursor-pointer rounded-2xl bg-[#F3F3F3] px-5 py-3 text-[15px] font-semibold text-[#555555] transition-all hover:bg-[#EBEBEB] disabled:cursor-not-allowed disabled:opacity-50"
+                                            className="flex-1 cursor-pointer rounded-2xl bg-[#F3F3F3] dark:bg-slate-700 px-5 py-3 text-[15px] font-semibold text-[#555555] dark:text-slate-300 transition-all hover:bg-[#EBEBEB] dark:hover:bg-slate-600 disabled:cursor-not-allowed disabled:opacity-50"
                                         >
                                             {loadingId === invitation.id
                                                 ? "Loading..."
@@ -182,19 +182,19 @@ export default function InvitationCard({ invitationsData, onAccept, onReject, }:
                         )
                     )
                 ) : (
-                    <div className="flex h-[220px] flex-col items-center justify-center rounded-[28px] bg-[#FAFAFA]">
+                    <div className="flex h-[220px] flex-col items-center justify-center rounded-[28px] bg-[#FAFAFA] dark:bg-slate-800">
 
-                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-sm">
+                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white dark:bg-slate-700 shadow-sm">
                             <span className="text-[24px]">
                                 📂
                             </span>
                         </div>
 
-                        <h4 className="mt-5 text-[18px] font-semibold text-[#222222]">
+                        <h4 className="mt-5 text-[18px] font-semibold text-[#222222] dark:text-slate-100">
                             No Invitations
                         </h4>
 
-                        <p className="mt-1 text-[14px] text-[#8A8A8A]">
+                        <p className="mt-1 text-[14px] text-[#8A8A8A] dark:text-slate-400">
                             No project invitations available
                         </p>
                     </div>

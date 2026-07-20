@@ -157,7 +157,7 @@ function InputField({
     <div className="space-y-2">
       <label
         htmlFor={name}
-        className="block text-sm font-medium text-slate-800"
+        className="block text-sm font-medium text-slate-800 dark:text-slate-200"
       >
         {label}
       </label>
@@ -211,7 +211,7 @@ function TextareaField({
     <div className="space-y-2">
       <label
         htmlFor={name}
-        className="block text-sm font-medium text-slate-800"
+        className="block text-sm font-medium text-slate-800 dark:text-slate-200"
       >
         {label}
       </label>
@@ -440,7 +440,7 @@ export default function ProjectReviewModal({
     >
       <div className="flex min-h-full items-start justify-center p-4 py-6 lg:items-center">
         <div
-          className="relative w-full max-w-6xl overflow-hidden rounded-3xl bg-white shadow-2xl"
+          className="relative w-full max-w-6xl overflow-hidden rounded-3xl bg-white shadow-2xl dark:bg-card"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close button - solid bg so it stays visible over either panel */}
@@ -592,13 +592,13 @@ export default function ProjectReviewModal({
             </div>
 
             {/* Right panel: order-1 on mobile (shown first), order-2 on desktop */}
-            <div className="order-1 bg-slate-50 px-6 py-8 sm:px-8 lg:order-2 lg:px-10 lg:py-10">
+            <div className="order-1 bg-slate-50 px-6 py-8 sm:px-8 lg:order-2 lg:px-10 lg:py-10 dark:bg-background">
               <div className="mx-auto max-w-2xl">
                 <div className="mb-8">
                   <h3 className="text-2xl font-semibold tracking-tight text-slate-950">
                     Project review request
                   </h3>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                  <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
                     Fill in the details below and we’ll get back to you with a
                     review of your engineering challenge.
                   </p>
@@ -681,15 +681,15 @@ export default function ProjectReviewModal({
                     />
                   </div>
 
-                  <div className="rounded-2xl border border-slate-200 bg-white p-5">
-                    <div className="flex flex-wrap gap-2.5 text-xs text-slate-600">
-                      <span className="rounded-full bg-slate-100 px-3 py-1.5">
+                  <div className="rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-card">
+                    <div className="flex flex-wrap gap-2.5 text-xs text-slate-600 dark:text-slate-400">
+                      <span className="rounded-full bg-slate-100 px-3 py-1.5 dark:bg-slate-800">
                         🔒 Your information stays confidential
                       </span>
-                      <span className="rounded-full bg-slate-100 px-3 py-1.5">
+                      <span className="rounded-full bg-slate-100 px-3 py-1.5 dark:bg-slate-800">
                         ⚡ No payment required
                       </span>
-                      <span className="rounded-full bg-slate-100 px-3 py-1.5">
+                      <span className="rounded-full bg-slate-100 px-3 py-1.5 dark:bg-slate-800">
                         👨‍💻 Reviewed by experienced engineers
                       </span>
                     </div>
@@ -706,7 +706,7 @@ export default function ProjectReviewModal({
                       type="button"
                       onClick={onClose}
                       disabled={loading}
-                      className="inline-flex h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="inline-flex h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-800 dark:bg-card dark:text-slate-300"
                     >
                       Maybe later
                     </button>

@@ -15,7 +15,7 @@ function getTabsForRole() {
 
 function TabBar({ tabs, active, setActive }: { tabs: string[]; active: string; setActive: (t: string) => void }) {
   return (
-    <div className="flex items-center gap-1 border-b border-[var(--border)] bg-white overflow-x-auto">
+    <div className="flex items-center gap-1 border-b border-[var(--border)] bg-white overflow-x-auto dark:bg-card">
       <Link href="/client/project" className="p-3 hover:bg-[var(--primary-light)] transition-colors shrink-0">
         <ArrowLeft size={18} className="text-[var(--text-muted)]" />
       </Link>

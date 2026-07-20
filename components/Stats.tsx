@@ -34,10 +34,10 @@ const Stats = () => {
   const iconsRef = useScrollAnimation('fadeUp')
 
   return (
-    <section className="w-full bg-white py-20 px6 font-inter">
+    <section className="w-full bg-background py-20 px6 font-inter transition-colors duration-300">
       <div className="mx-auto">
         <div ref={headingRef} className="text-center mb-18">
-          <h2 className="text-[40px] lg:text-[50px] font-semibold leading-tight text-slate-950">
+          <h2 className="text-[40px] lg:text-[50px] font-semibold leading-tight text-slate-950 dark:text-white">
             Trusted by <span className="italic">builders,</span><br /> startups &amp; growing teams
           </h2>
         </div>
@@ -48,12 +48,12 @@ const Stats = () => {
               <p className="text-[50px] lg:text-[70px] font-semibold bg-[linear-gradient(106.71deg,#00BBFF_16.24%,#C15DFF_53.84%,#FFAE58_69.09%)] bg-clip-text text-transparent">
                 {item.value}
               </p>
-              <p className="text-[20px] text-[#4B4B4B] font-id">{item.label}</p>
+              <p className="text-[20px] text-[#4B4B4B] dark:text-slate-350 font-id">{item.label}</p>
             </div>
           ))}
         </div>
 
-        <div ref={iconsRef} className="mt-26 w-full h-full border border-slate-200 py-8 w-full overflow-hidden">
+        <div ref={iconsRef} className="mt-26 w-full h-full border border-slate-200 dark:border-slate-800 bg-card py-8 w-full overflow-hidden transition-colors duration-300">
           <div className="flex animate-marquee items-center">
             {[...companyIcons, ...companyIcons].map((company, index) => (
               <div key={index} className="flex-shrink-0 h-10 w-[190px] lg:w-[290px] h-[60px] relative">

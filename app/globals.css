@@ -64,32 +64,40 @@
    DARK THEME
 ========================= */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
+  /* Tech-Engi Custom Tokens */
+  --bg: #0a0b10;
+  --bg-card: #13141f;
+  --primary: #ffae58;
+  --primary-light: #2c1e11;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --destructive: rgb(239, 68, 68);
 
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
+  /* Shadcn & Tailwind tokens */
+  --background: #0a0b10;
+  --foreground: #f8fafc;
 
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
+  --card: #13141f;
+  --card-foreground: #f8fafc;
 
-  --primary: oklch(0.922 0 0);
+  --popover: #13141f;
+  --popover-foreground: #f8fafc;
+
   --primary-foreground: oklch(0.205 0 0);
 
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
+  --secondary: #1e2030;
+  --secondary-foreground: #f8fafc;
 
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
+  --muted: #1e2030;
+  --muted-foreground: #94a3b8;
 
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --accent: #1e2030;
+  --accent-foreground: #f8fafc;
 
-  --destructive: oklch(0.704 0.191 22.216);
-
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #ffae58;
 
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
@@ -97,14 +105,14 @@
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
 
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar: #13141f;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #ffae58;
+  --sidebar-primary-foreground: #0a0b10;
+  --sidebar-accent: #1e2030;
+  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #ffae58;
 }
 
 /* =========================
@@ -295,13 +303,14 @@
 /* Import this once globally, e.g. in app/globals.css: @import "./payout-tour-theme.css"; */
 
 .driver-popover.payout-tour-popover {
-  background: #ffffff;
+  background: var(--popover);
   border: 1px solid var(--border);
-  border-radius: 0.75rem; /* rounded-xl */
+  border-radius: 0.75rem;
   box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.12);
   padding: 1.25rem;
   max-width: 320px;
   font-family: inherit;
+  color: var(--popover-foreground);
 }
 
 .payout-tour-popover .driver-popover-title {
@@ -328,7 +337,7 @@
   font-weight: 500;
   padding: 0.4rem 0.85rem;
   border: 1px solid var(--border);
-  background: #fff;
+  background: var(--popover);
   color: var(--text-primary);
   text-shadow: none;
 }
@@ -348,10 +357,48 @@
 .payout-tour-popover .driver-popover-arrow-side-right.driver-popover-arrow,
 .payout-tour-popover .driver-popover-arrow-side-top.driver-popover-arrow,
 .payout-tour-popover .driver-popover-arrow-side-bottom.driver-popover-arrow {
-  border-color: #ffffff;
+  border-color: var(--popover);
 }
 
-/* Highlighted element outline — subtle, matches primary color instead of driver.js default */
+/* Highlighted element outline */
 .driver-active-element {
   border-radius: 0.75rem !important;
+}
+
+/* =========================
+   GLOBAL DARK MODE UTILITY STYLES
+   Input, select, textarea auto-dark
+========================= */
+@layer base {
+  .dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+  .dark textarea,
+  .dark select {
+    background-color: #1a1b2e;
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #f8fafc;
+  }
+
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: #64748b;
+  }
+
+  .dark input:focus,
+  .dark textarea:focus,
+  .dark select:focus {
+    border-color: #ffae58;
+    outline-color: rgba(255, 174, 88, 0.3);
+  }
+
+  /* Scrollbar dark mode */
+  .dark ::-webkit-scrollbar {
+    background: #0a0b10;
+  }
+  .dark ::-webkit-scrollbar-thumb {
+    background: #2d2e44;
+    border-radius: 4px;
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #3d3e55;
+  }
 }

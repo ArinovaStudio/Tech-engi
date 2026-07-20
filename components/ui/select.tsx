@@ -43,7 +43,7 @@ export function CustomSelect({
       {label ? (
         <label
           htmlFor={name}
-          className="block text-sm font-medium text-slate-900"
+          className="block text-sm font-medium text-slate-900 dark:text-slate-100"
         >
           {label}
         </label>

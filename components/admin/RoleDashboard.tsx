@@ -224,7 +224,7 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
                 className="sm:w-[56px] sm:h-[56px] rounded-full object-cover"
               />
             ) : (
-              <div className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-gray-200 font-semibold">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-full bg-gray-200 font-semibold dark:bg-slate-800">
                 {(u.name || "U").charAt(0).toUpperCase()}
               </div>
             )}
@@ -262,7 +262,7 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
             </div>
 
             {/* INFO */}
-            <div className="mt-2 flex flex-col gap-1 text-sm text-gray-600">
+            <div className="mt-2 flex flex-col gap-1 text-sm text-gray-600 dark:text-slate-400">
               <div style={s.iconRow}>
                 <Mail size={12} />
                 <span className="truncate">{u.email}</span>
@@ -299,7 +299,7 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
 
             {/* DIVIDER TEXT */}
             <div className="mt-3 border-t pt-3">
-              <p className="text-xs text-gray-600 leading-relaxed">
+              <p className="text-xs text-gray-600 leading-relaxed dark:text-slate-400">
                 {role === "ENGINEER" && (
                   <>
                     <strong>Skills:</strong>{" "}
@@ -379,7 +379,7 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
 
           <div className="flex flex-col md:flex-row items-center gap-3">
             <div className="relative w-full md:w-64">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
               <input
                 type="text"
                 placeholder="Search name or email..."
@@ -392,11 +392,11 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
             <div className="flex items-center gap-8">
               {role === "ENGINEER" && (
               <div className="relative">
-                <Filter size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                <Filter size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none dark:text-slate-500" />
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="pl-8 pr-8 py-2 border border-[#e5e5e5] rounded-lg text-sm outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[#FFAE58] bg-white"
+                  className="pl-8 pr-8 py-2 border border-[#e5e5e5] rounded-lg text-sm outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[#FFAE58] bg-white dark:bg-card"
                 >
                   <option value="ALL">All Status</option>
                   <option value="APPROVED">Approved Only</option>
@@ -408,7 +408,7 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
             {role === "ENGINEER" && (
               <button
                 onClick={() => setStatusFilter(statusFilter === "PENDING" ? "APPROVED" : "PENDING")}
-                className={`relative p-2.5 rounded-lg border transition-colors ${statusFilter === "PENDING" ? "bg-[#FFAE58] text-white border-[#FFAE58]" : "bg-white border-[#e5e5e5] text-gray-600 hover:bg-gray-50"}`}
+                className={`relative p-2.5 rounded-lg border transition-colors ${statusFilter === "PENDING" ? "bg-[#FFAE58] text-white border-[#FFAE58]" : "bg-white border-[#e5e5e5] text-gray-600 hover:bg-gray-50"} dark:text-slate-400`}
                 title="View Pending Requests"
               >
                 <Bell size={18} />

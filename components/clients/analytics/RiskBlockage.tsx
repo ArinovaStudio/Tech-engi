@@ -88,9 +88,7 @@ const RiskBlockage = ({ tickets = [] }: { tickets: any[] }) => {
       </div>
 
       {/* Bottom Fade */}
-      <div
-  className=" pointer-events-none absolute bottom-2 left-2 right-2 h-10 rounded-b-2xl bg-gradient-to-t from-white to-transparent"/>
-
+     <div className="pointer-events-none absolute bottom-2 left-2 right-2 h-10 rounded-b-2xl bg-gradient-to-t from-white dark:from-card to-transparent"/>
     </div>
   );
 };

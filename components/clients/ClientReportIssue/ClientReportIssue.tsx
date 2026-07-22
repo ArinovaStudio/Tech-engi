@@ -297,7 +297,7 @@ const ClientReportIssue = () => {
 
     }, [currentUserId, sortedTickets.length]);
 
-    const inputCls = "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
+    const inputCls = "w-full px-3 py-2 rounded-lg bg-white dark:bg-card dark:text-white border border-[var(--border)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
 
     if (loading)
         return (
@@ -480,8 +480,7 @@ const ClientReportIssue = () => {
                                 <select
                                     value={selectedProjectId}
                                     onChange={(e) => setSelectedProjectId(e.target.value)}
-                                    className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] dark:bg-card"
-                                >
+                                    className="w-full px-4 py-3 rounded-xl border border-[var(--border)] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] dark:bg-card dark:text-white"                                >
                                     <option value="" disabled>Select Project</option>
                                     {projects.map((project) => (
                                         <option key={project.id} value={project.id}>{project.title}</option>
@@ -525,7 +524,7 @@ const ClientReportIssue = () => {
                                 </label>
                                 <label
                                     htmlFor="ticket-images"
-                                    className="group flex flex-col items-center justify-center w-full min-h-[140px] rounded-2xl border-2 border-dashed border-[#FFD4A6] bg-gradient-to-br from-[#FFF8F1] to-[#FFF3E6] cursor-pointer transition-all duration-300 hover:border-[#FFAE58] hover:shadow-[0_8px_30px_rgba(255,174,88,0.15)]"
+                                    className="group flex flex-col items-center justify-center w-full min-h-[140px] rounded-2xl border-2 border-dashed border-[#FFD4A6] dark:border-[#5a4632] bg-gradient-to-br from-[#FFF8F1] to-[#FFF3E6] dark:from-slate-800 dark:to-slate-800 cursor-pointer transition-all duration-300 hover:border-[#FFAE58] hover:shadow-[0_8px_30px_rgba(255,174,88,0.15)]"
                                 >
                                     <input
                                         id="ticket-images"

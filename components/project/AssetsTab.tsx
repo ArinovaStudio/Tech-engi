@@ -15,10 +15,6 @@ import { useSession } from "next-auth/react";
 import { driver, type Driver, type DriveStep } from "driver.js";
 import "driver.js/dist/driver.css";
 
-// driver.js's default overlay can read as quite heavy, and the cutout
-// around the active element sometimes looks "dulled" rather than crisp.
-// This keeps the highlighted element at full brightness with a clean ring.
-// Plain <style> (not styled-jsx) so it works regardless of project setup.
 function TourStyleOverrides() {
   return (
     <style
@@ -248,8 +244,6 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
   const [content, setContent] = useState("");
   const [deleting, setDeleting] = useState(false);
 
-  // Holds the active driver.js instance so the "open modal -> continue tour"
-  // handoff can call .moveNext() / .destroy() on it from outside the effect.
   const tourRef = useRef<Driver | null>(null);
 
   const [deleteModal, setDeleteModal] = useState<{
@@ -292,7 +286,6 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
   const isAdmin = role === "ADMIN";
   const isEngineer = role === "ENGINEER";
 
-  // Only Admin & Engineer can upload resources
   const canUpload = isAdmin || isEngineer;
 
   const fetchResources = async () => {
@@ -315,13 +308,6 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
     fetchResources();
   }, [projectId]);
 
-  // ---------------------------------------------------------------------
-  // TOUR
-  // ---------------------------------------------------------------------
-  // Flow: page steps (Resources heading -> table header -> a row -> Upload
-  // Resource button) -> clicking "Next" on the Upload button step opens the
-  // modal -> tour continues inside the modal (Title -> Type -> Dropzone ->
-  // Upload button) -> destroy + mark as seen on close/finish.
   useEffect(() => {
     if (loading) return;
     if (!session?.user?.id) return;
@@ -578,8 +564,6 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
     }
   };
 
-  // If the user closes/cancels the modal mid-tour, kill the tour gracefully
-  // instead of leaving it pointed at a now-unmounted element.
   const closeUploadModal = () => {
     setOpen(false);
     if (tourRef.current) {
@@ -587,7 +571,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
     }
   };
 
-  const inputCls = "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)]  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
+  const inputCls = "w-full px-3 py-2 rounded-lg bg-white dark:bg-card text-[var(--text-primary)] border border-[var(--border)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
   const labelCls = "block text-sm font-medium  mb-1.5";
 
   return (
@@ -637,7 +621,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
             <div
               key={resource.id}
               data-tour={index === 0 ? "assets-row-0" : undefined}
-              className="grid grid-cols-12 gap-4 px-5 py-4 border-b border-gray-100 items-center hover:bg-gray-50 transition dark:border-slate-800"
+              className="grid grid-cols-12 gap-4 px-5 py-4 border-b border-gray-100 items-center hover:bg-gray-50 dark:hover:bg-[var(--accent)] transition dark:border-slate-800"
             >
 
               {/* RESOURCE */}
@@ -659,14 +643,14 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
 
                   {resource.type === "CREDENTIALS" &&
                     visibleCredentials[resource.id] ? (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2">
-                      <pre className="text-xs whitespace-pre-wrap font-mono text-yellow-800">
+                    <div className="bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-900 rounded-lg px-3 py-2">
+                      <pre className="text-xs whitespace-pre-wrap font-mono text-yellow-800 dark:text-yellow-300">
                         {resource.content}
                       </pre>
                     </div>
                   ) : (
                     <>
-                      <p className="font-medium truncate">
+                      <p className="font-medium truncate text-gray-900 dark:text-slate-100">
                         {resource.title}
                       </p>
 
@@ -686,14 +670,14 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
                 <span
                   className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold
           ${resource.type === "IMAGE"
-                      ? "bg-green-100 text-green-700"
+                      ? "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300"
                       : resource.type === "FILE"
-                        ? "bg-blue-100 text-blue-700"
+                        ? "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300"
                         : resource.type === "LINK"
-                          ? "bg-purple-100 text-purple-700"
+                          ? "bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300"
                           : resource.type === "CREDENTIALS"
-                            ? "bg-red-100 text-red-700"
-                            : "bg-yellow-100 text-yellow-700"
+                            ? "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300"
+                            : "bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300"
                     }`}
                 >
                   {resource.type}
@@ -702,7 +686,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
 
               {/* USER */}
               <div className="col-span-2 flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full overflow-hidden border">
+                <div className="w-8 h-8 rounded-full overflow-hidden border border-[var(--border)]">
                   {resource.addedBy?.image ? (
                     <Image
                       src={resource.addedBy.image}
@@ -717,7 +701,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
                   )}
                 </div>
 
-                <span className="text-sm truncate">
+                <span className="text-sm truncate text-gray-900 dark:text-slate-100">
                   {resource.addedBy?.name}
                 </span>
               </div>
@@ -738,7 +722,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
                         onClick={() =>
                           window.open(resource.content, "_blank")
                         }
-                        className="p-2 rounded-lg hover:bg-gray-100 transition"
+                        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[var(--accent)] transition"
                       >
                         <Eye size={16} />
                       </button>
@@ -751,7 +735,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
                         onClick={() =>
                           triggerSuccess(resource.id, "download")
                         }
-                        className="p-2 rounded-lg hover:bg-gray-100 transition"
+                        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[var(--accent)] transition"
                       >
                         {actionState.id === resource.id &&
                           actionState.action === "download" ? (
@@ -776,7 +760,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
 
                       triggerSuccess(resource.id, "copy");
                     }}
-                    className="p-2 rounded-lg hover:bg-gray-100 transition"
+                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[var(--accent)] transition"
                   >
                     {actionState.id === resource.id &&
                       actionState.action === "copy" ? (
@@ -800,7 +784,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
 
                       triggerSuccess(resource.id, "copy");
                     }}
-                    className="p-2 rounded-lg hover:bg-gray-100 transition"
+                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[var(--accent)] transition"
                   >
                     {actionState.id === resource.id &&
                       actionState.action === "copy" ? (
@@ -824,7 +808,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
                           !prev[resource.id],
                       }))
                     }
-                    className="p-2 rounded-lg hover:bg-gray-100 transition"
+                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[var(--accent)] transition"
                   >
                     {visibleCredentials[resource.id] ? (
                       <EyeOff size={16} />
@@ -840,7 +824,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
                     onClick={() =>
                       openDeleteModal(resource.id)
                     }
-                    className="p-2 rounded-lg text-red-500 hover:bg-red-50 transition"
+                    className="p-2 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -883,7 +867,6 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
               <option value="FILE">File (ZIP, PDF, etc.)</option>
               <option value="LINK">Link</option>
               <option value="TEXT">Text Note</option>
-              {/* Hide Credentials option from Clients (though they shouldn't reach here) */}
               {(isAdmin || isEngineer) && (
                 <option value="CREDENTIALS">Credentials</option>
               )}
@@ -920,8 +903,8 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
                   }
                 }}
                 className={`relative mb-4 rounded-xl border-2 border-dashed p-6 transition-all duration-200 ${dragActive
-                  ? "border-[var(--primary)] bg-orange-50"
-                  : "border-gray-300 bg-gray-50"
+                  ? "border-[var(--primary)] bg-orange-50 dark:bg-[var(--primary-light)]"
+                  : "border-[var(--border)] bg-gray-50 dark:bg-[var(--bg)]"
                   }`}
               >
                 {/* HIDDEN INPUT */}
@@ -968,7 +951,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
                           <img
                             src={URL.createObjectURL(file)}
                             alt="preview"
-                            className="max-h-52 w-full object-cover rounded-lg border"
+                            className="max-h-52 w-full object-cover rounded-lg border border-[var(--border)]"
                           />
 
                           <div className="text-xs text-gray-600 break-all dark:text-slate-400">
@@ -1061,7 +1044,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
                     resourceId: null,
                   })
                 }
-                className="p-1 rounded-lg hover:bg-gray-100"
+                className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-[var(--accent)]"
               >
                 <X size={18} />
               </button>
@@ -1077,7 +1060,7 @@ export default function AssetsTab({ projectId }: { projectId: string }) {
                     resourceId: null,
                   })
                 }
-                className="px-4 py-2 rounded-xl border border-gray-300 text-sm font-medium hover:bg-gray-100 dark:border-slate-700"
+                className="px-4 py-2 rounded-xl border border-gray-300 dark:border-slate-700 text-sm font-medium hover:bg-gray-100 dark:hover:bg-[var(--accent)]"
               >
                 Cancel
               </button>

@@ -19,18 +19,18 @@ import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 
 const statusColors: Record<string, string> = {
-  OPEN: "bg-red-100 text-red-600",
-  IN_PROGRESS: "bg-yellow-100 text-yellow-700",
-  RESOLVED: "bg-green-100 text-green-600",
-  CLOSED: "bg-gray-200 text-gray-700",
+  OPEN: "bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-300",
+  IN_PROGRESS: "bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300",
+  RESOLVED: "bg-green-100 text-green-600 dark:bg-green-950 dark:text-green-300",
+  CLOSED: "bg-gray-200 text-gray-700 dark:bg-slate-800 dark:text-slate-300",
 };
 
 const typeColors: Record<string, string> = {
-  PAYMENT: "bg-purple-100 text-purple-600",
-  COMMUNICATION: "bg-blue-100 text-blue-600",
-  TECHNICAL: "bg-orange-100 text-orange-600",
-  DELIVERY: "bg-pink-100 text-pink-600",
-  OTHER: "bg-gray-100 text-gray-600",
+  PAYMENT: "bg-purple-100 text-purple-600 dark:bg-purple-950 dark:text-purple-300",
+  COMMUNICATION: "bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-300",
+  TECHNICAL: "bg-orange-100 text-orange-600 dark:bg-orange-950 dark:text-orange-300",
+  DELIVERY: "bg-pink-100 text-pink-600 dark:bg-pink-950 dark:text-pink-300",
+  OTHER: "bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-300",
 };
 // export const tickets = [
 //   {
@@ -400,7 +400,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
   };
   // const handleUpdateTicket = async () => {};
   // const deleteTicket = async () => {};
-  const inputCls = "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)]  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
+  const inputCls = "w-full px-3 py-2 rounded-lg bg-white dark:bg-card text-[var(--text-primary)] border border-[var(--border)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
 
   const currentUserId = session?.user?.id;
 
@@ -528,7 +528,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                     onClick={() => setActiveTab(tab)}
                     className={`flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${activeTab === tab
                       ? "text-white"
-                      : "hover:bg-gray-100 text-gray-700"
+                      : "hover:bg-gray-100 dark:hover:bg-[var(--accent)] text-gray-700 dark:text-[var(--text-muted)]"
                       }`}
                     style={
                       activeTab === tab
@@ -590,7 +590,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                           {/* Top Row */}
                           <div className="flex items-center justify-between">
                             {/* Type Badge */}
-                            <span className="text-xs uppercase font-semibold px-2.5 py-0.5 rounded-full border bg-gray-100 text-gray-700 border-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-800">
+                            <span className={`text-xs uppercase font-semibold px-2.5 py-0.5 rounded-full border border-gray-200 dark:border-slate-800 ${typeColors[report.issueType] || typeColors.OTHER}`}>
                               {report.issueType}
                             </span>
 
@@ -622,23 +622,21 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                                 openDropdownId === report.id &&
                                 !updating &&
                                 (role === "ADMIN")) && (
-                                  <div className="absolute right-0 mt-1 w-36 bg-white border rounded-lg shadow-md z-10 dark:bg-card">
-                                    {["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"].map((status) => (
-                                      <button
-                                        key={status}
-                                        onClick={async () => {
-                                          setOpenDropdownId(null);
+                                  <div className="absolute right-0 mt-1 w-36 bg-white border border-[var(--border)] rounded-lg shadow-md z-10 dark:bg-card">                                    {["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"].map((status) => (
+                                    <button
+                                      key={status}
+                                      onClick={async () => {
+                                        setOpenDropdownId(null);
 
-                                          await updateTicketStatus({
-                                            ticketId: report.id,
-                                            status,
-                                          });
-                                        }}
-                                        className="w-full text-black text-left px-3 py-2 text-xs hover:bg-gray-100 dark:text-white"
-                                      >
-                                        {status.replace("_", " ")}
-                                      </button>
-                                    ))}
+                                        await updateTicketStatus({
+                                          ticketId: report.id,
+                                          status,
+                                        });
+                                      }}
+                                      className="w-full text-black text-left px-3 py-2 text-xs hover:bg-gray-100 dark:text-white dark:hover:bg-[var(--accent)]"                                      >
+                                      {status.replace("_", " ")}
+                                    </button>
+                                  ))}
                                   </div>
                                 )}
                             </div>
@@ -666,7 +664,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                                   <img
                                     src={img}
                                     alt="ticket"
-                                    className="w-16 h-16 object-cover rounded-lg border cursor-pointer hover:opacity-80 transition"
+                                    className="w-16 h-16 object-cover rounded-lg border border-[var(--border)] cursor-pointer hover:opacity-80 transition"
                                   />
                                 </a>
                               ))}
@@ -700,13 +698,12 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-          <div data-tour="ticket-modal" className="bg-white text-black! w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg dark:bg-card">
-            <h3
-              className="text-lg font-semibold  mb-4"
-              style={{ color: "var(--text-primary)" }}
-            >
-              Raise a Ticket
-            </h3>
+          <div data-tour="ticket-modal" className="bg-white dark:bg-card text-[var(--text-primary)]! w-full max-w-md p-6 rounded-xl border border-[var(--border)] shadow-lg">            <h3
+            className="text-lg font-semibold  mb-4"
+            style={{ color: "var(--text-primary)" }}
+          >
+            Raise a Ticket
+          </h3>
 
             <div className="space-y-4">
               {/* Ticket Type */}
@@ -802,7 +799,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                 <label
                   data-tour="ticket-upload"
                   htmlFor="ticket-images"
-                  className={` group flex flex-col items-center justify-center w-full min-h-[140px] rounded-2xl border-2 border-dashed border-[#FFD4A6] bg-gradient-to-br from-[#FFF8F1] to-[#FFF3E6] cursor-pointer transition-all duration-300 hover:border-[#FFAE58] hover:shadow-[0_8px_30px_rgba(255,174,88,0.15)]`}>
+                  className={` group flex flex-col items-center justify-center w-full min-h-[140px] rounded-2xl border-2 border-dashed border-[#FFD4A6] dark:border-[var(--primary)]/40 bg-gradient-to-br from-[#FFF8F1] to-[#FFF3E6] dark:from-[var(--primary-light)] dark:to-[var(--bg)] cursor-pointer transition-all duration-300 hover:border-[#FFAE58] hover:shadow-[0_8px_30px_rgba(255,174,88,0.15)]`}>
                   <input
                     id="ticket-images"
                     type="file"
@@ -896,7 +893,7 @@ export default function ReportIssueTab({ projectId }: { projectId: string }) {
                     images: [],
                   });
                 }}
-                className="px-4 py-2 border rounded-lg text-sm"
+                className="px-4 py-2 border border-[var(--border)] bg-[var(--bg)] text-[var(--text-primary)] rounded-lg text-sm"
               >
                 Cancel
               </button>

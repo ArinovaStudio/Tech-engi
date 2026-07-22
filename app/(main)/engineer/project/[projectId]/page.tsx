@@ -8,6 +8,7 @@ import Link from "next/link";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import { useAuth } from "@/hooks/useAuth";
+import AgreementModal from "@/components/project/AgreementModal";
 
 const ENGINEER_TABS = ["Overview", "Tasks", "Milestones", "Credentials", "Assets", "Report Issue", "Chat"];
 
@@ -53,35 +54,54 @@ export default function ProjectDetailPage() {
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("");
 
-  // Tracks whether the overview tour is handing off to the next tab.
-  // When true, onDestroyed must NOT write the localStorage flag —
-  // the chain is still in progress.
+  const [agreementRequired, setAgreementRequired] = useState(false);
+  const [agreementStatus, setAgreementStatus] = useState<"PENDING" | "ACCEPTED" | "DECLINED">("PENDING");
+  const [agreementSubmitting, setAgreementSubmitting] = useState(false);
+
   const isHandingOffRef = useRef(false);
 
-  useEffect(() => {
+  const fetchProject = () => {
     if (!projectId) return;
+    setLoading(true);
     fetch(`/api/overview/${projectId}`)
       .then((r) => r.json())
       .then((data) => {
         if (!data.success) { setError(data.message || "Failed to load project"); return; }
+        setAgreementRequired(!!data.agreementRequired);
+        setAgreementStatus(data.agreementStatus || "PENDING");
         setProject(data.project);
         setActiveTab(getTabsForRole()[0]);
       })
       .catch(() => setError("Failed to load project"))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchProject();
   }, [projectId]);
+
+  const respondToAgreement = async (action: "accept" | "decline") => {
+    setAgreementSubmitting(true);
+    try {
+      await fetch(`/api/engineer/projects/${projectId}/agreement`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      fetchProject();
+    } finally {
+      setAgreementSubmitting(false);
+    }
+  };
 
   // Engineer Overview Tour
   useEffect(() => {
-    if (!user?.id || loading || !project || activeTab !== "Overview") return;
+    if (!user?.id || loading || !project || activeTab !== "Overview" || agreementRequired) return;
 
     const tourKey = `tour_seen_engineer_project_${user.id}`;
     const forced = sessionStorage.getItem("force_tour") === "true";
 
     if (localStorage.getItem(tourKey) && !forced) return;
-
-    // Do NOT clear force_tour here — downstream tab tours need it too.
-    // It will be cleared by the final tab in the chain (Chat).
 
     const timer = setTimeout(() => {
       isHandingOffRef.current = false;
@@ -110,8 +130,6 @@ export default function ProjectDetailPage() {
           }
         },
         onDestroyed: () => {
-          // Only mark as seen if the user finished/closed the tour normally.
-          // If we're handing off to the next tab, skip — the chain isn't done.
           if (!isHandingOffRef.current) {
             localStorage.setItem(tourKey, "true");
             sessionStorage.removeItem("force_tour");
@@ -160,7 +178,6 @@ export default function ProjectDetailPage() {
               title: "Work Done History",
               description: "A log of completed tasks tied to this project, with status and dates.",
               onNextClick: (_el: any, _step: any, opts: any) => {
-                // Mark as handing off so onDestroyed skips the localStorage write
                 isHandingOffRef.current = true;
                 opts.driver.destroy();
                 sessionStorage.setItem("tour_in_progress", "true");
@@ -176,10 +193,9 @@ export default function ProjectDetailPage() {
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [user?.id, loading, project, activeTab]);
+  }, [user?.id, loading, project, activeTab, agreementRequired]);
 
-  // Tab handoff listener — receives events from each tab's tour to advance
-  // to the next tab and set the appropriate sessionStorage flag.
+  // Tab handoff listener
   useEffect(() => {
     const TAB_FLAGS: Record<string, string> = {
       Tasks: "start_kanban_tour",
@@ -219,6 +235,20 @@ export default function ProjectDetailPage() {
             ← Back to projects
           </Link>
         </div>
+      </DashboardShell>
+    );
+  }
+
+  if (agreementRequired) {
+    return (
+      <DashboardShell>
+        <AgreementModal
+          projectTitle={project.title}
+          wasDeclined={agreementStatus === "DECLINED"}
+          submitting={agreementSubmitting}
+          onAccept={() => respondToAgreement("accept")}
+          onDecline={() => respondToAgreement("decline")}
+        />
       </DashboardShell>
     );
   }

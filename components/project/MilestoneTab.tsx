@@ -87,12 +87,11 @@ export default function MilestoneTab({ projectId }: any) {
       fetchCurrentUser();
     }
   }, [projectId]);
-  // Replace the startMilestoneTourIfNew call's useEffect with this:
   useEffect(() => {
-  if (!loading) {
-    startMilestoneTourIfNew(() => setOpen(true));
-  }
-}, [loading]);
+    if (!loading) {
+      startMilestoneTourIfNew(() => setOpen(true));
+    }
+  }, [loading]);
 
   const fetchCurrentUser = async () => {
     try {
@@ -108,7 +107,6 @@ export default function MilestoneTab({ projectId }: any) {
     try {
       const res = await fetch(`/api/milestones?projectId=${projectId}`);
       const data = await res.json();
-      // console.log(data, "milestone");
 
       if (data.success) setMilestones(data.milestones);
     } catch (err) {
@@ -117,41 +115,6 @@ export default function MilestoneTab({ projectId }: any) {
       setLoading(false);
     }
   };
-
-  // const createMilestone = async () => {
-  //   if (!newMilestone.title.trim() || !newMilestone.dueDate.trim()) {
-  //     toast.error("Please fill in all required fields");
-  //     return;
-  //   }
-  //   try {
-  //     setCreating(true);
-  //     const res = await fetch("/api/project/milestone", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         ...newMilestone,
-  //         projectId,
-  //         adminId: currentUser?.id,
-  //       }),
-  //     });
-  //     const data = await res.json();
-  //     if (data.success) {
-  //       setOpen(false);
-  //       setNewMilestone({
-  //         title: "",
-  //         description: "",
-  //         dueDate: "",
-  //         status: "PENDING",
-  //       });
-  //       await fetchMilestones();
-  //       toast.success("Milestone created!");
-  //     } else toast.error(data.message || "Failed to create milestone");
-  //   } catch {
-  //     toast.error("Error creating milestone");
-  //   } finally {
-  //     setCreating(false);
-  //   }
-  // };
 
   const editMilestone = async () => {
     if (!newMilestone.title.trim()) {
@@ -173,7 +136,6 @@ export default function MilestoneTab({ projectId }: any) {
       formData.append("title", newMilestone.title);
       formData.append("type", newMilestone.type);
 
-      // 🔥 HANDLE CONTENT PROPERLY
       if (newMilestone.type === "LINK") {
         let url = newMilestone.content.trim();
 
@@ -184,10 +146,8 @@ export default function MilestoneTab({ projectId }: any) {
         formData.append("content", url);
       } else {
         if (file) {
-          // new file uploaded
           formData.append("file", file);
         } else if (newMilestone.content) {
-          // keep old file URL
           formData.append("content", newMilestone.content);
         }
       }
@@ -202,7 +162,6 @@ export default function MilestoneTab({ projectId }: any) {
       if (data.success) {
         toast.success("Milestone updated!");
 
-        // ✅ RESET STATE CLEANLY
         setOpen(false);
         setEditMode(false);
         setEditingId(null);
@@ -225,7 +184,7 @@ export default function MilestoneTab({ projectId }: any) {
     } catch {
       toast.error("Error updating milestone");
     } finally {
-      setUploading(false); // ✅ ALWAYS resets now
+      setUploading(false);
     }
   };
 
@@ -239,27 +198,6 @@ export default function MilestoneTab({ projectId }: any) {
       type,
     });
   };
-
-  // const deleteMilestone = async (id: string) => {
-  //   // if (!confirm("Delete this milestone?")) return;
-  //   try {
-  //     // setDeleting(true);
-  //     const res = await fetch(`/api/milestones/${id}`, {
-  //       method: "DELETE",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ id }),
-  //     });
-  //     const data = await res.json();
-  //     if (data.success) {
-  //       await fetchMilestones();
-  //       toast.success("Milestone deleted!");
-  //     } else toast.error(data.message || "Failed to delete");
-  //   } catch {
-  //     toast.error("Error deleting milestone");
-  //   } finally {
-  //     setDeleting(false);
-  //   }
-  // };
 
   const deleteMilestone = async (id: string) => {
     try {
@@ -329,7 +267,6 @@ export default function MilestoneTab({ projectId }: any) {
       if (data.success) {
         toast.success("Milestone added");
 
-        // RESET STATE (IMPORTANT)
         setOpen(false);
         setFile(null);
 
@@ -442,36 +379,36 @@ export default function MilestoneTab({ projectId }: any) {
     switch (status) {
       case "COMPLETED":
         return {
-          card: "border-green-200 bg-green-50",
-          badge: "bg-green-50 text-green-700 border-green-200",
+          card: "border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950",
+          badge: "bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800",
           dot: "bg-green-500",
-          text: "text-green-600",
+          text: "text-green-600 dark:text-green-400",
         };
       case "IN_PROGRESS":
         return {
-          card: "border-blue-200 bg-blue-50",
-          badge: "bg-blue-50 text-blue-700 border-blue-200",
+          card: "border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950",
+          badge: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800",
           dot: "bg-blue-500",
-          text: "text-blue-600",
+          text: "text-blue-600 dark:text-blue-400",
         };
       case "DELAYED":
         return {
-          card: "border-orange-200 bg-orange-50",
-          badge: "bg-orange-50 text-orange-700 border-orange-200",
+          card: "border-orange-200 bg-orange-50 dark:border-orange-900 dark:bg-orange-950",
+          badge: "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-800",
           dot: "bg-orange-500",
-          text: "text-orange-600",
+          text: "text-orange-600 dark:text-orange-400",
         };
       case "CANCELLED":
         return {
-          card: "border-red-200 bg-red-50",
-          badge: "bg-red-50 text-red-700 border-red-200",
+          card: "border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950",
+          badge: "bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-800",
           dot: "bg-red-400",
-          text: "text-red-500",
+          text: "text-red-500 dark:text-red-400",
         };
       default:
         return {
           card: "border-[var(--border)] bg-[var(--primary-light)]",
-          badge: "bg-[var(--primary-light)] border-[#ffd9a8] text-[#b87a2e]",
+          badge: "bg-[var(--primary-light)] border-[#ffd9a8] text-[#b87a2e] dark:text-[var(--primary)]",
           dot: "bg-[var(--primary)]",
           text: "text-[var(--primary)]",
         };
@@ -489,7 +426,7 @@ export default function MilestoneTab({ projectId }: any) {
   };
 
   const inputCls =
-    "w-full px-3 py-2 rounded-lg bg-white border border-[var(--border)]  text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
+    "w-full px-3 py-2 rounded-lg bg-white dark:bg-card text-[var(--text-primary)] border border-[var(--border)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]";
 
   if (loading)
     return (
@@ -583,6 +520,7 @@ export default function MilestoneTab({ projectId }: any) {
                               : `https://${m.content}`
                           }
                           target="_blank"
+                          rel="noopener noreferrer"
                           className="underline hover:text-[var(--primary)]"
                         >
                           {m.content}
@@ -637,8 +575,8 @@ export default function MilestoneTab({ projectId }: any) {
                   {/* COMPLETION BADGE */}
                   <span
                     className={`text-[10px] px-2 py-0.5 rounded-full  ${m.completed
-                      ? "bg-green-100 text-green-600"
-                      : "bg-gray-100 text-gray-500"
+                      ? "bg-green-100 text-green-600 dark:bg-green-950 dark:text-green-400"
+                      : "bg-gray-100 text-gray-500 dark:bg-[var(--accent)] dark:text-[var(--text-muted)]"
                       }`}
                   >
                     {m.completed ? "Completed" : "Pending"}
@@ -708,7 +646,7 @@ export default function MilestoneTab({ projectId }: any) {
                   setEditMode(false);
                   setEditingId(null);
                 }}
-                className="p-1 hover:bg-gray-100 rounded"
+                className="p-1 hover:bg-[var(--bg)] rounded"
               >
                 <X size={18} />
               </button>
@@ -821,7 +759,6 @@ export default function MilestoneTab({ projectId }: any) {
                   disabled={
                     uploading || currentUser?.role === "CLIENT" || editMode
                   }
-                // 🔥 lock type in edit mode (important)
                 >
                   <option value="IMAGE">Image</option>
                   <option value="ZIP">Zip</option>
@@ -850,34 +787,6 @@ export default function MilestoneTab({ projectId }: any) {
                   />
                 </div>
               ) : (
-                // <div>
-                //   <label className="block text-sm font-medium  mb-1.5">
-                //     {editMode ? "Replace File (optional)" : "Upload File *"}
-                //   </label>
-
-                //   <input
-                //     type="file"
-                //     onChange={(e) => setFile(e.target.files?.[0] || null)}
-                //     className="w-full text-sm "
-                //     disabled={uploading || currentUser?.role === "CLIENT"}
-                //   />
-
-                //   {/* EXISTING FILE PREVIEW (EDIT MODE) */}
-                //   {editMode && !file && newMilestone.content && (
-                //     <div className="mt-2 text-xs text-[var(--text-muted)]">
-                //       Current file:
-                //       <button
-                //         onClick={() =>
-                //           window.open(newMilestone.content, "_blank")
-                //         }
-                //         className="ml-2 underline hover:text-[var(--primary)]"
-                //       >
-                //         View
-                //       </button>
-                //     </div>
-                //   )}
-                // </div>
-
                 <div>
                   <label className="block text-sm font-medium mb-1.5">
                     {editMode ? "Replace File (optional)" : "Upload File *"}
@@ -913,8 +822,8 @@ export default function MilestoneTab({ projectId }: any) {
                       }
                     }}
                     className={`relative rounded-xl border-2 border-dashed p-6 transition-all duration-200 ${dragActive
-                      ? "border-[var(--primary)] bg-orange-50"
-                      : "border-gray-300 bg-gray-50"
+                      ? "border-[var(--primary)] bg-orange-50 dark:bg-[var(--primary-light)]"
+                      : "border-[var(--border)] bg-gray-50 dark:bg-[var(--bg)]"
                       }`}
                   >
                     <input
@@ -958,7 +867,7 @@ export default function MilestoneTab({ projectId }: any) {
                               <img
                                 src={URL.createObjectURL(file)}
                                 alt="preview"
-                                className="max-h-52 w-full object-cover rounded-lg border"
+                                className="max-h-52 w-full object-cover rounded-lg border border-[var(--border)]"
                               />
 
                               <div className="text-xs text-gray-600 break-all dark:text-slate-400">
@@ -1037,7 +946,7 @@ export default function MilestoneTab({ projectId }: any) {
                     !newMilestone.title.trim() ||
                     (newMilestone.type === "LINK"
                       ? !newMilestone.content?.trim()
-                      : !editMode && !file) // 🔥 only require file in create mode
+                      : !editMode && !file)
                   }
                   onClick={editMode ? editMilestone : uploadMilestoneFile}
                   className="px-4 py-2 text-white rounded-lg flex items-center gap-2  text-sm disabled:opacity-40"
@@ -1079,7 +988,7 @@ export default function MilestoneTab({ projectId }: any) {
                     type: "milestone",
                   })
                 }
-                className="p-1 rounded-lg hover:bg-gray-100"
+                className="p-1 rounded-lg hover:bg-[var(--bg)]"
               >
                 <X size={18} />
               </button>
@@ -1096,7 +1005,7 @@ export default function MilestoneTab({ projectId }: any) {
                     type: "milestone",
                   })
                 }
-                className="px-4 py-2 rounded-xl border border-gray-300 text-sm font-medium hover:bg-gray-100 dark:border-slate-700"
+                className="px-4 py-2 rounded-xl border border-gray-300 dark:border-slate-700 text-sm font-medium hover:bg-gray-100 dark:hover:bg-[var(--accent)]"
               >
                 Cancel
               </button>

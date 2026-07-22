@@ -76,6 +76,8 @@ model EngineerProfile {
   user                    User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
   assignedWork            Project[]
   invitations             ProjectInvitation[]
+
+  projectAgreements ProjectAgreement[]
 }
 
 model Account {
@@ -145,6 +147,8 @@ model Project {
   projectTasks         ProjectTask[]
   tickets              Ticket[]
   transactions         Transaction[]
+
+  projectAgreements ProjectAgreement[]
 }
 
 model DesignSystem {
@@ -553,4 +557,23 @@ enum KanbanTaskStatus {
   NOT_STARTED
   IN_PROGRESS
   COMPLETED
+}
+model ProjectAgreement {
+  id          String           @id @default(uuid())
+  projectId   String
+  engineerId  String
+  status      AgreementStatus  @default(PENDING)
+  respondedAt DateTime?
+  createdAt   DateTime         @default(now())
+
+  project     Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  engineer    EngineerProfile  @relation(fields: [engineerId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, engineerId])
+}
+
+enum AgreementStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
 }

@@ -50,9 +50,9 @@ interface Task {
 }
 
 const priorityClasses = {
-  LOW: "bg-blue-50 text-blue-700 border-blue-200",
-  MEDIUM: "bg-[var(--primary-light)] text-[#b87a2e] border-[#ffd9a8]",
-  HIGH: "bg-red-50 text-red-700 border-red-200",
+  LOW: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800",
+  MEDIUM: "bg-[var(--primary-light)] text-[#b87a2e] border-[#ffd9a8] dark:text-[var(--primary)]",
+  HIGH: "bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-800",
 } as const;
 
 type NewTaskShape = {
@@ -159,7 +159,7 @@ const NewTaskModal: React.FC<{
               </label>
               <TextArea
                 value={newTask.description}
-                className="bg-white! text-black! border-1! outline-none! ring-0! border-border!"
+                className="bg-white! dark:bg-card! text-[var(--text-primary)]! border-1! outline-none! ring-0! border-border!"
                 onChange={(e) => setNewTask({ ...newTask, description: e })}
               />
             </div>
@@ -221,11 +221,11 @@ const NewTaskModal: React.FC<{
                       onClick={() => setNewTask({ ...newTask, priority })}
                       className={`flex-1 px-4 py-3 rounded-lg border  text-sm capitalize transition-all ${newTask.priority === priority
                         ? priority === "LOW"
-                          ? "bg-blue-50 text-blue-700 border-blue-300"
+                          ? "bg-blue-50 text-blue-700 border-blue-300 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800"
                           : priority === "MEDIUM"
-                            ? "bg-[var(--primary-light)] text-[#b87a2e] border-[#ffd9a8]"
-                            : "bg-red-50 text-red-700 border-red-300"
-                        : "bg-white border-[var(--border)] hover:bg-[var(--bg)]"
+                            ? "bg-[var(--primary-light)] text-[#b87a2e] border-[#ffd9a8] dark:text-[var(--primary)]"
+                            : "bg-red-50 text-red-700 border-red-300 dark:bg-red-950 dark:text-red-300 dark:border-red-800"
+                        : "bg-white dark:bg-card border-[var(--border)] hover:bg-[var(--bg)]"
                         }`}
                       style={
                         newTask.priority !== priority
@@ -809,100 +809,100 @@ export default function KanbanTab({ projectId }: KanbanTabProps) {
   }, [showNewTaskModal, taskMode, currentUser]);
   // Board-level Kanban tour
   // Board-level Kanban tour
-// Board-level Kanban tour
-useEffect(() => {
-  if (!currentUser?.id || loading) return;
+  // Board-level Kanban tour
+  useEffect(() => {
+    if (!currentUser?.id || loading) return;
 
-  const tourKey = `tour_seen_kanban_${currentUser.id}`;
-  const isHandoff = sessionStorage.getItem("start_kanban_tour") === "true";
-  const forced = sessionStorage.getItem("force_tour") === "true";
+    const tourKey = `tour_seen_kanban_${currentUser.id}`;
+    const isHandoff = sessionStorage.getItem("start_kanban_tour") === "true";
+    const forced = sessionStorage.getItem("force_tour") === "true";
 
-  if (!isHandoff && !forced && localStorage.getItem(tourKey)) return;
-  // Do NOT touch force_tour here — Milestones, Credentials, etc. still need it
+    if (!isHandoff && !forced && localStorage.getItem(tourKey)) return;
+    // Do NOT touch force_tour here — Milestones, Credentials, etc. still need it
 
-  let isHandingOff = false;
+    let isHandingOff = false;
 
-  const timer = setTimeout(() => {
-    const driverObj = driver({
-      showProgress: true,
-      animate: true,
-      smoothScroll: true,
-      popoverClass: "custom-tour-popover",
-      overlayOpacity: 0.35,
-      nextBtnText: "Next →",
-      prevBtnText: "← Prev",
-      doneBtnText: "Done ✓",
-      onPopoverRender: (popover) => {
-        const style = (el: HTMLElement) => {
-          el.style.setProperty("background", "var(--primary)", "important");
-          el.style.setProperty("color", "#ffffff", "important");
-          el.style.setProperty("opacity", "1", "important");
-          el.style.setProperty("border", "none", "important");
-        };
-        if (popover.nextButton) style(popover.nextButton);
-        if (popover.previousButton) {
-          popover.previousButton.style.setProperty("background", "transparent", "important");
-          popover.previousButton.style.setProperty("color", "var(--text-secondary)", "important");
-          popover.previousButton.style.setProperty("border", "1px solid var(--border)", "important");
-        }
-      },
-      onDestroyed: () => {
-        sessionStorage.removeItem("start_kanban_tour");
-        localStorage.setItem(tourKey, "true");
-        if (!isHandingOff) {
-          window.dispatchEvent(
-            new CustomEvent("tour-go-to-tab", { detail: "Milestones" })
-          );
-        }
-      },
-      steps: [
-        {
-          element: "#kanban-columns",
-          popover: {
-            title: "Kanban Board",
-            description:
-              "Your tasks are organized into 4 columns — On Hold, Not Started, In Progress, and Completed. Drag and drop any task card between columns to update its status.",
-          },
+    const timer = setTimeout(() => {
+      const driverObj = driver({
+        showProgress: true,
+        animate: true,
+        smoothScroll: true,
+        popoverClass: "custom-tour-popover",
+        overlayOpacity: 0.35,
+        nextBtnText: "Next →",
+        prevBtnText: "← Prev",
+        doneBtnText: "Done ✓",
+        onPopoverRender: (popover) => {
+          const style = (el: HTMLElement) => {
+            el.style.setProperty("background", "var(--primary)", "important");
+            el.style.setProperty("color", "#ffffff", "important");
+            el.style.setProperty("opacity", "1", "important");
+            el.style.setProperty("border", "none", "important");
+          };
+          if (popover.nextButton) style(popover.nextButton);
+          if (popover.previousButton) {
+            popover.previousButton.style.setProperty("background", "transparent", "important");
+            popover.previousButton.style.setProperty("color", "var(--text-secondary)", "important");
+            popover.previousButton.style.setProperty("border", "1px solid var(--border)", "important");
+          }
         },
-        {
-          element: "#kanban-search",
-          popover: {
-            title: "Search Tasks",
-            description: "Quickly find any task by typing its title or description here.",
-          },
+        onDestroyed: () => {
+          sessionStorage.removeItem("start_kanban_tour");
+          localStorage.setItem(tourKey, "true");
+          if (!isHandingOff) {
+            window.dispatchEvent(
+              new CustomEvent("tour-go-to-tab", { detail: "Milestones" })
+            );
+          }
         },
-        {
-          element: "#kanban-new-task-btn",
-          popover: {
-            title: "Create a Task",
-            description:
-              "Click here to add a new task to this project. You can fill in the title, description, priority, due date, and tags.",
-            onNextClick: (_el: any, _step: any, opts: any) => {
-              const taskTourKey = `hasSeenNewTaskTour_${currentUser?.id}`;
-              const taskTourAlreadySeen = localStorage.getItem(taskTourKey);
-
-              if (taskTourAlreadySeen) {
-                // Modal tour won't run — isHandingOff stays false so
-                // onDestroyed will dispatch Milestones handoff normally
-                isHandingOff = false;
-              } else {
-                // Modal tour WILL run and dispatches Milestones itself
-                isHandingOff = true;
-                setShowNewTaskModal(true);
-              }
-
-              opts.driver.destroy();
+        steps: [
+          {
+            element: "#kanban-columns",
+            popover: {
+              title: "Kanban Board",
+              description:
+                "Your tasks are organized into 4 columns — On Hold, Not Started, In Progress, and Completed. Drag and drop any task card between columns to update its status.",
             },
           },
-        },
-      ],
-    });
+          {
+            element: "#kanban-search",
+            popover: {
+              title: "Search Tasks",
+              description: "Quickly find any task by typing its title or description here.",
+            },
+          },
+          {
+            element: "#kanban-new-task-btn",
+            popover: {
+              title: "Create a Task",
+              description:
+                "Click here to add a new task to this project. You can fill in the title, description, priority, due date, and tags.",
+              onNextClick: (_el: any, _step: any, opts: any) => {
+                const taskTourKey = `hasSeenNewTaskTour_${currentUser?.id}`;
+                const taskTourAlreadySeen = localStorage.getItem(taskTourKey);
 
-    driverObj.drive();
-  }, isHandoff ? 0 : 1000);
+                if (taskTourAlreadySeen) {
+                  // Modal tour won't run — isHandingOff stays false so
+                  // onDestroyed will dispatch Milestones handoff normally
+                  isHandingOff = false;
+                } else {
+                  // Modal tour WILL run and dispatches Milestones itself
+                  isHandingOff = true;
+                  setShowNewTaskModal(true);
+                }
 
-  return () => clearTimeout(timer);
-}, [currentUser?.id, loading]);
+                opts.driver.destroy();
+              },
+            },
+          },
+        ],
+      });
+
+      driverObj.drive();
+    }, isHandoff ? 0 : 1000);
+
+    return () => clearTimeout(timer);
+  }, [currentUser?.id, loading]);
   const handleReport = async () => {
     if (!message.trim() || !selectedTask) {
       toast.error("Message cannot be empty");
@@ -1134,7 +1134,7 @@ useEffect(() => {
                       draggable={currentUser?.role !== "CLIENT"}
                       onDragStart={currentUser?.role !== "CLIENT" ? () => handleDragStart(task) : undefined}
                       onClick={() => setSelectedTask(task)}
-                      className={`p-4 rounded-xl border cursor-pointer transition-all bg-white border-[var(--border)] hover:shadow-md ${draggedTask?.id === task.id ? "opacity-50" : "" } dark:bg-card`}
+                      className={`p-4 rounded-xl border cursor-pointer transition-all bg-white border-[var(--border)] hover:shadow-md ${draggedTask?.id === task.id ? "opacity-50" : ""} dark:bg-card`}
                     >
                       <div className="flex flex-col gap-4 items-start justify-between mb-3">
                         <h3

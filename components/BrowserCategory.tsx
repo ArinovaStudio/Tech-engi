@@ -95,8 +95,26 @@ const BrowserCategory = () => {
       );
     });
 
-    return () => ctx.revert();
+    // Fonts, emoji glyphs, and images higher up the page (e.g. the
+    // EngineeringSolutions section above this one) can finish loading
+    // after ScrollTrigger has already computed its start/end positions,
+    // which shifts this section down and desyncs every trigger below it.
+    // Refresh once everything has actually settled.
+    const refresh = () => ScrollTrigger.refresh();
+
+    if (document.fonts) {
+      document.fonts.ready.then(refresh);
+    }
+    window.addEventListener("load", refresh);
+    const settleTimeout = setTimeout(refresh, 500);
+
+    return () => {
+      ctx.revert();
+      window.removeEventListener("load", refresh);
+      clearTimeout(settleTimeout);
+    };
   }, []);
+
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const startAutoRotate = () => {
@@ -217,30 +235,9 @@ const BrowserCategory = () => {
                 width={900}
                 height={400}
                 priority
+                onLoad={() => ScrollTrigger.refresh()}
                 className=" w-full h-[220px] sm:h-[300px] lg:h-[420px] object-cover" />
             </div>
-
-            {/* DESCRIPTION 1 */}
-
-
-            {/* DESCRIPTION 2 */}
-            {/* <p
-          className="
-            text-[14px]
-            sm:text-[15px]
-            lg:text-[16px]
-
-            text-gray-600
-
-            text-left
-            lg:text-right
-
-            font-inter
-            leading-relaxed
-          "
-        >
-          {selectedCategory.description2}
-        </p> */}
           </div>
         </div>
       </div>

@@ -162,7 +162,7 @@ export default function LoginPage() {
               <div className="text-center mb-8">
 
 
-                <h1 className="text-2xl font-bold text-[#0f172a] tracking-tight">Welcome Back <span>👋</span></h1>
+                <h1 className="text-2xl font-bold text-[#0f172a] dark:text-white tracking-tight">Welcome Back <span>👋</span></h1>
                 <p className="text-sm text-gray-500 mt-2 dark:text-slate-400">Log in to your TECH ENGI account</p>
               </div>
 
@@ -187,7 +187,8 @@ export default function LoginPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
-                      className="w-full pl-11 pr-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
+
+                      className="w-full pl-11 pr-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white dark:focus:bg-slate-900 focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:text-white dark:border-slate-800"
                       placeholder="you@example.com"
                     />
                   </div>
@@ -209,7 +210,7 @@ export default function LoginPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full pl-11 pr-11 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
+                      className="w-full pl-11 pr-11 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white dark:focus:bg-slate-900 focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:text-white dark:border-slate-800"
                       placeholder="••••••••"
                     />
                     <button

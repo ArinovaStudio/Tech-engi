@@ -97,7 +97,7 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
     }
   };
 
-  const inputCls = "w-full px-3 py-2 border border-[var(--border)] rounded-lg text-sm  outline-none focus:ring-2 focus:ring-[var(--primary)] bg-white text-[var(--text-primary)]";
+  const inputCls = "w-full px-3 py-2 border border-[var(--border)] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[var(--primary)] bg-[var(--input-bg)] text-[var(--text-primary)]";
   const budgetAmount = form.budget ? Number(form.budget) : 0;
   const advanceAmount = (budgetAmount * 0.4).toFixed(0);
 

@@ -364,12 +364,12 @@ const DesignOverview = ({ data }: { data: any }) => {
         </div>
       </div>
 
-      <div className="w-[65%] h-[370px] rounded-[24px] border border-[#d6d6d6] bg-[#f5f5f5] overflow-hidden">
+      <div className="w-[65%] h-[370px] rounded-[24px] border border-[#d6d6d6] dark:border-gray-700 bg-[#f5f5f5] dark:bg-gray-800 overflow-hidden">
 
         <div className="grid grid-cols-3 h-full">
 
           {/* LEFT SECTION */}
-          <div className="p-5 border-r border-[#d6d6d6] flex flex-col gap-30">
+          <div className="p-5 border-r border-[#d6d6d6] dark:border-gray-700 flex flex-col gap-30">
 
             {/* Status */}
             <div>

@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 import LeadForm, { ProjectReviewFormData } from "@/components/common/LeadForm";
+import EngineeringSolutions from "@/components/engineeringsolutions";
 const userTypes = [
   "Student",
   "Freelancer",
@@ -114,6 +115,7 @@ export default function Home() {
         <Start />
         <HowItWorks />
         <WhatWeOffer />
+        <EngineeringSolutions/>
         <TrustIndicator />
         <BrowserCategory />
         <Stats />

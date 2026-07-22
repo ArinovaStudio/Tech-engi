@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { ChevronLeft, ChevronRight, FolderKanban, ArrowUpRight,} from "lucide-react";
+import { ChevronLeft, ChevronRight, FolderKanban, ArrowUpRight, } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type Project = {
@@ -21,7 +21,7 @@ interface EngineerProjectsCarouselProps {
   onProjectSelect?: (project: Project) => void;
 }
 
-export default function EngineerProjectsCarousel({ projects, onProjectSelect,}: EngineerProjectsCarouselProps) {
+export default function EngineerProjectsCarousel({ projects, onProjectSelect, }: EngineerProjectsCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -40,23 +40,19 @@ export default function EngineerProjectsCarousel({ projects, onProjectSelect,}: 
   };
 
   const getStatusColor = (status?: string) => {
-    switch (status) {
-      case "IN_PROGRESS":
-        return "bg-yellow-100 text-yellow-700 border-yellow-200";
-
-      case "COMPLETED":
-        return "bg-green-100 text-green-700 border-green-200";
-
-      case "CANCELLED":
-        return "bg-red-100 text-red-700 border-red-200";
-
-      case "AWAITING_ADVANCE":
-        return "bg-orange-100 text-orange-700 border-orange-200";
-
-      default:
-        return "bg-gray-100 text-gray-700 border-gray-200";
-    }
-  };
+  switch (status) {
+    case "IN_PROGRESS":
+      return "bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-950 dark:text-yellow-300 dark:border-yellow-800";
+    case "COMPLETED":
+      return "bg-green-100 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800";
+    case "CANCELLED":
+      return "bg-red-100 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-800";
+    case "AWAITING_ADVANCE":
+      return "bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-950 dark:text-orange-300 dark:border-orange-800";
+    default:
+      return "bg-gray-100 text-gray-700 border-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-800";
+  }
+};
 
   const getPhase = (phase?: string | string[]) => {
     if (Array.isArray(phase)) {
@@ -89,14 +85,14 @@ export default function EngineerProjectsCarousel({ projects, onProjectSelect,}: 
         <div className="flex gap-2">
           <button
             onClick={scrollLeft}
-            className="w-11 h-11 rounded-xl border border-[var(--border)] flex items-center justify-center hover:bg-gray-50 transition"
+            className="w-11 h-11 rounded-xl border border-[var(--border)] flex items-center justify-center hover:bg-gray-50 dark:hover:bg-[var(--accent)] transition"
           >
             <ChevronLeft size={18} />
           </button>
 
           <button
             onClick={scrollRight}
-            className="w-11 h-11 rounded-xl border border-[var(--border)] flex items-center justify-center hover:bg-gray-50 transition"
+            className="w-11 h-11 rounded-xl border border-[var(--border)] flex items-center justify-center hover:bg-gray-50 dark:hover:bg-[var(--accent)] transition"
           >
             <ChevronRight size={18} />
           </button>
@@ -117,8 +113,7 @@ export default function EngineerProjectsCarousel({ projects, onProjectSelect,}: 
           {projects.map((project) => (
             <div
               key={project.id}
-              className="min-w-[360px] max-w-[360px] shrink-0 rounded-3xl border border-[var(--border)] bg-gradient-to-br from-white to-[#fafafa] p-5 hover:shadow-lg transition-all duration-300"
-            >
+              className="min-w-[360px] max-w-[360px] shrink-0 rounded-3xl border border-[var(--border)] bg-gradient-to-br from-white to-[#fafafa] dark:from-[var(--bg-card)] dark:to-[var(--bg-card)] p-5 hover:shadow-lg transition-all duration-300"            >
               <div className="flex items-start justify-between mb-5">
                 <div className="flex items-center gap-3">
                   <div
@@ -195,7 +190,7 @@ export default function EngineerProjectsCarousel({ projects, onProjectSelect,}: 
               </div>
 
               <div className="mb-4">
-                <div className="flex justify-between text-xs mb-2">
+                <div className="flex justify-between text-xs mb-2 text-gray-500 dark:text-slate-400">
                   <span>Completion</span>
                   <span>{project.progress || 0}%</span>
                 </div>

@@ -73,14 +73,14 @@ export default function ClientProjectsCarousel({ projects, onProjectSelect,}: Cl
                 <div className="flex gap-2">
                     <button
                         onClick={scrollLeft}
-                        className="w-11 h-11 rounded-xl border border-[var(--border)] flex items-center justify-center hover:bg-gray-50 transition"
+                        className="w-11 h-11 rounded-xl border border-[var(--border)] flex items-center justify-center hover:bg-gray-50 dark:hover:bg-slate-800 transition"
                     >
                         <ChevronLeft size={18} />
                     </button>
 
                     <button
                         onClick={scrollRight}
-                        className="w-11 h-11 rounded-xl border border-[var(--border)] flex items-center justify-center hover:bg-gray-50 transition"
+                        className="w-11 h-11 rounded-xl border border-[var(--border)] flex items-center justify-center hover:bg-gray-50 dark:hover:bg-slate-800 transition"
                     >
                         <ChevronRight size={18} />
                     </button>
@@ -94,7 +94,7 @@ export default function ClientProjectsCarousel({ projects, onProjectSelect,}: Cl
                 {projects.map((project) => (
                     <div
                         key={project.id}
-                        className="min-w-[360px] max-w-[360px] shrink-0 rounded-3xl border border-[var(--border)] bg-gradient-to-br from-white to-[#fafafa] p-5 hover:shadow-lg transition-all duration-300"
+                        className="min-w-[360px] max-w-[360px] shrink-0 rounded-3xl border border-[var(--border)] bg-gradient-to-br from-white to-[#fafafa] dark:from-card dark:to-card p-5 hover:shadow-lg transition-all duration-300"
                     >
                         <div className="flex items-start justify-between mb-5">
                             <div className="flex items-center gap-3">

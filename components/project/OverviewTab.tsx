@@ -116,7 +116,7 @@ export default function OverviewTab({ project }: { project: any }) {
             <div id="overall-progress" style={{ ...cardStyle, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
               <ProgressGauge progress={currentProgress} />
               <p style={{ margin: "12px 0 0", fontWeight: 600, fontSize: 14, color: T.text }}>Overall Progress</p>
-              {isEngineer || isAdmin && (
+              {(isEngineer || isAdmin) && (
                 <button onClick={() => setShowProgressModal(true)} style={{ marginTop: 10, padding: "5px 16px", background: T.primaryLight, border: `1px solid ${T.primary}`, borderRadius: 20, color: T.primary, cursor: "pointer", fontWeight: 600, fontSize: 12, display: "flex", alignItems: "center", gap: 4 }}>
                   <ArrowUp size={13} /> Update
                 </button>
@@ -136,9 +136,9 @@ export default function OverviewTab({ project }: { project: any }) {
           {project?.repository && (
             <div>
               <h2 style={{ fontSize: 16, fontWeight: 700, color: T.text, margin: "0 0 8px" }}>Repository</h2>
-              <div style={{ background: "#f0f7ff", border: "1px solid #bfdbfe", borderRadius: 12, padding: "14px 16px" }}>
+              <div style={{ background: T.primaryLight, border: `1px solid ${T.border}`, borderRadius: 12, padding: "14px 16px" }}>
                 <p style={{ margin: "0 0 6px", fontSize: 11, color: T.textMuted }}>{project.repository?.split("/")[4]?.split(".git")[0]}</p>
-                <div style={{ background: "#dbeafe", border: "1px solid #93c5fd", borderRadius: 8, padding: "6px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: "6px 10px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <code style={{ fontSize: 12, color: T.text, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{project.repository}</code>
                   <button onClick={() => copyTextToClipboard(project.repository!)} style={{ width: 28, height: 28, borderRadius: 6, background: T.primary, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginLeft: 8 }}>
                     {isCopied ? <LucideCheckCheck size={13} color="#fff" /> : <LucideCopy size={13} color="#fff" />}
@@ -149,8 +149,8 @@ export default function OverviewTab({ project }: { project: any }) {
           )}
 
           {/* Engineer / Team */}
-          <div id="engineer-card">
-            <h2 style={{ fontSize: 16, fontWeight: 700, color: T.text, margin: "0 0 4px" }}>{teamSectionLabel}</h2>
+          <div id="engineer-card" style={cardStyle}>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: T.text, margin: "0 0 12px" }}>{teamSectionLabel}</h2>
             {isClient && (project.engineer?.user ? <TeamMemberCard user={project.engineer.user} label="Engineer" /> : <p style={{ fontSize: 13, color: T.textMuted, marginTop: 8 }}>No engineer assigned yet</p>)}
             {isEngineer && (project.client?.user ? <TeamMemberCard user={project.client.user} label="Client" /> : <p style={{ fontSize: 13, color: T.textMuted, marginTop: 8 }}>No client found</p>)}
             {isAdmin && (
@@ -184,7 +184,7 @@ export default function OverviewTab({ project }: { project: any }) {
                           {project.designSystem.colors.map((color: string, index: number) => (
                             <div key={index} className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 dark:border-slate-800">
                               <div className="w-5 h-5 rounded-full border border-gray-200 dark:border-slate-800" style={{ backgroundColor: color }} />
-                              <span className="text-xs font-medium">{color}</span>
+                              <span className="text-xs font-medium text-gray-900 dark:text-slate-100">{color}</span>
                             </div>
                           ))}
                         </div>
@@ -210,7 +210,7 @@ export default function OverviewTab({ project }: { project: any }) {
                         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 dark:text-slate-400">Key Pages</p>
                         <div className="flex flex-wrap gap-2">
                           {project.designSystem.keyPages.map((page: string, index: number) => (
-                            <span key={index} className="px-3 py-1.5 text-xs font-medium rounded-full bg-blue-50 text-blue-700 border border-blue-200">{page}</span>
+                            <span key={index} className="px-3 py-1.5 text-xs font-medium rounded-full bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800">{page}</span>
                           ))}
                         </div>
                       </div>
@@ -247,8 +247,8 @@ export default function OverviewTab({ project }: { project: any }) {
                       </div>
                     )}
                     {/* Uniqueness */}
-                    <div className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl p-5">
-                      <p className="text-xs font-semibold text-orange-600 uppercase tracking-wide mb-3">Unique Selling Point</p>
+                    <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950 dark:to-amber-950 border border-orange-200 dark:border-orange-900 rounded-xl p-5">
+                      <p className="text-xs font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wide mb-3">Unique Selling Point</p>
                       <p className="text-sm leading-relaxed text-gray-800 dark:text-slate-200">{project.designSystem.uniqueness?.differentiator || "-"}</p>
                     </div>
                   </div>
@@ -340,7 +340,7 @@ export default function OverviewTab({ project }: { project: any }) {
               )}
 
               {project.finalProjectLink && (
-                <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 10, padding: "10px 14px" }}>
+                <div style={{ background: "var(--accent)", border: `1px solid ${T.border}`, borderRadius: 10, padding: "10px 14px" }}>
                   <p style={{ margin: "0 0 4px", fontSize: 11, fontWeight: 600, color: "#15803d", textTransform: "uppercase", letterSpacing: "0.05em" }}>Final Delivery</p>
                   <a href={project.finalProjectLink} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: "#16a34a", textDecoration: "underline", wordBreak: "break-all" }}>{project.finalProjectLink}</a>
                 </div>

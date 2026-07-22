@@ -13,7 +13,6 @@ import { dashboardTourSteps } from "@/config/dashboardTourSteps";
 import { engineerDashboardTourSteps } from "@/config/engineerDashboardTourSteps";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
-import next from "next";
 import Image from "next/image";
 
 interface NavItem {
@@ -29,7 +28,7 @@ const ADMIN_NAV: NavItem[] = [
   { label: "Client Management", icon: <User size={20} />, href: "/admin/client-management" },
   { label: "Engineer Management", icon: <UserKeyIcon size={20} />, href: "/admin/engineer-management" },
   { label: "Invitations Management", icon: <Send size={20} />, href: "/admin/invitations-management" },
-   { label: "Leads", icon: <Headset size={20} />, href: "/admin/leads" },
+  { label: "Leads", icon: <Headset size={20} />, href: "/admin/leads" },
   { label: "Message", icon: <MessageSquare size={20} />, href: "/admin/message" },
 ];
 
@@ -145,16 +144,17 @@ export default function Sidebar() {
       sessionStorage.removeItem("tour_in_progress");
     }
   };
+
   // Handoff: Engineer Dashboard → Engineer Projects page
-const goToEngineerProjectsTour = () => {
-  activeDriverRef.current?.destroy();
-  activeDriverRef.current = null;
+  const goToEngineerProjectsTour = () => {
+    activeDriverRef.current?.destroy();
+    activeDriverRef.current = null;
 
-  sessionStorage.setItem("tour_in_progress", "true");
-  sessionStorage.setItem("start_engineer_projects_tour", "true");
+    sessionStorage.setItem("tour_in_progress", "true");
+    sessionStorage.setItem("start_engineer_projects_tour", "true");
 
-  router.push("/engineer/project");
-};
+    router.push("/engineer/project");
+  };
 
   // Handoff: Report Issue page → Assets page
   // Called by the "go-to-assets-tour" event dispatched from ClientReportIssue.
@@ -174,70 +174,73 @@ const goToEngineerProjectsTour = () => {
       sessionStorage.removeItem("tour_in_progress");
     }
   };
+
   // Handoff: Assets page → Payout (Account) page
-const goToPayoutTour = () => {
-  activeDriverRef.current?.destroy();
-  activeDriverRef.current = null;
+  const goToPayoutTour = () => {
+    activeDriverRef.current?.destroy();
+    activeDriverRef.current = null;
 
-  sessionStorage.setItem("tour_in_progress", "true");
-  sessionStorage.setItem("start_payout_tour", "true");
+    sessionStorage.setItem("tour_in_progress", "true");
+    sessionStorage.setItem("start_payout_tour", "true");
 
-  router.push("/client/account");
-};
- const goToProfileTour = () => {
-  activeDriverRef.current?.destroy();
-  activeDriverRef.current = null;
+    router.push("/client/account");
+  };
 
-  sessionStorage.setItem("tour_in_progress", "true");
-  sessionStorage.setItem("start_profile_tour", "true");
+  const goToProfileTour = () => {
+    activeDriverRef.current?.destroy();
+    activeDriverRef.current = null;
 
-  router.push("/client/profile");
-};
+    sessionStorage.setItem("tour_in_progress", "true");
+    sessionStorage.setItem("start_profile_tour", "true");
+
+    router.push("/client/profile");
+  };
+
   // Sidebar + Dashboard steps only. Report Issue and Assets tours run
   // inside their own pages via events — don't include their steps here.
   const buildTourSteps = () => {
-  const roleDashboardSteps = isEngineer ? engineerDashboardTourSteps : dashboardTourSteps;
-  const goToNextPage = isEngineer ? goToEngineerProjectsTour : goToReportIssueTour;
+    const roleDashboardSteps = isEngineer ? engineerDashboardTourSteps : dashboardTourSteps;
+    const goToNextPage = isEngineer ? goToEngineerProjectsTour : goToReportIssueTour;
 
-  const dashboardStepsWithHandoff = roleDashboardSteps.map((step, index) => {
-    const isLastStep = index === roleDashboardSteps.length - 1;
-    if (!isLastStep) return step;
+    const dashboardStepsWithHandoff = roleDashboardSteps.map((step, index) => {
+      const isLastStep = index === roleDashboardSteps.length - 1;
+      if (!isLastStep) return step;
 
-    return {
-      ...step,
+      return {
+        ...step,
+        popover: {
+          ...step.popover,
+          onNextClick: (_el: any, _stepArg: any, opts: any) => {
+            activeDriverRef.current = opts.driver;
+            goToNextPage();
+          },
+        },
+      };
+    });
+
+    const sidebarSteps = nav.map((item) => ({
+      element: `#nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`,
       popover: {
-        ...step.popover,
-        onNextClick: (_el: any, _stepArg: any, opts: any) => {
-          activeDriverRef.current = opts.driver;
-          goToNextPage();
+        title: item.label,
+        description: getSidebarDescription(item.label),
+      },
+    }));
+
+    return [
+      ...sidebarSteps,
+      {
+        element: "#nav-dashboard",
+        popover: {
+          title: "You're Ready! 🎉",
+          description:
+            isEngineer
+              ? "Now click on any project from the dashboard to continue the tour and explore the full project details, tasks, milestones, and more!"
+              : "Now click on any project from the dashboard to continue the tour and explore the full project analytics, budget, design system, and more!",
         },
       },
-    };
-  });
-
-  const sidebarSteps = nav.map((item) => ({
-    element: `#nav-${item.label.toLowerCase().replace(/\s+/g, "-")}`,
-    popover: {
-      title: item.label,
-      description: getSidebarDescription(item.label),
-    },
-  }));
-
-  return [
-    ...sidebarSteps,
-    {
-      element: "#nav-dashboard",
-      popover: {
-        title: "You're Ready! 🎉",
-        description:
-          isEngineer
-            ? "Now click on any project from the dashboard to continue the tour and explore the full project details, tasks, milestones, and more!"
-            : "Now click on any project from the dashboard to continue the tour and explore the full project analytics, budget, design system, and more!",
-      },
-    },
-    ...dashboardStepsWithHandoff,
-  ];
-};
+      ...dashboardStepsWithHandoff,
+    ];
+  };
 
   const driverConfig = () => ({
     showProgress: true,
@@ -288,20 +291,20 @@ const goToPayoutTour = () => {
 
   // Manual tour trigger via "Start Tour" button on the dashboard
   useEffect(() => {
-  const handleManualTour = () => {
-    // Signal all downstream pages to ignore their localStorage gate
-    sessionStorage.setItem("force_tour", "true");
+    const handleManualTour = () => {
+      // Signal all downstream pages to ignore their localStorage gate
+      sessionStorage.setItem("force_tour", "true");
 
-    const driverObj = driver({
-      ...driverConfig(),
-      steps: buildTourSteps(),
-    });
-    activeDriverRef.current = driverObj;
-    driverObj.drive();
-  };
-  window.addEventListener("start-sidebar-tour", handleManualTour);
-  return () => window.removeEventListener("start-sidebar-tour", handleManualTour);
-}, [nav]);
+      const driverObj = driver({
+        ...driverConfig(),
+        steps: buildTourSteps(),
+      });
+      activeDriverRef.current = driverObj;
+      driverObj.drive();
+    };
+    window.addEventListener("start-sidebar-tour", handleManualTour);
+    return () => window.removeEventListener("start-sidebar-tour", handleManualTour);
+  }, [nav]);
 
   // Dedicated listener for the Report Issue → Assets handoff event.
   // Kept in its own effect with empty deps so it is ALWAYS mounted,
@@ -317,11 +320,12 @@ const goToPayoutTour = () => {
     window.addEventListener("go-to-payout-tour", handleGoToPayout);
     return () => window.removeEventListener("go-to-payout-tour", handleGoToPayout);
   }, []);
+
   useEffect(() => {
-  const handleGoToProfile = () => goToProfileTour();
-  window.addEventListener("go-to-profile-tour", handleGoToProfile);
-  return () => window.removeEventListener("go-to-profile-tour", handleGoToProfile);
-}, []);
+    const handleGoToProfile = () => goToProfileTour();
+    window.addEventListener("go-to-profile-tour", handleGoToProfile);
+    return () => window.removeEventListener("go-to-profile-tour", handleGoToProfile);
+  }, []);
 
   return (
     <aside
@@ -329,9 +333,17 @@ const goToPayoutTour = () => {
       className="h-screen flex flex-col bg-sidebar border-r border-[var(--sidebar-border)] transition-all duration-300 shrink-0 relative"
     >
       <div className="flex items-center justify-center h-20 border-b border-[var(--sidebar-border)] bg-sidebar">
-        {!collapsed && <span className="font-bold text-xl text-[var(--text-primary)] tracking-tight">
-          <Image src="/imagelogodiff.PNG" alt="logo" width={300} height={300} className="dark:brightness-110" />
-          </span>}
+        {!collapsed && (
+          <span className="font-bold text-xl text-[var(--text-primary)] tracking-tight">
+            <Image
+              src="/logo-transparent.png"
+              alt="logo"
+              width={300}
+              height={300}
+              priority
+            />
+          </span>
+        )}
         {collapsed && <span className="font-bold text-xl text-[var(--text-primary)] tracking-tight">TE</span>}
       </div>
 

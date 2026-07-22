@@ -46,7 +46,7 @@ export default function StatCard({ title, value, change, changeType, subtitle, h
 
   return (
     <div className="">
-      <div className={`relative rounded-[24px] border p-6 m-2 h-43 transition-all duration-300 
+      <div className={`relative rounded-[24px] border p-6 m-2 h-43 transition-all duration-300 flex flex-col
        
         ${highlighted
           ? "bg-gradient-to-br from-[#FF7A00] via-[#FFAE58] to-[#FFE0B8] border-transparent text-white"
@@ -56,9 +56,9 @@ export default function StatCard({ title, value, change, changeType, subtitle, h
     >
       {/* Top */}
       <div className="flex items-start justify-between ">
-        <div>
+        <div className="min-w-0 pr-2">
           <p
-            className={`text-[1.1rem] font-medium ${highlighted ? "text-white/90" : "text-[#111] dark:text-slate-100"
+            className={`text-[1.1rem] font-medium leading-tight line-clamp-2 ${highlighted ? "text-white/90" : "text-[#111] dark:text-slate-100"
               }`}
           >
             {title}
@@ -66,7 +66,7 @@ export default function StatCard({ title, value, change, changeType, subtitle, h
         </div>
 
         {/* Arrow Button */}
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center border
+        <div className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center border
             ${highlighted
               ? "bg-white text-black border-white/20"
               : "bg-white dark:bg-slate-800 text-black dark:text-white border-[#DADADA] dark:border-slate-700"
@@ -78,7 +78,7 @@ export default function StatCard({ title, value, change, changeType, subtitle, h
       </div>
 
       {/* Value */}
-      <div className="mt-2 mb-8">
+      <div className="mt-2 mb-8 flex-1 flex items-end">
         <h2 className={`text-[36px] leading-none font-medium tracking-tight ${highlighted ? "text-white" : "text-black dark:text-white"
             }`}
         >
@@ -94,8 +94,8 @@ export default function StatCard({ title, value, change, changeType, subtitle, h
               ${highlighted
                 ? "bg-white/10 border-white/20 text-white"
                 : isUp
-                  ? "bg-[#EEF9F1] border-[#D7F0DD] text-[#238B57]"
-                  : "bg-red-50 border-red-100 text-red-500"
+                  ? "bg-[#EEF9F1] dark:bg-emerald-950/40 border-[#D7F0DD] dark:border-emerald-800 text-[#238B57] dark:text-emerald-400"
+                  : "bg-red-50 dark:bg-red-950/40 border-red-100 dark:border-red-800 text-red-500 dark:text-red-400"
               }
             `}
           >

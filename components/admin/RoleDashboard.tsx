@@ -21,13 +21,13 @@ const socket = io({
 });
 
 const s = {
-  page: { minHeight: "100vh", background: "#fffffff", padding: 32, fontFamily: "inherit" } as React.CSSProperties,
-  card: { position: "relative", background: "#fff", borderRadius: 12, border: "1px solid #e5e5e5", padding: 20, boxShadow: "0 1px 4px rgba(5,10,48,0.05)", transition: "box-shadow 0.2s" } as React.CSSProperties,
+  page: { minHeight: "100vh", background: "var(--bg)", padding: 32, fontFamily: "inherit" } as React.CSSProperties,
+  card: { position: "relative", background: "var(--card)", borderRadius: 12, border: "1px solid var(--border)", padding: 20, boxShadow: "0 1px 4px rgba(5,10,48,0.05)", transition: "box-shadow 0.2s" } as React.CSSProperties,
   avatar: (isSuspended: boolean) => ({ width: 56, height: 56, borderRadius: "50%", background: isSuspended ? "#fee2e2" : "#fff4e6", border: `2px solid ${isSuspended ? "#ef4444" : "#FFAE58"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, fontWeight: 600, color: isSuspended ? "#ef4444" : "#FFAE58", position: "relative", flexShrink: 0 } as React.CSSProperties),
-  dot: (isActive: boolean) => ({ position: "absolute", bottom: 1, right: 1, width: 11, height: 11, borderRadius: "50%", background: isActive ? "#22c55e" : "#9ca3af", border: "2px solid #fff" } as React.CSSProperties),
+  dot: (isActive: boolean) => ({ position: "absolute", bottom: 1, right: 1, width: 11, height: 11, borderRadius: "50%", background: isActive ? "#22c55e" : "#9ca3af", border: "2px solid var(--card)" } as React.CSSProperties),
   badge: (color: string, bg: string) => ({ display: "inline-block", padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600, background: bg, color } as React.CSSProperties),
-  divider: { borderTop: "1px solid #e5e5e5", marginTop: 14, paddingTop: 12 } as React.CSSProperties,
-  iconRow: { display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#6F6F6F" } as React.CSSProperties,
+  divider: { borderTop: "1px solid var(--border)", marginTop: 14, paddingTop: 12 } as React.CSSProperties,
+  iconRow: { display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-secondary)" } as React.CSSProperties,
   actionBtn: (danger = false) => ({ padding: "6px 8px", borderRadius: 8, background: danger ? "#fff0f0" : "#f4f4f4", border: "none", cursor: "pointer", display: "flex", alignItems: "center" } as React.CSSProperties),
 };
 
@@ -106,8 +106,6 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
     };
   }, []);
 
-  // console.log(data,"userss");
-
   // ACTION HANDLERS
   const handleDelete = async () => {
     if (!deletingUser) return;
@@ -171,7 +169,7 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
         key={u.id}
         style={{ ...s.card, cursor: "pointer" }}
         onClick={() => handleRedirect(u.role)}
-        className="hover:shadow-md transition-shadow relative p-4 sm:p-5 bg-amber-300"
+        className="hover:shadow-md transition-shadow relative p-4 sm:p-5"
       >
         {/* ACTION BUTTONS */}
         <div className="absolute top-3 right-3 flex gap-2 z-10">
@@ -238,15 +236,15 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
             {/* NAME */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-start gap-2">
               <span
-                className={`text-[15px] font-semibold ${u.isSuspended ? "text-red-500" : "text-[#050A30]"
-                  }`}
+                style={{ color: u.isSuspended ? "#ef4444" : "var(--text-primary)" }}
+                className="text-[15px] font-semibold"
               >
                 {u.name || "Unnamed"}
               </span>
 
               {role === "ENGINEER" && (
                 <span
-                className="rounded-full"
+                  className="rounded-full"
                   style={s.badge(
                     u.status === "PENDING"
                       ? "#f59e0b"
@@ -370,9 +368,9 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
       <div style={{ marginBottom: 28 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
 
-          <h1 style={{ fontSize: 22, fontWeight: 600, color: "#050A30", display: "flex", alignItems: "center", gap: "10px" }}>
+          <h1 style={{ fontSize: 22, fontWeight: 600, color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "10px" }}>
             {statusFilter === "PENDING" ? "Pending Requests" : tabLabel[role]}
-            <span style={{ fontSize: 14, fontWeight: 500, color: "#6F6F6F" }}>
+            <span style={{ fontSize: 14, fontWeight: 500, color: "var(--text-secondary)" }}>
               ({visibleUsers.length})
             </span>
           </h1>
@@ -385,40 +383,40 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
                 placeholder="Search name or email..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 border border-[#e5e5e5] rounded-lg text-sm outline-none focus:ring-1 focus:ring-[#FFAE58]"
+                className="w-full pl-9 pr-4 py-2 border border-[#e5e5e5] dark:border-slate-700 bg-white dark:bg-card dark:text-white rounded-lg text-sm outline-none focus:ring-1 focus:ring-[#FFAE58]"
               />
             </div>
 
             <div className="flex items-center gap-8">
               {role === "ENGINEER" && (
-              <div className="relative">
-                <Filter size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none dark:text-slate-500" />
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="pl-8 pr-8 py-2 border border-[#e5e5e5] rounded-lg text-sm outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[#FFAE58] bg-white dark:bg-card"
-                >
-                  <option value="ALL">All Status</option>
-                  <option value="APPROVED">Approved Only</option>
-                  <option value="REJECTED">Rejected</option>
-                </select>
-              </div>
-            )}
+                <div className="relative">
+                  <Filter size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none dark:text-slate-500" />
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="pl-8 pr-8 py-2 border border-[#e5e5e5] dark:border-slate-700 rounded-lg text-sm outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[#FFAE58] bg-white dark:bg-card dark:text-white"
+                  >
+                    <option value="ALL">All Status</option>
+                    <option value="APPROVED">Approved Only</option>
+                    <option value="REJECTED">Rejected</option>
+                  </select>
+                </div>
+              )}
 
-            {role === "ENGINEER" && (
-              <button
-                onClick={() => setStatusFilter(statusFilter === "PENDING" ? "APPROVED" : "PENDING")}
-                className={`relative p-2.5 rounded-lg border transition-colors ${statusFilter === "PENDING" ? "bg-[#FFAE58] text-white border-[#FFAE58]" : "bg-white border-[#e5e5e5] text-gray-600 hover:bg-gray-50"} dark:text-slate-400`}
-                title="View Pending Requests"
-              >
-                <Bell size={18} />
-                {pendingCount > 0 && statusFilter !== "PENDING" && (
-                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full">
-                    {pendingCount}
-                  </span>
-                )}
-              </button>
-            )}
+              {role === "ENGINEER" && (
+                <button
+                  onClick={() => setStatusFilter(statusFilter === "PENDING" ? "APPROVED" : "PENDING")}
+                  className={`relative p-2.5 rounded-lg border transition-colors ${statusFilter === "PENDING" ? "bg-[#FFAE58] text-white border-[#FFAE58]" : "bg-white dark:bg-card border-[#e5e5e5] dark:border-slate-700 text-gray-600 hover:bg-gray-50 dark:hover:bg-slate-800"} dark:text-slate-400`}
+                  title="View Pending Requests"
+                >
+                  <Bell size={18} />
+                  {pendingCount > 0 && statusFilter !== "PENDING" && (
+                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full">
+                      {pendingCount}
+                    </span>
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -439,7 +437,7 @@ export default function RoleDashboard({ role }: { role: "ENGINEER" | "ADMIN" | "
           </div>
 
           {visibleUsers.length === 0 && (
-            <p style={{ color: "#6F6F6F", textAlign: "center", paddingTop: 40 }}>
+            <p style={{ color: "var(--text-secondary)", textAlign: "center", paddingTop: 40 }}>
               No {tabLabel[role].toLowerCase()} found.
             </p>
           )}

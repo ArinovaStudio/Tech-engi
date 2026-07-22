@@ -26,9 +26,36 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ proj
       return NextResponse.json({ success: false, message: "Forbidden" }, { status: 403 });
     }
 
+    // Check agreement status
+    const agreement = await prisma.projectAgreement.findUnique({
+      where: {
+        projectId_engineerId: {
+          projectId: project.id,
+          engineerId: user.engineerProfile.id
+        }
+      }
+    });
+
+    const agreementStatus = agreement?.status ?? "PENDING";
+
+    if (agreementStatus !== "ACCEPTED") {
+      // Don't leak project details until agreement is accepted
+      return NextResponse.json({
+        success: true,
+        agreementRequired: true,
+        agreementStatus,
+        project: { id: project.id, title: project.title } // minimal info only
+      }, { status: 200 });
+    }
+
     const { budget, ...projectData } = project;
 
-    return NextResponse.json({ success: true, project: { ...projectData, earnings: budget * 0.7 } }, { status: 200 });
+    return NextResponse.json({
+      success: true,
+      agreementRequired: false,
+      agreementStatus,
+      project: { ...projectData, earnings: budget * 0.7 }
+    }, { status: 200 });
 
   } catch {
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });

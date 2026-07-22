@@ -66,7 +66,7 @@ const updates = [
 const LatestUpdates = ({ data, }: { data: any; }) => {
   const project = data?.[0];
   return (
-    <div id="latest-task" className="relative w-full h-[620px] rounded-[24px] border-2 border-[#cfcfcf] bg-[#f5f5f5] p-6 flex flex-col overflow-hidden">
+    <div id="latest-task" className="relative w-full h-[620px] rounded-[24px] border-2 border-[#cfcfcf] dark:border-gray-700 bg-[#f5f5f5] dark:bg-gray-800 p-6 flex flex-col overflow-hidden">
       {/* Header */}
       <div className="flex items-start justify-between mb-5 shrink-0">
         <h2 className="text-[30px] leading-none font-black text-black font-id dark:text-white">
@@ -89,7 +89,8 @@ const LatestUpdates = ({ data, }: { data: any; }) => {
       project.kanbanTasks.map((task: any) => (
         <div
           key={task.id}
-          className="bg-[#fafafa] rounded-[18px] px-5 py-5 shadow-[0_4px_18px_rgba(0,0,0,0.06)] relative"
+          className="bg-[#fafafa] dark:bg-gray-700 rounded-[18px] px-5 py-5 shadow-[0_4px_18px_rgba(0,0,0,0.06)] relative"
+
         >
           {/* Date */}
           <span className="absolute top-4 right-5 text-[18px] font-semibold text-[#7B3FFF] font-id">
@@ -124,7 +125,7 @@ const LatestUpdates = ({ data, }: { data: any; }) => {
   </div>
 
   {/* Bottom Fade */}
-  <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#f5f5f5] via-[#f5f5f5]/90 to-transparent z-20" />
+  <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#f5f5f5] dark:from-gray-800 via-[#f5f5f5]/90 dark:via-gray-800/90 to-transparent z-20" />
 
 </div>
   );

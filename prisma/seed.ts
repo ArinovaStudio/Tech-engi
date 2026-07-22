@@ -14,7 +14,7 @@ async function main() {
 
   const hashedPassword = await bcrypt.hash("password123", 10);
 
-  /*console.log("Creating Admin...");
+  console.log("Creating Admin...");
   await prisma.user.upsert({
     where: { email: "admin@example.com" },
     update: {},
@@ -26,8 +26,8 @@ async function main() {
       emailVerified: new Date(),
     },
   });
-
-  console.log("Creating Client...");
+}
+ /* console.log("Creating Client...");
   const clientUser = await prisma.user.upsert({
     where: { email: "client@example.com" },
     update: {},
@@ -192,30 +192,50 @@ async function main() {
   */
 
   /*console.log("Creating Aditya's account...");
-  await prisma.user.upsert({
-    where: { email: "aditya@gmail.com" },
-    update: {},
-    create: {
-      name: "Aditya Singh",
-      email: "aditya@gmail.com",
-      password: hashedPassword,
-      role: Role.CLIENT,
-      emailVerified: new Date(),
-      clientProfile: {
-        create: {
-          totalProjects: 0,
-          totalBudget: 0,
-          expertise: [],
-        },
+const aditya = await prisma.user.upsert({
+  where: { email: "aditya@gmail.com" },
+  update: {},
+  create: {
+    name: "Aditya Singh",
+    email: "aditya@gmail.com",
+    password: hashedPassword,
+    role: Role.CLIENT,
+    emailVerified: new Date(),
+    clientProfile: {
+      create: {
+        totalProjects: 0,
+        totalBudget: 0,
+        expertise: [],
       },
     },
-  });
+  },
+  include: {
+    clientProfile: true,
+  },
+});
 
-  console.log("Seeding finished.");
-}*/
+if (aditya.clientProfile) {
+  console.log("Creating project for Aditya...");
+  await prisma.project.create({
+    data: {
+      clientId: aditya.clientProfile.id,
+      title: "Portfolio Website Revamp",
+      description:
+        "Need a modern, responsive portfolio site built with Next.js and Tailwind CSS.",
+      budget: 15000,
+      instruments: ["Next.js", "TypeScript", "Tailwind CSS"],
+      advancePaid: true,
+      status: ProjectStatus.DRAFT,
+    },
+  });
+}
+}
+
+console.log("Seeding finished.");
+*/
 // console.log("Creating Aditya's engineer account...");
 
-await prisma.user.upsert({
+/*await prisma.user.upsert({
   where: { email: "aditya.engineer@gmail.com" },
   update: {},
   create: {
@@ -237,7 +257,7 @@ await prisma.user.upsert({
     },
   },
 });
-}
+}*/
 main()
   .catch((e) => {
     console.error("Seeding failed:", e);

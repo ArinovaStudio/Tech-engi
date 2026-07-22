@@ -68,7 +68,7 @@ const milestones = [
 
 const Milestones = ({ milestones = [] }: { milestones: any[] }) => {
   return (
-    <div className="relative w-full h-[320px] rounded-[24px] border-2 border-[#d6d6d6] bg-[#f5f5f5] p-6 overflow-hidden">
+    <div className="relative w-full h-[320px] rounded-[24px] border-2 border-[#d6d6d6] dark:border-gray-700 bg-[#f5f5f5] dark:bg-gray-800 p-6 overflow-hidden">
 
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
@@ -92,7 +92,7 @@ const Milestones = ({ milestones = [] }: { milestones: any[] }) => {
           milestones.map((m) => (
             <div
               key={m.id}
-              className="bg-white rounded-[18px] p-5 border border-[#e6e6e6] shadow-[0_4px_18px_rgba(0,0,0,0.05)] dark:bg-card"
+              className="bg-white rounded-[18px] p-5 border border-[#e6e6e6] dark:border-gray-700 shadow-[0_4px_18px_rgba(0,0,0,0.05)] dark:bg-card"
             >
 
               {/* Top */}
@@ -131,7 +131,7 @@ const Milestones = ({ milestones = [] }: { milestones: any[] }) => {
       </div>
 
       {/* Bottom Fade */}
-      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#f5f5f5] to-transparent" />
+      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#f5f5f5] dark:from-gray-800 to-transparent" />
 
     </div>
   );

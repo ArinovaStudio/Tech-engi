@@ -2,19 +2,20 @@ import React from "react";
 import { User } from "lucide-react";
 
 export const T = {
-  bg: "#f4f4f4", card: "#ffffff", border: "#e5e5e5", primary: "#FFAE58",
-  primaryLight: "#fff4e6", text: "#050A30", textSec: "#4B4B4B", textMuted: "#6F6F6F",
-  danger: "#ef4444", purple: "#8b5cf6", success: "#16a34a"
+  bg: "var(--bg)", card: "var(--bg-card)", border: "var(--border)", primary: "var(--primary)",
+  primaryLight: "var(--primary-light)", text: "var(--text-primary)", textSec: "var(--text-secondary)",
+  textMuted: "var(--text-muted)",
+  danger: "var(--destructive)", purple: "#8b5cf6", success: "#16a34a"
 } as const;
 
-export const inputCls = "w-full px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-orange-300 bg-white text-[#050A30] border-[#e5e5e5]";
-export const selectCls = "w-full px-3 py-2 border border-[#e5e5e5] rounded-lg text-sm outline-none focus:ring-2 focus:ring-orange-300 bg-white text-[#050A30]";
+export const inputCls = "w-full px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-orange-300 bg-[var(--bg-card)] text-[var(--text-primary)] border-[var(--border)]";
+export const selectCls = "w-full px-3 py-2 border border-[var(--border)] rounded-lg text-sm outline-none focus:ring-2 focus:ring-orange-300 bg-[var(--bg-card)] text-[var(--text-primary)]";
 export const labelStyle: React.CSSProperties = { display: "block", fontSize: 13, fontWeight: 500, color: T.text, marginBottom: 4 };
 
 export const getApiBase = (role: string) => {
   if (role === "CLIENT") return "/api/client/projects";
   if (role === "ENGINEER") return "/api/engineer/projects";
-  return "/api/admin/project"; 
+  return "/api/admin/project";
 };
 
 export const ProgressGauge = ({ progress }: { progress?: number }) => {
@@ -23,7 +24,7 @@ export const ProgressGauge = ({ progress }: { progress?: number }) => {
   return (
     <div style={{ position: "relative", width: 120, height: 120 }}>
       <svg style={{ width: 120, height: 120, transform: "rotate(-90deg)" }} viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="45" stroke="#e5e5e5" strokeWidth="8" fill="none" />
+        <circle cx="50" cy="50" r="45" stroke="var(--border)" strokeWidth="8" fill="none" />
         <circle cx="50" cy="50" r="45" stroke={T.primary} strokeWidth="8" fill="none" strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.4s ease" }} />
       </svg>
       <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -56,9 +57,9 @@ export const TeamMemberCard = ({ user, label }: { user: any; label: string }) =>
   const isOnline = user.lastActiveAt ? new Date(user.lastActiveAt) > new Date(Date.now() - 5 * 60 * 1000) : false;
   return (
     <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 12, padding: "12px 16px", marginTop: 10, display: "flex", alignItems: "center", gap: 12 }}>
-      <div style={{ position: "relative", width: 48, height: 48, borderRadius: "50%", background: "#f0f0f0", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+      <div style={{ position: "relative", width: 48, height: 48, borderRadius: "50%", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
         {user.image ? <img src={user.image} alt={user.name || "User"} style={{ width: 48, height: 48, borderRadius: "50%", objectFit: "cover" }} /> : <User size={24} color={T.textMuted} />}
-        <span style={{ position: "absolute", bottom: 2, right: 2, width: 10, height: 10, borderRadius: "50%", background: isOnline ? "#22c55e" : "#d1d5db", border: "1.5px solid #fff" }} />
+        <span style={{ position: "absolute", bottom: 2, right: 2, width: 10, height: 10, borderRadius: "50%", background: isOnline ? "#22c55e" : "#d1d5db", border: `1.5px solid ${T.card}` }} />
       </div>
       <div style={{ minWidth: 0 }}>
         <p style={{ margin: 0, fontWeight: 600, fontSize: 14, color: T.text }}>{user.name || "Unknown"}</p>

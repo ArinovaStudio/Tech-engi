@@ -19,10 +19,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ proj
           orderBy: { updatedAt: "desc" }
         },
         milestones: true,
-        designSystem: true, 
+        designSystem: true,
       }
     });
- 
     if (!project) return NextResponse.json({ success: false, message: "Project not found" }, { status: 404 });
 
     const isAdmin = user.role === "ADMIN";
@@ -31,6 +30,29 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ proj
 
     if (!isAdmin && !isClient && !isEngineer) {
       return NextResponse.json({ success: false, message: "You are not a participant in this project" }, { status: 403 });
+    }
+
+    // Agreement gate — only applies to engineers
+    if (isEngineer) {
+      const agreement = await prisma.projectAgreement.findUnique({
+        where: {
+          projectId_engineerId: {
+            projectId: project.id,
+            engineerId: user.engineerProfile!.id
+          }
+        }
+      });
+
+      const agreementStatus = agreement?.status ?? "PENDING";
+
+      if (agreementStatus !== "ACCEPTED") {
+        return NextResponse.json({
+          success: true,
+          agreementRequired: true,
+          agreementStatus,
+          project: { id: project.id, title: project.title } // minimal info only
+        }, { status: 200 });
+      }
     }
 
     const projectData: any = { ...project };
@@ -43,9 +65,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ proj
       delete projectData.budget;
     }
 
-    return NextResponse.json({ success: true, project: projectData }, { status: 200 });
+    return NextResponse.json({
+      success: true,
+      agreementRequired: false,
+      project: projectData
+    }, { status: 200 });
   } catch (error) {
-    
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }

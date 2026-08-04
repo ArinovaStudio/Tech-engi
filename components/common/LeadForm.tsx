@@ -13,6 +13,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { CustomSelect } from "../ui/select";
+import BriefBox from "../BriefBoxPanel";
 
 // import {
 //   Select,
@@ -456,7 +457,7 @@ export default function ProjectReviewModal({
 
           <div className="grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr]">
             {/* Left panel: order-2 on mobile (shown after the form), order-1 on desktop */}
-            <div className="relative order-1 overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 px-6 py-6 pt-20 text-white sm:px-8 lg:order-1 lg:px-10 lg:py-10">
+            <div className="relative order-2 overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 px-6 py-6 pt-20 text-white sm:px-8 lg:order-1 lg:px-10 lg:py-10">
               <div className="pointer-events-none absolute -left-16 top-10 h-40 w-40 rounded-full bg-orange-500/20 blur-3xl" />
               <div className="pointer-events-none absolute -right-16 bottom-10 h-52 w-52 rounded-full bg-blue-400/20 blur-3xl" />
 
@@ -592,8 +593,8 @@ export default function ProjectReviewModal({
             </div>
 
             {/* Right panel: order-1 on mobile (shown first), order-2 on desktop */}
-            <div className="order-1 bg-slate-50 px-6 py-8 sm:px-8 lg:order-2 lg:px-10 lg:py-10 dark:bg-background">
-              <div className="mx-auto max-w-2xl">
+            <div className="order-1 bg-slate-50 px-4 py-6 sm:px-6 sm:py-8 lg:order-2 lg:px-8 lg:py-10 dark:bg-background">
+              {/* <div className="mx-auto max-w-2xl">
                 <div className="mb-8">
                   <h3 className="text-2xl font-semibold tracking-tight text-slate-950">
                     Project review request
@@ -727,8 +728,10 @@ export default function ProjectReviewModal({
                     </button>
                   </div>
                 </form>
-              </div>
+              </div> */}
+              <BriefBox />
             </div>
+            
           </div>
         </div>
       </div>

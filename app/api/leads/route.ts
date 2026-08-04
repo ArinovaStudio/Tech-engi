@@ -4,21 +4,28 @@ import { prisma } from "@/lib/prisma";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, number, email, domain, challenge, timeline, hear } = body;
+    
+    // Support both old payload and new BriefBox payload
+    const isBriefBox = body.brief !== undefined;
+    
+    let name = body.name || "";
+    let number = body.number || body.contact || "";
+    let email = body.email || (isBriefBox ? "Not provided" : "");
+    let domain = body.domain || (body.domains ? body.domains.join(", ") : "");
+    let challenge = body.challenge || body.brief || "";
+    let timeline = body.timeline || (isBriefBox ? "Not specified" : "");
+    let hear = body.hear || (isBriefBox ? "BriefBox" : "");
 
     if (
       !name?.trim() ||
       !number?.trim() ||
-      !email?.trim() ||
       !domain?.trim() ||
-      !challenge?.trim() ||
-      !timeline?.trim() ||
-      !hear?.trim()
+      !challenge?.trim()
     ) {
       return NextResponse.json(
         {
           success: false,
-          message: "All fields are required.",
+          message: "Name, Contact/Number, Domain, and Brief/Challenge are required.",
         },
         { status: 400 }
       );

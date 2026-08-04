@@ -1,5 +1,30 @@
 import React, { useState } from "react";
 
+/**
+ * Tech Engi — Engineering Solutions Grid
+ * Single-file React + TypeScript + Tailwind. Drop <EngineeringSolutions />
+ * anywhere.
+ *
+ * Light/dark mode: uses Tailwind's `dark:` variant, driven by the standard
+ * class strategy — add/remove a `dark` class on <html> or a parent element
+ * (e.g. via next-themes or a manual toggle). Requires `darkMode: "class"`
+ * in tailwind.config (Tailwind's default in most setups). If the cards
+ * still look identical in both modes after this, the `dark` class isn't
+ * reaching this component — check your provider/toggle, not this file.
+ *
+ * Color tokens:
+ *              Light        Dark (original design system)
+ *   page bg    gray-50      #0b0f19
+ *   card       white        #111827
+ *   card grad  white/gray50 #111827/#171e2e (featured only)
+ *   border     gray-200     white/5
+ *   input/tag  gray-100     white/[0.03]
+ *   text (h)   gray-900     white
+ *   text (p)   gray-600     gray-400
+ *   blue       #2563eb      #3b82f6  (accent stays roughly constant)
+ *   yellow     #ca8a04      #eab308  (featured accent stays constant)
+ */
+
 type Category = "all" | "corporate" | "startup" | "product" | "drone";
 
 interface Solution {
@@ -95,7 +120,7 @@ const filters: { label: string; value: Category }[] = [
   { label: "Drone", value: "drone" },
 ];
 
-const EngineeringSolutions: React.FC = () => {
+export default function EngineeringSolutions() {
   const [activeFilter, setActiveFilter] = useState<Category>("all");
 
   const visibleSolutions = solutions.filter(
@@ -103,23 +128,12 @@ const EngineeringSolutions: React.FC = () => {
   );
 
   return (
-    <div
-      className="eng-solutions-section min-h-screen"
-      style={{
-        background: "#0b0f19",
-        color: "#f3f4f6",
-        padding: "80px 20px",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        fontFamily:
-          '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-      }}
-    >
+    <div className="eng-solutions-section flex min-h-screen items-center justify-center bg-gray-50 px-5 py-20 font-sans text-gray-900 transition-colors dark:bg-[#0b0f19] dark:text-gray-100">
       {/*
-        All selectors below are scoped under .eng-solutions-section so they
-        can never leak into or collide with sibling components rendered
-        elsewhere on the page (BrowserCategory, TrustIndicator, Stats, etc).
+        Only the keyframe animation and the featured-card hover glow live
+        here — they use raw box-shadow / cubic-bezier values that plain
+        Tailwind utilities can't express without a config extension.
+        Everything else below is dark:-variant utility classes.
       */}
       <style>{`
         @keyframes engFadeInUp {
@@ -128,99 +142,54 @@ const EngineeringSolutions: React.FC = () => {
         }
         .eng-solutions-section .eng-solution-card {
           animation: engFadeInUp 0.6s forwards ease-out;
+          transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+            box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+            border-color 0.3s ease;
         }
         .eng-solutions-section .eng-solution-card:hover {
           transform: translateY(-12px);
+          box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+        }
+        .dark .eng-solutions-section .eng-solution-card:hover {
           box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
-          border-color: rgba(255, 255, 255, 0.15) !important;
         }
         .eng-solutions-section .eng-solution-card.eng-featured:hover {
           border-color: #eab308 !important;
           box-shadow: 0 30px 60px rgba(234, 179, 8, 0.15);
         }
-        .eng-solutions-section .eng-filter-btn:hover,
-        .eng-solutions-section .eng-filter-btn.eng-active {
-          background: #2563eb !important;
-          color: #ffffff !important;
-          border-color: #3b82f6 !important;
-          box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
-        }
-        @media (max-width: 768px) {
-          .eng-solutions-section .eng-section-title-h2 { font-size: 2rem !important; }
-        }
       `}</style>
 
-      <section style={{ maxWidth: 1200, width: "100%", margin: "0 auto" }}>
-        {/* Filter Navigation Tabs */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: 15,
-            marginBottom: 50,
-            flexWrap: "wrap",
-          }}
-        >
-          {filters.map((f) => (
-            <button
-              key={f.value}
-              className={`eng-filter-btn${activeFilter === f.value ? " eng-active" : ""}`}
-              onClick={() => setActiveFilter(f.value)}
-              style={{
-                background: "rgba(255, 255, 255, 0.05)",
-                color: "#9ca3af",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
-                padding: "12px 24px",
-                borderRadius: 30,
-                cursor: "pointer",
-                fontWeight: 600,
-                fontSize: "0.95rem",
-                transition: "all 0.3s ease",
-              }}
-            >
-              {f.label}
-            </button>
-          ))}
+      <section className="mx-auto w-full max-w-7xl">
+        {/* FILTER TABS */}
+        <div className="mb-12 flex flex-wrap justify-center gap-4">
+          {filters.map((f) => {
+            const active = activeFilter === f.value;
+            return (
+              <button
+                type="button"
+                key={f.value}
+                onClick={() => setActiveFilter(f.value)}
+                className={`rounded-full border px-6 py-3 text-sm font-semibold transition-all duration-300 ${
+                  active
+                    ? "border-blue-500 bg-blue-600 text-white shadow-[0_0_20px_rgba(59,130,246,0.4)]"
+                    : "border-gray-200 bg-white text-gray-500 hover:border-blue-500 hover:bg-blue-600 hover:text-white hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] dark:border-white/10 dark:bg-white/5 dark:text-gray-400"
+                }`}
+              >
+                {f.label}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Section Title */}
-        <div style={{ textAlign: "center", marginBottom: 60 }}>
-          <span
-            style={{
-              color: "#3b82f6",
-              fontWeight: 700,
-              letterSpacing: 2,
-              fontSize: "0.85rem",
-              textTransform: "uppercase",
-              display: "block",
-              marginBottom: 12,
-            }}
-          >
+        {/* SECTION TITLE */}
+        <div className="mb-16 text-center">
+          <span className="mb-3 block text-sm font-bold uppercase tracking-[2px] text-blue-600 dark:text-blue-400">
             OUR EXPERTISE
           </span>
-          <h2
-            className="eng-section-title-h2"
-            style={{
-              fontSize: "2.5rem",
-              fontWeight: 800,
-              marginBottom: 20,
-              color: "#ffffff",
-              background: "linear-gradient(to right, #ffffff, #9ca3af)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
+          <h2 className="mb-5 bg-gradient-to-r from-gray-900 to-gray-500 bg-clip-text text-3xl font-extrabold text-transparent dark:from-white dark:to-gray-400 sm:text-[2.5rem]">
             Engineering Solutions Built Around Your Business
           </h2>
-          <p
-            style={{
-              maxWidth: 650,
-              margin: "0 auto",
-              color: "#9ca3af",
-              lineHeight: 1.6,
-              fontSize: "1.1rem",
-            }}
-          >
+          <p className="mx-auto max-w-[650px] text-base leading-relaxed text-gray-600 dark:text-gray-400 sm:text-[1.1rem]">
             Whether you're fixing production issues, building your startup,
             developing a hardware product, or creating autonomous systems,
             Tech Engi provides verified engineering teams from concept to
@@ -228,109 +197,49 @@ const EngineeringSolutions: React.FC = () => {
           </p>
         </div>
 
-        {/* Cards Grid */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: 30,
-          }}
-        >
+        {/* CARDS GRID — 1 / 2 / 4 columns, fully responsive */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6 xl:gap-8">
           {visibleSolutions.map((s, i) => (
             <div
               key={s.title}
-              className={`eng-solution-card${s.featured ? " eng-featured" : ""}`}
-              style={{
-                background: s.featured
-                  ? "linear-gradient(145deg, #111827, #171e2e)"
-                  : "#111827",
-                border: `1px solid ${
-                  s.featured ? "rgba(234, 179, 8, 0.3)" : "rgba(255, 255, 255, 0.05)"
-                }`,
-                borderRadius: 16,
-                padding: "35px 30px",
-                position: "relative",
-                display: "flex",
-                flexDirection: "column",
-                transition:
-                  "transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.3s ease",
-                animationDelay: `${0.1 * (i + 1)}s`,
-              }}
+              className={`eng-solution-card relative flex flex-col rounded-2xl border p-8 ${
+                s.featured
+                  ? "eng-featured border-yellow-500/30 bg-gradient-to-br from-white to-gray-50 dark:from-[#111827] dark:to-[#171e2e]"
+                  : "border-gray-200 bg-white dark:border-white/5 dark:bg-[#111827]"
+              }`}
+              style={{ animationDelay: `${0.1 * (i + 1)}s` }}
             >
               {s.badge && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 25,
-                    right: 25,
-                    background: "rgba(234, 179, 8, 0.1)",
-                    color: "#eab308",
-                    padding: "6px 14px",
-                    borderRadius: 20,
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    letterSpacing: 0.5,
-                    border: "1px solid rgba(234, 179, 8, 0.2)",
-                  }}
-                >
+                <div className="absolute right-6 top-6 rounded-full border border-yellow-500/20 bg-yellow-500/10 px-3.5 py-1.5 text-xs font-bold tracking-wide text-yellow-600 dark:text-yellow-500">
                   {s.badge}
                 </div>
               )}
 
-              <div
-                style={{
-                  fontSize: "2.2rem",
-                  marginBottom: 25,
-                  background: "rgba(255, 255, 255, 0.03)",
-                  width: 60,
-                  height: 60,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: 12,
-                  border: "1px solid rgba(255, 255, 255, 0.05)",
-                }}
-              >
+              <div className="mb-6 flex h-[60px] w-[60px] items-center justify-center rounded-xl border border-gray-200 bg-gray-100 text-3xl dark:border-white/5 dark:bg-white/[0.03]">
                 {s.icon}
               </div>
 
-              <h3
-                style={{
-                  fontSize: "1.35rem",
-                  fontWeight: 700,
-                  marginBottom: 15,
-                  color: "#ffffff",
-                }}
-              >
+              <h3 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
                 {s.title}
               </h3>
 
-              <p
-                style={{
-                  color: "#9ca3af",
-                  fontSize: "0.95rem",
-                  lineHeight: 1.6,
-                  marginBottom: 25,
-                  flexGrow: 1,
-                }}
-              >
+              <p className="mb-6 flex-grow text-[0.95rem] leading-relaxed text-gray-600 dark:text-gray-400">
                 {s.description}
               </p>
 
-              <ul style={{ listStyle: "none", marginBottom: 30 }}>
+              <ul className="mb-8 list-none">
                 {s.items.map((item) => (
                   <li
                     key={item}
-                    style={{
-                      color: "#d1d5db",
-                      fontSize: "0.9rem",
-                      marginBottom: 12,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 10,
-                    }}
+                    className="mb-3 flex items-center gap-2.5 text-[0.9rem] text-gray-700 dark:text-gray-300"
                   >
-                    <span style={{ color: s.featured ? "#eab308" : "#3b82f6", fontWeight: "bold" }}>
+                    <span
+                      className={`font-bold ${
+                        s.featured
+                          ? "text-yellow-600 dark:text-yellow-500"
+                          : "text-blue-600 dark:text-blue-400"
+                      }`}
+                    >
                       ✔
                     </span>
                     {item}
@@ -338,26 +247,11 @@ const EngineeringSolutions: React.FC = () => {
                 ))}
               </ul>
 
-              <div
-                style={{
-                  borderTop: "1px solid rgba(255, 255, 255, 0.05)",
-                  paddingTop: 20,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  fontSize: "0.85rem",
-                  fontWeight: 600,
-                }}
-              >
-                <span style={{ color: "#ffffff", fontSize: "1rem" }}>{s.price}</span>
-                <span
-                  style={{
-                    color: "#9ca3af",
-                    background: "rgba(255, 255, 255, 0.05)",
-                    padding: "4px 10px",
-                    borderRadius: 6,
-                  }}
-                >
+              <div className="flex items-center justify-between border-t border-gray-200 pt-5 text-sm font-semibold dark:border-white/5">
+                <span className="text-base text-gray-900 dark:text-white">
+                  {s.price}
+                </span>
+                <span className="rounded-md bg-gray-100 px-2.5 py-1 text-gray-600 dark:bg-white/5 dark:text-gray-400">
                   {s.metaTag}
                 </span>
               </div>
@@ -367,6 +261,4 @@ const EngineeringSolutions: React.FC = () => {
       </section>
     </div>
   );
-};
-
-export default EngineeringSolutions;
+}

@@ -13,6 +13,7 @@ import { toast } from "react-hot-toast";
 import { Loader2 } from "lucide-react";
 import LeadForm, { ProjectReviewFormData } from "@/components/common/LeadForm";
 import EngineeringSolutions from "@/components/engineeringsolutions";
+import BriefBox from "@/components/BriefBoxPanel";
 const userTypes = [
   "Student",
   "Freelancer",
@@ -114,18 +115,21 @@ export default function Home() {
       <div className="overflow-hidden">
         <Start />
         <HowItWorks />
+        <div className="order-1 bg-slate-50 px-4 py-6 sm:px-6 sm:py-8 lg:order-2 lg:px-8 lg:py-10 dark:bg-background">
+          <BriefBox />
+        </div>
         <WhatWeOffer />
-        <EngineeringSolutions/>
+        <EngineeringSolutions />
         <TrustIndicator />
         <BrowserCategory />
         <Stats />
         <AboutUs />
         <Footer />
       </div>
-        <LeadForm 
+      {/* <LeadForm
         isOpen={showWelcome}
-        onClose={() => setShowWelcome(false)} 
-        />
+        onClose={() => setShowWelcome(false)}
+      /> */}
     </div>
   );
 }

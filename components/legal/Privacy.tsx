@@ -346,7 +346,7 @@ export default function PrivacyPolicy() {
                   <span className="font-semibold text-gray-900">
                     Support:
                   </span>{" "}
-                  tsy1@tsquarey.store
+                  techengi@tsquarey.tech
                 </p>
 
                 <p>

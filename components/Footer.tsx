@@ -91,7 +91,7 @@ const Footer = () => {
 
           <ul className="space-y-2">
             {[
-              "tsy1@tsquarey.store",
+              "techengi@tsquarey.tech",
               // "9086345xx2",
               // "Area 51, Siliguri, west Bengal",
               // "sales@tech-engi.com",
@@ -259,9 +259,9 @@ const Footer = () => {
             Policy • Terms &amp; Conditions • Cookie Policy
           </p>
 
-          <p className="text-[14px] sm:text-[15px]">
+          {/* <p className="text-[14px] sm:text-[15px]">
             Designed by Arinova Studio
-          </p>
+          </p> */}
         </div>
       </div>
     </footer>

@@ -270,7 +270,7 @@ export default function TermsAndConditionsPage() {
             <p>
               <strong>Tech Engi</strong>
             </p>
-            <p>Support: tsy1@tsquarey.store</p>
+            <p>Support: techengi@tsquarey.tech</p>
             <p>Website: https://techengi.tsquarey.store</p>
           </div>
         </>

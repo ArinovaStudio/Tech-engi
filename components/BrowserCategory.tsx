@@ -214,15 +214,15 @@ const BrowserCategory = () => {
           <div ref={detailRef} className="min-w-0">
 
             {/* TITLE */}
-            <h3
+            <h2
               className=" text-[34px] sm:text-[42px] lg:text-[50px] font-extrabold text-black dark:text-white text-left lg:text-right leading-tight">
               {selectedCategory.title}
-            </h3>
+            </h2>
 
-            <h4
+            <p
               className="text-[14px] sm:text-[15px] lg:text-[17px] text-gray-700 dark:text-slate-300 text-left lg:text-right mb-1 font-inter leading-relaxed">
               {selectedCategory.description1}
-            </h4>
+            </p>
 
             {/* IMAGE */}
             <div

@@ -187,10 +187,9 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 
   /* Fonts */
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
   --font-benz: var(--font-benz);
-  --font-montserrat: var(--font-montserrat);
   --font-id: var(--font-id);
   --font-inter: var(--font-inter);
   --font-spacegrotesk: var(--font-spacegrotesk);

@@ -85,7 +85,7 @@ const Start = () => {
             {/* LOGO */}
             <span
               className=" text-[22px] font-benz tracking-tight text-black dark:text-white lg:mr-4 lg:border-r-2 lg:border-gray-300 lg:pr-4 " >
-              <Image src="/imagelogodiffcrop.png" alt="logo" width={150} height={150} />
+              <Image src="/imagelogodiffcrop.png" alt="Tech Engi logo" width={150} height={150} />
             </span>
 
             {/* DESKTOP NAV */}
@@ -392,7 +392,7 @@ const Start = () => {
                 >
                   <Image
                     src={src}
-                    alt={`User ${i + 1}`}
+                    alt=""
                     fill
                     className="object-cover"
                   />

@@ -27,7 +27,7 @@ const HowItWorks = () => {
 
   return (
     <section id='howitworks' className="w-full px-6">
-      <div className="w-full">
+      <div id="howitworks" className="w-full">
         {/* Header */}
         <div ref={headerRef} className="text-center space-y-1 mb-16 mt-30 lg:mt-0">
           <div className="inline-flex items-center gap-2 justify-center text-[#FFAE58] ">

@@ -161,9 +161,9 @@ const AboutUs = () => {
               />
 
               <div className="relative xl:absolute xl:left-80 w-full max-w-[569px] border border-gray-300 dark:border-slate-800 font-inter bg-card shadow-lg p-5 sm:p-6 mt-6 xl:mt-8 transition-colors duration-300">
-                <h3 className="text-[28px] sm:text-[40px] font-bold text-black dark:text-white">
+                <p className="text-[28px] sm:text-[40px] font-bold text-black dark:text-white">
                   {current.name}
-                </h3>
+                </p>
 
                 <p className="text-[14px] text-gray-400 dark:text-slate-400 mb-4">
                   {current.role}
@@ -259,7 +259,7 @@ const AboutUs = () => {
             <div className="flex justify-center">
               <Image
                 src="/girl.png"
-                alt="Emoji"
+                alt="Illustration of a curious person"
                 width={218}
                 height={218}
                 className=" w-[140px] sm:w-[180px] lg:w-[218px] h-auto object-cover object-bottom " />

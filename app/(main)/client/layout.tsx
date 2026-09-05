@@ -1,67 +1,22 @@
-"use client";
-
-import { useAuth } from "@/hooks/useAuth";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { redirect } from "next/navigation";
+import { getUser } from "@/lib/auth";
 
 import DashboardShell from "@/components/layout/DashboardShell";
 
-export default function ClientLayout({
+export default async function ClientLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const auth = useAuth();
-  const router = useRouter();
+  const { user } = await getUser();
 
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted || auth.isLoading) return;
-
-    // Not authenticated
-    if (!auth.isAuthenticated) {
-      router.replace("/login");
-      return;
-    }
-
-    // Not client
-    if (!auth.isClient) {
-      router.replace("/");
-      return;
-    }
-  }, [
-    mounted,
-    auth.isLoading,
-    auth.isAuthenticated,
-    auth.isClient,
-    router,
-  ]);
-
-  // Prevent hydration mismatch
-  if (!mounted) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-[#f0b31e]" />
-      </div>
-    );
+  if (!user) {
+    redirect("/login");
   }
 
-  // Auth loading
-  if (auth.isLoading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-[#f0b31e]" />
-      </div>
-    );
+  if (user.role !== "CLIENT") {
+    redirect("/");
   }
-
-  // Prevent protected UI flash
 
   return (
     <div className="min-h-screen">

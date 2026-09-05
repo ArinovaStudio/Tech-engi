@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAdmin } from "@/lib/auth";
+import type { Prisma } from "@prisma/client";
 
 export async function GET(req: NextRequest) {
   try {
@@ -18,7 +19,6 @@ export async function GET(req: NextRequest) {
     const skip = (page - 1) * limit;
 
     const whereClause: any = {};
-    
     if (roleFilter && ["ADMIN", "ENGINEER", "CLIENT"].includes(roleFilter.toUpperCase())) {
       whereClause.role = roleFilter.toUpperCase();
     }
@@ -34,17 +34,24 @@ export async function GET(req: NextRequest) {
       whereClause.engineerProfile = { status: statusFilter };
     }
 
+    let orderBy: Prisma.UserOrderByWithRelationInput;
+    if (roleFilter === "ENGINEER") {
+      orderBy = { engineerProfile: { createdAt: "desc" } };
+    } else {
+      orderBy = { lastActiveAt: "desc" }; // User has no createdAt field yet
+    }
+
     const users = await prisma.user.findMany({
       where: whereClause,
-      include: { 
-        engineerProfile: true, 
+      include: {
+        engineerProfile: true,
         clientProfile: {
           include: {
             _count: { select: { projects: { where: { advancePaid: true } } } }
           }
-        } 
+        }
       },
-      orderBy: { lastActiveAt: "desc" },
+      orderBy,
       skip,
       take: limit,
     });
@@ -84,18 +91,15 @@ export async function GET(req: NextRequest) {
 
     if (roleFilter === "ENGINEER" && statusFilter === "ALL") {
       const orderMap: Record<string, number> = { PENDING: 1, APPROVED: 2, REJECTED: 3 };
-      
       formattedUsers.sort((a: any, b: any) => {
         const orderA = orderMap[a?.status as string] || 99;
         const orderB = orderMap[b?.status as string] || 99;
-        
         if (orderA !== orderB) {
           return orderA - orderB;
         }
-        
-        const nameA = (a.name || "").toLowerCase();
-        const nameB = (b.name || "").toLowerCase();
-        return nameA.localeCompare(nameB);
+        const dateA = new Date(a.joinedAt || 0).getTime();
+        const dateB = new Date(b.joinedAt || 0).getTime();
+        return dateB - dateA; // newest first
       });
     }
 

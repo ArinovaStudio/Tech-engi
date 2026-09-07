@@ -1,6 +1,12 @@
-"use client";
-import React from 'react'
-import { useScrollAnimation } from '@/lib/useScrollAnimation'
+import ScrollReveal from '@/components/ScrollReveal'
+import { DM_Serif_Display } from "next/font/google";
+
+const dmSerif = DM_Serif_Display({
+  variable: "--font-dmserif",
+  weight: ["400"],
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+});
 
 const WhatWeOffer = () => {
   const engineersOffers = [
@@ -27,21 +33,18 @@ const WhatWeOffer = () => {
     "End-to-End Product Development"
   ]
 
-  const titleRef = useScrollAnimation('fadeUp')
-  const leftRef = useScrollAnimation('slideLeft')
-  const rightRef = useScrollAnimation('slideRight')
-
   return (
-    <section id='Services' className="w-full bg-background py-20 px-6 transition-colors duration-300">
+    <section id='Services' className={`${dmSerif.variable} w-full bg-background py-20 px-6 transition-colors duration-300`}>
       <div className="w-full">
         {/* Title */}
         <div className="flex flex-col items-center justify-center leading-none mb-8">
-          <h2
-            ref={titleRef}
+          <ScrollReveal
+            as="h2"
+            animation="fadeUp"
             className="text-[50px] lg:text-[85px] font-semibold text-black dark:text-white font-id text-center mb-2"
           >
             What we
-          </h2>
+          </ScrollReveal>
 
           <span className="text-[#FFAE58] font-dm italic text-[3rem] lg:text-[5rem] leading-none">
             offer?
@@ -52,8 +55,8 @@ const WhatWeOffer = () => {
         <div
           className=" flex flex-col lg:flex-row justify-between items-stretch lg:items-start gap-10 lg:gap-8 font-id">
           {/* LEFT COLUMN - FOR ENGINEERS */}
-          <div
-            ref={leftRef}
+          <ScrollReveal
+            animation="slideLeft"
             className=" flex flex-row items-stretch gap-0 w-full">
             {/* VERTICAL LABEL */}
             <div className="flex items-stretch shrink-0 pr-3 sm:pr-4">
@@ -87,11 +90,11 @@ const WhatWeOffer = () => {
                 ))}
               </div>
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* RIGHT COLUMN - FOR CLIENTS */}
-          <div
-            ref={rightRef}
+          <ScrollReveal
+            animation="slideRight"
             className=" flex flex-row items-stretch gap-0 w-full" >
             {/* CARD */}
             <div
@@ -126,7 +129,7 @@ const WhatWeOffer = () => {
                 For Clients
               </p>
             </div>
-          </div>
+          </ScrollReveal>
         </div>
       </div>
     </section>

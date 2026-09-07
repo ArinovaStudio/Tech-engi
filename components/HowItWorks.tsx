@@ -1,7 +1,5 @@
-"use client";
-import React from 'react'
 import { Briefcase, Users, Rocket } from 'lucide-react'
-import { useScrollAnimation } from '@/lib/useScrollAnimation'
+import ScrollReveal from '@/components/ScrollReveal'
 
 const HowItWorks = () => {
   const steps = [
@@ -22,14 +20,11 @@ const HowItWorks = () => {
     }
   ]
 
-  const headerRef = useScrollAnimation('fadeUp')
-  const cardsRef = useScrollAnimation('fadeUp')
-
   return (
     <section id='howitworks' className="w-full px-6">
       <div id="howitworks" className="w-full">
         {/* Header */}
-        <div ref={headerRef} className="text-center space-y-1 mb-16 mt-30 lg:mt-0">
+        <ScrollReveal animation="fadeUp" className="text-center space-y-1 mb-16 mt-30 lg:mt-0">
           <div className="inline-flex items-center gap-2 justify-center text-[#FFAE58] ">
             <span className="text-lg">•</span>
             <p className="font-medium font-id text-[22px] tracking-wide">How it works</p>
@@ -39,11 +34,11 @@ const HowItWorks = () => {
           <h2 className="text-[2.5rem] lg:text-7xl font-id font-semibold text-slate-950 dark:text-white">
             How we make everything<br />easy for you?
           </h2>
-        </div>
+        </ScrollReveal>
 
         {/* Cards Grid */}
-        <div
-          ref={cardsRef}
+        <ScrollReveal
+          animation="fadeUp"
           className=" grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-y-16 gap-x-8 lg:gap-x-12 xl:gap-x-20 px-4 sm:px-6 lg:px-10 xl:px-15">
           {steps.map((step, index) => {
             const Icon = step.icon
@@ -96,7 +91,7 @@ const HowItWorks = () => {
               </div>
             )
           })}
-        </div>
+        </ScrollReveal>
       </div>
     </section>
   )

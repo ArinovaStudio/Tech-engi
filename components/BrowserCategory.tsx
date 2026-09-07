@@ -3,6 +3,12 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Space_Grotesk } from "next/font/google";
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-spacegrotesk",
+  subsets: ["latin"],
+});
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -139,7 +145,7 @@ const BrowserCategory = () => {
   }, []);
 
   return (
-    <section id="Categories" className="w-full bg-background py-12 sm:py-16 lg:py-20 px-4 sm:px-6 font-id transition-colors duration-300">
+    <section id="Categories" className={`${spaceGrotesk.variable} w-full bg-background py-12 sm:py-16 lg:py-20 px-4 sm:px-6 font-id transition-colors duration-300`}>
       <div className="max-w-[1600px] mx-auto">
 
         {/* HEADER */}

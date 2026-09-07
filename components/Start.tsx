@@ -6,6 +6,13 @@ import Link from "next/link";
 import { ArrowRight, Menu, X, Sun, Moon } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "@/components/ThemeProvider";
+import localFont from "next/font/local";
+
+const benzGrotesk = localFont({
+  src: "../public/font/Benz-Grotesk.ttf",
+  weight: "400",
+  variable: "--font-benz",
+});
 
 const heroTestimonials = [
   {
@@ -36,7 +43,7 @@ const heroTestimonials = [
   {
     name: "Ayesha",
     role: "Computer Science Engineering Student, SRM University",
-    text: "My project on data analytics wasn’t giving correct outputs. The mentor helped me identify mistakes in preprocessing and model selection.",
+    text: "My project on data analytics wasn't giving correct outputs. The mentor helped me identify mistakes in preprocessing and model selection.",
   },
   {
     name: "Karan",
@@ -54,6 +61,7 @@ const Start = () => {
   const bannerRef = useRef<HTMLDivElement>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
@@ -74,8 +82,18 @@ const Start = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Tracks viewport so only the visible hero image variant preloads with high priority
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)"); // matches Tailwind's `lg:` breakpoint
+    setIsDesktop(mq.matches);
+
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   return (
-    <div className="lg:min-h-screen p-5 font-sans w-full h-[5vh]: bg-background text-foreground transition-colors duration-300">
+    <div className={`${benzGrotesk.variable} lg:min-h-screen p-5 font-sans w-full h-[5vh]: bg-background text-foreground transition-colors duration-300`}>
       {/* Navbar */}
       <header className="border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-card overflow-hidden py-3 transition-colors duration-300">
         <div
@@ -342,13 +360,13 @@ const Start = () => {
           <div className="absolute inset-0 sm:top-1/4 rounded-2xl bg-[#FFAE58] lg:h-[450px] md:h-[400px] mt-10 lg:mt-0 h-[225px]" />
           <div className="absolute inset-0 rounded-2xl bg-[#ffffff] dark:bg-[#0a0b10] lg:hidden md:hidden mt-66 lg:mt-0 h-[50px] z-10 transition-colors duration-300" />
 
-          {/* Two guys image — desktop only, scales with viewport ✅ */}
+          {/* Two guys image — desktop only, scales with viewport */}
           <div
             ref={bannerRef}
             className="hidden lg:block absolute -translate-x-1/2"
             style={{
               bottom: 0,
-              width: "min(1030px, 60vw)",/* ✅ shrinks proportionally, never overflows */
+              width: "min(1030px, 60vw)",/* shrinks proportionally, never overflows */
               left: "calc(30% + 80px)",
             }}
           >
@@ -358,20 +376,19 @@ const Start = () => {
               width={600}
               height={500}
               className="w-full h-auto object-contain "
-              priority
+              priority={isDesktop}
             />
           </div>
 
-          {/* Mobile/tablet image */}
           {/* Mobile/tablet image */}
           <div className="lg:hidden relative flex justify-center">
             <Image
               src="/two-guys.png"
               alt="Student and builder shaking hands"
-              width={6000}
-              height={6000}
+              width={400}
+              height={545}
               className="w-full max-w-[400px] h-[300px] md:max-w-[400px] md:h-[545px] scale-125 object-contain"
-              priority
+              priority={!isDesktop}
             />
           </div>
 
@@ -394,6 +411,7 @@ const Start = () => {
                     src={src}
                     alt=""
                     fill
+                    sizes="36px"
                     className="object-cover"
                   />
                 </div>

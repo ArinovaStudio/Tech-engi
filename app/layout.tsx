@@ -1,49 +1,20 @@
 import type { Metadata } from "next";
-import { Toaster } from "react-hot-toast";
-import {
-  Geist_Mono,
-  Inter,
-  Space_Grotesk,
-  DM_Serif_Display,
-} from "next/font/google";
+import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 
 import "./globals.css";
 import Providers from "@/components/Providers";
 import SocketAnnouncer from "@/components/SocketAnnouncer";
 import FacebookPixel from "@/components/FacebookPixel";
-import { getUser } from "@/lib/auth";
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 const idGrotesk = localFont({
   src: [{ path: "../public/font/IDGrotesk-Regular.ttf", weight: "400" }],
   variable: "--font-id",
 });
 
-const benzGrotesk = localFont({
-  src: [{ path: "../public/font/Benz-Grotesk.ttf", weight: "400" }],
-  variable: "--font-benz",
-});
-
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
-});
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-spacegrotesk",
-  subsets: ["latin"],
-});
-
-const dmSerif = DM_Serif_Display({
-  variable: "--font-dmserif",
-  weight: ["400"],
-  subsets: ["latin"],
-  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -114,20 +85,11 @@ const jsonLd = {
   ],
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { user } = await getUser();
-
-  <Toaster
-    position="top-center"
-    toastOptions={{
-      duration: 4000,
-    }}
-  />
-
   return (
     <html lang="en" className="h-full antialiased" suppressHydrationWarning>
       <head>
@@ -157,13 +119,15 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={`min-h-full flex flex-col ${spaceGrotesk.variable} ${geistMono.variable} ${idGrotesk.variable} ${benzGrotesk.variable} ${inter.variable} ${dmSerif.variable}`}
+        className={`min-h-full flex flex-col ${idGrotesk.variable} ${inter.variable}`}
       >
         {/* Facebook Meta Pixel — skips auth/admin/dashboard routes, see components/FacebookPixel.tsx */}
         <FacebookPixel />
 
-        <SocketAnnouncer userId={user?.id} />
-        <Providers>{children}</Providers>
+        <Providers>
+          <SocketAnnouncer />
+          {children}
+        </Providers>
       </body>
     </html>
   );

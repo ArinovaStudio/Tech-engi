@@ -1,5 +1,5 @@
-import HomeClient from "./HomeClient";
+import TechEngiLanding from "./NewLanding";
 
 export default function Home() {
-  return <HomeClient />;
+  return <TechEngiLanding />;
 }

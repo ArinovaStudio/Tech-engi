@@ -1,5 +1,5 @@
-import TechEngiLanding from "./NewLanding";
+import SaasLanding from "@/components/saas/SaasLanding";
 
 export default function Home() {
-  return <TechEngiLanding />;
+  return <SaasLanding />;
 }

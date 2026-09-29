@@ -21,7 +21,7 @@ import { figtree } from "@/components/saas/fonts";
 
 import techEngiFix from "@/public/saas/tech-engi-fix.png";
 import pair from "@/public/saas/tech-engi-pair.png";
-import techEngiai from "@/public/saas/tech-engi-ai.png";
+import techEngiai from "@/public/saas/tech-engi-debug-refined.png";
 
 export default function SaasLanding() {
   return (

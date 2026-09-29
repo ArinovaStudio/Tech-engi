@@ -1,3 +1,6 @@
+import Image from "next/image";
+import bg from "@/public/saas/tech-engi-students.png"
+
 const TAGS = [
   "Capstone projects",
   "Robotics contests",
@@ -17,14 +20,23 @@ export default function StudentsSection() {
   return (
     <section className="py-24 md:py-32">
       <div className="mx-auto max-w-[1200px] px-8">
-        <div className="reveal rounded-saas-6xl border border-saas-line bg-[#EEF2FB] p-10 md:p-20">
-          <div className="grid items-center gap-12 md:grid-cols-2 md:gap-24">
+        <div className="reveal rounded-saas-6xl border border-saas-line bg-[#EEF2FB] p-10 md:p-20 relative overflow-hidden">
+          <div className="w-1/2 h-[70%] absolute -bottom-2 -right-3">
+          <Image 
+          src={bg.src}
+          width={bg.width}
+          height={bg.height}
+          alt="student"
+          className="w-fit h-full object-contain"
+          />
+          </div>
+          <div className="grid items-start gap-12 md:grid-cols-2 md:gap-24">
             <div>
-              <h2 className="text-inset text-[clamp(2.25rem,5vw,4rem)]">
+              <h2 className="text-inset text-[clamp(2.25rem,5vw, 2.7rem)]">
                 Engineering students?{" "}
                 <span className="text-saas-mut">Get real paid work, not just projects.</span>
               </h2>
-              <p className="mt-6 text-lg">
+              <p className="mt-6 text-sm">
                 Verified engineers on Tech Engi also take on student-friendly tasks — a way in
                 before your first full-time role.
               </p>

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import gyroscope from "@/public/saas/gyroscope.png";
-import fix from "@/public/saas/tech-engi-fix.png";
+import fix from "@/public/saas/tech-engi-coding.png";
 import cloud from "@/public/saas/tech-engi-cloud.png";
 
 export default function BuildTypesSection() {

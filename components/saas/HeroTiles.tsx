@@ -16,7 +16,7 @@ const STOPS = [
   [110, 168, 255],
   [185, 140, 246],
   [233, 139, 200],
-  [245, 165, 160],
+  [245, 165, 20],
 ];
 
 // Grid size per screen width. Fewer, larger tiles on small screens.

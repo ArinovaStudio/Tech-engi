@@ -108,6 +108,21 @@ export default function Hero() {
       {/* Hero content */}
       <div className="relative z-[2] mx-auto w-full max-w-none px-[clamp(20px,5vw,80px)]">
         <div className="max-w-[1100px] pb-20 sm:pb-28 md:pb-32">
+                   <div className="my-5 flex sm:my-6">
+            <button
+              type="button"
+              aria-label="Switch between client, engineer and corporate view"
+              onClick={toggle}
+              className="view-switch hero-entrance hero-entrance-delay-2"
+              data-view={view} 
+            >
+              <span>Client</span>
+              <span>Engineer</span>
+              <span>Corporate</span>
+            <i className="knob" />  
+            </button>
+          </div>
+
           <h1 className="text-[clamp(2.25rem,5.4vw,4.5rem)]">
             {/* First line */}
             <b className="line-mask block overflow-hidden pb-[0.08em]">
@@ -125,20 +140,6 @@ export default function Hero() {
           </h1>
 
           {/* Toggle: between the headline and the sub heading */}
-          <div className="mt-5 flex sm:mt-6">
-            <button
-              type="button"
-              aria-label="Switch between client, engineer and corporate view"
-              onClick={toggle}
-              className="view-switch hero-entrance hero-entrance-delay-2"
-              data-view={view}
-            >
-              <span>Client</span>
-              <span>Engineer</span>
-              <span>Corporate</span>
-              <i className="knob" />
-            </button>
-          </div>
 
           <p className="hero-sub hero-entrance hero-entrance-delay-2 mt-5 max-w-[520px] text-base sm:mt-6 sm:text-[1.15rem]">
             {v.sub}

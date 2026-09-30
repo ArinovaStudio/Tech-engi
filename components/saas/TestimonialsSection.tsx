@@ -32,14 +32,14 @@ export default function TestimonialsSection() {
         <div className="mt-[60px] grid gap-6 md:grid-cols-3">
           {TESTIMONIALS.map((t) => (
             <div key={t.name} className="card reveal flex flex-col">
-              <p className="mb-5 flex-1 text-[1.15rem] leading-[1.55] text-saas-ink">{t.quote}</p>
+              <p className="mb-5 flex-1 text-base sm:text-[1.15rem] leading-[1.55] text-saas-ink">{t.quote}</p>
               <div className="flex items-center gap-3.5">
                 <i className="grid h-11 w-11 flex-none place-items-center rounded-full bg-saas-accent font-semibold not-italic text-white">
                   {t.initial}
                 </i>
                 <div>
-                  <b className="text-saas-ink">{t.name}</b>
-                  <p className="text-[0.9rem] leading-[1.3]">{t.role}</p>
+                  <b className="text-saas-ink text-sm lg:text-base">{t.name}</b>
+                  <p className="text-xs lg:text-[0.9rem] leading-[1.3]">{t.role}</p>
                 </div>
               </div>
             </div>

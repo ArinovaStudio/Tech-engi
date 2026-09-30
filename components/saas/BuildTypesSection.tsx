@@ -1,5 +1,5 @@
 import Image from "next/image";
-import gyroscope from "@/public/saas/gyroscope.png";
+import gyroscope from "@/public/saas/micro-controller.png";
 import fix from "@/public/saas/tech-engi-coding.png";
 import cloud from "@/public/saas/tech-engi-cloud.png";
 

@@ -11,7 +11,7 @@ export default function ResultsSection() {
         </h2>
 
         <div className="bento">
-          <div className="card reveal tile-top bento-3 bento-row-2 relative [&>*]:max-w-[56%]">
+          <div className="card reveal tile-top bento-3 bento-row-2 relative max-w-full *:max-w-[56%]">
             <h3>From reposted to resolved</h3>
             <p>
               Production issues is our. We diagnose, isolate the root cause and put the right specialist on the fix, not just the symptom.

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { List, X } from "@phosphor-icons/react";
+import Image from "next/image";
 
 const LINKS = [
   { href: "#who", label: "Platform" },
@@ -30,27 +31,17 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-[9] border-b border-saas-line/80 bg-saas-bg/78 backdrop-blur-[14px]">
-      <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between gap-3 px-4 sm:px-6 md:h-[76px] md:px-8">
+    <header className="sticky top-0 z-[9] border-b border-saas-line/80 bg-white backdrop-blur-[14px]">
+      <div className="mx-auto flex h-16 max-w-8xl items-center justify-between gap-3 px-4 sm:px-6 md:h-[76px] md:px-8">
         <a
           href="#top"
           className="flex shrink-0 items-center gap-2 text-lg font-semibold text-saas-ink sm:gap-2.5 sm:text-xl"
           onClick={() => setOpen(false)}
         >
-          <svg
-            width="28"
-            height="28"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#7B95F5"
-            strokeWidth={1.8}
-            strokeLinejoin="round"
-            className="h-6 w-6 sm:h-7 sm:w-7"
-          >
-            <path d="M12 2l8.5 5v10L12 22 3.5 17V7z" />
-            <path d="M12 22V12M12 12L3.5 7M12 12l8.5-5" />
-          </svg>
-          Tech Engi
+            <span
+              className=" text-[22px] font-benz tracking-tight text-black dark:text-white lg:mr-4 lg:border-r-2 lg:border-gray-300 lg:pr-4 " >
+              <Image src="/imagelogodiffcrop.png" alt="Tech Engi logo" width={150} height={150} />
+            </span>
         </a>
 
         {/* Desktop nav */}

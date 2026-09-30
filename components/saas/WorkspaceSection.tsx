@@ -45,26 +45,35 @@ export default function WorkspaceSection() {
         </p>
 
         <div className="bento">
-          <div className="card reveal tile-top bento-4 bento-row-2">
-            <h3>Project board</h3>
-            <p>See what is planned, in progress and done at a glance.</p>
-            <div className="mt-5 grid grid-cols-3 gap-3">
-              {BOARD.map((col) => (
-                <div key={col.col} className="grid content-start gap-2 rounded-2xl bg-[#F3F6FC] p-3">
-                  <b className="text-[0.8rem] font-medium text-saas-mut">{col.col}</b>
-                  {col.items.map(([title, tag]) => (
-                    <i
-                      key={title}
-                      className="block rounded-xl border border-saas-line bg-white px-3 py-2.5 not-italic text-[0.85rem] text-saas-ink"
-                    >
-                      {title}
-                      <small className="mt-1.5 block text-[0.75rem] text-saas-accent-2">{tag}</small>
-                    </i>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
+<div className="card reveal tile-top bento-4 bento-row-2 min-w-0">
+  <h3>Project board</h3>
+  <p>See what is planned, in progress and done at a glance.</p>
+
+  <div
+    role="region"
+    aria-label="Project board"
+    tabIndex={0}
+    className="mt-5 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-3 sm:snap-none sm:overflow-visible sm:pb-0"
+  >
+    {BOARD.map((col) => (
+      <div
+        key={col.col}
+        className="grid min-w-[75%] shrink-0 snap-start content-start gap-2 rounded-2xl bg-[#F3F6FC] p-3 sm:min-w-0"
+      >
+        <b className="text-[0.8rem] font-medium text-saas-mut">{col.col}</b>
+        {col.items.map(([title, tag]) => (
+          <i
+            key={title}
+            className="block rounded-xl border border-saas-line bg-white px-3 py-2.5 not-italic text-[0.85rem] text-saas-ink"
+          >
+            {title}
+            <small className="mt-1.5 block text-[0.75rem] text-saas-accent-2">{tag}</small>
+          </i>
+        ))}
+      </div>
+    ))}
+  </div>
+</div>
 
           <div className="card reveal tile-top bento-2">
             <h3>Milestones</h3>

@@ -1,6 +1,10 @@
+"use client";
+
 import Link from "next/link";
 
 import { Briefcase, Key } from "@phosphor-icons/react/dist/ssr";
+import UpgradeProModal from "../PricingPop";
+import { useState } from "react";
 
 const LEADS = [
   { title: "production API returning 500s ", meta: "Urgent · From scratch", locked: false },
@@ -11,8 +15,15 @@ const LEADS = [
 ];
 
 export default function LeadsSection() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <section id="leads" className="relative dot-grid">
+      <UpgradeProModal 
+      open={isOpen}
+      onClose={() => setIsOpen(false)}
+      onUpgrade={() => {}}
+      />
       <div className="section-glow" />
       <div className="relative mx-auto max-w-[1200px] px-8">
         <h2 className="reveal max-w-[820px]">
@@ -45,7 +56,9 @@ export default function LeadsSection() {
                 </em>
               </div>
             ))}
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-saas-nav px-[22px] py-3 font-medium text-white shadow-saas-btn">
+            <div 
+            onClick={() => setIsOpen(true)}
+            className="absolute bottom-8 left-1/2 hover:scale-90 transition-all cursor-pointer -translate-x-1/2 whitespace-nowrap rounded-full bg-saas-nav px-[22px] py-3 font-medium text-white shadow-saas-btn">
               Full panel with a subscription
             </div>
           </div>

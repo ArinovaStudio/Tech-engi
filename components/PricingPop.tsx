@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import {
   X,
   Crown,
@@ -79,11 +79,124 @@ const proFeatures = [
   },
 ];
 
+/* ===============================================================
+   FIT-TO-SCREEN (desktop)
+
+   On desktop windows (>= 1024px wide) the modal keeps its full
+   two-column design and is scaled down as a whole when the window
+   is narrow OR short, so everything shrinks together and nothing
+   needs scrolling. Below 1024px the normal responsive layout is
+   used (single column, scrolls on its own).
+=============================================================== */
+
+const DESKTOP_MIN = 1024; // px, viewport width where desktop mode starts
+const DESIGN_W = 1240; // px, width the desktop design is built for
+const DESIGN_H = 980; // px, height the desktop design needs (no scroll)
+const MAX_W = 1400; // px, max modal width at scale 1
+const GUTTER = 16; // px, minimum space around the modal
+const MIN_SCALE = 0.62; // never shrink below this (keeps text readable)
+
+type Fit = {
+  desktop: boolean;
+  scale: number;
+  width: number;
+  maxHeight: number;
+};
+
+function getFit(): Fit {
+  if (typeof window === "undefined" || window.innerWidth < DESKTOP_MIN) {
+    return { desktop: false, scale: 1, width: 0, maxHeight: 0 };
+  }
+
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  const scale = Math.max(
+    MIN_SCALE,
+    Math.min(
+      1,
+      (vw - GUTTER * 2) / DESIGN_W,
+      (vh - GUTTER * 2) / DESIGN_H
+    )
+  );
+
+  return {
+    desktop: true,
+    scale,
+    // layout size is enlarged by 1/scale so the scaled result fits the screen
+    width: Math.min(MAX_W, (vw - GUTTER * 2) / scale),
+    maxHeight: (vh - GUTTER * 2) / scale,
+  };
+}
+
+function useModalFit(open: boolean): Fit {
+  const [fit, setFit] = useState<Fit>(getFit);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const update = () => setFit(getFit());
+
+    update();
+    window.addEventListener("resize", update);
+
+    return () => window.removeEventListener("resize", update);
+  }, [open]);
+
+  return fit;
+}
+
+/* ===============================================================
+   REVEAL ANIMATIONS
+   (disabled automatically for prefers-reduced-motion)
+=============================================================== */
+
+const REVEAL_CSS = `
+@keyframes upm-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes upm-pop {
+  from { opacity: 0; transform: translateY(28px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes upm-rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes upm-slide {
+  from { opacity: 0; transform: translateX(48px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes upm-zoom {
+  from { opacity: 0; transform: scale(1.07); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes upm-card {
+  from { opacity: 0; transform: translateY(22px) scale(0.88); }
+  to { opacity: 1; transform: none; }
+}
+.upm-fade { animation: upm-fade 0.3s ease-out both; }
+.upm-pop { animation: upm-pop 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.upm-rise { animation: upm-rise 0.65s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.upm-slide { animation: upm-slide 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.upm-zoom { animation: upm-zoom 1.1s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.upm-card { animation: upm-card 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .upm-fade, .upm-pop, .upm-rise, .upm-slide, .upm-zoom, .upm-card {
+    animation: none;
+  }
+}
+`;
+
+const delay = (ms: number): CSSProperties => ({
+  animationDelay: `${ms}ms`,
+});
+
 export default function UpgradeProModal({
   open,
   onClose,
   onUpgrade,
 }: UpgradeProModalProps) {
+  const { desktop, scale, width, maxHeight } = useModalFit(open);
+
   /*
    * Prevent background scrolling while modal is open.
    */
@@ -112,424 +225,281 @@ export default function UpgradeProModal({
 
   return (
     <div
-      className="
-        fixed inset-0 z-[9999]
-        flex items-center justify-center
-        bg-[#050a30]/55
-        p-3
-        backdrop-blur-md
-        sm:p-6
-      "
+      className="upm-fade fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-[#050a30]/55 p-2 backdrop-blur-md sm:p-6"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
           onClose();
         }
       }}
     >
+      <style>{REVEAL_CSS}</style>
+
+      {/* Fit wrapper: scales the whole modal down on smaller desktop windows */}
+
       <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="upgrade-title"
-        className="
-          relative
-          flex
-          max-h-[94vh]
-          w-full
-          max-w-[1400px]
-          flex-col
-          overflow-hidden
-          rounded-[28px]
-          bg-white
-          shadow-[0_35px_100px_rgba(5,10,48,0.35)]
-        "
+        className={`flex min-h-0 shrink-0 flex-col ${
+          desktop
+            ? ""
+            : "max-h-[96dvh] w-full max-w-[1400px] sm:max-h-[94dvh]"
+        }`}
+        style={
+          desktop
+            ? { width, maxHeight, transform: `scale(${scale})` }
+            : undefined
+        }
       >
-        {/* =========================================================
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="upgrade-title"
+          className="upm-pop relative flex min-h-0 flex-col overflow-hidden rounded-[20px] bg-white shadow-[0_35px_100px_rgba(5,10,48,0.35)] sm:rounded-[28px]"
+        >
+          {/* =========================================================
             CLOSE BUTTON
         ========================================================= */}
 
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close"
-          className="
-            absolute
-            right-5
-            top-5
-            z-50
-            flex
-            h-11
-            w-11
-            items-center
-            justify-center
-            rounded-full
-            bg-white/90
-            text-[#050a30]
-            shadow-md
-            backdrop-blur
-            transition
-            hover:scale-105
-            hover:bg-white
-          "
-        >
-          <X size={21} strokeWidth={1.8} />
-        </button>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="absolute right-3 top-3 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-[#050a30] shadow-md backdrop-blur transition hover:scale-105 hover:bg-white sm:right-5 sm:top-5 sm:h-11 sm:w-11"
+          >
+            <X size={21} strokeWidth={1.8} />
+          </button>
 
-        {/* =========================================================
+          {/* =========================================================
             MAIN CONTENT
+
+            Mobile / tablet: single column, this wrapper scrolls as one.
+            Desktop: two columns, left side scrolls on its own if needed.
         ========================================================= */}
 
-        <div className="grid min-h-0 flex-1 lg:grid-cols-[58%_42%]">
-          {/* =======================================================
+          <div
+            className={`grid min-h-0 flex-1 overscroll-contain ${
+              desktop
+                ? "grid-cols-[58%_42%] grid-rows-[minmax(0,1fr)] overflow-hidden"
+                : "grid-cols-1 overflow-y-auto"
+            }`}
+          >
+            {/* =======================================================
               LEFT SIDE
           ======================================================= */}
 
-          <section className="relative overflow-y-auto bg-white px-6 pb-7 pt-8 sm:px-10 sm:pt-10 lg:px-12">
-            {/* subtle cyber / architectural lines */}
+            <section
+              className={`relative bg-white ${
+                desktop
+                  ? "overflow-y-auto overscroll-contain px-12 pb-7 pt-10"
+                  : "px-5 pb-6 pt-7 sm:px-8 sm:pb-7 sm:pt-9 md:px-10"
+              }`}
+            >
+              {/* subtle cyber / architectural lines */}
 
-            <CyberLines />
+              <CyberLines />
 
-            <div className="relative z-10">
-              {/* Small label */}
+              <div className="relative z-10">
+                {/* Small label */}
 
-              <div className="mb-5 flex items-center gap-3">
                 <div
-                  className="
-                    flex
-                    h-7
-                    w-7
-                    items-center
-                    justify-center
-                    text-[#ffffff]
-                  "
+                  className="upm-rise mb-4 flex items-center gap-3 pr-12 sm:mb-5 sm:pr-0"
+                  style={delay(200)}
                 >
-                  <Crown
-                    size={19}
-                    strokeWidth={2}
-                    className="fill-[#ffffff]"
-                  />
+                  <div className="flex h-7 w-7 items-center justify-center text-[#ffffff]">
+                    <Crown
+                      size={19}
+                      strokeWidth={2}
+                      className="fill-[#ffffff]"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <span className="text-[11px] font-bold uppercase tracking-[0.24em] text-[#050a30] sm:tracking-[0.32em]">
+                      Upgrade to Pro
+                    </span>
+
+                    <span className="h-px w-10 bg-[#ffffff] sm:w-16" />
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <span
-                    className="
-                      text-[11px]
-                      font-bold
-                      uppercase
-                      tracking-[0.32em]
-                      text-[#050a30]
-                    "
-                  >
-                    Upgrade to Pro
-                  </span>
-
-                  <span className="h-px w-16 bg-[#ffffff]" />
-                </div>
-              </div>
-
-              {/* =================================================
+                {/* =================================================
                   HEADLINE
               ================================================= */}
 
-              <h1
-                id="upgrade-title"
-                className="
-                  max-w-[720px]
-                  text-[38px]
-                  font-bold
-                  leading-[0.98]
-                  tracking-[-0.045em]
-                  text-[#050a30]
-                  sm:text-[48px]
-                  lg:text-[54px]
-                  xl:text-[60px]
-                "
-              >
-                Get instant access to
-                <br />
-                <span className="text-[#1257e8]">
-                  more opportunities
-                </span>
-              </h1>
+                <h1
+                  id="upgrade-title"
+                  className={`upm-rise max-w-[720px] font-bold tracking-[-0.04em] text-[#050a30] ${
+                    desktop
+                      ? "text-[56px] leading-[1]"
+                      : "text-[30px] leading-[1.05] min-[420px]:text-[34px] sm:text-[44px] sm:leading-[1] md:text-[50px]"
+                  }`}
+                  style={delay(280)}
+                >
+                  Get instant access to
+                  <br />
+                  <span className="text-[#1257e8]">more opportunities</span>
+                </h1>
 
-              <p
-                className="
-                  mt-5
-                  max-w-[670px]
-                  text-[15px]
-                  leading-6
-                  text-slate-500
-                  sm:text-[16px]
-                "
-              >
-                Upgrade to Pro and unlock real-time leads, unlimited
-                applications and advanced filters to grow your business
-                faster.
-              </p>
+                <p
+                  className="upm-rise mt-4 max-w-[670px] text-sm leading-6 text-slate-500 sm:mt-5 sm:text-[16px]"
+                  style={delay(360)}
+                >
+                  Upgrade to Pro and unlock real-time leads, unlimited
+                  applications and advanced filters to grow your business
+                  faster.
+                </p>
 
-              {/* =================================================
+                {/* =================================================
                   PLANS
               ================================================= */}
 
-              <div
-                className="
-                  mt-7
-                  grid
-                  gap-4
-                  md:grid-cols-2
-                "
-              >
-                {/* FREE */}
+                <div className="mt-6 grid gap-4 sm:mt-7 md:grid-cols-2">
+                  {/* FREE */}
 
-                <FreePlan />
+                  <FreePlan delay={440} />
 
-                {/* PRO */}
+                  {/* PRO */}
 
-                <ProPlan onUpgrade={onUpgrade} />
+                  <ProPlan onUpgrade={onUpgrade} delay={540} />
+                </div>
               </div>
-            </div>
-          </section>
+            </section>
 
-          {/* =======================================================
+            {/* =======================================================
               RIGHT SIDE / ARTWORK
+              (desktop only)
           ======================================================= */}
 
-          <section
-            className="
-              relative
-              hidden
-              min-h-[680px]
-              overflow-hidden
-              bg-[#1257e8]
-              lg:block
-            "
-          >
-            {/* background geometry */}
-
-            <RightBackground />
-
-            {/* Top message */}
-
-            <div
-              className="
-                absolute
-                left-10
-                top-14
-                z-20
-                max-w-[150px]
-              "
+            <section
+              className={`upm-slide relative overflow-hidden bg-[#1257e8] ${
+                desktop ? "block" : "hidden"
+              }`}
+              style={delay(150)}
             >
-              <p
-                className="
-                  text-[12px]
-                  font-medium
-                  uppercase
-                  leading-[1.8]
-                  tracking-[0.32em]
-                  text-white/70
-                "
+              {/* background geometry */}
+
+              <RightBackground />
+
+              {/* Top message */}
+
+              <div
+                className="upm-fade absolute left-10 top-14 z-20 max-w-[150px]"
+                style={delay(600)}
               >
-                More
-                <br />
-                clients
-                <br />
-                faster
-                <br />
-                growth
-              </p>
+                <p className="text-[12px] font-medium uppercase leading-[1.8] tracking-[0.32em] text-white/70">
+                  More
+                  <br />
+                  clients
+                  <br />
+                  faster
+                  <br />
+                  growth
+                </p>
 
-              <div className="mt-4 h-px w-10 bg-[#ffffff]" />
-            </div>
-
-            {/* Character */}
-
-            <div
-              className="
-                absolute
-                top-0
-                left-0
-                z-10
-                flex
-                items-end
-                justify-center
-              "
-            >
-              <img
-                src="/saas/pricing.png"
-                alt="Pro member working with new leads"
-                className="
-                  h-auto
-                  w-full
-                  max-w-none
-                  object-cover
-                  object-bottom
-                "
-              />
-            </div>
-
-            {/* Floating New Leads card */}
-
-            <div
-              className="
-                absolute
-                left-[7%]
-                top-[28%]
-                z-30
-                w-[150px]
-                -rotate-[7deg]
-                rounded-xl
-                border
-                border-white/40
-                bg-white/10
-                p-4
-                shadow-xl
-                backdrop-blur-md
-              "
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-white">
-                  New Leads
-                </span>
-
-                <span className="text-[#ffffff]">
-                  ♥
-                </span>
+                <div className="mt-4 h-px w-10 bg-[#ffffff]" />
               </div>
 
-              <div className="mt-3 flex items-end gap-1">
-                <span className="h-4 w-1.5 rounded-sm bg-[#ffffff]" />
-                <span className="h-6 w-1.5 rounded-sm bg-[#ffffff]" />
-                <span className="h-9 w-1.5 rounded-sm bg-[#ffffff]" />
-                <span className="h-12 w-1.5 rounded-sm bg-[#ffffff]" />
+              {/* Character */}
+
+              <div className="absolute inset-0 z-10 flex items-end justify-center">
+                <img
+                  src="/saas/pricing.png"
+                  alt="Pro member working with new leads"
+                  className="upm-zoom h-full w-full max-w-none object-cover object-bottom"
+                  style={delay(300)}
+                />
               </div>
 
-              <p className="mt-2 text-xl font-bold text-[#ffffff]">
-                +12
-              </p>
-            </div>
+              {/* Floating New Leads card
+                  (outer wrapper animates, inner element keeps the rotation) */}
 
-            {/* Client interested card */}
+              <div
+                className="upm-card absolute left-[7%] top-[28%] z-30"
+                style={delay(750)}
+              >
+                <div className="w-[150px] -rotate-[7deg] rounded-xl border border-white/40 bg-white/10 p-4 shadow-xl backdrop-blur-md">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold text-white">
+                      New Leads
+                    </span>
 
-            <div
-              className="
-                absolute
-                right-[6%]
-                top-[38%]
-                z-30
-                w-[150px]
-                rotate-[4deg]
-                rounded-xl
-                border
-                border-white/40
-                bg-white/10
-                p-4
-                shadow-xl
-                backdrop-blur-md
-              "
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className="
-                    flex
-                    h-10
-                    w-10
-                    items-center
-                    justify-center
-                    rounded-lg
-                    bg-white/10
-                  "
-                >
-                  <div className="h-4 w-4 rounded-full bg-[#ffffff]" />
-                </div>
+                    <span className="text-[#ffffff]">♥</span>
+                  </div>
 
-                <div>
-                  <p className="text-[10px] text-white/60">
-                    Client
-                  </p>
+                  <div className="mt-3 flex items-end gap-1">
+                    <span className="h-4 w-1.5 rounded-sm bg-[#ffffff]" />
+                    <span className="h-6 w-1.5 rounded-sm bg-[#ffffff]" />
+                    <span className="h-9 w-1.5 rounded-sm bg-[#ffffff]" />
+                    <span className="h-12 w-1.5 rounded-sm bg-[#ffffff]" />
+                  </div>
 
-                  <p className="text-xs font-semibold text-white">
-                    Interested
-                  </p>
+                  <p className="mt-2 text-xl font-bold text-[#ffffff]">+12</p>
                 </div>
               </div>
 
-              <div className="mt-3 h-1.5 rounded-full bg-white/10">
-                <div className="h-full w-[75%] rounded-full bg-[#ffffff]" />
+              {/* Client interested card */}
+
+              <div
+                className="upm-card absolute right-[6%] top-[38%] z-30"
+                style={delay(900)}
+              >
+                <div className="w-[150px] rotate-[4deg] rounded-xl border border-white/40 bg-white/10 p-4 shadow-xl backdrop-blur-md">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/10">
+                      <div className="h-4 w-4 rounded-full bg-[#ffffff]" />
+                    </div>
+
+                    <div>
+                      <p className="text-[10px] text-white/60">Client</p>
+
+                      <p className="text-xs font-semibold text-white">
+                        Interested
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 h-1.5 rounded-full bg-white/10">
+                    <div className="h-full w-[75%] rounded-full bg-[#ffffff]" />
+                  </div>
+                </div>
               </div>
-            </div>
 
-            {/* Crown card */}
+              {/* Crown card */}
 
-            <div
-              className="
-                absolute
-                right-[7%]
-                top-[23%]
-                z-30
-                flex
-                h-16
-                w-16
-                rotate-[5deg]
-                items-center
-                justify-center
-                rounded-xl
-                border
-                border-white/30
-                bg-white/10
-                backdrop-blur-md
-              "
-            >
-              <Crown
-                size={30}
-                className="fill-[#ffffff] text-[#ffffff]"
-              />
-            </div>
-          </section>
-        </div>
+              <div
+                className="upm-card absolute right-[7%] top-[23%] z-30"
+                style={delay(1050)}
+              >
+                <div className="flex h-16 w-16 rotate-[5deg] items-center justify-center rounded-xl border border-white/30 bg-white/10 backdrop-blur-md">
+                  <Crown
+                    size={30}
+                    className="fill-[#ffffff] text-[#ffffff]"
+                  />
+                </div>
+              </div>
+            </section>
+          </div>
 
-        {/* =========================================================
+          {/* =========================================================
             TRUST FOOTER
+            Three columns at every size; stacks icon above text on mobile.
         ========================================================= */}
 
-        <div
-          className="
-            relative
-            z-40
-            border-t
-            border-slate-100
-            bg-white
-            px-5
-            py-4
-            sm:px-10
-          "
-        >
           <div
-            className="
-              grid
-              grid-cols-1
-              divide-y
-              divide-slate-200
-              sm:grid-cols-3
-              sm:divide-x
-              sm:divide-y-0
-            "
+            className="upm-fade relative z-40 border-t border-slate-100 bg-white px-2 py-3 sm:px-10 sm:py-4"
+            style={delay(700)}
           >
-            <TrustItem
-              icon={ShieldCheck}
-              title="Cancel anytime"
-              description="No long-term contract"
-            />
+            <div className="grid grid-cols-2 divide-x divide-slate-200">
+              <TrustItem
+                icon={CreditCard}
+                title="Secure payment"
+                description="SSL encrypted"
+              />
 
-            <TrustItem
-              icon={CreditCard}
-              title="Secure payment"
-              description="SSL encrypted"
-            />
-
-            <TrustItem
-              icon={Headphones}
-              title="24/7 support"
-              description="We're here to help"
-            />
+              <TrustItem
+                icon={Headphones}
+                title="24/7 support"
+                description="We're here to help"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -541,19 +511,13 @@ export default function UpgradeProModal({
    FREE PLAN
 =============================================================== */
 
-function FreePlan() {
+function FreePlan({ delay: startDelay = 0 }: { delay?: number }) {
   return (
     <div
-      className="
-        rounded-[18px]
-        border
-        border-slate-200
-        bg-white
-        p-5
-        sm:p-6
-      "
+      className="upm-rise rounded-[18px] border border-slate-200 bg-white p-5 sm:p-6"
+      style={delay(startDelay)}
     >
-      <h2 className="text-[24px] font-bold tracking-tight text-[#050a30]">
+      <h2 className="text-[22px] font-bold tracking-tight text-[#050a30] sm:text-[24px]">
         Free
       </h2>
 
@@ -561,24 +525,23 @@ function FreePlan() {
         Good to explore and get started.
       </p>
 
-      <div className="mt-5 flex items-baseline gap-2">
-        <span className="text-[38px] font-bold tracking-[-0.04em] text-[#050a30]">
+      <div className="mt-4 flex items-baseline gap-2 sm:mt-5">
+        <span className="text-[34px] font-bold tracking-[-0.04em] text-[#050a30] sm:text-[38px]">
           ₹0
         </span>
 
-        <span className="text-sm text-slate-500">
-          /month
-        </span>
+        <span className="text-sm text-slate-500">/month</span>
       </div>
 
-      <div className="my-5 h-px bg-slate-100" />
+      <div className="my-4 h-px bg-slate-100 sm:my-5" />
 
       <div className="space-y-3">
-        {freeFeatures.map((feature) => (
+        {freeFeatures.map((feature, index) => (
           <Feature
             key={feature.text}
             icon={feature.icon}
             text={feature.text}
+            delay={startDelay + 140 + index * 60}
             dark
           />
         ))}
@@ -586,24 +549,7 @@ function FreePlan() {
 
       <button
         type="button"
-        className="
-          mt-6
-          flex
-          h-12
-          w-full
-          items-center
-          justify-center
-          gap-2
-          rounded-full
-          border
-          border-slate-200
-          bg-white
-          text-sm
-          font-semibold
-          text-[#050a30]
-          transition
-          hover:bg-slate-50
-        "
+        className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-full border border-slate-200 bg-white text-sm font-semibold text-[#050a30] transition hover:bg-slate-50 sm:mt-6"
       >
         Continue with Free
         <ArrowRight size={17} />
@@ -618,41 +564,23 @@ function FreePlan() {
 
 function ProPlan({
   onUpgrade,
+  delay: startDelay = 0,
 }: {
   onUpgrade: () => void;
+  delay?: number;
 }) {
   return (
     <div
-      className="
-        relative
-        overflow-hidden
-        rounded-[18px]
-        bg-[#1257e8]
-        p-5
-        text-white
-        shadow-[0_15px_40px_rgba(18,87,232,0.18)]
-        sm:p-6
-      "
+      className="upm-rise relative overflow-hidden rounded-[18px] bg-[#1257e8] p-5 text-white shadow-[0_15px_40px_rgba(18,87,232,0.18)] sm:p-6"
+      style={delay(startDelay)}
     >
       {/* subtle technical corner */}
 
-      <div
-        className="
-          pointer-events-none
-          absolute
-          right-0
-          top-0
-          h-12
-          w-12
-          border-l
-          border-b
-          border-white/20
-        "
-      />
+      <div className="pointer-events-none absolute right-0 top-0 h-12 w-12 border-b border-l border-white/20" />
 
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <h2 className="text-[24px] font-bold text-white tracking-tight">
+        <div className="min-w-0">
+          <h2 className="text-[22px] font-bold tracking-tight text-white sm:text-[24px]">
             Pro
           </h2>
 
@@ -661,48 +589,25 @@ function ProPlan({
           </p>
         </div>
 
-        <div
-          className="
-            flex
-            shrink-0
-            items-center
-            gap-1.5
-            rounded-full
-            bg-white
-            px-3
-            py-1.5
-            text-[11px]
-            font-semibold
-            text-[#1257e8]
-          "
-        >
-          <Crown
-            size={13}
-            className="fill-[#f0b31e] text-[#f0b31e]"
-          />
-
-          Most Popular
-        </div>
       </div>
 
-      <div className="mt-5 flex items-baseline gap-2">
-        <span className="text-[38px] font-bold tracking-[-0.04em]">
+      <div className="mt-4 flex items-baseline gap-2 sm:mt-5">
+        <span className="text-[34px] font-bold tracking-[-0.04em] sm:text-[38px]">
           ₹734
         </span>
 
-        <span className="text-sm text-white/70">
-          /month
-        </span>
+        <span className="text-sm text-white/70">/month</span>
       </div>
 
-      <div className="my-5 h-px bg-white/15" />
+      <div className="my-4 h-px bg-white/15 sm:my-5" />
 
       <div className="space-y-3">
-        {proFeatures.map((feature) => (
+        {proFeatures.map((feature, index) => (
           <Feature
             key={feature.text}
             icon={feature.icon}
             text={feature.text}
+            delay={startDelay + 140 + index * 60}
           />
         ))}
       </div>
@@ -710,24 +615,7 @@ function ProPlan({
       <button
         type="button"
         onClick={onUpgrade}
-        className="
-          group
-          mt-6
-          flex
-          h-12
-          w-full
-          items-center
-          justify-center
-          gap-2
-          rounded-full
-          bg-white
-          text-sm
-          font-bold
-          text-[#1257e8]
-          transition
-          hover:-translate-y-0.5
-          hover:shadow-xl
-        "
+        className="group mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white text-sm font-bold text-[#1257e8] transition hover:-translate-y-0.5 hover:shadow-xl sm:mt-6"
       >
         {/* Upgrade to Pro */}
         Coming soon
@@ -751,13 +639,18 @@ function Feature({
   icon: Icon,
   text,
   dark = false,
+  delay: startDelay = 0,
 }: {
   icon: React.ElementType;
   text: string;
   dark?: boolean;
+  delay?: number;
 }) {
   return (
-    <div className="flex items-start gap-3">
+    <div
+      className="upm-rise flex items-start gap-3"
+      style={delay(startDelay)}
+    >
       <div
         className={`
           mt-0.5
@@ -780,6 +673,7 @@ function Feature({
 
       <p
         className={`
+          min-w-0
           text-[13px]
           leading-[1.45]
           ${
@@ -809,38 +703,17 @@ function TrustItem({
   description: string;
 }) {
   return (
-    <div
-      className="
-        flex
-        items-center
-        justify-center
-        gap-3
-        px-4
-        py-2
-      "
-    >
-      <div
-        className="
-          flex
-          h-10
-          w-10
-          shrink-0
-          items-center
-          justify-center
-          rounded-full
-          bg-slate-50
-          text-[#050a30]
-        "
-      >
+    <div className="flex flex-col items-center justify-center gap-1.5 px-1.5 py-1 text-center sm:flex-row sm:gap-3 sm:px-4 sm:py-2 sm:text-left">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-50 text-[#050a30] sm:h-10 sm:w-10">
         <Icon size={18} />
       </div>
 
-      <div>
-        <p className="text-sm font-semibold text-[#050a30]">
+      <div className="min-w-0">
+        <p className="text-[11px] font-semibold leading-tight text-[#050a30] sm:text-sm">
           {title}
         </p>
 
-        <p className="mt-0.5 text-xs text-slate-400">
+        <p className="mt-0.5 hidden text-[10px] leading-tight text-slate-400 min-[400px]:block sm:text-xs">
           {description}
         </p>
       </div>
@@ -855,83 +728,25 @@ function TrustItem({
 function CyberLines() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      {/* top right vertical */}
+      {/* top right vertical (hidden on small screens so it never touches text) */}
 
-      <div
-        className="
-          absolute
-          right-[4%]
-          top-0
-          h-24
-          w-px
-          bg-[#1257e8]/20
-        "
-      />
+      <div className="absolute right-[4%] top-0 hidden h-24 w-px bg-[#1257e8]/20 sm:block" />
 
-      <div
-        className="
-          absolute
-          right-[4%]
-          top-10
-          h-px
-          w-16
-          bg-[#1257e8]/20
-        "
-      />
+      <div className="absolute right-[4%] top-10 hidden h-px w-16 bg-[#1257e8]/20 sm:block" />
 
       {/* corner line */}
 
-      <div
-        className="
-          absolute
-          right-[12%]
-          top-0
-          h-28
-          w-24
-          border-b
-          border-l
-          border-[#1257e8]/15
-        "
-      />
+      <div className="absolute right-[12%] top-0 hidden h-28 w-24 border-b border-l border-[#1257e8]/15 sm:block" />
 
       {/* little blue accent */}
 
-      <div
-        className="
-          absolute
-          right-[5%]
-          top-10
-          h-8
-          w-1
-          bg-[#1257e8]
-        "
-      />
+      <div className="absolute right-[5%] top-10 hidden h-8 w-1 bg-[#1257e8] sm:block" />
 
       {/* bottom left */}
 
-      <div
-        className="
-          absolute
-          bottom-8
-          left-0
-          h-20
-          w-20
-          border-r
-          border-t
-          border-[#ffffff]/40
-        "
-      />
+      <div className="absolute bottom-8 left-0 h-20 w-20 border-r border-t border-[#ffffff]/40" />
 
-      <div
-        className="
-          absolute
-          bottom-8
-          left-0
-          h-px
-          w-24
-          bg-[#ffffff]/40
-        "
-      />
+      <div className="absolute bottom-8 left-0 h-px w-24 bg-[#ffffff]/40" />
     </div>
   );
 }
@@ -945,67 +760,23 @@ function RightBackground() {
     <>
       {/* dark blue architectural blocks */}
 
-      <div
-        className="
-          absolute
-          inset-0
-          bg-[#1257e8]
-        "
-      />
+      <div className="absolute inset-0 bg-[#1257e8]" />
 
-      <div
-        className="
-          absolute
-          right-[-8%]
-          top-[-10%]
-          h-[70%]
-          w-[48%]
-          bg-[#050a30]
-          [clip-path:polygon(35%_0,100%_0,100%_100%,0_100%,0_30%)]
-        "
-      />
+      <div className="absolute right-[-8%] top-[-10%] h-[70%] w-[48%] bg-[#050a30] [clip-path:polygon(35%_0,100%_0,100%_100%,0_100%,0_30%)]" />
 
-      <div
-        className="
-          absolute
-          bottom-0
-          left-[8%]
-          h-[45%]
-          w-[38%]
-          bg-[#050a30]/90
-          [clip-path:polygon(0_30%,35%_0,100%_0,100%_100%,0_100%)]
-        "
-      />
+      <div className="absolute bottom-0 left-[8%] h-[45%] w-[38%] bg-[#050a30]/90 [clip-path:polygon(0_30%,35%_0,100%_0,100%_100%,0_100%)]" />
 
       {/* yellow architectural accent */}
 
       <div
-        className="
-          absolute
-          right-[30%]
-          top-0
-          h-[100%]
-          w-[10px]
-          bg-[#ffffff]
-          opacity-90
-        "
+        className="absolute right-[30%] top-0 h-[100%] w-[10px] bg-[#ffffff] opacity-90"
         style={{
           clipPath:
             "polygon(0 0,100% 8%,100% 65%,0 100%)",
         }}
       />
 
-      <div
-        className="
-          absolute
-          bottom-[-5%]
-          right-[3%]
-          h-[32%]
-          w-[32%]
-          bg-[#ffffff]
-          [clip-path:polygon(40%_0,100%_0,100%_100%,0_100%,0_50%)]
-        "
-      />
+      <div className="absolute bottom-[-5%] right-[3%] h-[32%] w-[32%] bg-[#ffffff] [clip-path:polygon(40%_0,100%_0,100%_100%,0_100%,0_50%)]" />
 
       {/* thin cyber lines */}
 

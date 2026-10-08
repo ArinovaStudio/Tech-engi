@@ -413,7 +413,7 @@ export default function Hero() {
                       placeholder={v.placeholder}
                       aria-label={v.placeholder}
                       autoComplete="off"
-                      className="block h-full w-full resize-none overflow-y-auto border-0 bg-transparent p-0 py-[12px] pt-4 text-[15px] leading-6 text-saas-ink outline-none ring-0 [scrollbar-width:none] placeholder:text-saas-mut focus:outline-none focus:ring-0 [&::-webkit-scrollbar]:hidden"
+                      className="block h-full w-full resize-none overflow-y-auto border-0 bg-transparent p-0 py-[12px] text-[15px] leading-6 text-saas-ink outline-none ring-0 [scrollbar-width:none] placeholder:text-saas-mut focus:outline-none focus:ring-0 [&::-webkit-scrollbar]:hidden"
                     />
                   </div>
                 </form>

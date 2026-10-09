@@ -57,6 +57,14 @@ const PANEL_CLS =
 const FIELD_CLS =
   "h-11 w-full rounded-full border-0 bg-[rgba(238,242,250,.75)] px-4 text-[14px] text-saas-ink outline-none ring-0 transition-shadow placeholder:text-saas-mut focus:outline-none focus:ring-0 shadow-[inset_0_2px_6px_rgba(15,27,61,.2),inset_0_1px_2px_rgba(15,27,61,.12),inset_0_-1px_1px_rgba(255,255,255,.95),0_1px_0_rgba(255,255,255,.95)] focus:shadow-[inset_0_2px_6px_rgba(15,27,61,.22),inset_0_1px_2px_rgba(15,27,61,.14),0_0_0_3px_rgba(110,168,255,.3)]";
 
+const GREEN_AT = 100; // characters until the border is fully green
+
+// Focus glow for the box. With the progress border showing, the blue ring is left out.
+const FOCUS_RING =
+  "focus-within:shadow-[inset_0_2px_6px_rgba(15,27,61,.12),inset_0_-1px_1px_rgba(255,255,255,.9),0_1px_0_rgba(255,255,255,.95),0_18px_40px_-14px_rgba(110,120,255,.45),0_0_0_3px_rgba(110,168,255,.28)]";
+const FOCUS_PLAIN =
+  "focus-within:shadow-[inset_0_2px_6px_rgba(15,27,61,.12),inset_0_-1px_1px_rgba(255,255,255,.9),0_1px_0_rgba(255,255,255,.95),0_18px_40px_-14px_rgba(15,27,61,.3)]";
+
 type Step = "compose" | "details" | "done";
 
 // Content layers inside the morphing box: the box changes shape first, then the new content fades in
@@ -96,6 +104,7 @@ export default function Hero() {
   const fieldRef = useRef<HTMLDivElement>(null);
   const detailsRef = useRef<HTMLDivElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
+  const taRef = useRef<HTMLTextAreaElement>(null);
 
   const v = VIEWS[view];
   const value = values[view];
@@ -103,6 +112,10 @@ export default function Hero() {
   const pillW = (labelW || 140) + LABEL_PAD;
   const isCompose = step === "compose";
   const showPills = isCompose && value.length <= HIDE_PILLS_AFTER;
+  // Border colour: orange -> yellow -> green (hue 24 -> 140) as the message gets longer
+  const progress = Math.min(value.trim().length / GREEN_AT, 1);
+  const hue = Math.round(24 + progress * 116);
+  const ringOn = isCompose && hasText;
   const composeLayer = layer(isCompose);
   const detailsLayer = layer(!isCompose);
 
@@ -147,6 +160,10 @@ export default function Hero() {
     if (detailsRef.current) ro.observe(detailsRef.current);
     return () => ro.disconnect();
   }, []);
+
+  useEffect(() => {
+    if (isCompose && taRef.current) taRef.current.scrollTop = 0;
+  }, [isCompose]);
 
   const goStep = (next: Step) => {
     setAnimH(true); // animate the container height only while switching steps
@@ -368,7 +385,7 @@ export default function Hero() {
               }}
             >
               <div
-                className={`relative overflow-hidden ${PANEL_CLS} focus-within:shadow-[inset_0_2px_6px_rgba(15,27,61,.12),inset_0_-1px_1px_rgba(255,255,255,.9),0_1px_0_rgba(255,255,255,.95),0_18px_40px_-14px_rgba(110,120,255,.45),0_0_0_3px_rgba(110,168,255,.28)]`}
+                className={`relative overflow-hidden ${PANEL_CLS} ${ringOn ? FOCUS_PLAIN : FOCUS_RING}`}
                 style={{
                   width: hasText || narrow || !isCompose ? "100%" : `calc(100% - ${pillW + 12}px)`,
                   height: isCompose ? fieldH + 12 : detailsH,
@@ -381,7 +398,7 @@ export default function Hero() {
                 <form
                   id={formId}
                   onSubmit={handleSubmit}
-                  className="absolute inset-0 flex items-end p-1.5 pl-5"
+                  className="absolute inset-x-0 top-0 flex items-start p-1.5 pl-5"
                   style={{
                     ...composeLayer,
                     paddingRight: hasText ? CIRCLE + 12 : 20,
@@ -401,6 +418,7 @@ export default function Hero() {
                       {value + "\u200b"}
                     </div>
                     <textarea
+                      ref={taRef}
                       rows={1}
                       value={value}
                       onChange={(e) => setValue(e.target.value)}
@@ -413,7 +431,7 @@ export default function Hero() {
                       placeholder={v.placeholder}
                       aria-label={v.placeholder}
                       autoComplete="off"
-                      className="block h-full w-full resize-none overflow-y-auto border-0 bg-transparent p-0 py-[12px] text-[15px] leading-6 text-saas-ink outline-none ring-0 [scrollbar-width:none] placeholder:text-saas-mut focus:outline-none focus:ring-0 [&::-webkit-scrollbar]:hidden"
+                      className="block h-full w-full resize-none overflow-y-auto border-0 bg-transparent p-0 py-2.5 text-sm leading-6 text-saas-ink outline-none ring-0 [scrollbar-width:none] placeholder:text-saas-mut focus:outline-none focus:ring-0 [&::-webkit-scrollbar]:hidden"
                     />
                   </div>
                 </form>
@@ -514,9 +532,24 @@ export default function Hero() {
                           </svg>
                         </button>
                       </div>
+
+                      <p className="mt-3 px-2 pb-1 text-[11px] leading-snug text-saas-mut">
+                        We don&apos;t store any of your data. It&apos;s only sent to our team by email.
+                      </p>
                     </form>
                   )}
                 </div>
+
+                {/* Progress border: orange -> yellow -> green while you write */}
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 rounded-[28px]"
+                  style={{
+                    boxShadow: `inset 0 0 0 2px hsl(${hue} 90% 50%), inset 0 0 16px -2px hsl(${hue} 90% 50% / .28)`,
+                    opacity: ringOn ? 1 : 0,
+                    transition: "box-shadow 450ms ease, opacity 300ms ease",
+                  }}
+                />
               </div>
 
               {/* Send button for step 1: rides along while the box morphs, then fades out */}

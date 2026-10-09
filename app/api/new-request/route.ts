@@ -235,9 +235,9 @@ export async function POST(req: Request) {
   const lead: Lead = { role: role as Role, message, name, email, phone };
 
   const from = process.env.EMAIL_USER;
-  const adminTo = process.env.EMAIL_USER;
-  if (!process.env.SMTP_HOST || !process.env.EMAIL_USER || !process.env.EMAIL_PASS || !from || !adminTo) {
-    console.error("[new-request] Missing SMTP_* / MAIL_FROM / EMAIL_USER environment variables.");
+  const adminTo = process.env.SMTP_ADMIN_TO || process.env.EMAIL_USER;
+  if (!process.env.SMTP_HOST || !process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.log("[new-request] Missing SMTP_* / MAIL_FROM / EMAIL_USER environment variables.");
     return fail("We couldn't send your request right now. Please try again later.", 500);
   }
 

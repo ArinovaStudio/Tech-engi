@@ -577,3 +577,11 @@ enum AgreementStatus {
   ACCEPTED
   DECLINED
 }
+
+model Visit {
+  id        Int      @id @default(autoincrement())
+  ref       String
+  createdAt DateTime @default(now())
+
+  @@index([ref])
+}

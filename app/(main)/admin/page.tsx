@@ -1,6 +1,15 @@
 "use client";
 
-import { Eye, ReceiptText, Activity, Download, Briefcase, Users, CheckCircle, Clock } from "lucide-react";
+import {
+  Eye,
+  ReceiptText,
+  Activity,
+  Download,
+  Briefcase,
+  Users,
+  CheckCircle,
+  Clock,
+} from "lucide-react";
 import StatCard from "@/components/dashboard/StatCard";
 import ProjectDistribution from "@/components/dashboard/ProjectDistribution";
 import RevenueChart from "@/components/dashboard/RevenueChart";
@@ -10,11 +19,23 @@ import { fetcher } from "@/lib/fetcher";
 import { Loader2 } from "lucide-react";
 import TicketIssuesCard from "@/components/dashboard/TicketIssuesCard";
 import ProjectCollaborationCard from "@/components/dashboard/ProjectCollaborationCard";
+import VisitStats from "@/components/dashboard/VisitCardStats";
 
 export default function DashboardPage() {
   const { data, isLoading } = useSWR("/api/admin/dashboard", fetcher);
-  const { data: projectTicketsData, isLoading: ticketsLoading, } = useSWR("/api/admin/project-tickets", fetcher);
-  const { data: projectsData, isLoading: projectsLoading, } = useSWR("/api/admin/project/all-projects", fetcher);
+  const { data: projectTicketsData, isLoading: ticketsLoading } = useSWR(
+    "/api/admin/project-tickets",
+    fetcher,
+  );
+  const { data: projectsData, isLoading: projectsLoading } = useSWR(
+    "/api/admin/project/all-projects",
+    fetcher,
+  );
+  const { data: visitData, isLoading: visitLoading } = useSWR(
+    "/api/visit",
+    fetcher,
+  );
+
   // console.log(projectsData?.projects, "projectsData");
 
   if (isLoading) {
@@ -29,13 +50,15 @@ export default function DashboardPage() {
 
   const stats = data?.stats || {};
   const charts = data?.charts || {};
-  
+
   return (
     <DashboardShell>
       {/* Page header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--text-primary)]">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)]">
+            Dashboard
+          </h1>
         </div>
         <div className="flex items-center gap-2 ">
           <button className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-secondary)] bg-white px-4 py-2 border border-[var(--border)] rounded-lg dark:bg-card">
@@ -93,25 +116,19 @@ export default function DashboardPage() {
 
         {/* Charts */}
         <div className="flex flex-col xl:flex-row py-2 pr-2 gap-3">
-
           {/* LEFT SIDE */}
 
           <div className="w-full xl:w-[75%] flex flex-col gap-3">
-
             {/* TOP SECTION */}
 
-            <div
-              className="flex flex-col lg:flex-row gap-3 h-auto xl:h-[46vh]">
-
+            <div className="flex flex-col lg:flex-row gap-3 h-auto xl:h-[46vh]">
               {/* REVENUE CHART */}
 
               <div className="w-full min-h-90">
-
                 <RevenueChart
                   data={charts.revenue}
                   totalRevenue={stats.totalRevenue}
                 />
-
               </div>
 
               {/* RIGHT CARD */}
@@ -122,18 +139,14 @@ export default function DashboardPage() {
                   hello
                 </p>
               </div> */}
-
             </div>
 
             {/* BOTTOM SECTION */}
 
-            <div
-              className="flex flex-col lg:flex-row gap-3 h-auto xl:h-[55vh]">
-
+            <div className="flex flex-col lg:flex-row gap-3 h-auto xl:h-[55vh]">
               {/* PROJECT CARD */}
 
-              <div
-                className="bg-white w-full lg:w-[59%] rounded-2xl overflow-hidden border border-[#ECECEC] dark:bg-card">
+              <div className="bg-white w-full lg:w-[59%] rounded-2xl overflow-hidden border border-[#ECECEC] dark:bg-card">
                 <ProjectCollaborationCard
                   projects={projectsData?.projects || []}
                 />
@@ -141,28 +154,24 @@ export default function DashboardPage() {
 
               {/* DISTRIBUTION */}
 
-              <div
-                className="bg-white w-full lg:w-[41%] rounded-2xl overflow-hidden border border-[#ECECEC] dark:bg-card">
-                <ProjectDistribution
-                  data={charts.projectDistribution}
-                />
+              <div className="bg-white w-full lg:w-[41%] rounded-2xl overflow-hidden border border-[#ECECEC] dark:bg-card">
+                <ProjectDistribution data={charts.projectDistribution} />
               </div>
-
             </div>
-
           </div>
 
           {/* RIGHT SIDE */}
 
-          <div
-            className="w-full xl:w-[25%] min-h-[400px] xl:h-screen rounded-2xl overflow-hidden">
+          <div className="w-full xl:w-[25%] min-h-[400px] xl:h-screen rounded-2xl overflow-hidden">
+            {/* new card: 40% height */}
+            <div className="h-[30%] mb-3 min-h-[220px]">
+              <VisitStats stats={visitData} loading={visitLoading} onDeleted={() => window.location.reload()} />
+            </div>
 
-            <TicketIssuesCard
-              projects={projectTicketsData?.data || []}
-            />
-
+            <div className="flex-1 min-h-0">
+              <TicketIssuesCard projects={projectTicketsData?.data || []} />
+            </div>
           </div>
-
         </div>
       </div>
     </DashboardShell>

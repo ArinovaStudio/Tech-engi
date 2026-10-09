@@ -1,7 +1,6 @@
 // app/api/new-request/route.ts  (or src/app/api/new-request/route.ts)
+import { transporter } from "@/lib/email";
 import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
-
 
 /* ------------------------------------------------------------------ */
 /* Config                                                              */
@@ -19,20 +18,6 @@ const INK = "#0f1b3d";
 
 const EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 const PHONE_RE = /^\d{10}$/;
-
-
-let transporter: nodemailer.Transporter | null = null;
-function getTransporter() {
-  if (!transporter) {
-    transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: 465,
-      secure: true,
-      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAI_PASS },
-    });
-  }
-  return transporter;
-}
 
 /* ------------------------------------------------------------------ */
 /* Tiny in-memory rate limit (5 requests / 10 min / IP)                */
@@ -236,10 +221,7 @@ export async function POST(req: Request) {
 
   const from = process.env.EMAIL_USER;
   const adminTo = process.env.SMTP_ADMIN_TO || process.env.EMAIL_USER;
-  if (!process.env.SMTP_HOST || !process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.log("[new-request] Missing SMTP_* / MAIL_FROM / EMAIL_USER environment variables.");
-    return fail("We couldn't send your request right now. Please try again later.", 500);
-  }
+
 
   const receivedAt = new Date().toLocaleString("en-IN", {
     dateStyle: "medium",
@@ -247,11 +229,11 @@ export async function POST(req: Request) {
     timeZone: "Asia/Kolkata",
   });
 
-  const mailer = getTransporter();
-
+  const mailer = transporter
   // 1) Notify the team. If this fails, the request did not go through.
   try {
     const admin = adminEmail(lead, receivedAt);
+
     await mailer.sendMail({
       from,
       to: adminTo,

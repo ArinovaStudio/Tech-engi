@@ -5,7 +5,7 @@ import type { CSSProperties, FormEvent } from "react";
 import { gsap } from "@/components/saas/gsapClient";
 import HeroTiles from "@/components/saas/HeroTiles";
 
-type ViewKey = "client" | "engineer" | "corporate";
+type ViewKey = "client" | "engineer" | "bug";
 
 type View = {
   line1: string;
@@ -33,7 +33,7 @@ const VIEWS: Record<ViewKey, View> = {
     suggestions: ["Find React leads", "Join a team", "Find a partner to finish"],
     primary: { label: "Browse leads", href: "#leads" },
   },
-  corporate: {
+  bug: {
     line1: "Your bug doesn't wait for Monday.",
     line2: "Neither do we.",
     sub: "Post the problem. Get matched with a verified engineer in hours. Pay only when it's fixed — just 5% platform fee.",
@@ -43,7 +43,7 @@ const VIEWS: Record<ViewKey, View> = {
   },
 };
 
-const ORDER: ViewKey[] = ["client", "engineer", "corporate"];
+const ORDER: ViewKey[] = ["client", "engineer", "bug"];
 
 const CIRCLE = 44; // button diameter (px)
 const LABEL_PAD = 40; // horizontal padding around the label (px)
@@ -86,7 +86,7 @@ export default function Hero() {
   const [values, setValues] = useState<Record<ViewKey, string>>({
     client: "",
     engineer: "",
-    corporate: "",
+    bug: "",
   });
   const [labelW, setLabelW] = useState(0);
   const [fieldH, setFieldH] = useState(MIN_H);
@@ -237,7 +237,7 @@ export default function Hero() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          role: view, // "client" | "engineer" | "corporate"
+          role: view, // "client" | "engineer" | "bug"
           message: value.trim(),
           name: name || undefined,
           email,
@@ -342,14 +342,14 @@ export default function Hero() {
           <div className="my-5 flex sm:my-6">
             <button
               type="button"
-              aria-label="Switch between client, engineer and corporate view"
+              aria-label="Switch between client, engineer and Fix a bug view"
               onClick={toggle}
               className="view-switch hero-entrance hero-entrance-delay-2"
               data-view={view}
             >
               <span>Client</span>
               <span>Engineer</span>
-              <span>Corporate</span>
+              <span>Fix a Bug</span>
               <i className="knob" />
             </button>
           </div>

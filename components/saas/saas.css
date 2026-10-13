@@ -491,7 +491,7 @@
     transform: translateX(100%);
   }
 
-  .view-switch[data-view="corporate"] .knob {
+  .view-switch[data-view="bug"] .knob {
     transform: translateX(200%);
   }
 

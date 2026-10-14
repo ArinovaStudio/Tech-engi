@@ -17,7 +17,7 @@ import {
 =============================================================== */
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://techengi.tsquarey.tech";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://techengi.in";
 const PATH = "/blog";
 
 const META_TITLE = "Tech Engi Blog: Freelance Safety, Hiring and Engineering";

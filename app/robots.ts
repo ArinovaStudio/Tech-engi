@@ -17,6 +17,6 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: "https://techengi.tsquarey.tech/sitemap.xml",
+    sitemap: "https://techengi.in/sitemap.xml",
   };
 }

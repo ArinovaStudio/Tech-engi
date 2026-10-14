@@ -2,6 +2,10 @@
 import { transporter } from "@/lib/email";
 import { NextResponse } from "next/server";
 
+// Needs Node (Buffer + SMTP). Uploads can take a while, so allow a longer run on Vercel.
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
 /* ------------------------------------------------------------------ */
 /* Config                                                              */
 /* ------------------------------------------------------------------ */
@@ -9,6 +13,7 @@ import { NextResponse } from "next/server";
 const ROLES = {
   client: "Client",
   engineer: "Engineer",
+  bug: "Fix a Bug", // sent by the "Fix a Bug" tab in Hero.tsx
   corporate: "Corporate",
 } as const;
 type Role = keyof typeof ROLES;
@@ -18,6 +23,18 @@ const INK = "#0f1b3d";
 
 const EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 const PHONE_RE = /^\d{10}$/;
+
+// Same limits as the form: a file up to 20 MB, a zip up to 50 MB, 50 MB in total
+const MB = 1024 * 1024;
+const MAX_FILE_BYTES = 20 * MB;
+const MAX_ZIP_BYTES = 50 * MB;
+const MAX_TOTAL_BYTES = 50 * MB;
+const MAX_FILES = 10;
+
+// What can actually be attached to an email. Gmail rejects messages over 25 MB, and email
+// encoding adds ~33%, so about 18 MB of raw files is the safe ceiling. Anything bigger needs
+// file storage (S3, R2, UploadThing...) plus a link in the email.
+const EMAIL_ATTACH_MAX = Number(process.env.EMAIL_ATTACH_MAX_MB ?? 18) * MB;
 
 /* ------------------------------------------------------------------ */
 /* Tiny in-memory rate limit (5 requests / 10 min / IP)                */
@@ -66,12 +83,38 @@ const withBreaks = (s: string) => esc(s).replace(/\r?\n/g, "<br>");
 
 const fail = (error: string, status = 400) => NextResponse.json({ error }, { status });
 
+const fmtSize = (n: number) =>
+  n < 1024 ? `${n} B` : n < MB ? `${Math.round(n / 1024)} KB` : `${(n / MB).toFixed(1)} MB`;
+
+const isZip = (f: File) => /\.zip$/i.test(f.name);
+
+// Only these types are accepted: DOCX, PDF, PNG, JPG, and a zip
+const ALLOWED_EXT = /\.(docx|pdf|png|jpe?g|zip)$/i;
+
+// The first bytes of a file say what it really is, so a renamed file is caught
+const startsWith = (b: Buffer, sig: number[]) => sig.every((x, i) => b[i] === x);
+function hasValidSignature(name: string, b: Buffer) {
+  const ext = name.split(".").pop()?.toLowerCase();
+  if (ext === "pdf") return startsWith(b, [0x25, 0x50, 0x44, 0x46]); // %PDF
+  if (ext === "png") return startsWith(b, [0x89, 0x50, 0x4e, 0x47]);
+  if (ext === "jpg" || ext === "jpeg") return startsWith(b, [0xff, 0xd8, 0xff]);
+  if (ext === "docx" || ext === "zip") return startsWith(b, [0x50, 0x4b]); // "PK" (zip container)
+  return false;
+}
+
+// Keep only a safe file name (no paths, no odd characters)
+const cleanName = (n: string) =>
+  n.replace(/[\\/:*?"<>|\u0000-\u001f]+/g, "_").trim().slice(0, 120) || "file";
+
+type FileInfo = { name: string; size: number };
+
 type Lead = {
   role: Role;
   message: string;
   name: string;
   email: string;
   phone: string;
+  files: FileInfo[];
 };
 
 /* ------------------------------------------------------------------ */
@@ -113,6 +156,13 @@ const messageBox = (message: string) => `
     ${withBreaks(message)}
   </div>`;
 
+const filesHtml = (files: FileInfo[]) =>
+  files.map((f) => `${esc(f.name)} <span style="color:#6b7690;">(${fmtSize(f.size)})</span>`).join("<br>");
+
+const filesText = (files: FileInfo[]) => files.map((f) => `  - ${f.name} (${fmtSize(f.size)})`);
+
+const NO_MESSAGE = "(No message, see the attachments.)";
+
 function adminEmail(lead: Lead, receivedAt: string) {
   const roleLabel = ROLES[lead.role];
   const html = layout(
@@ -128,9 +178,10 @@ function adminEmail(lead: Lead, receivedAt: string) {
       ${row("Email", `<a href="mailto:${esc(lead.email)}" style="color:${INK};">${esc(lead.email)}</a>`)}
       ${row("Phone", `<a href="tel:${esc(lead.phone)}" style="color:${INK};">${esc(lead.phone)}</a>`)}
       ${row("Received", esc(receivedAt))}
+      ${lead.files.length ? row("Attachments", filesHtml(lead.files)) : ""}
     </table>
     <p style="margin:22px 0 0;font-size:13px;color:#6b7690;">Message</p>
-    ${messageBox(lead.message)}`
+    ${messageBox(lead.message || NO_MESSAGE)}`
   );
 
   const text = [
@@ -140,13 +191,16 @@ function adminEmail(lead: Lead, receivedAt: string) {
     `Email: ${lead.email}`,
     `Phone: ${lead.phone}`,
     `Received: ${receivedAt}`,
+    ...(lead.files.length ? [`Attachments:`, ...filesText(lead.files)] : []),
     ``,
     `Message:`,
-    lead.message,
+    lead.message || NO_MESSAGE,
   ].join("\n");
 
   return {
-    subject: oneLine(`New ${roleLabel} request - ${lead.name || lead.email}`),
+    subject: oneLine(
+      `New ${roleLabel} request - ${lead.name || lead.email}${lead.files.length ? ` (${lead.files.length} attached)` : ""}`
+    ),
     html,
     text,
   };
@@ -166,9 +220,10 @@ function userEmail(lead: Lead) {
       ${row("Request type", esc(roleLabel))}
       ${row("Email", esc(lead.email))}
       ${row("Phone", esc(lead.phone))}
+      ${lead.files.length ? row("Attachments", filesHtml(lead.files)) : ""}
     </table>
     <p style="margin:22px 0 0;font-size:13px;color:#6b7690;">Your message</p>
-    ${messageBox(lead.message)}
+    ${messageBox(lead.message || NO_MESSAGE)}
     <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#6b7690;">
       If anything above looks wrong, just reply to this email.
     </p>`
@@ -180,15 +235,16 @@ function userEmail(lead: Lead) {
     `Thanks for reaching out to ${BRAND}. We have received your request and we will reach out to you shortly.`,
     ``,
     `Request type: ${roleLabel}`,
+    ...(lead.files.length ? [`Attachments:`, ...filesText(lead.files)] : []),
     `Your message:`,
-    lead.message,
+    lead.message || NO_MESSAGE,
   ].join("\n");
 
   return { subject: `We've received your request - ${BRAND}`, html, text };
 }
 
 /* ------------------------------------------------------------------ */
-/* POST /api/new-request                                               */
+/* POST /api/new-request  (multipart/form-data)                        */
 /* ------------------------------------------------------------------ */
 
 export async function POST(req: Request) {
@@ -197,31 +253,84 @@ export async function POST(req: Request) {
     return fail("Too many requests. Please try again in a few minutes.", 429);
   }
 
-  let body: Record<string, unknown>;
+  // Cheap early check so an oversized upload is refused before it is read into memory
+  const declared = Number(req.headers.get("content-length") ?? 0);
+  if (declared > MAX_TOTAL_BYTES + MB) {
+    return fail(`Attachments are limited to ${fmtSize(MAX_TOTAL_BYTES)} in total.`, 413);
+  }
+
+  let fd: FormData;
   try {
-    body = (await req.json()) as Record<string, unknown>;
+    fd = await req.formData();
   } catch {
     return fail("Invalid request body.");
   }
 
-  const role = str(body?.role);
-  const message = str(body?.message);
-  const name = str(body?.name);
-  const email = str(body?.email);
-  const phone = str(body?.phone);
+  const role = str(fd.get("role"));
+  const message = str(fd.get("message"));
+  const name = str(fd.get("name"));
+  const email = str(fd.get("email"));
+  const phone = str(fd.get("phone"));
+
+  // Attachments: only real files, empty ones skipped
+  const files = fd
+    .getAll("attachments")
+    .filter((v): v is File => typeof v !== "string" && v.size > 0);
 
   if (!(role in ROLES)) return fail("Invalid request type.");
-  if (!message) return fail("Please describe your request.");
+  if (!message && files.length === 0) return fail("Please describe your request or attach a file.");
   if (message.length > 2000) return fail("Message is too long (max 2000 characters).");
   if (name.length > 80) return fail("Name is too long (max 80 characters).");
   if (email.length > 254 || !EMAIL_RE.test(email)) return fail("Please enter a valid email address.");
   if (!PHONE_RE.test(phone)) return fail("Phone number must be exactly 10 digits.");
 
-  const lead: Lead = { role: role as Role, message, name, email, phone };
+  // Check every size from file.size before reading any file into memory
+  if (files.length > MAX_FILES) return fail(`You can attach up to ${MAX_FILES} files.`);
+
+  let total = 0;
+  for (const f of files) {
+    if (!ALLOWED_EXT.test(f.name)) {
+      return fail(`${cleanName(f.name)} is not allowed. Use DOCX, PDF, PNG, JPG or a zip.`);
+    }
+    const limit = isZip(f) ? MAX_ZIP_BYTES : MAX_FILE_BYTES;
+    if (f.size > limit) {
+      return fail(`${cleanName(f.name)} is over ${fmtSize(limit)}.`, 413);
+    }
+    total += f.size;
+  }
+  if (total > MAX_TOTAL_BYTES) {
+    return fail(`Attachments are limited to ${fmtSize(MAX_TOTAL_BYTES)} in total.`, 413);
+  }
+  if (total > EMAIL_ATTACH_MAX) {
+    // NEXT STEP for bigger uploads: save the files to storage here (S3, R2, UploadThing...)
+    // and put the download links in the email instead of attaching them.
+    return fail(
+      `Attachments over ${fmtSize(EMAIL_ATTACH_MAX)} can't be emailed yet. Send a smaller zip, or share a download link in your message.`,
+      413
+    );
+  }
+
+  const uploads = await Promise.all(
+    files.map(async (f) => ({
+      filename: cleanName(f.name),
+      content: Buffer.from(await f.arrayBuffer()),
+    }))
+  );
+
+  const bad = uploads.find((u) => !hasValidSignature(u.filename, u.content));
+  if (bad) return fail(`${bad.filename} is not a valid file of its type.`);
+
+  const lead: Lead = {
+    role: role as Role,
+    message,
+    name,
+    email,
+    phone,
+    files: uploads.map((u) => ({ name: u.filename, size: u.content.length })),
+  };
 
   const from = process.env.EMAIL_USER;
   const adminTo = process.env.SMTP_ADMIN_TO || process.env.EMAIL_USER;
-
 
   const receivedAt = new Date().toLocaleString("en-IN", {
     dateStyle: "medium",
@@ -229,8 +338,9 @@ export async function POST(req: Request) {
     timeZone: "Asia/Kolkata",
   });
 
-  const mailer = transporter
-  // 1) Notify the team. If this fails, the request did not go through.
+  const mailer = transporter;
+
+  // 1) Notify the team, with the files attached. If this fails, the request did not go through.
   try {
     const admin = adminEmail(lead, receivedAt);
 
@@ -241,13 +351,15 @@ export async function POST(req: Request) {
       subject: admin.subject,
       html: admin.html,
       text: admin.text,
+      attachments: uploads,
     });
   } catch (err) {
     console.error("[new-request] Admin email failed:", err);
     return fail("We couldn't send your request right now. Please try again later.", 500);
   }
 
-  // 2) Confirmation to the user. The team already has the request, so a failure here is only logged.
+  // 2) Confirmation to the user (file names only, not the files). The team already has the
+  //    request, so a failure here is only logged.
   try {
     const user = userEmail(lead);
     await mailer.sendMail({

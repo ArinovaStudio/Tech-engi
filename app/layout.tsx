@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 
@@ -7,8 +8,15 @@ import Providers from "@/components/Providers";
 import SocketAnnouncer from "@/components/SocketAnnouncer";
 import FacebookPixel from "@/components/FacebookPixel";
 
+const GTM_ID = "GTM-5HV8B6QX";
+
 const idGrotesk = localFont({
-  src: [{ path: "../public/font/IDGrotesk-Regular.ttf", weight: "400" }],
+  src: [
+    {
+      path: "../public/font/IDGrotesk-Regular.ttf",
+      weight: "400",
+    },
+  ],
   variable: "--font-id",
 });
 
@@ -18,7 +26,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://techengi.tsquarey.tech"),
+  metadataBase: new URL("https://techengi.in"),
   title: {
     default: "Tech Engi | Engineering Solutions & Expert Support",
     template: "%s | Tech Engi",
@@ -35,7 +43,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    url: "https://techengi.tsquarey.tech",
+    url: "https://techengi.in",
     siteName: "Tech Engi",
     title: "Tech Engi | Engineering Solutions & Expert Support",
     description:
@@ -63,10 +71,10 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "Organization",
-      "@id": "https://techengi.tsquarey.tech/#organization",
+      "@id": "https://techengi.in/#organization",
       name: "Tech Engi",
-      url: "https://techengi.tsquarey.tech",
-      logo: "https://techengi.tsquarey.tech/logo-transparent.png",
+      url: "https://techengi.in",
+      logo: "https://techengi.in/logo-transparent.png",
       sameAs: [
         "https://www.linkedin.com/company/tsquarey1",
         "https://www.instagram.com/tsy1_tech.engi",
@@ -75,11 +83,11 @@ const jsonLd = {
     },
     {
       "@type": "WebSite",
-      "@id": "https://techengi.tsquarey.tech/#website",
-      url: "https://techengi.tsquarey.tech",
+      "@id": "https://techengi.in/#website",
+      url: "https://techengi.in",
       name: "Tech Engi",
       publisher: {
-        "@id": "https://techengi.tsquarey.tech/#organization",
+        "@id": "https://techengi.in/#organization",
       },
     },
   ],
@@ -91,8 +99,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased" suppressHydrationWarning>
+    <html
+      lang="en"
+      className="h-full antialiased"
+      suppressHydrationWarning
+    >
       <head>
+        {/* Google Tag Manager - Head */}
+        <Script
+          id="google-tag-manager"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+              })(window,document,'script','dataLayer','${GTM_ID}');
+            `,
+          }}
+        />
+
+        {/* Existing theme initialization */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -110,18 +138,37 @@ export default function RootLayout({
                   }
                 } catch (e) {}
               })();
-            `
+            `,
           }}
         />
+
+        {/* Existing JSON-LD structured data */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd),
+          }}
         />
       </head>
+
       <body
         className={`min-h-full flex flex-col ${idGrotesk.variable} ${inter.variable}`}
       >
-        {/* Facebook Meta Pixel — skips auth/admin/dashboard routes, see components/FacebookPixel.tsx */}
+        {/* Google Tag Manager - Body (noscript fallback) */}
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+            height="0"
+            width="0"
+            style={{
+              display: "none",
+              visibility: "hidden",
+            }}
+            title="Google Tag Manager"
+          />
+        </noscript>
+
+        {/* Facebook Meta Pixel — skips auth/admin/dashboard routes */}
         <FacebookPixel />
 
         <Providers>

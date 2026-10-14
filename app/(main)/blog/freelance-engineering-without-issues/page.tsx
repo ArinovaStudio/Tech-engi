@@ -27,7 +27,7 @@ import {
 =============================================================== */
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://techengi.tsquarey.tech";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://techengi.in";
 const PATH = "/blog/freelance-engineering-without-issues";
 const URL_FULL = `${SITE_URL}${PATH}`;
 

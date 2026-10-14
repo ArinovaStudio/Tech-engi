@@ -1,18 +1,28 @@
 "use client";
 
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
-import type { CSSProperties, FormEvent } from "react";
+import type { CSSProperties, FormEvent, ReactNode } from "react";
 import { gsap } from "@/components/saas/gsapClient";
 import HeroTiles from "@/components/saas/HeroTiles";
 
 type ViewKey = "client" | "engineer" | "bug";
+
+type PillIconName = "bug" | "wrench" | "handshake" | "rocket" | "flag" | "users" | "search";
+
+// A pill either fills the message box with its label, or (upload: true) opens the file picker
+type Suggestion = {
+  label: string;
+  icon?: PillIconName;
+  upload?: boolean;
+  action?: () => void;
+};
 
 type View = {
   line1: string;
   line2: string;
   sub: string;
   placeholder: string;
-  suggestions: string[];
+  suggestions: Suggestion[];
   primary: { label: string; href: string };
 };
 
@@ -22,7 +32,11 @@ const VIEWS: Record<ViewKey, View> = {
     line2: "Get projects finished.",
     sub: "Tech Engi brings clients, engineers and students into one workspace. Start a project from zero, or hand over one that stalled halfway.",
     placeholder: "Describe your project…",
-    suggestions: ["Get project by professional", "Finish my stalled build", "Hire a small team"],
+    suggestions: [
+      { label: "Build my idea from scratch", icon: "rocket" },
+      { label: "Take over my stalled project and finish it", icon: "flag" },
+      { label: "Put a small team on my build", icon: "users" },
+    ],
     primary: { label: "Start a project", href: "#leads" },
   },
   engineer: {
@@ -30,15 +44,22 @@ const VIEWS: Record<ViewKey, View> = {
     line2: "Finish what you started.",
     sub: "Find leads that match your skills, join a team, or bring in a partner to finish your own unfinished build.",
     placeholder: "What do you build best?",
-    suggestions: ["Find React leads", "Join a team", "Find a partner to finish"],
+    suggestions: [
+      { label: "Help me to Find leads", icon: "search" },
+      { label: "Add me to a team on a live project", icon: "users" },
+      { label: "Find a partner to finish my unfinished build", icon: "handshake" },
+    ],
     primary: { label: "Browse leads", href: "#leads" },
   },
   bug: {
     line1: "Your bug doesn't wait for Monday.",
     line2: "Neither do we.",
-    sub: "Post the problem. Get matched with a verified engineer in hours. Pay only when it's fixed — just 5% platform fee.",
+    sub: "Keep your daily dose. Don’t let temporary bugs ruin your forever.",
     placeholder: "What's broken right now?",
-    suggestions: ["Debug project", "Fix a production bug", "Get project by professional"],
+    suggestions: [
+      { label: "Debug my project", icon: "wrench" },
+      { label: "Work as my coworker for today, ₹3,480", icon: "handshake", action: () => (window.open("https://techengi.in/login", "_blank")) },
+    ],
     primary: { label: "Post your first task", href: "#leads" },
   },
 };
@@ -51,8 +72,48 @@ const MIN_H = 44; // one line of text field (px)
 const MAX_H = 116; // four lines, then it scrolls (px)
 const HIDE_PILLS_AFTER = 10; // characters
 
+// Attachments: each file up to 20 MB, a zip up to 50 MB, never more than 50 MB in total.
+const MAX_FILE_BYTES = 20 * 1024 * 1024;
+const MAX_ZIP_BYTES = 50 * 1024 * 1024;
+const MAX_TOTAL_BYTES = MAX_ZIP_BYTES;
+
+// Allowed types, checked by file extension. The file dialog's own filter (accept) is only a
+// hint and can be switched to "All files", so addPicked() enforces the rules again.
+const FILE_EXTS = [".docx", ".pdf", ".png", ".jpg", ".jpeg"];
+const FILE_ACCEPT = [
+  ...FILE_EXTS,
+  "application/pdf",
+  "image/png",
+  "image/jpeg",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+].join(",");
+
+const extOf = (name: string) => name.slice(name.lastIndexOf(".")).toLowerCase();
+const isZip = (f: File) => extOf(f.name) === ".zip";
+const isAllowedFile = (f: File) => FILE_EXTS.includes(extOf(f.name));
+
+type Attachment = {
+  id: string;
+  kind: "file" | "image" | "zip";
+  name: string;
+  size: number;
+  file: File;
+};
+
+const totalBytes = (list: Attachment[]) => list.reduce((n, a) => n + a.size, 0);
+
+const fmtSize = (n: number) =>
+  n < 1024
+    ? `${n} B`
+    : n < 1024 * 1024
+      ? `${Math.round(n / 1024)} KB`
+      : `${(n / 1024 / 1024).toFixed(1)} MB`;
+
 const PANEL_CLS =
   "rounded-[28px] bg-white/75 backdrop-blur-md shadow-[inset_0_2px_6px_rgba(15,27,61,.10),inset_0_-1px_1px_rgba(255,255,255,.9),0_1px_0_rgba(255,255,255,.95),0_14px_32px_-14px_rgba(15,27,61,.28),0_0_0_1px_rgba(15,27,61,.06)]";
+
+// Same glass as the panel, with a smaller radius for the little "+" menu
+const MENU_CLS = PANEL_CLS.replace("rounded-[28px]", "rounded-2xl");
 
 const FIELD_CLS =
   "h-11 w-full rounded-full border-0 bg-[rgba(238,242,250,.75)] px-4 text-[14px] text-saas-ink outline-none ring-0 transition-shadow placeholder:text-saas-mut focus:outline-none focus:ring-0 shadow-[inset_0_2px_6px_rgba(15,27,61,.2),inset_0_1px_2px_rgba(15,27,61,.12),inset_0_-1px_1px_rgba(255,255,255,.95),0_1px_0_rgba(255,255,255,.95)] focus:shadow-[inset_0_2px_6px_rgba(15,27,61,.22),inset_0_1px_2px_rgba(15,27,61,.14),0_0_0_3px_rgba(110,168,255,.3)]";
@@ -81,6 +142,106 @@ const EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]
 // same rule as EMAIL_RE, written for the HTML pattern attribute
 const EMAIL_PATTERN = "[A-Za-z0-9._%+\\-]+@[A-Za-z0-9\\-]+(\\.[A-Za-z0-9\\-]+)*\\.[A-Za-z]{2,}";
 
+// Small outline icon wrapper (same stroke style as the other icons in this file)
+function Ico({ children, className = "h-4 w-4" }: { children: ReactNode; className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className={className}
+    >
+      {children}
+    </svg>
+  );
+}
+
+const FileGlyph = ({ className }: { className?: string }) => (
+  <Ico className={className}>
+    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+    <path d="M14 2v6h6" />
+  </Ico>
+);
+
+// Used for zip archives
+const ZipGlyph = ({ className }: { className?: string }) => (
+  <Ico className={className}>
+    <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
+  </Ico>
+);
+
+const ImageGlyph = ({ className }: { className?: string }) => (
+  <Ico className={className}>
+    <rect width="18" height="18" x="3" y="3" rx="2" />
+    <circle cx="9" cy="9" r="2" />
+    <path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21" />
+  </Ico>
+);
+
+function PillIcon({ name }: { name: PillIconName }) {
+  if (name === "handshake") {
+    return (
+      <span aria-hidden="true" className="text-[13px] leading-none">
+        🤝
+      </span>
+    );
+  }
+  return (
+    <Ico className="h-3.5 w-3.5">
+      {name === "bug" && (
+        <>
+          <path d="m8 2 1.88 1.88" />
+          <path d="M14.12 3.88 16 2" />
+          <path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1" />
+          <path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6" />
+          <path d="M12 20v-9" />
+          <path d="M6.53 9C4.6 8.8 3 7.1 3 5" />
+          <path d="M6 13H2" />
+          <path d="M3 21c0-2.1 1.7-3.9 3.8-4" />
+          <path d="M20.97 5c0 2.1-1.6 3.8-3.5 4" />
+          <path d="M22 13h-4" />
+          <path d="M17.2 17c2.1.1 3.8 1.9 3.8 4" />
+        </>
+      )}
+      {name === "wrench" && (
+        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+      )}
+      {name === "rocket" && (
+        <>
+          <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+          <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+          <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+          <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+        </>
+      )}
+      {name === "flag" && (
+        <>
+          <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+          <path d="M4 22v-7" />
+        </>
+      )}
+      {name === "users" && (
+        <>
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </>
+      )}
+      {name === "search" && (
+        <>
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.3-4.3" />
+        </>
+      )}
+    </Ico>
+  );
+}
+
 export default function Hero() {
   const [view, setView] = useState<ViewKey>("engineer");
   const [values, setValues] = useState<Record<ViewKey, string>>({
@@ -88,6 +249,14 @@ export default function Hero() {
     engineer: "",
     bug: "",
   });
+  // Attachments are kept per tab, like the message text
+  const [attachments, setAttachments] = useState<Record<ViewKey, Attachment[]>>({
+    client: [],
+    engineer: [],
+    bug: [],
+  });
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [attachMsg, setAttachMsg] = useState<{ text: string; error: boolean } | null>(null);
   const [labelW, setLabelW] = useState(0);
   const [fieldH, setFieldH] = useState(MIN_H);
   const [narrow, setNarrow] = useState(false);
@@ -105,10 +274,18 @@ export default function Hero() {
   const detailsRef = useRef<HTMLDivElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const taRef = useRef<HTMLTextAreaElement>(null);
+  const plusRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const zipInputRef = useRef<HTMLInputElement | null>(null);
 
   const v = VIEWS[view];
   const value = values[view];
+  const attached = attachments[view];
   const hasText = value.trim().length > 0;
+  const hasFiles = attached.length > 0;
+  // The message can be sent with text, files, or both
+  const ready = hasText || hasFiles;
   const pillW = (labelW || 140) + LABEL_PAD;
   const isCompose = step === "compose";
   const showPills = isCompose && value.length <= HIDE_PILLS_AFTER;
@@ -165,6 +342,31 @@ export default function Hero() {
     if (isCompose && taRef.current) taRef.current.scrollTop = 0;
   }, [isCompose]);
 
+  // Switching tab closes the "+" menu and clears any attachment notice
+  useEffect(() => {
+    setMenuOpen(false);
+    setAttachMsg(null);
+  }, [view]);
+
+  // "+" menu: close on outside click or Escape
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onDown = (e: PointerEvent) => {
+      const t = e.target as Node;
+      if (plusRef.current?.contains(t) || menuRef.current?.contains(t)) return;
+      setMenuOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [menuOpen]);
+
   const goStep = (next: Step) => {
     setAnimH(true); // animate the container height only while switching steps
     setStep(next);
@@ -206,7 +408,7 @@ export default function Hero() {
   // Step 1: send the message -> ask for contact details
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!hasText) {
+    if (!ready) {
       window.location.href = v.primary.href;
       return;
     }
@@ -220,41 +422,45 @@ export default function Hero() {
     window.setTimeout(() => setAnimH(false), 450);
   };
 
-  // Step 2: email + 10-digit phone required, name optional -> POST /api/new-request
+  // Step 2: email + 10-digit phone required, name optional -> POST /api/new-request (multipart)
   const handleDetails = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (sending) return;
 
     const form = e.currentTarget; // grab it now, it is gone after the await
-    const fd = new FormData(form);
-    const name = String(fd.get("name") ?? "").trim();
+    const fd = new FormData(form); // already holds name, email and phone
     const email = String(fd.get("email") ?? "").trim();
     const phone = String(fd.get("phone") ?? "").trim();
 
     if (!EMAIL_RE.test(email)) return showError("Please enter a valid email address.");
     if (!/^\d{10}$/.test(phone)) return showError("Phone number must be exactly 10 digits.");
 
+    // Same size rule as the picker, checked again right before sending
+    if (totalBytes(attached) > MAX_TOTAL_BYTES) {
+      return showError(`Attachments are limited to ${fmtSize(MAX_TOTAL_BYTES)} in total.`);
+    }
+
+    fd.set("role", view); // "client" | "engineer" | "bug"
+    fd.set("message", value.trim());
+    attached.forEach((a) => fd.append("attachments", a.file, a.name));
+
     setFormError("");
     setSending(true);
     try {
-      const res = await fetch("/api/new-request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          role: view, // "client" | "engineer" | "bug"
-          message: value.trim(),
-          name: name || undefined,
-          email,
-          phone,
-        }),
-      });
+      // No Content-Type header: the browser adds the multipart boundary itself
+      const res = await fetch("/api/new-request", { method: "POST", body: fd });
       const data = await res.json().catch(() => ({}));
+      if (res.status === 413) {
+        throw new Error("Your files are too large for the server. Try a smaller zip.");
+      }
       if (!res.ok) throw new Error(data?.error || "Something went wrong. Please try again.");
 
       form.reset();
       goStep("done");
       window.setTimeout(() => {
         setValue("");
+        setAttached([]);
+        setAttachMsg(null);
         goStep("compose");
       }, 3200);
     } catch (err) {
@@ -265,6 +471,68 @@ export default function Hero() {
   };
 
   const setValue = (text: string) => setValues((s) => ({ ...s, [view]: text }));
+  const setAttached = (list: Attachment[]) => setAttachments((s) => ({ ...s, [view]: list }));
+
+  // Add files (several at once, max 20 MB each) or a zip (max 50 MB)
+  const addPicked = (list: FileList | null, zipOnly: boolean) => {
+    if (!list || list.length === 0) return;
+    const problems: string[] = [];
+    const incoming: Attachment[] = [];
+
+    for (const f of Array.from(list)) {
+      const zip = isZip(f);
+      if (zipOnly) {
+        if (!zip) {
+          problems.push(`${f.name} is not a .zip file`);
+          continue;
+        }
+      } else if (!isAllowedFile(f)) {
+        problems.push(
+          zip
+            ? `${f.name} is a zip. Use "Upload a zip" instead`
+            : `${f.name} is not allowed (DOCX, PDF, PNG or JPG only)`
+        );
+        continue;
+      }
+      const limit = zip ? MAX_ZIP_BYTES : MAX_FILE_BYTES;
+      if (f.size > limit) {
+        problems.push(`${f.name} is over ${fmtSize(limit)}`);
+        continue;
+      }
+      incoming.push({
+        id: `${f.name}:${f.size}:${f.lastModified}`,
+        kind: zip ? "zip" : /\.(png|jpe?g)$/i.test(f.name) ? "image" : "file",
+        name: f.name,
+        size: f.size,
+        file: f,
+      });
+    }
+
+    // Re-adding the same file replaces it instead of duplicating it
+    const ids = new Set(incoming.map((a) => a.id));
+    const next = [...attached.filter((a) => !ids.has(a.id)), ...incoming];
+
+    if (totalBytes(next) > MAX_TOTAL_BYTES) {
+      setAttachMsg({
+        text: `Attachments are limited to ${fmtSize(MAX_TOTAL_BYTES)} in total.`,
+        error: true,
+      });
+      return;
+    }
+
+    setAttached(next);
+    setAttachMsg(problems.length ? { text: `${problems.join(". ")}.`, error: true } : null);
+  };
+
+  const removeAttachment = (id: string) => {
+    setAttached(attached.filter((a) => a.id !== id));
+    setAttachMsg(null);
+  };
+
+  const openPicker = (zip: boolean) => {
+    setMenuOpen(false);
+    (zip ? zipInputRef : fileInputRef).current?.click();
+  };
 
   return (
     <section
@@ -380,18 +648,45 @@ export default function Hero() {
 
           {/* Input + morphing button + pills */}
           <div className="hero-cta hero-entrance hero-entrance-delay-3 mt-7 w-full max-w-[540px] sm:mt-8">
+            {/* Hidden pickers: files/images (20 MB each), and a zip (50 MB) */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept={FILE_ACCEPT}
+              multiple
+              hidden
+              tabIndex={-1}
+              aria-hidden="true"
+              onChange={(e) => {
+                addPicked(e.target.files, false);
+                e.target.value = ""; // lets the same file be picked again
+              }}
+            />
+            <input
+              ref={zipInputRef}
+              type="file"
+              accept=".zip"
+              hidden
+              tabIndex={-1}
+              aria-hidden="true"
+              onChange={(e) => {
+                addPicked(e.target.files, true);
+                e.target.value = "";
+              }}
+            />
+
             {/* One box that morphs: short input -> full width -> contact-details card */}
             <div
               className="relative"
               style={{
-                paddingBottom: narrow && isCompose && !hasText ? CIRCLE + 10 : 0,
+                paddingBottom: narrow && isCompose && !ready ? CIRCLE + 10 : 0,
                 transition: "padding-bottom 380ms cubic-bezier(.7,0,.2,1)",
               }}
             >
               <div
                 className={`relative overflow-hidden ${PANEL_CLS} ${ringOn ? FOCUS_PLAIN : FOCUS_RING}`}
                 style={{
-                  width: hasText || narrow || !isCompose ? "100%" : `calc(100% - ${pillW + 12}px)`,
+                  width: ready || narrow || !isCompose ? "100%" : `calc(100% - ${pillW + 12}px)`,
                   height: isCompose ? fieldH + 12 : detailsH,
                   transition: `width 380ms cubic-bezier(.7,0,.2,1), height ${
                     animH ? "380ms cubic-bezier(.7,0,.2,1)" : "260ms cubic-bezier(.4,0,.2,1)"
@@ -405,10 +700,26 @@ export default function Hero() {
                   className="absolute inset-x-0 top-0 flex items-start p-1.5 pl-5"
                   style={{
                     ...composeLayer,
-                    paddingRight: hasText ? CIRCLE + 12 : 20,
+                    paddingRight: ready ? CIRCLE + 12 : 20,
                     transition: `${composeLayer.transition}, padding-right 380ms cubic-bezier(.7,0,.2,1)`,
                   }}
                 >
+                  {/* "+" : add files or a zip */}
+                  <button
+                    ref={plusRef}
+                    type="button"
+                    onClick={() => setMenuOpen((o) => !o)}
+                    aria-label="Add files or a zip"
+                    aria-haspopup="menu"
+                    aria-expanded={menuOpen}
+                    className="-ml-3.5 mr-2 grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/80 text-saas-ink transition hover:bg-white active:scale-95 shadow-[inset_0_1px_0_rgba(255,255,255,1),inset_0_-2px_4px_rgba(15,27,61,.08),0_6px_14px_-6px_rgba(15,27,61,.3),0_0_0_1px_rgba(15,27,61,.08)]"
+                  >
+                    <Ico className="h-[18px] w-[18px]">
+                      <path d="M5 12h14" />
+                      <path d="M12 5v14" />
+                    </Ico>
+                  </button>
+
                   <div
                     ref={fieldRef}
                     className="relative min-w-0 flex-1"
@@ -429,7 +740,7 @@ export default function Hero() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter" && !e.shiftKey) {
                           e.preventDefault();
-                          if (hasText) e.currentTarget.form?.requestSubmit();
+                          if (ready) e.currentTarget.form?.requestSubmit();
                         }
                       }}
                       placeholder={v.placeholder}
@@ -443,7 +754,7 @@ export default function Hero() {
                 {/* Content 2: contact details (or confirmation) */}
                 <div ref={detailsRef} className="absolute inset-x-0 top-0" style={detailsLayer}>
                   {step === "done" ? (
-                    <div className={`flex items-center gap-3 p-3 pb-0`}>
+                    <div className="flex items-center gap-3 p-3 pb-0">
                       <span className="hero-send grid h-11 w-11 shrink-0 place-items-center rounded-full bg-saas-ink text-white">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="h-[18px] w-[18px]">
                           <path d="m5 12.5 4.5 4.5L19 7.5" />
@@ -454,7 +765,7 @@ export default function Hero() {
                       </p>
                     </div>
                   ) : (
-                    <form onSubmit={handleDetails} className={`p-3`}>
+                    <form onSubmit={handleDetails} className="p-3">
                       <p className="px-2 py-2.5 text-[13px] text-saas-mut">Where can we reach you?</p>
                       <div className="flex flex-col gap-2 py-2">
                         <input
@@ -556,18 +867,47 @@ export default function Hero() {
                 />
               </div>
 
+              {/* "+" menu: sits outside the box (which clips its content) */}
+              {menuOpen && isCompose && (
+                <div
+                  ref={menuRef}
+                  role="menu"
+                  aria-label="Add files or a zip"
+                  className={`absolute left-0 top-full z-10 mt-2 w-60 p-1.5 ${MENU_CLS}`}
+                >
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => openPicker(false)}
+                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-[13px] text-saas-ink transition hover:bg-white"
+                  >
+                    <FileGlyph className="h-4 w-4 shrink-0 text-saas-mut" />
+                    Upload files (20MB max)
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => openPicker(true)}
+                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-[13px] text-saas-ink transition hover:bg-white"
+                  >
+                    <ZipGlyph className="h-4 w-4 shrink-0 text-saas-mut" />
+                    Upload a zip (50MB max)
+                  </button>
+                </div>
+              )}
+
               {/* Send button for step 1: rides along while the box morphs, then fades out */}
               <button
                 type="submit"
                 form={formId}
                 tabIndex={isCompose ? 0 : -1}
                 aria-hidden={!isCompose}
-                aria-label={hasText ? "Send" : v.primary.label}
+                aria-label={ready ? "Send" : v.primary.label}
                 className="hero-send absolute h-11 overflow-hidden rounded-full bg-saas-ink text-sm font-medium text-white hover:brightness-110 active:scale-95"
                 style={{
-                  width: hasText ? CIRCLE : pillW,
-                  right: hasText ? 6 : 0,
-                  bottom: hasText || !narrow ? 6 : 0,
+                  width: ready ? CIRCLE : pillW,
+                  right: ready ? 6 : 0,
+                  bottom: ready || !narrow ? 6 : 0,
                   opacity: isCompose ? 1 : 0,
                   pointerEvents: isCompose ? "auto" : "none",
                   transform: isCompose ? undefined : "scale(.8)",
@@ -587,7 +927,7 @@ export default function Hero() {
                 <span
                   ref={labelRef}
                   className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap transition-[opacity,transform] duration-200 ${
-                    hasText ? "scale-90 opacity-0" : "scale-100 opacity-100 delay-100"
+                    ready ? "scale-90 opacity-0" : "scale-100 opacity-100 delay-100"
                   }`}
                 >
                   {v.primary.label}
@@ -603,7 +943,7 @@ export default function Hero() {
                   strokeLinejoin="round"
                   aria-hidden="true"
                   className={`absolute left-1/2 top-1/2 h-[18px] w-[18px] -translate-x-1/2 -translate-y-1/2 transition-[opacity,transform] duration-300 ${
-                    hasText
+                    ready
                       ? "rotate-0 scale-100 opacity-100 delay-100"
                       : "-rotate-45 scale-50 opacity-0"
                   }`}
@@ -614,7 +954,50 @@ export default function Hero() {
               </button>
             </div>
 
-            {/* Pills: sit below the input, floating; they collapse away once the message passes 20 characters */}
+            {/* Attached files: chips under the box, each with a remove button */}
+            {hasFiles && step !== "done" && (
+              <ul className="flex flex-wrap items-center gap-2 pl-2 pr-3 pt-3" aria-label="Attachments">
+                {attached.map((a) => (
+                  <li
+                    key={a.id}
+                    className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-white/65 py-1 pl-3 pr-1 text-[13px] text-saas-ink backdrop-blur shadow-[inset_0_1px_0_rgba(255,255,255,.95),0_6px_14px_-8px_rgba(15,27,61,.3),0_0_0_1px_rgba(15,27,61,.06)]"
+                  >
+                    {a.kind === "zip" ? (
+                      <ZipGlyph className="h-3.5 w-3.5 shrink-0 text-saas-mut" />
+                    ) : a.kind === "image" ? (
+                      <ImageGlyph className="h-3.5 w-3.5 shrink-0 text-saas-mut" />
+                    ) : (
+                      <FileGlyph className="h-3.5 w-3.5 shrink-0 text-saas-mut" />
+                    )}
+                    <span className="max-w-[160px] truncate">{a.name}</span>
+                    <span className="shrink-0 text-saas-mut">{fmtSize(a.size)}</span>
+                    <button
+                      type="button"
+                      disabled={sending}
+                      onClick={() => removeAttachment(a.id)}
+                      aria-label={`Remove ${a.name}`}
+                      className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-saas-mut transition hover:bg-white hover:text-saas-ink disabled:opacity-50"
+                    >
+                      <Ico className="h-3 w-3">
+                        <path d="M18 6 6 18" />
+                        <path d="m6 6 12 12" />
+                      </Ico>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {attachMsg && step !== "done" && (
+              <p
+                role={attachMsg.error ? "alert" : "status"}
+                className={`px-2 pt-2 text-[13px] ${attachMsg.error ? "text-red-600" : "text-saas-mut"}`}
+              >
+                {attachMsg.text}
+              </p>
+            )}
+
+            {/* Pills: sit below the input, floating; they collapse away once the message passes 10 characters */}
             <div
               className="-mx-3 grid"
               style={{
@@ -628,7 +1011,7 @@ export default function Hero() {
                 <ul className="flex flex-wrap items-start gap-x-2 gap-y-2 pb-4 pl-5 pr-3 pt-4" aria-label="Suggestions">
                   {v.suggestions.map((s, i) => (
                     <li
-                      key={`${view}-${s}`}
+                      key={`${view}-${s.label}`}
                       className="hero-chip"
                       style={{
                         marginTop: [0, 6, 2][i % 3], // small fixed stagger
@@ -638,10 +1021,13 @@ export default function Hero() {
                     >
                       <button
                         type="button"
-                        onClick={() => setValue(s)}
-                        className="rounded-full bg-white/65 px-3.5 py-1.5 text-[13px] text-saas-mut backdrop-blur transition-all duration-300 hover:bg-white hover:text-saas-ink shadow-[inset_0_1px_0_rgba(255,255,255,.95),0_6px_14px_-8px_rgba(15,27,61,.3),0_0_0_1px_rgba(15,27,61,.06)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,1),0_10px_18px_-8px_rgba(15,27,61,.35),0_0_0_1px_rgba(15,27,61,.1)]"
+                        onClick={() => (s.action ? s.action() : setValue(s.label))}
+                        className={`rounded-full bg-white/65 px-3.5 py-1.5 text-[13px] text-saas-mut backdrop-blur transition-all duration-300 hover:bg-white hover:text-saas-ink shadow-[inset_0_1px_0_rgba(255,255,255,.95),0_6px_14px_-8px_rgba(15,27,61,.3),0_0_0_1px_rgba(15,27,61,.06)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,1),0_10px_18px_-8px_rgba(15,27,61,.35),0_0_0_1px_rgba(15,27,61,.1)]${
+                          s.icon ? " inline-flex items-center gap-1.5" : ""
+                        }`}
                       >
-                        {s}
+                        {s.icon && <PillIcon name={s.icon} />}
+                        {s.label}
                       </button>
                     </li>
                   ))}

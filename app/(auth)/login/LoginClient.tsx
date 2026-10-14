@@ -216,7 +216,7 @@ export default function LoginClient() {
 
                                     <p className="mt-10 text-center text-sm text-gray-500 dark:text-slate-400">
                                         Don&apos;t have an account?{" "}
-                                        <Link href="/register/client" className="text-[#f0b31e] hover:underline font-semibold">
+                                        <Link href="/register" className="text-[#f0b31e] hover:underline font-semibold">
                                             Register here
                                         </Link>
                                     </p>

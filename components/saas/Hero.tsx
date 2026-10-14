@@ -57,7 +57,7 @@ const VIEWS: Record<ViewKey, View> = {
     sub: "Keep your daily dose. Don’t let temporary bugs ruin your forever.",
     placeholder: "What's broken right now?",
     suggestions: [
-      { label: "Debug my project", icon: "wrench" },
+      { label: "Debug my project", icon: "wrench", action: () => (window.open("https://techengi.in/login", "_blank")) },
       { label: "Work as my coworker for today, ₹3,480", icon: "handshake", action: () => (window.open("https://techengi.in/login", "_blank")) },
     ],
     primary: { label: "Post your first task", href: "#leads" },

@@ -9,6 +9,7 @@ import {
   Flag,
   Lock,
   ShieldAlert,
+  TrendingDown,
 } from "lucide-react";
 
 /* ===============================================================
@@ -62,6 +63,16 @@ type Post = {
 };
 
 const posts: Post[] = [
+  {
+    title: "Indian IT Is Breaking Its Own People — Then Blaming AI For the Layoffs",
+    description:
+      "Unpaid overtime, understaffed teams, bugs that cost companies millions, and layoffs blamed on AI that was never the real reason. Here's what's actually happening inside Indian IT in 2026.",
+    href: "/blog/indian-it-burnout-overtime-bugs-ai-layoffs-2026",
+    date: "2026-10-17",
+    dateLabel: "17 October 2026",
+    readTime: "7 min read",
+    visual: <BurnoutCover />,
+  },
   {
     title: "How to Avoid Scammer or Cheating Freelancers (Before They Cost You)",
     description:
@@ -250,6 +261,43 @@ function Meta({ post, className = "" }: { post: Post; className?: string }) {
 /* ===============================================================
    COVER VISUALS (pure HTML/Tailwind, no image files)
 =============================================================== */
+
+function BurnoutCover() {
+  const rows = [
+    { l: "Reported workday", v: "16 hrs", w: "100%", c: "bg-red-500" },
+    { l: "Legal overtime cap", v: "6 hrs/wk", w: "22%", c: "bg-[#1257e8]" },
+  ];
+  return (
+    <div className="w-full max-w-[300px] rounded-[22px] bg-white p-5 shadow-[0_20px_50px_rgba(5,10,48,0.12)]" aria-hidden="true">
+      <div className="flex items-center justify-between">
+        <p className="text-[13px] font-bold">Hours vs the law</p>
+        <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2.5 py-1 text-[10px] font-semibold text-red-700">
+          <Flag size={11} />
+          Unpaid
+        </span>
+      </div>
+      <ul className="mt-4 space-y-3.5">
+        {rows.map((r) => (
+          <li key={r.l}>
+            <div className="flex items-center justify-between text-[11.5px] font-semibold">
+              <span className="text-slate-600">{r.l}</span>
+              <span>{r.v}</span>
+            </div>
+            <div className="mt-1.5 h-3 w-full overflow-hidden rounded-full bg-slate-100">
+              <span className={`block h-full rounded-full ${r.c}`} style={{ width: r.w }} />
+            </div>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-4 flex items-center gap-2.5 rounded-xl bg-[#050a30] p-3 text-white">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500 text-[#050a30]">
+          <TrendingDown size={14} />
+        </span>
+        <p className="text-[11.5px] font-semibold">100,000+ layoffs blamed on AI</p>
+      </div>
+    </div>
+  );
+}
 
 function ScamCover() {
   const rows = ["100% upfront", "Pay today", "Move to WhatsApp"];

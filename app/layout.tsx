@@ -28,7 +28,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://techengi.in"),
   title: {
-    default: "Tech Engi | Engineering Solutions & Expert Support",
+    default: "Tech Engi |  India’s first AI Match Freelance platform ",
     template: "%s | Tech Engi",
   },
   description:

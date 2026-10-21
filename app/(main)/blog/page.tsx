@@ -3,13 +3,16 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import {
   ArrowRight,
+  BadgeCheck,
   Check,
   Clock3,
   FileSignature,
   Flag,
   Lock,
   ShieldAlert,
+  ShieldCheck,
   TrendingDown,
+  UserCheck,
 } from "lucide-react";
 
 /* ===============================================================
@@ -63,6 +66,36 @@ type Post = {
 };
 
 const posts: Post[] = [
+  {
+    title: "₹3,480 for a Co-Worker Who Clears Your Task List: Hire a Verified Engineer for a Day",
+    description:
+      "Overloaded, behind on a sprint, or no tech team? Book a verified Tech Engi engineer as your co-worker for a full day at ₹3,480. What you get, the maths, and how it works.",
+    href: "/blog/hire-coworker-for-a-day-3480",
+    date: "2026-10-27",
+    dateLabel: "27 October 2026",
+    readTime: "6 min read",
+    visual: <CoworkerCover />,
+  },
+  {
+    title: "My Code Is Not Working: How to Fix It, Who Can Fix It, and How Soon",
+    description:
+      "Code broken and deadline close? What to try first, whether ChatGPT can fix it, who to ask, how fast a bug can be fixed, and how to share code safely.",
+    href: "/blog/who-can-fix-my-code-how-soon",
+    date: "2026-10-23",
+    dateLabel: "23 October 2026",
+    readTime: "9 min read",
+    visual: <FixCodeCover />,
+  },
+  {
+    title: "The 14 Bugs That Break Code Every Day (And Why Even Senior Engineers Get Stuck)",
+    description:
+      "From undefined errors to race conditions and legacy code: the bugs that stall students and senior engineers alike, and when to call a human expert.",
+    href: "/blog/common-coding-bugs-why-hard-to-fix",
+    date: "2026-10-21",
+    dateLabel: "21 October 2026",
+    readTime: "8 min read",
+    visual: <BugsCover />,
+  },
   {
     title: "Indian IT Is Breaking Its Own People — Then Blaming AI For the Layoffs",
     description:
@@ -261,6 +294,113 @@ function Meta({ post, className = "" }: { post: Post; className?: string }) {
 /* ===============================================================
    COVER VISUALS (pure HTML/Tailwind, no image files)
 =============================================================== */
+
+function CoworkerCover() {
+  return (
+    <div className="w-full max-w-[300px] rounded-[22px] bg-white p-5 shadow-[0_20px_50px_rgba(5,10,48,0.12)]" aria-hidden="true">
+      <div className="flex items-center justify-between">
+        <p className="text-[13px] font-bold">Co-worker for a day</p>
+        <span className="inline-flex items-center gap-1 rounded-full bg-[#e6eeff] px-2.5 py-1 text-[10px] font-semibold text-[#1257e8]">
+          <BadgeCheck size={11} />
+          Verified
+        </span>
+      </div>
+      <div className="mt-4 flex items-end justify-between rounded-xl bg-amber-100 p-4">
+        <p className="text-[30px] font-bold leading-none tracking-[-0.04em]">₹3,480</p>
+        <p className="text-right text-[10.5px] leading-4 text-slate-600">
+          flat rate<br />full working day
+        </p>
+      </div>
+      <ul className="mt-4 space-y-2">
+        {["Tasks and hours agreed upfront", "You review what ships"].map((t) => (
+          <li key={t} className="flex items-center gap-2.5 text-[11.5px] font-semibold">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#1257e8] text-white">
+              <Check size={11} strokeWidth={3} />
+            </span>
+            {t}
+          </li>
+        ))}
+      </ul>
+      <div className="mt-4 flex items-center gap-2.5 rounded-xl bg-[#050a30] p-3 text-white">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500 text-[#050a30]">
+          <ShieldCheck size={14} />
+        </span>
+        <p className="text-[11.5px] font-semibold">Aadhaar, PAN, experience checked</p>
+      </div>
+    </div>
+  );
+}
+
+function FixCodeCover() {
+  const progress = [
+    { t: "Bug posted", done: true },
+    { t: "Matched to a verified engineer", done: true },
+    { t: "Fix in progress", done: false },
+  ];
+  return (
+    <div className="w-full max-w-[300px] overflow-hidden rounded-[22px] bg-white shadow-[0_20px_50px_rgba(5,10,48,0.12)]" aria-hidden="true">
+      <div className="bg-[#050a30] p-4 font-mono text-[11px] leading-5 text-white">
+        <p className="text-white/50">$ deploy --prod</p>
+        <p className="text-red-300">500 Internal Server Error</p>
+        <p className="text-white/70">Login fails after deploy</p>
+      </div>
+      <div className="p-4">
+        <ul className="space-y-2.5">
+          {progress.map((p) => (
+            <li key={p.t} className="flex items-center gap-2.5 text-[11.5px] font-semibold">
+              <span
+                className={`flex h-5 w-5 items-center justify-center rounded-full ${
+                  p.done ? "bg-[#1257e8] text-white" : "border border-slate-300 text-transparent"
+                }`}
+              >
+                <Check size={11} strokeWidth={3} />
+              </span>
+              {p.t}
+            </li>
+          ))}
+        </ul>
+        <div className="mt-4 flex items-center gap-2.5 rounded-xl bg-amber-100 p-3">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500 text-[#050a30]">
+            <UserCheck size={14} />
+          </span>
+          <p className="text-[11.5px] font-bold">AI matches. Humans fix.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BugsCover() {
+  const rows = [
+    { l: "Easy", t: "Minutes", w: "18%", c: "bg-emerald-500" },
+    { l: "Medium", t: "Hours", w: "40%", c: "bg-amber-500" },
+    { l: "Hard", t: "A day+", w: "68%", c: "bg-orange-500" },
+    { l: "Nightmare", t: "Weeks", w: "100%", c: "bg-red-600" },
+  ];
+  return (
+    <div className="w-full max-w-[300px] rounded-[22px] bg-white p-5 shadow-[0_20px_50px_rgba(5,10,48,0.12)]" aria-hidden="true">
+      <div className="flex items-center justify-between">
+        <p className="text-[13px] font-bold">14 bug families</p>
+        <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2.5 py-1 text-[10px] font-semibold text-red-700">
+          Stuck for hours?
+        </span>
+      </div>
+      <ul className="mt-4 space-y-3">
+        {rows.map((r) => (
+          <li key={r.l}>
+            <div className="flex items-center justify-between text-[11.5px] font-semibold">
+              <span>{r.l}</span>
+              <span className="text-slate-500">{r.t}</span>
+            </div>
+            <div className="mt-1.5 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
+              <span className={`block h-full rounded-full ${r.c}`} style={{ width: r.w }} />
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 function BurnoutCover() {
   const rows = [

@@ -1,0 +1,44 @@
+# Tech Engi
+
+> Tech Engi (techengi.in) is India's AI-matched freelance network for bug fixing and engineering work. Clients post a bug, feature or project; an AI (LLM) matches it to a verified engineer by project title, description, tech stack, skills and budget; and an experienced human engineer does the work. AI matches. Humans fix. Tech Engi is a platform of TSquareY1 OPC Private Limited, a DPIIT- and MSME-recognised startup based in Chennai, Tamil Nadu, India, founded by Tarun Patak K.
+
+Key facts:
+
+- Focus: bug fixing first, especially for corporate teams; also CRM, ERP, SaaS, AI development, embedded systems and IoT.
+- How it works for clients: post the requirement, pay 25% upfront to confirm, get matched by AI, track progress live, pay by milestone through escrow.
+- Co-worker for a day: a verified engineer works through your agreed task list for one working day for ₹3,480.
+- For engineers: no bidding, no tokens or credits, no profile ranking, no fee to close a deal. Engineers keep 97% of what the client pays on their first project and 95% on every project after.
+- Tech Engi Pro: optional ₹734 plan for engineers that sends client leads by email. Escrow protection applies only to work run through the Tech Engi dashboard.
+- Verification: engineers submit Aadhaar, PAN and proof of experience before taking work.
+- Who it's for: corporate teams and managers, QA testers, debuggers, junior/senior/full-stack/MERN developers, freshers, students (help with their own projects), startups and founders.
+- Tagline: "Tech Engi — where engineers build without overhead."
+
+## Start
+
+- [About Tech Engi](https://techengi.in/about): what Tech Engi is, how it works, pricing, verification and company details
+- [Post a bug or project](https://techengi.in/register/client): for clients, founders and companies
+- [Join as an engineer](https://techengi.in/register/engineer): for developers, QA testers and freelancers
+
+## Blog
+
+- [The 14 bugs that break code every day](https://techengi.in/blog/common-coding-bugs-why-hard-to-fix): common bug types, difficulty, and why senior engineers get stuck too
+- [Who can fix my code, and how soon?](https://techengi.in/blog/who-can-fix-my-code-how-soon): what to try first, whether AI can fix it, who can, how fast, and sharing code safely
+- [₹3,480 co-worker for a day](https://techengi.in/blog/hire-coworker-for-a-day-3480): hire a verified engineer for one working day in India
+- [How to fix your code without AI](https://techengi.in/blog/how-to-fix-code-without-ai): a 9-step human debugging method and free tools by language
+- [My developer left and the project is unfinished](https://techengi.in/blog/developer-left-unfinished-project): what to secure, finish vs rebuild, and how to find someone to finish it
+- [Cost to hire a developer or fix a bug in India](https://techengi.in/blog/cost-to-hire-developer-fix-bug-india): 2026 freelance rates, per-day salary cost, platform fees and Tech Engi pricing
+- [Indian IT is breaking its own people](https://techengi.in/blog/indian-it-burnout-overtime-bugs-ai-layoffs-2026): burnout, overtime, bugs and AI layoffs in Indian IT
+- [How to avoid scammer freelancers](https://techengi.in/blog/how-to-avoid-scammer-freelancers): red flags and fixes when hiring freelancers
+- [Freelance engineering without the chaos](https://techengi.in/blog/freelance-engineering-without-issues): how Tech Engi helps freelance engineers finish work
+
+## Company
+
+- [Tech Engi on LinkedIn](https://www.linkedin.com/company/tech-engi)
+- [TSquareY1 OPC Private Limited on LinkedIn](https://www.linkedin.com/company/tsquarey1)
+- [Founder: Tarun Patak K](https://www.linkedin.com/in/tarunpatak)
+- Contact: support@techengi.in · Chennai, Tamil Nadu, India
+
+## Optional
+
+- [Privacy policy](https://techengi.in/privacy-policy)
+- [Terms and conditions](https://techengi.in/terms-and-conditions)

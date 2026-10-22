@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import {
+  AlertTriangle,
   ArrowRight,
   BadgeCheck,
   Check,
@@ -66,6 +67,36 @@ type Post = {
 };
 
 const posts: Post[] = [
+  {
+    title: "How Much Does It Cost to Hire a Developer or Fix a Bug in India? (2026)",
+    description:
+      "Freelance developer rates in India by experience, what a full-time engineer costs per day, platform fees, what drives bug-fix cost, and Tech Engi's ₹3,480 co-worker day.",
+    href: "/blog/cost-to-hire-developer-fix-bug-india",
+    date: "2026-11-03",
+    dateLabel: "3 November 2026",
+    readTime: "7 min read",
+    visual: <CostCover />,
+  },
+  {
+    title: "My Developer Left and the Project Is Unfinished: How to Get It Finished",
+    description:
+      "Your developer disappeared mid-project. What to secure in the first 48 hours, how to judge finish vs rebuild, what to hand the next engineer, and how to find someone to finish it in India.",
+    href: "/blog/developer-left-unfinished-project",
+    date: "2026-10-31",
+    dateLabel: "31 October 2026",
+    readTime: "7 min read",
+    visual: <UnfinishedCover />,
+  },
+  {
+    title: "How to Fix Your Code Without AI: A Human Debugging Method That Actually Works",
+    description:
+      "No ChatGPT, no Copilot. A 9-step human debugging method, the right tools for Python, JavaScript, React, Node, SQL and embedded, and when to call a human expert.",
+    href: "/blog/how-to-fix-code-without-ai",
+    date: "2026-10-29",
+    dateLabel: "29 October 2026",
+    readTime: "8 min read",
+    visual: <HumanDebugCover />,
+  },
   {
     title: "₹3,480 for a Co-Worker Who Clears Your Task List: Hire a Verified Engineer for a Day",
     description:
@@ -294,6 +325,120 @@ function Meta({ post, className = "" }: { post: Post; className?: string }) {
 /* ===============================================================
    COVER VISUALS (pure HTML/Tailwind, no image files)
 =============================================================== */
+
+function CostCover() {
+  return (
+    <div className="w-full max-w-[300px] rounded-[22px] bg-white p-5 shadow-[0_20px_50px_rgba(5,10,48,0.12)]" aria-hidden="true">
+      <div className="flex items-center justify-between">
+        <p className="text-[13px] font-bold">Cost per working day</p>
+        <span className="inline-flex items-center gap-1 rounded-full bg-[#e6eeff] px-2.5 py-1 text-[10px] font-semibold text-[#1257e8]">
+          India, 2026
+        </span>
+      </div>
+      <ul className="mt-4 space-y-3.5">
+        <li>
+          <div className="flex items-center justify-between text-[11.5px] font-semibold">
+            <span className="text-slate-600">₹12 LPA engineer</span>
+            <span className="text-red-600">~₹4,800</span>
+          </div>
+          <div className="mt-1.5 h-3 w-full overflow-hidden rounded-full bg-slate-100">
+            <span className="block h-full w-full rounded-full bg-red-400" />
+          </div>
+        </li>
+        <li>
+          <div className="flex items-center justify-between text-[11.5px] font-semibold">
+            <span className="text-slate-600">Tech Engi co-worker day</span>
+            <span className="text-[#1257e8]">₹3,480</span>
+          </div>
+          <div className="mt-1.5 h-3 w-full overflow-hidden rounded-full bg-slate-100">
+            <span className="block h-full rounded-full bg-[#1257e8]" style={{ width: "72.5%" }} />
+          </div>
+        </li>
+      </ul>
+      <div className="mt-4 flex items-center gap-2.5 rounded-xl bg-[#050a30] p-3 text-white">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500 text-[#050a30]">
+          <BadgeCheck size={14} />
+        </span>
+        <p className="text-[11.5px] font-semibold">Freelance rates from $14 to $95 an hour</p>
+      </div>
+    </div>
+  );
+}
+
+function UnfinishedCover() {
+  const secure = ["Repo in your name", "Hosting and domain", "API keys rotated"];
+  return (
+    <div className="w-full max-w-[300px] rounded-[22px] bg-white p-5 shadow-[0_20px_50px_rgba(5,10,48,0.12)]" aria-hidden="true">
+      <div className="flex items-center justify-between">
+        <p className="text-[13px] font-bold">Project status</p>
+        <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2.5 py-1 text-[10px] font-semibold text-red-700">
+          <AlertTriangle size={11} />
+          Developer gone
+        </span>
+      </div>
+      <div className="mt-4">
+        <div className="flex items-center justify-between text-[11.5px] font-semibold">
+          <span>&ldquo;80% done&rdquo;</span>
+          <span className="text-slate-500">Launch hasn&apos;t moved</span>
+        </div>
+        <div className="mt-1.5 h-3 w-full overflow-hidden rounded-full bg-slate-100">
+          <span className="block h-full rounded-full bg-[#1257e8]" style={{ width: "80%" }} />
+        </div>
+      </div>
+      <ul className="mt-4 space-y-2">
+        {secure.map((t) => (
+          <li key={t} className="flex items-center gap-2.5 text-[11.5px] font-semibold">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#1257e8] text-white">
+              <Check size={11} strokeWidth={3} />
+            </span>
+            {t}
+          </li>
+        ))}
+      </ul>
+      <div className="mt-4 flex items-center gap-2.5 rounded-xl bg-[#050a30] p-3 text-white">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500 text-[#050a30]">
+          <UserCheck size={14} />
+        </span>
+        <p className="text-[11.5px] font-semibold">Takeover by a verified engineer</p>
+      </div>
+    </div>
+  );
+}
+
+function HumanDebugCover() {
+  return (
+    <div className="w-full max-w-[300px] overflow-hidden rounded-[22px] bg-white shadow-[0_20px_50px_rgba(5,10,48,0.12)]" aria-hidden="true">
+      <div className="bg-[#050a30] p-4 font-mono text-[11px] leading-5 text-white">
+        <p className="text-white/50">$ node --inspect app.js</p>
+        <p className="text-emerald-300">Debugger attached.</p>
+        <p className="mt-1.5 inline-flex rounded-full bg-amber-500 px-2.5 py-0.5 font-sans text-[10px] font-bold text-[#050a30]">
+          No AI needed
+        </p>
+      </div>
+      <div className="p-4">
+        <p className="text-[12px] font-bold">The 9-step method</p>
+        <ol className="mt-3 grid grid-cols-9 gap-1">
+          {Array.from({ length: 9 }).map((_, i) => (
+            <li
+              key={i}
+              className={`flex h-7 items-center justify-center rounded-md text-[11px] font-bold ${
+                i < 5 ? "bg-[#1257e8] text-white" : "bg-amber-100 text-[#050a30]"
+              }`}
+            >
+              {i + 1}
+            </li>
+          ))}
+        </ol>
+        <div className="mt-3 flex items-center gap-2.5 rounded-xl bg-amber-100 p-3">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500 text-[#050a30]">
+            <UserCheck size={14} />
+          </span>
+          <p className="text-[11.5px] font-bold">Still stuck? A human fixes it.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function CoworkerCover() {
   return (

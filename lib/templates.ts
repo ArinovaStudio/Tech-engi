@@ -367,3 +367,67 @@ export const userUnsuspendedTemplate = (name: string, customMessage: string) => 
   </div>
 </div>
 `;
+
+export const clientProjectInvitationEmailTemplate = (
+  clientName: string,
+  projectTitle: string,
+  projectDescription: string,
+  engineerEarnings: number,
+  inviteLink: string,
+  customNote?: string
+) => {
+  return `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e5e7eb; border-radius: 16px; background-color: #ffffff; color: #111827;">
+      
+      <div style="text-align: center; margin-bottom: 24px;">
+        <span style="background-color: #ecfdf5; color: #059669; padding: 6px 16px; border-radius: 9999px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid #a7f3d0;">
+          Direct Client Invitation
+        </span>
+      </div>
+      
+      <h2 style="color: #111827; text-align: center; margin-bottom: 8px; font-size: 24px; font-weight: 800;">You're Invited to Work on a Project!</h2>
+      <p style="color: #4b5563; text-align: center; font-size: 15px; margin-top: 0;">
+        <strong>${clientName}</strong> has personally invited you to engineer their project on Tech-Engi.
+      </p>
+
+      ${customNote ? `
+      <div style="background-color: #f8fafc; border-left: 4px solid #3b82f6; padding: 14px 18px; border-radius: 8px; margin: 20px 0;">
+        <p style="margin: 0 0 4px 0; color: #64748b; font-size: 12px; font-weight: 700; text-transform: uppercase;">Message from Client:</p>
+        <p style="margin: 0; color: #334155; font-size: 14px; font-style: italic; line-height: 1.5;">"${customNote}"</p>
+      </div>
+      ` : ''}
+      
+      <div style="background-color: #f9fafb; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #e5e7eb;">
+        <p style="margin: 0 0 6px 0; color: #6b7280; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Project Title</p>
+        <p style="margin: 0; color: #111827; font-size: 18px; font-weight: 700;">${projectTitle}</p>
+        
+        <p style="margin: 16px 0 6px 0; color: #6b7280; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Overview</p>
+        <p style="margin: 0; color: #374151; font-size: 14px; line-height: 1.6;">${projectDescription || "No description provided."}</p>
+      </div>
+
+      <div style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 20px; border-radius: 12px; text-align: center; margin: 24px 0; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
+        <p style="margin: 0 0 4px 0; font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Your Guaranteed Payout</p>
+        <p style="margin: 0; font-size: 32px; font-weight: 800;">₹${engineerEarnings.toLocaleString('en-IN')}</p>
+        <p style="margin: 4px 0 0 0; font-size: 12px; opacity: 0.85;">70% milestone payout upon completion</p>
+      </div>
+
+      <div style="text-align: center; margin: 32px 0;">
+        <a href="${inviteLink}" 
+           style="background-color: #10b981; color: white; padding: 14px 32px; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);">
+          View & Accept Project Invitation →
+        </a>
+      </div>
+
+      <p style="color: #6b7280; font-size: 13px; line-height: 1.5; text-align: center;">
+        Or copy and paste this link in your browser:<br/>
+        <a href="${inviteLink}" style="color: #2563eb; word-break: break-all;">${inviteLink}</a>
+      </p>
+      
+      <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 30px 0 16px;" />
+      
+      <p style="color: #9ca3af; font-size: 12px; text-align: center; margin: 0;">
+        Tech-Engi • Connecting Visionary Clients with World-Class Hardware Engineers
+      </p>
+    </div>
+  `;
+};

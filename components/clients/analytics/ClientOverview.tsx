@@ -4,7 +4,9 @@ import { format } from 'date-fns/format';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
 
-const ClientOverview = ({ data, projectId }: { data: any, projectId: any }) => {
+const ClientOverview = ({ data, projectId, onInviteEngineer }: { data: any, projectId: any, onInviteEngineer?: () => void }) => {
+  const [status, setStatus] = useState("");
+
   if (!data) return (
     <div className="p-6 text-center text-red-500 dark:text-red-400">No project data available</div>
   );
@@ -19,8 +21,6 @@ const ClientOverview = ({ data, projectId }: { data: any, projectId: any }) => {
   const projectManager = data.projectManager || 'Unassigned';
   const overallProgress = data.overallProgress ?? 0;
   const circumference = +(2 * Math.PI * 80).toFixed(1);
-
-  const [status, setStatus] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,7 +103,18 @@ const ClientOverview = ({ data, projectId }: { data: any, projectId: any }) => {
                   {/* Project Engineer */}
                   <div id="engineer-card" className="bg-gray-100 dark:bg-gray-800 w-full rounded-2xl p-5 shadow-sm border border-gray-400/50 dark:border-gray-700">
                     <div className="flex flex-col items-start gap-1">
-                      <span className="text-xs text-gray-600 dark:text-gray-400">Project Engineer</span>
+                      <div className="flex items-center justify-between w-full">
+                        <span className="text-xs text-gray-600 dark:text-gray-400">Project Engineer</span>
+                        {onInviteEngineer && (
+                          <button
+                            type="button"
+                            onClick={onInviteEngineer}
+                            className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 flex items-center gap-0.5 cursor-pointer transition-colors"
+                          >
+                            + Invite
+                          </button>
+                        )}
+                      </div>
                       <p className="text-lg font-bold text-gray-900 dark:text-white truncate w-full">{projectManager}</p>
                     </div>
                   </div>

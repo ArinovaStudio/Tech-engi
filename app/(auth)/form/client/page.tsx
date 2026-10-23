@@ -103,7 +103,7 @@ export default function ClientFormPage() {
                   value={totalProjects}
                   onChange={(e) => setTotalProjects(e.target.value)}
                   placeholder="e.g. 5"
-                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
+                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
                 />
               </div>
 
@@ -115,7 +115,7 @@ export default function ClientFormPage() {
                   value={totalBudget}
                   onChange={(e) => setTotalBudget(e.target.value)}
                   placeholder="e.g. 50000"
-                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
+                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
                 />
               </div>
 
@@ -128,7 +128,7 @@ export default function ClientFormPage() {
                     onChange={(e) => setExpertiseInput(e.target.value)}
                     onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addExpertise(); } }}
                     placeholder="e.g. Embedded Systems"
-                    className="flex-1 px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
+                    className="flex-1 px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
                   />
                   <button
                     type="button"

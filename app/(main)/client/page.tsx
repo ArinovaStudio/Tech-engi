@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, Suspense } from 'react';
-import { Loader, AlertCircle, Filter, Search, Calendar, Plus } from 'lucide-react';
+import { Loader, AlertCircle, Filter, Search, Calendar, Plus, UserPlus } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import ClientOverview from '@/components/clients/analytics/ClientOverview';
 import DesignOverview from '@/components/clients/analytics/DesignOverview';
@@ -9,6 +9,7 @@ import RiskBlockage from '@/components/clients/analytics/RiskBlockage';
 import Milestones from '@/components/clients/analytics/Milestones';
 import BudgetAndDocs from '@/components/clients/analytics/BudgetAndDocs';
 import { CreateProjectModal } from '@/components/project/CreateProjectModal';
+import InviteEngineerModal from '@/components/clients/InviteEngineerModal';
 import { useTour } from '@/hooks/useTour';
 
 interface Project {
@@ -32,6 +33,8 @@ interface User {
 
 const ProjectAnalyticsView = ({ projectAnalytics, projectId, setShowProjects, user }: any) => {
   useTour(user?.id ?? '');
+  const [showInviteModal, setShowInviteModal] = useState(false);
+
   return (
     <div className="space-y-10">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -39,13 +42,29 @@ const ProjectAnalyticsView = ({ projectAnalytics, projectId, setShowProjects, us
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{projectAnalytics?.overview?.name || 'Project Analytics'}</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">Analytics dashboard for your project</p>
         </div>
-        <button id="switch-project-btn"
-          onClick={() => { setShowProjects(true); window.history.pushState({}, '', window.location.pathname); }}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap">
-          Switch Project
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            id="invite-engineer-btn"
+            onClick={() => setShowInviteModal(true)}
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors whitespace-nowrap font-medium flex items-center gap-2 cursor-pointer shadow-sm text-sm"
+          >
+            <UserPlus size={16} />
+            Invite Engineer
+          </button>
+          <button
+            id="switch-project-btn"
+            onClick={() => { setShowProjects(true); window.history.pushState({}, '', window.location.pathname); }}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap font-medium text-sm cursor-pointer"
+          >
+            Switch Project
+          </button>
+        </div>
       </div>
-      <ClientOverview data={projectAnalytics?.overview} projectId={projectId} />
+      <ClientOverview
+        data={projectAnalytics?.overview}
+        projectId={projectId}
+        onInviteEngineer={() => setShowInviteModal(true)}
+      />
       <DesignOverview data={projectAnalytics?.projects} />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
@@ -57,6 +76,15 @@ const ProjectAnalyticsView = ({ projectAnalytics, projectId, setShowProjects, us
         </div>
       </div>
       <BudgetAndDocs data={projectAnalytics?.budget} tasks={projectAnalytics?.projects} projects={projectAnalytics?.projects} />
+
+      <InviteEngineerModal
+        isOpen={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
+        projectId={projectId}
+        projectName={projectAnalytics?.overview?.name}
+        projectBudget={projectAnalytics?.overview?.budget}
+        assignedEngineer={projectAnalytics?.overview?.projectManager}
+      />
     </div>
   );
 };

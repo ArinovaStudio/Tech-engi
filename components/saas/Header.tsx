@@ -6,10 +6,11 @@ import { List, X } from "@phosphor-icons/react";
 import Image from "next/image";
 
 const LINKS = [
-  { href: "#who", label: "Platform" },
-  { href: "#how", label: "How it works" },
-  { href: "#leads", label: "Leads" },
-  { href: "#faq", label: "FAQ" },
+  { href: "/#who", label: "Platform" },
+  { href: "/#how", label: "How it works" },
+  { href: "/#leads", label: "Leads" },
+  { href: "/blog", label: "Blog" },
+  { href: "/#faq", label: "FAQ" },
 ];
 
 export default function Header() {
@@ -31,25 +32,24 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-[9] border-b border-saas-line/80 bg-white backdrop-blur-[14px]">
+    <header className="sticky top-0 z-[9] border-b border-saas-line/80 bg-white/95 backdrop-blur-[14px]">
       <div className="mx-auto flex h-16 max-w-8xl items-center justify-between gap-3 px-4 sm:px-6 md:h-[76px] md:px-8">
-        <a
-          href="#top"
+        <Link
+          href="/"
           className="flex shrink-0 items-center gap-2 text-lg font-semibold text-saas-ink sm:gap-2.5 sm:text-xl"
           onClick={() => setOpen(false)}
         >
-            <span
-              className=" text-[22px] font-benz tracking-tight text-black dark:text-white lg:mr-4 lg:border-r-2 lg:border-gray-300 lg:pr-4 " >
-              <Image src="/imagelogodiffcrop.png" alt="Tech Engi logo" width={150} height={150} />
-            </span>
-        </a>
+          <span className="text-[22px] font-benz tracking-tight text-black dark:text-white lg:mr-4 lg:border-r-2 lg:border-gray-300 lg:pr-4">
+            <Image src="/imagelogodiffcrop.png" alt="Tech Engi logo" width={150} height={150} priority />
+          </span>
+        </Link>
 
         {/* Desktop nav */}
         <nav className="hidden gap-6 text-[0.95rem] md:flex lg:gap-9">
           {LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="transition-colors hover:text-saas-ink">
+            <Link key={l.href} href={l.href} className="transition-colors hover:text-saas-ink">
               {l.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -90,7 +90,7 @@ export default function Header() {
             aria-hidden={!open}
           >
             {LINKS.map((l) => (
-              <a
+              <Link
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
@@ -98,7 +98,7 @@ export default function Header() {
                 className="border-b border-saas-line/70 py-3.5 text-base text-saas-tx transition-colors hover:text-saas-ink"
               >
                 {l.label}
-              </a>
+              </Link>
             ))}
 
             {/* Login lives here on phones, since the header button is hidden below sm */}

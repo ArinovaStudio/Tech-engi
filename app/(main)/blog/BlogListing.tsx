@@ -66,9 +66,27 @@ export default function BlogListing({ posts }: BlogListingProps) {
     });
   }, [posts, selectedCategory, searchQuery]);
 
-  // The featured post is the first item of the full list (or first of filtered)
-  const featured = filteredPosts[0];
-  const rest = filteredPosts.slice(1);
+  // The absolute latest blog is always the first item in the full sorted posts array
+  const latestPost = posts[0];
+
+  // The big banner should show the latest blog only:
+  // - Show on the default "All" view with no active search
+  // - Or when specifically viewing the category of the latest post with no active search
+  // - Never show any other/older blog as the big banner!
+  const isLatestCategory =
+    latestPost &&
+    (selectedCategory === "All" ||
+      latestPost.category.toLowerCase() === selectedCategory.toLowerCase());
+
+  const showBigBanner =
+    Boolean(latestPost) &&
+    !searchQuery.trim() &&
+    isLatestCategory &&
+    filteredPosts.some((p) => p.href === latestPost.href);
+
+  // The list of posts to show in the grid:
+  // If the big banner is active, exclude latestPost so it is NOT duplicated in the grid below
+  // If the big banner is inactive, show all filtered posts in the grid
 
   return (
     <div className="w-full">
@@ -84,20 +102,18 @@ export default function BlogListing({ posts }: BlogListingProps) {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 cursor-pointer ${
-                    active
+                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 cursor-pointer ${active
                       ? "bg-saas-ink text-white shadow-saas-btn"
                       : "border border-saas-line bg-white/80 text-saas-tx hover:border-saas-accent/40 hover:text-saas-ink hover:bg-white"
-                  }`}
+                    }`}
                 >
                   <span>{cat}</span>
                   {count > 0 && (
                     <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                        active
+                      className={`rounded-full px-2 py-0.5 text-xs font-semibold ${active
                           ? "bg-white/20 text-white"
                           : "bg-saas-icon-bg text-saas-accent"
-                      }`}
+                        }`}
                     >
                       {count}
                     </span>
@@ -181,47 +197,47 @@ export default function BlogListing({ posts }: BlogListingProps) {
           </div>
         ) : (
           <>
-            {/* Featured Post (Only show full banner if search is empty or matches) */}
-            {featured && (
+            {/* Featured Post (Big banner showing the latest blog only) */}
+            {showBigBanner && latestPost && (
               <div className="mb-14">
                 <Link
-                  href={featured.href}
-                  className="card group grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12 cursor-pointer"
+                  href={latestPost.href}
+                  className="card group grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12 cursor-pointer shadow-saas-card hover:shadow-saas-card-hover"
                 >
                   <div className="flex flex-col">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-saas-icon-bg px-3.5 py-1 text-xs font-semibold text-saas-accent">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-saas-icon-bg px-3.5 py-1 text-xs font-semibold text-saas-accent shadow-2xs">
                         <Sparkles size={12} />
                         Latest Guide
                       </span>
-                      {featured.category && (
+                      {latestPost.category && (
                         <span className="rounded-full border border-saas-line bg-white px-3 py-1 text-xs font-medium text-saas-tx">
-                          {featured.category}
+                          {latestPost.category}
                         </span>
                       )}
                     </div>
 
                     <h2 className="mt-5 text-2xl font-bold leading-[1.18] tracking-tight text-saas-ink transition-colors group-hover:text-saas-accent sm:text-3xl lg:text-[32px]">
-                      {featured.title}
+                      {latestPost.title}
                     </h2>
 
-                    <p className="mt-4 text-[15px] leading-relaxed text-saas-tx">
-                      {featured.description}
+                    <p className="mt-4 text-[15px] leading-relaxed text-saas-tx line-clamp-3">
+                      {latestPost.description}
                     </p>
 
                     <div className="mt-6 flex flex-wrap items-center gap-4 text-xs text-saas-mut">
                       <span className="inline-flex items-center gap-1.5">
                         <Calendar size={13} className="text-saas-accent" />
-                        <time dateTime={featured.date}>{featured.dateLabel}</time>
+                        <time dateTime={latestPost.date}>{latestPost.dateLabel}</time>
                       </span>
                       <span className="inline-flex items-center gap-1.5">
                         <Clock3 size={13} className="text-saas-accent" />
-                        {featured.readTime}
+                        {latestPost.readTime}
                       </span>
                     </div>
 
                     <div className="mt-8">
-                      <span className="btn inline-flex items-center gap-2 text-sm">
+                      <span className="btn inline-flex items-center gap-2 text-sm shadow-saas-btn">
                         Read the article
                         <ArrowRight size={16} />
                       </span>
@@ -230,7 +246,7 @@ export default function BlogListing({ posts }: BlogListingProps) {
 
                   <div className="relative">
                     <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-white to-saas-bg border border-saas-line/80 p-6 shadow-sm">
-                      {featured.visual}
+                      {latestPost.visual}
                     </div>
                   </div>
                 </Link>
@@ -238,7 +254,7 @@ export default function BlogListing({ posts }: BlogListingProps) {
             )}
 
             {/* Grid of Remaining Posts */}
-            {rest.length > 0 && (
+            {filteredPosts.length > 0 && (
               <div>
                 <div className="mb-6 flex items-center justify-between">
                   <h3 className="text-xl font-bold text-saas-ink">
@@ -247,12 +263,12 @@ export default function BlogListing({ posts }: BlogListingProps) {
                       : "Matching Articles"}
                   </h3>
                   <span className="text-xs text-saas-mut">
-                    {rest.length} {rest.length === 1 ? "article" : "articles"}
+                    {filteredPosts.length} {filteredPosts.length === 1 ? "article" : "articles"}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {rest.map((post) => (
+                  {filteredPosts.map((post) => (
                     <Link
                       key={post.href}
                       href={post.href}

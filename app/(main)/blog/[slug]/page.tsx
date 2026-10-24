@@ -436,7 +436,7 @@ export default function DynamicBlogSlugPage({
                   {/* Sticky Table of Contents Sidebar */}
                   {headings.length > 0 && (
                     <aside className="hidden lg:block sticky top-28">
-                      <div className="surface rounded-3xl border border-saas-line bg-white/80 p-6 shadow-sm backdrop-blur-md">
+                      <div className="">
                         <p className="text-xs font-bold uppercase tracking-wider text-saas-mut">
                           On this page
                         </p>

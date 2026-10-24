@@ -5,7 +5,7 @@ export const dataset =
   process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
 
 export const projectId =
-  process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "";
+  process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "aachh2bz";
 
 export const useCdn = process.env.NODE_ENV === "production";
 

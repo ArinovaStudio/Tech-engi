@@ -65,17 +65,6 @@ type Post = BlogPostItem;
 
 const staticPosts: Post[] = [
   {
-    title: "How Much Does It Cost to Hire a Developer or Fix a Bug in India? (2026)",
-    description:
-      "Freelance developer rates in India by experience, what a full-time engineer costs per day, platform fees, what drives bug-fix cost, and Tech Engi's ₹3,480 co-worker day.",
-    href: "/blog/cost-to-hire-developer-fix-bug-india",
-    date: "2026-11-03",
-    dateLabel: "3 November 2026",
-    readTime: "7 min read",
-    category: "Hiring & Costs",
-    visual: <CostCover />,
-  },
-  {
     title: "My Developer Left and the Project Is Unfinished: How to Get It Finished",
     description:
       "Your developer disappeared mid-project. What to secure in the first 48 hours, how to judge finish vs rebuild, what to hand the next engineer, and how to find someone to finish it in India.",
@@ -85,6 +74,17 @@ const staticPosts: Post[] = [
     readTime: "7 min read",
     category: "Freelance Safety",
     visual: <UnfinishedCover />,
+  },
+  {
+    title: "How Much Does It Cost to Hire a Developer or Fix a Bug in India? (2026)",
+    description:
+      "Freelance developer rates in India by experience, what a full-time engineer costs per day, platform fees, what drives bug-fix cost, and Tech Engi's ₹3,480 co-worker day.",
+    href: "/blog/cost-to-hire-developer-fix-bug-india",
+    date: "2026-10-25",
+    dateLabel: "25 October 2026",
+    readTime: "7 min read",
+    category: "Hiring & Costs",
+    visual: <CostCover />,
   },
   {
     title: "How to Fix Your Code Without AI: A Human Debugging Method That Actually Works",
@@ -205,7 +205,8 @@ function SanityDefaultCover({
    PAGE COMPONENT
 =============================================================== */
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function BlogIndexPage() {
   // Fetch dynamic posts from Sanity (with graceful fallback if not yet configured)
@@ -250,6 +251,8 @@ export default async function BlogIndexPage() {
             sizes="(max-width: 768px) 100vw, 400px"
           />
         </div>
+      ) : sp.slug === "developer-left-unfinished-project" ? (
+        <UnfinishedCover />
       ) : (
         <SanityDefaultCover title={sp.title} categories={sp.categories} />
       ),

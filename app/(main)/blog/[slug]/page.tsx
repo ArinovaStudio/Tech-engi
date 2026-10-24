@@ -354,7 +354,7 @@ export default function DynamicBlogSlugPage({
                       <aside className="surface mb-12 rounded-3xl p-7 sm:p-8">
                         <div className="flex items-center gap-2 text-saas-ink font-bold text-[17px]">
                           <Sparkles size={18} className="text-saas-accent" />
-                          <h3>TKey Takeaways</h3>
+                          <h3>Key Takeaways</h3>
                         </div>
                         <p className="mt-3.5 text-[15px] leading-relaxed text-saas-tx whitespace-pre-line">
                           {post.tldr}

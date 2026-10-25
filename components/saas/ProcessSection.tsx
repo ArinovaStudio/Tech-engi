@@ -137,8 +137,8 @@ const STEPS: {
   {
     icon: ChartLineUp,
     illo: IlloMatch,
-    title: "Get matched in 24 hours",
-    body: "We break the work into milestones and send a custom quote based on scope and skills.",
+    title: "Get matched in 2 to 24 hours",
+    body: "Most matches happen within 2 hours (24 hours maximum). We define clear milestones and scope.",
     rows: [
       { label: "Milestone 1", value: "Requirements" },
       { label: "Milestone 2", value: "Prototype" },
@@ -170,8 +170,8 @@ const STEPS: {
   {
     icon: CheckCircle,
     illo: IlloPay,
-    title: "Approve and pay — just 5% fee",
-    body: "Approve each milestone. Payment is released and the finished files are yours.",
+    title: "Approve and pay — 0% client fee",
+    body: "Approve each milestone before funds release. Clients pay 0% fee; engineers keep 97% on 1st project (95% after).",
     rows: [
       { label: "Milestone 3", value: "Approved", done: true },
       { label: "Payment", value: "Released", done: true },

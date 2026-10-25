@@ -13,7 +13,7 @@ const TAGS = [
 const POINTS = [
   "Real briefs from real companies",
   "Mentor support from working engineers",
-  "Every project — keep 95% of what you earn",
+  "Every project — keep 97% on your first project, 95% after",
 ];
 
 export default function StudentsSection() {

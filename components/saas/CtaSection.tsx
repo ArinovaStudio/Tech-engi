@@ -13,8 +13,8 @@ export default function CtaSection() {
             </h2>
 
             <p className="mt-4 text-base sm:text-lg">
-              Post the bug, hire an engineer for overflow work, or register to
-              start earning — keep 95% of every project.
+              Post your bug with 0% client fee, hire an engineer for overflow work, or register to
+              start earning — keep 97% on your first project (95% after).
             </p>
 
             <div className="mt-6 flex flex-col gap-3 sm:mt-7 sm:flex-row">

@@ -28,26 +28,32 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://techengi.in"),
   title: {
-    default: "Tech Engi |  India’s first AI Match Freelance platform ",
+    default: "Tech Engi | India's First AI Match Freelance Platform",
     template: "%s | Tech Engi",
   },
   description:
-    "Tech Engi connects students, startups, and companies with engineering experts for embedded systems, IoT, PCB design, robotics, AI, and prototyping projects.",
+    "Tech Engi connects founders, startups, and companies with verified Indian engineers for AI bug fixing, code takeovers, and ₹3,480 day-pass co-working.",
+  alternates: {
+    canonical: "https://techengi.in/",
+  },
   robots: {
     index: true,
     follow: true,
     googleBot: {
       index: true,
       follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
     },
   },
   openGraph: {
     type: "website",
-    url: "https://techengi.in",
+    url: "https://techengi.in/",
     siteName: "Tech Engi",
-    title: "Tech Engi | Engineering Solutions & Expert Support",
+    title: "Tech Engi | India's First AI Match Freelance Platform",
     description:
-      "Tech Engi connects students, startups, and companies with engineering experts for embedded systems, IoT, PCB design, robotics, AI, and prototyping projects.",
+      "Tech Engi connects founders, startups, and companies with verified Indian engineers for AI bug fixing, code takeovers, and ₹3,480 day-pass co-working.",
     images: [
       {
         url: "/logo-transparent.png",
@@ -59,9 +65,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tech Engi | Engineering Solutions & Expert Support",
+    title: "Tech Engi | India's First AI Match Freelance Platform",
     description:
-      "Tech Engi connects students, startups, and companies with engineering experts for embedded systems, IoT, PCB design, robotics, AI, and prototyping projects.",
+      "Tech Engi connects founders, startups, and companies with verified Indian engineers for AI bug fixing, code takeovers, and ₹3,480 day-pass co-working.",
     images: ["/logo-transparent.png"],
   },
 };
@@ -73,8 +79,27 @@ const jsonLd = {
       "@type": "Organization",
       "@id": "https://techengi.in/#organization",
       name: "Tech Engi",
+      legalName: "TSquareY1 OPC Private Limited",
       url: "https://techengi.in",
-      logo: "https://techengi.in/logo-transparent.png",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://techengi.in/logo-transparent.png",
+      },
+      founder: {
+        "@type": "Person",
+        name: "Tarun Patak K",
+      },
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Chennai",
+        addressRegion: "Tamil Nadu",
+        addressCountry: "IN",
+      },
+      contactPoint: {
+        "@type": "ContactPoint",
+        email: "support@techengi.in",
+        contactType: "customer service",
+      },
       sameAs: [
         "https://www.linkedin.com/company/tsquarey1",
         "https://www.instagram.com/tsy1_tech.engi",
@@ -86,6 +111,8 @@ const jsonLd = {
       "@id": "https://techengi.in/#website",
       url: "https://techengi.in",
       name: "Tech Engi",
+      description:
+        "India's first AI-matched freelance platform for verified engineering work and bug resolution.",
       publisher: {
         "@id": "https://techengi.in/#organization",
       },

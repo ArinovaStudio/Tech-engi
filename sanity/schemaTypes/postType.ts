@@ -15,11 +15,33 @@ export const postType = defineType({
       name: "slug",
       title: "Slug",
       type: "slug",
+      description:
+        "The URL slug for this article (e.g. 'my-article-title'). Do not include '/blog/' or spaces.",
       options: {
         source: "title",
         maxLength: 96,
+        slugify: (input: string) =>
+          input
+            .toLowerCase()
+            .trim()
+            .replace(/^\/?(blog\/)?/i, "")
+            .replace(/\/+$/, "")
+            .replace(/\s+/g, "-")
+            .replace(/[^\w-]+/g, "")
+            .slice(0, 96),
       },
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) =>
+        Rule.required().custom((slug) => {
+          if (!slug?.current) return "Slug is required";
+          if (slug.current.includes(" ")) return "Slug cannot contain spaces";
+          if (slug.current.startsWith("/") || slug.current.endsWith("/")) {
+            return "Slug cannot start or end with a slash '/'";
+          }
+          if (slug.current.toLowerCase().startsWith("blog/")) {
+            return "Slug should not include 'blog/'. Just the article name (e.g. 'my-first-post')";
+          }
+          return true;
+        }),
     }),
     defineField({
       name: "metaTitle",

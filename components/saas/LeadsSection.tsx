@@ -27,18 +27,18 @@ export default function LeadsSection() {
       <div className="section-glow" />
       <div className="relative mx-auto max-w-[1200px] px-8">
         <h2 className="reveal max-w-[820px]">
-          Verified Engineers <span className="text-saas-mut">see every open task. First to respond gets it.</span>
+          AI-Matched Projects. <span className="text-saas-mut">No bidding, no race. Matched by stack & domain.</span>
         </h2>
         <p className="reveal">
-          Every client project is different, so each one is quoted on its own. Engineers on a
-          subscription see every open lead and can respond to the ones that fit.
+          Every client project is analyzed and matched with verified engineers based on domain expertise,
+          technical stack, and verified experience. No bidding wars, no proposal spam.
         </p>
 
         <div className="bento">
           <div className="card reveal relative bento-4 bento-row-2 justify-start! overflow-hidden p-0!">
             <div className="flex items-center justify-between border-b border-saas-line px-7 py-5 text-saas-ink">
-              <b>Leads panel</b>
-              <span className="text-sm text-saas-mut">All · New · Saved</span>
+              <b>Verified project matching</b>
+              <span className="text-sm text-saas-mut">AI Matched · Escrow Protected</span>
             </div>
             {LEADS.map((lead) => (
               <div
@@ -52,14 +52,14 @@ export default function LeadsSection() {
                   <small className="text-saas-mut">{lead.meta}</small>
                 </div>
                 <em className="rounded-full bg-[#6EA8FF]/18 px-3 py-1 text-[0.8rem] not-italic text-saas-accent-2">
-                  Open
+                  Matched
                 </em>
               </div>
             ))}
             <div 
             onClick={() => setIsOpen(true)}
-            className="absolute bottom-8 left-1/2 hover:scale-90 transition-all cursor-pointer -translate-x-1/2 whitespace-nowrap rounded-full bg-saas-nav px-[22px] py-3 font-medium text-white shadow-saas-btn">
-              Full panel with a subscription
+            className="absolute bottom-8 left-1/2 hover:scale-95 transition-all cursor-pointer -translate-x-1/2 whitespace-nowrap rounded-full bg-saas-nav px-[22px] py-3 font-medium text-white shadow-saas-btn">
+              Explore engineer matching
             </div>
           </div>
 
@@ -67,8 +67,8 @@ export default function LeadsSection() {
             <span className="icon-tile">
               <Briefcase size={26} weight="regular" color="#4F6BEA" />
             </span>
-            <h3>Clients get a custom quote</h3>
-            <p>Post your brief and get a quote based on scope, skills and timeline.</p>
+            <h3>Post a project — 0% client fee</h3>
+            <p>Tell us your bug, stack, or project scope. Get an AI-matched engineer in 2 to 24 hours.</p>
             <Link href="/register/client" className="btn-outline mt-6 inline-flex">
               Request a quote
             </Link>
@@ -78,10 +78,10 @@ export default function LeadsSection() {
             <span className="icon-tile">
               <Key size={26} weight="regular" color="#4F6BEA" />
             </span>
-            <h3>Engineers Register free and see every open task </h3>
-            <p>Filter by domain, respond before it’s taken. </p>
+            <h3>Engineers register free and get matched</h3>
+            <p>Keep 97% on your first project (95% after). No bidding credits, no cut-rate contests.</p>
             <Link href="/register/engineer" className="btn mt-6 inline-flex">
-              Subscribe for leads
+              Join as an engineer
             </Link>
           </div>
         </div>

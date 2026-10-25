@@ -38,9 +38,9 @@ const META_DESCRIPTION =
 
 const AUTHOR = "Tarun Pathak K";
 const AUTHOR_ROLE = "Founder, Tech Engi";
-const PUBLISHED = "2026-11-03";
-const MODIFIED = "2026-11-03";
-const PUBLISHED_LABEL = "3 November 2026";
+const PUBLISHED = "2026-10-24";
+const MODIFIED = "2026-10-24";
+const PUBLISHED_LABEL = "24 October 2026";
 const READ_TIME = "7 min read";
 
 const KEYWORDS = [

@@ -127,8 +127,8 @@ export default function Footer() {
               <h3 className={colTitle}>Contact info</h3>
               <ul className="mt-4 grid list-none gap-3 p-0">
                 <li>
-                  <a href="mailto:techengi@tsquarey.tech" className={`${link} break-all`}>
-                    techengi@tsquarey.tech
+                  <a href="mailto:support@techengi.in" className={`${link} break-all`}>
+                    support@techengi.in
                   </a>
                 </li>
               </ul>

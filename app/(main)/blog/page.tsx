@@ -65,34 +65,34 @@ type Post = BlogPostItem;
 
 const staticPosts: Post[] = [
   {
-    title: "My Developer Left and the Project Is Unfinished: How to Get It Finished",
-    description:
-      "Your developer disappeared mid-project. What to secure in the first 48 hours, how to judge finish vs rebuild, what to hand the next engineer, and how to find someone to finish it in India.",
-    href: "/blog/developer-left-unfinished-project",
-    date: "2026-10-31",
-    dateLabel: "31 October 2026",
-    readTime: "7 min read",
-    category: "Freelance Safety",
-    visual: <UnfinishedCover />,
-  },
-  {
     title: "How Much Does It Cost to Hire a Developer or Fix a Bug in India? (2026)",
     description:
       "Freelance developer rates in India by experience, what a full-time engineer costs per day, platform fees, what drives bug-fix cost, and Tech Engi's ₹3,480 co-worker day.",
     href: "/blog/cost-to-hire-developer-fix-bug-india",
-    date: "2026-10-25",
-    dateLabel: "25 October 2026",
+    date: "2026-10-24",
+    dateLabel: "24 October 2026",
     readTime: "7 min read",
     category: "Hiring & Costs",
     visual: <CostCover />,
+  },
+  {
+    title: "My Developer Left and the Project Is Unfinished: How to Get It Finished",
+    description:
+      "Your developer disappeared mid-project. What to secure in the first 48 hours, how to judge finish vs rebuild, what to hand the next engineer, and how to find someone to finish it in India.",
+    href: "/blog/developer-left-unfinished-project",
+    date: "2026-10-23",
+    dateLabel: "23 October 2026",
+    readTime: "7 min read",
+    category: "Freelance Safety",
+    visual: <UnfinishedCover />,
   },
   {
     title: "How to Fix Your Code Without AI: A Human Debugging Method That Actually Works",
     description:
       "No ChatGPT, no Copilot. A 9-step human debugging method, the right tools for Python, JavaScript, React, Node, SQL and embedded, and when to call a human expert.",
     href: "/blog/how-to-fix-code-without-ai",
-    date: "2026-10-29",
-    dateLabel: "29 October 2026",
+    date: "2026-10-22",
+    dateLabel: "22 October 2026",
     readTime: "8 min read",
     category: "Bug Fixing",
     visual: <HumanDebugCover />,
@@ -102,8 +102,8 @@ const staticPosts: Post[] = [
     description:
       "Overloaded, behind on a sprint, or no tech team? Book a verified Tech Engi engineer as your co-worker for a full day at ₹3,480. What you get, the maths, and how it works.",
     href: "/blog/hire-coworker-for-a-day-3480",
-    date: "2026-10-27",
-    dateLabel: "27 October 2026",
+    date: "2026-10-21",
+    dateLabel: "21 October 2026",
     readTime: "6 min read",
     category: "Hiring & Costs",
     visual: <CoworkerCover />,
@@ -113,8 +113,8 @@ const staticPosts: Post[] = [
     description:
       "Code broken and deadline close? What to try first, whether ChatGPT can fix it, who to ask, how fast a bug can be fixed, and how to share code safely.",
     href: "/blog/who-can-fix-my-code-how-soon",
-    date: "2026-10-23",
-    dateLabel: "23 October 2026",
+    date: "2026-10-19",
+    dateLabel: "19 October 2026",
     readTime: "9 min read",
     category: "Bug Fixing",
     visual: <FixCodeCover />,
@@ -124,8 +124,8 @@ const staticPosts: Post[] = [
     description:
       "From undefined errors to race conditions and legacy code: the bugs that stall students and senior engineers alike, and when to call a human expert.",
     href: "/blog/common-coding-bugs-why-hard-to-fix",
-    date: "2026-10-21",
-    dateLabel: "21 October 2026",
+    date: "2026-10-18",
+    dateLabel: "18 October 2026",
     readTime: "8 min read",
     category: "Bug Fixing",
     visual: <BugsCover />,
@@ -233,10 +233,17 @@ export default async function BlogIndexPage() {
         ? sp.categories[0].title
         : "Engineering";
 
+    const cleanSlug = (sp.slug || "")
+      .toLowerCase()
+      .trim()
+      .replace(/^\/?(blog\/)?/i, "")
+      .replace(/\/+$/, "")
+      .replace(/\s+/g, "-");
+
     return {
       title: sp.title,
       description: sp.description,
-      href: `/blog/${sp.slug}`,
+      href: `/blog/${cleanSlug}`,
       date: sp.publishedAt || new Date().toISOString(),
       dateLabel: formattedDate,
       readTime: sp.readTime || "5 min read",
@@ -251,7 +258,7 @@ export default async function BlogIndexPage() {
             sizes="(max-width: 768px) 100vw, 400px"
           />
         </div>
-      ) : sp.slug === "developer-left-unfinished-project" ? (
+      ) : cleanSlug === "developer-left-unfinished-project" ? (
         <UnfinishedCover />
       ) : (
         <SanityDefaultCover title={sp.title} categories={sp.categories} />

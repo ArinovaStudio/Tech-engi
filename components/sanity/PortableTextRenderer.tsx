@@ -184,9 +184,18 @@ const components: PortableTextComponents = {
     faqBlock: ({ value }) => {
       const items: { question: string; answer: string }[] = value.items || [];
       if (!items.length) return null;
+      const faqId = value.title
+        ? value.title
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/(^-|-$)+/g, "")
+        : "faq";
 
       return (
-        <div className="my-12 rounded-3xl border border-saas-line/80 bg-white/70 p-6 sm:p-8 shadow-saas-panel backdrop-blur-sm">
+        <div
+          id={faqId || "faq"}
+          className="scroll-mt-28 my-12 rounded-3xl border border-saas-line/80 bg-white/70 p-6 sm:p-8 shadow-saas-panel backdrop-blur-sm"
+        >
           {value.title && (
             <div className="mb-6 flex items-center gap-2.5">
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-saas-icon-bg text-saas-accent">
@@ -230,7 +239,7 @@ const components: PortableTextComponents = {
       return (
         <h2
           id={id || undefined}
-          className="scroll-mt-24 mt-14 mb-4 text-[26px] font-bold leading-[1.2] tracking-tight text-saas-ink sm:text-[30px]"
+          className="scroll-mt-28 mt-14 mb-4 text-[26px] font-bold leading-[1.2] tracking-tight text-saas-ink sm:text-[30px]"
         >
           {children}
         </h2>
@@ -246,17 +255,28 @@ const components: PortableTextComponents = {
       return (
         <h3
           id={id || undefined}
-          className="scroll-mt-24 mt-10 mb-3 text-[21px] font-bold leading-[1.25] tracking-tight text-saas-ink sm:text-[24px]"
+          className="scroll-mt-28 mt-10 mb-3 text-[21px] font-bold leading-[1.25] tracking-tight text-saas-ink sm:text-[24px]"
         >
           {children}
         </h3>
       );
     },
-    h4: ({ children }) => (
-      <h4 className="mt-8 mb-2 text-[18px] font-bold leading-tight text-saas-ink">
-        {children}
-      </h4>
-    ),
+    h4: ({ children, value }) => {
+      const text = getBlockText(value);
+      const id = text
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)+/g, "");
+
+      return (
+        <h4
+          id={id || undefined}
+          className="scroll-mt-28 mt-8 mb-2 text-[18px] font-bold leading-tight text-saas-ink"
+        >
+          {children}
+        </h4>
+      );
+    },
     blockquote: ({ children }) => (
       <blockquote className="my-7 rounded-r-2xl border-l-4 border-saas-accent bg-saas-icon-bg/40 py-4 pl-6 pr-5 text-[16.5px] italic leading-relaxed text-saas-ink">
         {children}

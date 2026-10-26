@@ -1,6 +1,6 @@
 import Header from "@/components/saas/Header";
 import Hero from "@/components/saas/Hero";
-import StatsBar from "@/components/saas/StatsBar";
+import ExplainerSlidesSection from "@/components/saas/ExplainerSlidesSection";
 import AudienceSection from "@/components/saas/AudienceSection";
 import SplitFeature from "@/components/saas/SplitFeature";
 import StudentsSection from "@/components/saas/StudentsSection";
@@ -32,7 +32,7 @@ export default function SaasLanding() {
 
         <main id="top" className="w-full">
           <Hero />
-          <StatsBar />
+          <ExplainerSlidesSection />
           <AudienceSection />
 
           <SplitFeature

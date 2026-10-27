@@ -1,5 +1,5 @@
 import Header from "@/components/saas/Header";
-import Hero from "@/components/saas/Hero";
+import Hero from "@/components/saas/HeroUgly";
 import ExplainerSlidesSection from "@/components/saas/ExplainerSlidesSection";
 import AudienceSection from "@/components/saas/AudienceSection";
 import SplitFeature from "@/components/saas/SplitFeature";

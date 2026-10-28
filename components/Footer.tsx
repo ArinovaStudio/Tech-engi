@@ -55,13 +55,13 @@ const Footer = () => {
 
           <ul className="space-y-2">
             <li>
-              <Link href="/register/engineer" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 dark:text-slate-400 hover:text-black dark:hover:text-white font-id flex items-center gap-1 " >
+              <Link href="/register" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 dark:text-slate-400 hover:text-black dark:hover:text-white font-id flex items-center gap-1 " >
                 <span className="text-gray-400">›</span>
                 Join as Builder
               </Link>
             </li>
             <li>
-              <Link href="/register/client" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 dark:text-slate-400 hover:text-black dark:hover:text-white font-id flex items-center gap-1 " >
+              <Link href="/register" className=" text-[16px] sm:text-[17px] lg:text-[18px] text-gray-600 dark:text-slate-400 hover:text-black dark:hover:text-white font-id flex items-center gap-1 " >
                 <span className="text-gray-400">›</span>
                 Start a Project
               </Link>

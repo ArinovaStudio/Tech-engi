@@ -5,7 +5,7 @@ import type { CSSProperties, FormEvent, ReactNode } from "react";
 import { gsap } from "@/components/saas/gsapClient";
 import HeroTiles from "@/components/saas/HeroTiles";
 
-type ViewKey = "client" | "engineer" | "bug";
+type ViewKey = "client" | "engineer";
 
 type PillIconName = "bug" | "wrench" | "handshake" | "rocket" | "flag" | "users" | "search";
 
@@ -28,8 +28,8 @@ type View = {
 
 const VIEWS: Record<ViewKey, View> = {
   client: {
-    line1: "Get projects built.",
-    line2: "Get projects finished.",
+    line1: "You imagine it.",
+    line2: "We ship it.",
     sub: "Tech Engi brings clients, engineers and students into one workspace. Start a project from zero, or hand over one that stalled halfway.",
     placeholder: "Describe your project…",
     suggestions: [
@@ -50,21 +50,21 @@ const VIEWS: Record<ViewKey, View> = {
       { label: "Find a partner to finish my unfinished build", icon: "handshake" },
     ],
     primary: { label: "Browse leads", href: "#leads" },
-  },
-  bug: {
-    line1: "Your bug doesn't wait for Monday.",
-    line2: "Neither do we.",
-    sub: "Keep your daily dose. Don’t let temporary bugs ruin your forever.",
-    placeholder: "What's broken right now?",
-    suggestions: [
-      { label: "Debug my project", icon: "wrench", action: () => (window.open("https://techengi.in/login", "_blank")) },
-      { label: "Work as my coworker for today, ₹3,480", icon: "handshake", action: () => (window.open("https://techengi.in/login", "_blank")) },
-    ],
-    primary: { label: "Post your first task", href: "#leads" },
-  },
+  }
+  // bug: {
+  //   line1: "Your bug doesn't wait for Monday.",
+  //   line2: "Neither do we.",
+  //   sub: "Keep your daily dose. Don’t let temporary bugs ruin your forever.",
+  //   placeholder: "What's broken right now?",
+  //   suggestions: [
+  //     { label: "Debug my project", icon: "wrench", action: () => (window.open("https://techengi.in/login", "_blank")) },
+  //     { label: "Work as my coworker for today, ₹3,480", icon: "handshake", action: () => (window.open("https://techengi.in/login", "_blank")) },
+  //   ],
+  //   primary: { label: "Post your first task", href: "#leads" },
+  // },
 };
 
-const ORDER: ViewKey[] = ["client", "engineer", "bug"];
+const ORDER: ViewKey[] = ["client", "engineer"];
 
 const CIRCLE = 44; // button diameter (px)
 const LABEL_PAD = 40; // horizontal padding around the label (px)
@@ -247,13 +247,13 @@ export default function Hero() {
   const [values, setValues] = useState<Record<ViewKey, string>>({
     client: "",
     engineer: "",
-    bug: "",
+    // bug: "",
   });
   // Attachments are kept per tab, like the message text
   const [attachments, setAttachments] = useState<Record<ViewKey, Attachment[]>>({
     client: [],
     engineer: [],
-    bug: [],
+    // bug: [],
   });
   const [menuOpen, setMenuOpen] = useState(false);
   const [attachMsg, setAttachMsg] = useState<{ text: string; error: boolean } | null>(null);
@@ -621,7 +621,7 @@ export default function Hero() {
             >
               <span>Client</span>
               <span>Engineer</span>
-              <span>Fix a Bug</span>
+              {/* <span>Fix a Bug</span> */}
               <i className="knob" />
             </button>
           </div>

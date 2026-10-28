@@ -1,13 +1,14 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
-import { ApprovalStatus } from "@prisma/client";
 
 export const authOptions: NextAuthOptions = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   adapter: PrismaAdapter(prisma) as any,
   session: {
     strategy: "jwt",
@@ -16,6 +17,11 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true,
+    }),
+    GithubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID || process.env.GITHUB_ID || "github_placeholder_id",
+      clientSecret: process.env.GITHUB_CLIENT_SECRET || process.env.GITHUB_SECRET || "github_placeholder_secret",
       allowDangerousEmailAccountLinking: true,
     }),
     CredentialsProvider({
@@ -39,7 +45,7 @@ export const authOptions: NextAuthOptions = {
 
         if (!user) throw new Error("Invalid password or email");
         if (user.isSuspended) throw new Error("Your account has been suspended.");
-        if (user.password === null) throw new Error("Password is not set, please login with Google");
+        if (user.password === null) throw new Error("Password is not set, please login with Google or GitHub");
         const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
         if (!isPasswordValid) throw new Error("Invalid password or email");
         // if (user.role === "ENGINEER" &&
@@ -52,11 +58,14 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
-      if (account?.provider === "google") {
+    async signIn({ user, account }) {
+      if (account?.provider === "google" || account?.provider === "github") {
+        if (!user.email) {
+          throw new Error("No email returned from provider. Please ensure your account has a public/verified email.");
+        }
 
         const existingUser = await prisma.user.findUnique({
-          where: { email: user.email! }
+          where: { email: user.email }
         });
 
         if (existingUser) {
@@ -72,7 +81,7 @@ export const authOptions: NextAuthOptions = {
 
           await prisma.user.create({
             data: {
-              email: user.email!,
+              email: user.email,
               name: user.name,
               image: user.image,
               role: finalRole,

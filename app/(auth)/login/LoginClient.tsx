@@ -2,478 +2,408 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff, Mail, Lock, ArrowLeft, Briefcase, Wrench } from "lucide-react";
-import Image from "next/image";
-
-const testimonials = [
-    {
-        text: "Client ke perspective se bolun toh yeh platform engineers aur clients ko connect karne ke liye really smooth hai. Communication clear raha aur delivery time pe mila.",
-        avatar: "/users/image copy 8.png",
-        name: "Baisakhi",
-        role: "Startup Founder",
-    },
-    {
-        text: "From an engineer's perspective, the platform is well-structured. Requirements are clear, and it's easy to collaborate with clients without unnecessary confusion.",
-        avatar: "/users/image copy 9.png",
-        name: "Sarah Khan",
-        role: "Software Engineer",
-    },
-    {
-        text: "We needed quick technical support for a prototype. The matching process was fast and we got someone who understood the requirements immediately.",
-        avatar: "/users/image copy 3.png",
-        name: "Ankit Sharma",
-        role: "Product Manager",
-    },
-    {
-        text: "I've worked on multiple projects here. The client expectations are clear, and payments and communication are handled smoothly.",
-        avatar: "/users/image copy 10.png",
-        name: "Neha Verma",
-        role: "Freelance Developer",
-    },
-    {
-        text: "I collaborated on a simulation project and the requirements were very well explained. It saved a lot of back-and-forth time.",
-        avatar: "/users/image copy 5.png",
-        name: "Rohit Mehta",
-        role: "Mechanical Engineer",
-    },
-    {
-        text: "Good platform for freelance engineers. The projects feel structured and clients are generally responsive and clear.",
-        avatar: "/users/image copy 11.png",
-        name: "Priya Nair",
-        role: "Full Stack Developer",
-    },
-    {
-        text: "I helped a client with structural analysis work. Everything from scope to delivery was properly defined, which made execution easier.",
-        avatar: "/users/image copy 6.png",
-        name: "Aditya Kulkarni",
-        role: "Civil Engineer",
-    },
-    {
-        text: "Even for design-related technical work, the collaboration was smooth. Feedback cycles were quick and clear.",
-        avatar: "/users/image copy 13.png",
-        name: "Simran Kaur",
-        role: "UI/UX Designer",
-    },
-    {
-        text: "APIs and backend tasks were well documented by clients. It made development faster and less frustrating.",
-        avatar: "/users/image copy 18.png",
-        name: "Vikram Singh",
-        role: "Backend Engineer",
-    },
-    {
-        text: "I worked on a data visualization project. The requirements were specific, and I was able to deliver exactly what was needed.",
-        avatar: "/users/image copy 14.png",
-        name: "Ishita Roy",
-        role: "Data Analyst",
-    },
-    {
-        text: "IoT project collaboration was smooth. I got clear instructions and minimal confusion during implementation.",
-        avatar: "/users/image copy 19.png",
-        name: "Karan Malhotra",
-        role: "Electronics Engineer",
-    },
-    {
-        text: "Worked on a machine learning project. The dataset and goals were clearly defined, which helped a lot in model training.",
-        avatar: "/users/image copy 15.png",
-        name: "Ayesha Khan",
-        role: "AI/ML Engineer",
-    },
-    {
-        text: "Good experience working with startups through this platform. Requirements are usually practical and well thought out.",
-        avatar: "/users/image copy 20.png",
-        name: "Manish Gupta",
-        role: "Technical Consultant",
-    },
-    {
-        text: "UI implementation tasks were easy to understand. Clients gave clear references which made execution faster.",
-        avatar: "/users/image copy 16.png",
-        name: "Jiya Shankar",
-        role: "Frontend Developer",
-    },
-    {
-        text: "The structured data and reporting made it easy to track project milestones without chasing updates constantly.",
-        avatar: "https://i.pravatar.cc/100?img=32",
-        name: "Rohan Verma",
-        role: "Product Manager",
-    },
-    {
-        text: "Solid onboarding process and the engineers assigned actually understood the technical requirements from day one.",
-        avatar: "https://i.pravatar.cc/100?img=12",
-        name: "Ananya Iyer",
-        role: "Startup Founder",
-    },
-];
-
-type LoginRole = "CLIENT" | "ENGINEER";
+import { useTheme } from "@/components/ThemeProvider";
+import AuthBrandSide from "@/components/auth/AuthBrandSide";
 
 export default function LoginClient() {
-    const router = useRouter();
+  const { theme, toggleTheme } = useTheme();
 
-    const [role, setRole] = useState<LoginRole | null>(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [generalError, setGeneralError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    const handleCredentialsLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError("");
-        setLoading(true);
+  const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-        try {
-            const res = await signIn("credentials", {
-                email,
-                password,
-                role,
-                redirect: false,
-            });
+  const handleEmailChange = (val: string) => {
+    setEmail(val);
+    if (emailError && EMAIL_REGEX.test(val.trim())) {
+      setEmailError("");
+    }
+  };
 
-            if (res?.error) {
-                setError(res.error);
-                setLoading(false);
-                return;
-            }
+  const handlePasswordChange = (val: string) => {
+    setPassword(val);
+    if (passwordError && val.length > 0) {
+      setPasswordError("");
+    }
+  };
 
-            window.location.href = "/api/auth/role-redirect";
+  const validate = () => {
+    let isValid = true;
+    if (!EMAIL_REGEX.test(email.trim())) {
+      setEmailError("Enter a valid email address.");
+      isValid = false;
+    } else {
+      setEmailError("");
+    }
 
-        } catch {
-            setError("An unexpected error occurred. Please try again.");
-            setLoading(false);
-        }
-    };
+    if (!password.trim()) {
+      setPasswordError("Enter your password.");
+      isValid = false;
+    } else {
+      setPasswordError("");
+    }
 
-    const handleGoogleLogin = () => {
-        if (role) {
-            document.cookie = `oauth_role=${role}; path=/; max-age=120`;
-        }
-        signIn("google", { callbackUrl: "/api/auth/role-redirect" });
-    };
+    return isValid;
+  };
 
-    return (
-        <>
-            <div className="flex flex-col lg:flex-row w-full h-screen">
-                <div className="w-full lg:w-[50%] h-screen ">
-                    <div className="">
-                        <button
-                            onClick={() => (role ? setRole(null) : router.push('/'))}
-                            className="flex items-center cursor-pointer gap-2 text-sm text-gray-500 hover:text-gray-800 transition-colors m-5 dark:text-slate-400"
-                        >
-                            <ArrowLeft className="h-4 w-4" />
-                            Back
-                        </button>
-                    </div>
-                    <div className="min-h-screen flex items-center justify-center p-4">
-                        <div className="w-130 bg-white h-full p-8 dark:bg-card">
+  const handleCredentialsLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setGeneralError("");
 
-                            {!role && (
-                                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col justify-center h-full">
-                                    <div className="text-center mb-10">
-                                        <h1 className="text-2xl font-bold text-[#0f172a] dark:text-white tracking-tight">
-                                            Welcome Back <span>👋</span>
-                                        </h1>
-                                        <p className="text-sm text-gray-500 mt-2 dark:text-slate-400">
-                                            Log in to your TECH ENGI account as a...
-                                        </p>
-                                    </div>
+    if (!validate()) return;
 
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <button
-                                            type="button"
-                                            onClick={() => setRole("CLIENT")}
-                                            className="group flex flex-col items-center gap-3 p-6 rounded-2xl border border-gray-200 hover:border-[#f0b31e] hover:bg-[#f0b31e]/5 transition-all dark:border-slate-800 dark:hover:bg-[#f0b31e]/10"
-                                        >
-                                            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f0b31e]/10 group-hover:bg-[#f0b31e] transition-colors">
-                                                <Briefcase className="h-7 w-7 text-[#f0b31e] group-hover:text-white transition-colors" />
-                                            </div>
-                                            <div className="text-center">
-                                                <p className="font-semibold text-[#0f172a] dark:text-white">Client</p>
-                                                <p className="text-xs text-gray-500 mt-1 dark:text-slate-400">
-                                                    I want to hire engineers
-                                                </p>
-                                            </div>
-                                        </button>
+    setLoading(true);
 
-                                        <button
-                                            type="button"
-                                            onClick={() => setRole("ENGINEER")}
-                                            className="group flex flex-col items-center gap-3 p-6 rounded-2xl border border-gray-200 hover:border-[#f0b31e] hover:bg-[#f0b31e]/5 transition-all dark:border-slate-800 dark:hover:bg-[#f0b31e]/10"
-                                        >
-                                            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f0b31e]/10 group-hover:bg-[#f0b31e] transition-colors">
-                                                <Wrench className="h-7 w-7 text-[#f0b31e] group-hover:text-white transition-colors" />
-                                            </div>
-                                            <div className="text-center">
-                                                <p className="font-semibold text-[#0f172a] dark:text-white">Engineer</p>
-                                                <p className="text-xs text-gray-500 mt-1 dark:text-slate-400">
-                                                    I want to find projects
-                                                </p>
-                                            </div>
-                                        </button>
-                                    </div>
+    try {
+      const res = await signIn("credentials", {
+        email: email.trim(),
+        password,
+        redirect: false,
+      });
 
-                                    <p className="mt-10 text-center text-sm text-gray-500 dark:text-slate-400">
-                                        Don&apos;t have an account?{" "}
-                                        <Link href="/register" className="text-[#f0b31e] hover:underline font-semibold">
-                                            Register here
-                                        </Link>
-                                    </p>
-                                </div>
-                            )}
+      if (res?.error) {
+        setGeneralError(res.error);
+        setLoading(false);
+        return;
+      }
 
-                            {role && (
-                                <div className="animate-in fade-in slide-in-from-right-8 duration-500">
-                                    <div className="text-center mb-8">
-                                        <div className="flex h-14 w-14 items-center justify-center rounded-[1rem] bg-[#f0b31e] shadow-lg shadow-yellow-500/30 mx-auto mb-4">
-                                            {role === "CLIENT" ? (
-                                                <Briefcase className="h-7 w-7 text-white" />
-                                            ) : (
-                                                <Wrench className="h-7 w-7 text-white" />
-                                            )}
-                                        </div>
-                                        <h1 className="text-2xl font-bold text-[#0f172a] dark:text-white tracking-tight">
-                                            Welcome Back <span>👋</span>
-                                        </h1>
-                                        <p className="text-sm text-gray-500 mt-2 dark:text-slate-400">
-                                            Logging in as{" "}
-                                            <span className="font-semibold text-[#f0b31e]">
-                                                {role === "CLIENT" ? "Client" : "Engineer"}
-                                            </span>
-                                            {" · "}
-                                            <button
-                                                type="button"
-                                                onClick={() => setRole(null)}
-                                                className="underline hover:text-[#f0b31e] transition-colors"
-                                            >
-                                                change
-                                            </button>
-                                        </p>
-                                    </div>
+      window.location.href = "/api/auth/role-redirect";
+    } catch {
+      setGeneralError("An unexpected error occurred. Please try again.");
+      setLoading(false);
+    }
+  };
 
-                                    {error && (
-                                        <div className="mb-6 p-3 bg-red-50 text-red-600 text-sm rounded-xl border border-red-100 text-center">
-                                            {error}
-                                        </div>
-                                    )}
+  const handleOAuthLogin = (provider: "google" | "github") => {
+    setGeneralError("");
+    signIn(provider, { callbackUrl: "/api/auth/role-redirect" });
+  };
 
-                                    <form onSubmit={handleCredentialsLogin} className="space-y-5">
+  return (
+    <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2 bg-white text-slate-900 dark:bg-[#070b14] dark:text-slate-100 transition-colors duration-200">
+      {/* ================= LEFT: FORM SIDE ================= */}
+      <div className="flex flex-col justify-between p-6 sm:p-10 lg:p-12 overflow-y-auto min-h-screen">
+        {/* Topbar */}
+        <div className="flex items-center justify-between gap-4 pb-6">
+          <Link
+            href="/"
+            className="group inline-flex items-center gap-2.5 text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
+          >
+            <svg
+              width="16"
+              height="14"
+              viewBox="0 0 16 14"
+              aria-hidden="true"
+              className="transition-transform group-hover:-translate-x-0.5"
+            >
+              <path
+                d="M15 7H1M7 1L1 7l6 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span>Back to techengi.in</span>
+          </Link>
 
-                                        <div className="space-y-1.5">
-                                            <label className="text-sm font-medium text-gray-700 ml-1 dark:text-slate-300">
-                                                Email Address
-                                            </label>
-                                            <div className="relative">
-                                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                                    <Mail className="h-5 w-5 text-gray-400 dark:text-slate-500" />
-                                                </div>
-                                                <input
-                                                    type="email"
-                                                    value={email}
-                                                    onChange={(e) => setEmail(e.target.value)}
-                                                    required
-                                                    className="w-full pl-11 pr-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white dark:focus:bg-slate-900 focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:text-white dark:border-slate-800"
-                                                    placeholder="you@example.com"
-                                                />
-                                            </div>
-                                        </div>
+          <div className="flex items-center gap-3">
+            {/* Theme Toggle Button */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label="Toggle dark mode"
+              title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-white dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 transition-all cursor-pointer"
+            >
+              {theme === "light" ? (
+                /* Moon Icon */
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+                </svg>
+              ) : (
+                /* Sun Icon */
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="4" />
+                  <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+                </svg>
+              )}
+            </button>
 
-                                        <div className="space-y-1.5">
-                                            <div className="flex justify-between items-center mb-1">
-                                                <label className="text-sm font-medium text-gray-700 ml-1 dark:text-slate-300">
-                                                    Password
-                                                </label>
-                                            </div>
-                                            <div className="relative">
-                                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                                    <Lock className="h-5 w-5 text-gray-400 dark:text-slate-500" />
-                                                </div>
-                                                <input
-                                                    type={showPassword ? "text" : "password"}
-                                                    value={password}
-                                                    onChange={(e) => setPassword(e.target.value)}
-                                                    required
-                                                    className="w-full pl-11 pr-11 h-12 rounded-xl border border-gray-200 bg-transparent focus:bg-white dark:focus:bg-slate-900 focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:text-white dark:border-slate-800"
-                                                    placeholder="••••••••"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setShowPassword(!showPassword)}
-                                                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-[#f0b31e] transition-colors dark:text-slate-500"
-                                                >
-                                                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                                                </button>
-                                            </div>
-                                            <div className="flex justify-between items-center mb-1">
-                                                <div></div>
-                                                <Link href="/forgot-password" className="text-xs text-[#f0b31e] hover:text-yellow-600 transition-colors font-medium">
-                                                    Forgot password?
-                                                </Link>
-                                            </div>
-                                        </div>
+            {/* Mobile Brandmark */}
+            <div className="flex lg:hidden items-center gap-2 font-black text-slate-900 dark:text-white">
+              <span className="font-mono text-[#f0b31e]">{`{ }`}</span>
+              <span className="text-sm tracking-tight">Tech Engi</span>
+            </div>
+          </div>
+        </div>
 
-                                        <button
-                                            type="submit"
-                                            disabled={loading}
-                                            className="w-full h-12 bg-[#f0b31e] hover:bg-[#e0a61a] text-white rounded-xl text-base font-semibold shadow-md shadow-yellow-500/20 transition-all flex justify-center items-center disabled:opacity-70 disabled:cursor-not-allowed"
-                                        >
-                                            {loading ? "Signing in..." : "Sign In"}
-                                        </button>
-                                    </form>
+        {/* Form Container */}
+        <div className="w-full max-w-[420px] mx-auto my-auto py-8">
+          <div>
+            <h1 className="text-3xl sm:text-[34px] font-black tracking-[-0.035em] text-slate-900 dark:text-white">
+              Welcome back.
+            </h1>
+            <p className="mt-2 text-[15.5px] text-slate-500 dark:text-slate-400">
+              Log in to your Tech Engi account.
+            </p>
+          </div>
 
-                                    <div className="mt-8 flex items-center justify-center space-x-4">
-                                        <div className="h-px bg-gray-100 w-full dark:bg-slate-800"></div>
-                                        <span className="text-xs text-gray-400 uppercase tracking-wider font-medium dark:bg-card dark:text-slate-500">OR</span>
-                                        <div className="h-px bg-gray-100 w-full dark:bg-slate-800"></div>
-                                    </div>
+          {/* OAuth Buttons */}
+          <div className="mt-7 grid gap-3">
+            {/* Google */}
+            <button
+              type="button"
+              onClick={() => handleOAuthLogin("google")}
+              className="flex min-h-[50px] w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white font-semibold text-slate-800 shadow-xs hover:bg-slate-50 hover:shadow-sm active:translate-y-[1px] dark:border-slate-800 dark:bg-slate-900/90 dark:text-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-all duration-150"
+            >
+              <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+                <path
+                  d="M17.6 9.2c0-.6-.1-1.2-.2-1.8H9v3.5h4.8a4.1 4.1 0 01-1.8 2.7v2.2h2.9a8.8 8.8 0 002.7-6.6z"
+                  fill="#4285F4"
+                />
+                <path
+                  d="M9 18a8.7 8.7 0 006-2.2l-2.9-2.2a5.4 5.4 0 01-8.1-2.9H1v2.3A9 9 0 009 18z"
+                  fill="#34A853"
+                />
+                <path
+                  d="M4 10.7a5.4 5.4 0 010-3.4V5H1a9 9 0 000 8z"
+                  fill="#FBBC05"
+                />
+                <path
+                  d="M9 3.6a4.9 4.9 0 013.4 1.3l2.6-2.6A8.7 8.7 0 009 0 9 9 0 001 5l3 2.3A5.4 5.4 0 019 3.6z"
+                  fill="#EA4335"
+                />
+              </svg>
+              <span>Continue with Google</span>
+            </button>
 
-                                    <button
-                                        onClick={handleGoogleLogin}
-                                        className="mt-6 w-full h-12 flex items-center justify-center space-x-3 border border-gray-200 bg-white text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all text-sm dark:border-slate-800 dark:bg-card dark:text-slate-300"
-                                    >
-                                        <svg className="w-5 h-5" viewBox="0 0 24 24">
-                                            <path
-                                                fill="#4285F4"
-                                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                                            />
-                                            <path
-                                                fill="#34A853"
-                                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                                            />
-                                            <path
-                                                fill="#FBBC05"
-                                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                                            />
-                                            <path
-                                                fill="#EA4335"
-                                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                                            />
-                                        </svg>
-                                        <span>Sign in with Google</span>
-                                    </button>
+            {/* GitHub */}
+            <button
+              type="button"
+              onClick={() => handleOAuthLogin("github")}
+              className="flex min-h-[50px] w-full items-center justify-center gap-3 rounded-xl border border-slate-900 bg-slate-950 font-semibold text-white shadow-xs hover:bg-slate-900 active:translate-y-[1px] dark:border-slate-800 dark:bg-[#111622] dark:hover:bg-[#1a2133] cursor-pointer transition-all duration-150"
+            >
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor" aria-hidden="true">
+                <path d="M9 0a9 9 0 00-2.8 17.5c.4.1.6-.2.6-.5v-1.7c-2.5.6-3-1.2-3-1.2-.4-1-1-1.3-1-1.3-.8-.6.1-.6.1-.6.9.1 1.4.9 1.4.9.8 1.4 2.1 1 2.6.8.1-.6.3-1 .6-1.3-2-.2-4.1-1-4.1-4.5 0-1 .3-1.8.9-2.4-.1-.2-.4-1.1.1-2.3 0 0 .7-.2 2.4.9a8.4 8.4 0 014.4 0c1.7-1.1 2.4-.9 2.4-.9.5 1.2.2 2.1.1 2.3.6.6.9 1.4.9 2.4 0 3.5-2.1 4.3-4.1 4.5.3.3.6.9.6 1.8v2.6c0 .3.2.6.7.5A9 9 0 009 0z" />
+              </svg>
+              <span>Continue with GitHub</span>
+            </button>
+          </div>
 
-                                    <p className="mt-8 text-center text-sm text-gray-500 dark:text-slate-400">
-                                        Don&apos;t have an account?{" "}
-                                        <Link
-                                            href={role === "CLIENT" ? "/register/client" : "/register/engineer"}
-                                            className="text-[#f0b31e] hover:underline font-semibold"
-                                        >
-                                            Register here
-                                        </Link>
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-                <div className="hidden lg:flex lg:w-[50%] rounded-[40px] relative overflow-hidden p-10 flex-col justify-between m-6">
+          {/* Divider */}
+          <div className="relative my-6 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-200 dark:border-slate-800" />
+            </div>
+            <span className="relative bg-white px-3 font-mono text-[11px] font-semibold tracking-[0.14em] text-slate-400 dark:bg-[#070b14] dark:text-slate-500 uppercase">
+              OR WITH EMAIL
+            </span>
+          </div>
 
+          {/* General Error Notice */}
+          {generalError && (
+            <div
+              role="alert"
+              className="mb-5 rounded-xl border border-rose-200 bg-rose-50/80 p-3.5 text-[13.5px] leading-relaxed text-rose-600 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400"
+            >
+              {generalError}
+            </div>
+          )}
 
-                    <div className="absolute inset-0 bg-[linear-gradient(135deg,#FFF6D6_0%,#F8D978_18%,#F0B31E_45%,#E8A400_65%,#FFF1C2_100%)]" />
-
-
-                    <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-white/10 blur-[140px] rounded-full" />
-                    <div className="absolute -top-32 -right-32 w-[600px] h-[600px] bg-white/50 blur-[140px] rounded-full" />
-
-
-                    <div className="absolute top-[20%] left-[20%] w-[500px] h-[500px] bg-[#FFD65C]/40 blur-[120px] rounded-full" />
-
-
-                    <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#FFF3CF]/60 blur-[140px] rounded-full" />
-
-
-                    <div className="absolute inset-0 opacity-[0.12] mix-blend-soft-light bg-[url('https://www.transparenttextures.com/patterns/noise.png')]" />
-
-
-                    <div className="absolute inset-0 bg-white/[0.08]" />
-
-
-                    <div className="relative z-10 flex flex-col h-full ">
-
-                        <div className="mt-8">
-
-                            <div className="relative w-24 h-24 bg-white rounded-sm shadow-xl overflow-hidden dark:bg-card">
-                                <Image
-                                    src="/logoImagediff2.PNG"
-                                    alt="Logo"
-                                    fill
-                                    className="object-cover rounded-sm"
-                                />
-                            </div>
-
-
-                            <div className="mt-10">
-                                <p className="text-white text-7xl font-extrabold tracking-tight leading-none">
-                                    TECH ENGI
-                                </p>
-
-                                <p className="text-white/85 text-lg max-w-xl mt-4 leading-relaxed">
-                                    A platform where clients and engineers collaborate to solve real technical problems. Get support for building, fixing, and delivering projects with clarity and speed.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="mt-auto pt-10">
-                            <div className="relative w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
-                                <div className="flex gap-6 w-max animate-marquee">
-                                    {[...testimonials.slice(0, 8), ...testimonials.slice(0, 8)].map((t, i) => (
-                                        <div
-                                            key={i}
-                                            className="
-                        min-w-[420px] max-w-[420px]
-                        h-auto min-h-[150px]
-                        rounded-[28px]
-                        border border-white/15
-                        bg-white/[0.08]
-                        backdrop-blur-xl
-                        p-5
-                        shrink-0
-                        flex flex-col justify-between
-                      "
-                                        >
-                                            <p className="text-white/90 text-sm leading-relaxed font-medium line-clamp-3">
-                                                {t.text}
-                                            </p>
-
-                                            <div className="flex items-center gap-3 mt-4">
-                                                <Image
-                                                    src={t.avatar}
-                                                    alt=""
-                                                    width={40}
-                                                    height={40}
-                                                    loading="lazy"
-                                                    className="w-10 h-10 rounded-full object-cover border border-white/30"
-                                                />
-
-                                                <div>
-                                                    <h4 className="text-white font-semibold text-sm">
-                                                        {t.name}
-                                                    </h4>
-
-                                                    <p className="text-white/70 text-xs">
-                                                        {t.role}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="flex items-center justify-end mt-10 gap-4 pr-2">
-                                <div className="w-32 h-[2px] bg-white/70" />
-
-                                <p className="text-white text-3xl font-light tracking-tight">
-                                    Build for connectivity
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+          {/* Form */}
+          <form id="loginForm" onSubmit={handleCredentialsLogin} noValidate className="space-y-4">
+            {/* Email Field */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label
+                  htmlFor="liEmail"
+                  className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase"
+                >
+                  Email
+                </label>
+              </div>
+              <div className="relative flex items-center">
+                <input
+                  id="liEmail"
+                  name="email"
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => handleEmailChange(e.target.value)}
+                  placeholder="you@company.in"
+                  aria-invalid={emailError ? "true" : "false"}
+                  aria-describedby={emailError ? "liEmailErr" : undefined}
+                  required
+                  className={`min-h-[52px] w-full rounded-xl border px-4 text-base text-slate-900 transition-all placeholder:text-slate-400 focus:outline-none dark:text-white dark:placeholder:text-slate-500 ${
+                    emailError
+                      ? "border-rose-500 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/15"
+                      : "border-slate-200 bg-white hover:border-slate-300 focus:border-[#f0b31e] focus:ring-4 focus:ring-[#f0b31e]/15 dark:border-slate-800 dark:bg-slate-900/80 dark:hover:border-slate-700 dark:focus:border-[#f0b31e]"
+                  }`}
+                />
+              </div>
+              {emailError && (
+                <p id="liEmailErr" role="alert" className="mt-2 text-[13.5px] font-medium text-rose-500">
+                  {emailError}
+                </p>
+              )}
             </div>
 
-            <style dangerouslySetInnerHTML={{ __html: "@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } } .animate-marquee { animation: marquee 50s linear infinite; } .animate-marquee:hover { animation-play-state: paused; }" }} />
-        </>
-    );
+            {/* Password Field */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label
+                  htmlFor="liPass"
+                  className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase"
+                >
+                  Password
+                </label>
+                <Link
+                  href="/forgot-password"
+                  className="text-[13px] font-medium text-[#c48d08] hover:text-[#a07204] dark:text-[#f0b31e] dark:hover:text-[#ffc543] transition-colors"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+              <div className="relative flex items-center">
+                <input
+                  id="liPass"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
+                  placeholder="Your password"
+                  aria-invalid={passwordError ? "true" : "false"}
+                  aria-describedby={passwordError ? "liPassErr" : undefined}
+                  required
+                  className={`min-h-[52px] w-full rounded-xl border pl-4 pr-12 text-base text-slate-900 transition-all placeholder:text-slate-400 focus:outline-none dark:text-white dark:placeholder:text-slate-500 ${
+                    passwordError
+                      ? "border-rose-500 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/15"
+                      : "border-slate-200 bg-white hover:border-slate-300 focus:border-[#f0b31e] focus:ring-4 focus:ring-[#f0b31e]/15 dark:border-slate-800 dark:bg-slate-900/80 dark:hover:border-slate-700 dark:focus:border-[#f0b31e]"
+                  }`}
+                />
+                <button
+                  type="button"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2 flex h-10 w-10 items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                >
+                  {showPassword ? (
+                    /* Eye Off */
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                      <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+                      <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+                      <line x1="2" x2="22" y1="2" y2="22" />
+                    </svg>
+                  ) : (
+                    /* Eye */
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M1.5 10S4.8 4.5 10 4.5 18.5 10 18.5 10 15.2 15.5 10 15.5 1.5 10 1.5 10z"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                      />
+                      <circle cx="10" cy="10" r="2.6" stroke="currentColor" strokeWidth="1.7" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+              {passwordError && (
+                <p id="liPassErr" role="alert" className="mt-2 text-[13.5px] font-medium text-rose-500">
+                  {passwordError}
+                </p>
+              )}
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-6 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-[#f0b31e] font-bold text-slate-950 shadow-sm transition-all duration-150 hover:bg-[#ffc543] active:translate-y-[1px] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+            >
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <svg className="h-5 w-5 animate-spin text-slate-950" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  <span>Logging in...</span>
+                </div>
+              ) : (
+                <span>Log in</span>
+              )}
+            </button>
+          </form>
+
+          {/* Swap Link */}
+          <div className="mt-7 border-t border-slate-200 pt-5 text-center sm:text-left text-[15px] text-slate-500 dark:border-slate-800 dark:text-slate-400">
+            Don&apos;t have an account?{" "}
+            <Link
+              href="/register"
+              className="font-semibold text-[#c48d08] hover:text-[#a07204] dark:text-[#f0b31e] dark:hover:text-[#ffc543] underline-offset-2 hover:underline transition-colors"
+            >
+              Create one free
+            </Link>
+          </div>
+        </div>
+
+        {/* Mini Footer */}
+        <p className="pt-6 font-mono text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed text-center sm:text-left">
+          TSquareY1 OPC Private Limited, Chennai, Tamil Nadu &middot; techengi.in
+        </p>
+      </div>
+
+      {/* ================= RIGHT: BRAND + TRUST SIDE ================= */}
+      <AuthBrandSide role="CLIENT" />
+    </div>
+    
+  );
 }

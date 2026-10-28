@@ -7,12 +7,12 @@ export async function POST(req: NextRequest) {
   try {
     const { user, error } = await getClient();
     if (error || !user?.clientProfile) {
-      return NextResponse.json( { success: false, message: error || "Unauthorized" }, { status: 401 } );
+      return NextResponse.json({ success: false, message: error || "Unauthorized" }, { status: 401 });
     }
 
     const { projectId } = await req.json();
     if (!projectId) {
-      return NextResponse.json( { success: false, message: "Project ID required" }, { status: 400 } );
+      return NextResponse.json({ success: false, message: "Project ID required" }, { status: 400 });
     }
 
     const project = await prisma.project.findUnique({
@@ -20,17 +20,17 @@ export async function POST(req: NextRequest) {
     });
 
     if (!project || project.clientId !== user.clientProfile.id) {
-      return NextResponse.json( { success: false, message: "Project not found" }, { status: 404 } );
+      return NextResponse.json({ success: false, message: "Project not found" }, { status: 404 });
     }
 
     if (project.status !== "DRAFT" && project.status !== "AWAITING_FINAL_PAYMENT") {
-      return NextResponse.json( { success: false, message: "Project is not ready for payment" }, { status: 400 });
+      return NextResponse.json({ success: false, message: "Project is not ready for payment" }, { status: 400 });
     }
 
     const isAdvance = !project.advancePaid;
     const amountToPay = isAdvance
-      ? project.budget * 0.4 // 40% advance
-      : project.budget * 0.6; // 60% final payment
+      ? project.budget * 0.25 // 25% advance
+      : project.budget * 0.75; // 75% final payment
 
     const transactionType = isAdvance ? "ADVANCE_PAYMENT" : "FINAL_PAYMENT";
 
@@ -55,8 +55,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json( { success: true, order }, { status: 200 } );
+    return NextResponse.json({ success: true, order }, { status: 200 });
   } catch {
-    return NextResponse.json( { success: false, message: "Internal server error" }, { status: 500 } );
+    return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }

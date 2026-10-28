@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import RegisterClient from "./RegisterClient";
 
 export const metadata: Metadata = {
-  title: "Register",
+  title: "Create account · Tech Engi",
+  description:
+    "Create your Tech Engi account. AI-matched engineering work in India, escrow-backed and identity-verified.",
   robots: {
     index: false,
     follow: true,

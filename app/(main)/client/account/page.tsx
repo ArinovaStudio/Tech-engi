@@ -141,7 +141,7 @@ export default function ClientAccountPage() {
     setPaying(project.id);
 
     const isAdvance = project.status === "DRAFT";
-    const description = isAdvance ? "Advance Payment (40%)" : "Final Payment (60%)";
+    const description = isAdvance ? "Advance Payment (25%)" : "Remaining Payment (75%)";
 
     processPayment({
       projectId: project.id,
@@ -348,7 +348,7 @@ export default function ClientAccountPage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold  truncate" style={{ color: "var(--text-primary)" }}>{p.title}</p>
                         <p className="text-xs  mt-0.5" style={{ color: "var(--text-muted)" }}>
-                          {isAdvance ? "Advance (40%)" : "Final payment (60%)"}
+                          {isAdvance ? "Advance (25%)" : "Remaining payment (75%)"}
                         </p>
                         <p className="text-sm font-bold  mt-1" style={{ color: "var(--primary)" }}>
                           ₹{amount.toLocaleString()}

@@ -69,9 +69,9 @@ export const useRazorpay = () => {
         return;
       }
 
-      const autoDescription = orderData.order.notes?.type === "ADVANCE_PAYMENT" 
-        ? "Advance Payment (40%)" 
-        : "Final Payment (60%)";
+      const autoDescription = orderData.order.notes?.type === "ADVANCE_PAYMENT"
+        ? "Advance Payment (25%)"
+        : "Final Payment (75%)";
 
       // Open Razorpay Widget
       const rzpOptions = {
@@ -86,7 +86,7 @@ export const useRazorpay = () => {
           email: user?.email || "",
         },
         theme: { color: "#FFAE58" },
-        
+
         handler: async (response: any) => {
           try {
             setLoading(true);
@@ -122,7 +122,7 @@ export const useRazorpay = () => {
         modal: {
           ondismiss: async () => {
             toast.error("Payment cancelled");
-            
+
             try {
               await fetch("/api/razorpay/failed", {
                 method: "POST",
@@ -145,7 +145,7 @@ export const useRazorpay = () => {
         const errorMsg = response.error.description || "Payment failed";
         toast.error(errorMsg);
         setError(errorMsg);
-        
+
         try {
           await fetch("/api/razorpay/failed", {
             method: "POST",
@@ -157,7 +157,7 @@ export const useRazorpay = () => {
         } catch {
           console.error("Failed to update payment status on server");
         }
-        
+
         setLoading(false);
         onError?.(errorMsg);
       });

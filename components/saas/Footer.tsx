@@ -93,10 +93,10 @@ export default function Footer() {
               Start or finish your project with a verified engineer.
             </h2>
             <div className="flex flex-col gap-3 sm:flex-row w-1/4">
-              <Link href="/register/client" className={`${btn} bg-white !text-[#8F4F04] hover:bg-white/90 w-full`}>
+              <Link href="/register" className={`${btn} bg-white !text-[#8F4F04] hover:bg-white/90 w-full`}>
                 Start a Project
               </Link>
-              <Link href="/register/engineer" className={`${btn} border border-white/40 !text-white hover:bg-white/10 w-full`}>
+              <Link href="/register" className={`${btn} border border-white/40 !text-white hover:bg-white/10 w-full`}>
                 Join as Builder
               </Link>
             </div>

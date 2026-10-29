@@ -96,13 +96,13 @@ export async function GET(req: NextRequest) {
       else if (p.status === "CANCELED") canceledProjects++;
 
       if (p.status === "AWAITING_FINAL_PAYMENT" && !p.isFinalPaymentMade) {
-        const amount = p.budget * 0.60;
+        const amount = p.budget * 0.75;
         totalPending60Amount += amount;
         pending60Payments.push({ id: p.id, title: p.title, amount });
       }
 
       if (p.status === "DRAFT" && !p.advancePaid) {
-        const amount = p.budget * 0.40;
+        const amount = p.budget * 0.25;
         totalPending40Amount += amount;
         pending40Payments.push({ id: p.id, title: p.title, amount });
       }

@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
             status: "SEARCHING",
           },
         });
-        const payoutAmount = project.budget * 0.4;
+        // const payoutAmount = project.budget * 0.25;
 
         await tx.projectInvitation.create({
           data: {
@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
 
         engineerEmailHtml = advancePaymentSuccessTemplate(
           project.title,
-          project.budget * 0.4
+          project.budget * 0.25
         );
 
       } else if (transaction.type === "FINAL_PAYMENT") {

@@ -338,7 +338,7 @@ export default function ClientAccountPage() {
             <div className="flex-1 overflow-y-auto divide-y divide-[var(--border)]">
               {pendingProjects.map((p) => {
                 const isAdvance = p.status === "DRAFT";
-                const amount = isAdvance ? p.budget * 0.4 : p.budget * 0.6;
+                const amount = isAdvance ? p.budget * 0.25 : p.budget * 0.75;
                 return (
                   <div key={p.id} className="p-4 hover:bg-[var(--bg)] transition-colors">
                     <div className="flex items-start gap-3 mb-3">

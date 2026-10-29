@@ -72,7 +72,7 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
         projectId,
         redirectPath: `/client`,
         user: { name: user?.name, email: user?.email },
-        description: "Advance Payment (40%)",
+        description: "Advance Payment (25%)",
         
         onSuccess: () => {
           handleStartMatching(projectId);
@@ -99,14 +99,14 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
 
   const inputCls = "w-full px-3 py-2 border border-[var(--border)] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[var(--primary)] bg-[var(--input-bg)] text-[var(--text-primary)]";
   const budgetAmount = form.budget ? Number(form.budget) : 0;
-  const advanceAmount = (budgetAmount * 0.4).toFixed(0);
+  const advanceAmount = (budgetAmount * 0.25).toFixed(0);
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div className="bg-white rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl dark:bg-card" onClick={(e) => e.stopPropagation()}>
         <div className="p-6">
           <h2 className="text-lg font-bold  text-[var(--text-primary)] mb-1">Create New Project</h2>
-          <p className="text-xs text-[var(--text-muted)]  mb-5">You&apos;ll pay 40% advance after creation</p>
+          <p className="text-xs text-[var(--text-muted)]  mb-5">You&apos;ll pay 25% advance after creation</p>
 
           {error && (
             <div className="flex items-center gap-2 text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-4">
@@ -130,7 +130,7 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
               <input type="number" className={inputCls} placeholder="Min ₹500" value={form.budget} onChange={(e) => setForm({ ...form, budget: e.target.value })} min="500" disabled={loading || isPaying} required />
               {budgetAmount > 0 && (
                 <p className="text-[10px] text-[var(--text-muted)] mt-1.5 p-2 bg-blue-50 rounded border border-blue-100">
-                  💳 You&apos;ll pay <span className="font-bold text-[var(--primary)]">₹{advanceAmount}</span> (40% advance) after project creation
+                  💳 You&apos;ll pay <span className="font-bold text-[var(--primary)]">₹{advanceAmount}</span> (25% advance) after project creation
                 </p>
               )}
             </div>

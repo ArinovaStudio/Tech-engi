@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
 
     const targetUrl = redirectUrl || `/client/project/${projectId}`;
     const isAdvance = !project.advancePaid;
-    const amountToPay = isAdvance ? project.budget * 0.4 : project.budget * 0.6;
+    const amountToPay = isAdvance ? project.budget * 0.25 : project.budget * 0.75;
     const transactionType = isAdvance ? "ADVANCE_PAYMENT" : "FINAL_PAYMENT";
 
     const txnid = `TXN${Date.now()}${Math.floor(Math.random() * 1000)}`;

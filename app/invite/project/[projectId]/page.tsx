@@ -277,7 +277,7 @@ export default function InviteProjectPage() {
                       Awaiting Client Advance Payment
                     </p>
                     <p className="text-xs text-amber-700 dark:text-amber-400 mt-1">
-                      The client has invited you, but the 40% escrow advance is pending. Once paid, you can accept and begin execution.
+                      The client has invited you, but the 25% escrow advance is pending. Once paid, you can accept and begin execution.
                     </p>
                   </div>
                 ) : !session ? (

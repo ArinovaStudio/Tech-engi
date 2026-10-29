@@ -156,7 +156,7 @@ export const deletionRequestedClientTemplate = (projectTitle: string, refundAmou
   <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
     <h3 style="color: #d9534f;">Deletion Request Submitted</h3>
     <p>We have received your request to delete the project: <b>${projectTitle}</b>.</p>
-    <p>Your request is currently pending admin approval. Please note that if approved, half of your 40% advance payment <b>(₹${refundAmount.toLocaleString("en-IN")})</b> will be refunded to your account in 3-4 working days.</p>
+    <p>Your request is currently pending admin approval. Please note that if approved, half of your 25% advance payment <b>(₹${refundAmount.toLocaleString("en-IN")})</b> will be refunded to your account in 3-4 working days.</p>
     <br/>
     <p>Regards,<br/>The Platform Team</p>
   </div>

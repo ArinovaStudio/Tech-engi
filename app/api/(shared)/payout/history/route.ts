@@ -119,9 +119,9 @@ export async function GET() {
       let pendingAmount = 0;
       for (const p of pendingProjects) {
         if (p.status === "DRAFT") {
-          pendingAmount += (p.budget || 0) * 0.4;
+          pendingAmount += (p.budget || 0) * 0.25;
         } else if (p.status === "AWAITING_FINAL_PAYMENT") {
-          pendingAmount += (p.budget || 0) * 0.6;
+          pendingAmount += (p.budget || 0) * 0.75;
         }
       }
 

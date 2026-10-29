@@ -5,8 +5,8 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 
 const COMPANY = [
-  { label: "Join as Builder", href: "/register/engineer" },
-  { label: "Start a Project", href: "/register/client" },
+  { label: "Join as Builder", href: "/register" },
+  { label: "Start a Project", href: "/register" },
   { label: "Read Blogs", href: "/blog" },
   { label: "Privacy Policy", href: "/privacy-policy" },
   { label: "Terms and conditions", href: "/terms-and-conditions" },

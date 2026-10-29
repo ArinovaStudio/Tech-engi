@@ -75,7 +75,7 @@ export default function EngineerFormPage() {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/register/engineer");
+      router.push("/register");
     }
   }, [status, router]);
 

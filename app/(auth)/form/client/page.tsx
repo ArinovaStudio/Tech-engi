@@ -19,7 +19,7 @@ export default function ClientFormPage() {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/register/client");
+      router.push("/register");
     }
   }, [status, router]);
 

@@ -13,8 +13,6 @@ export async function proxy(req: NextRequest) {
   const authPages = [
     "/login",
     "/register",
-    "/register/client",
-    "/register/engineer",
     "/forgot-password",
   ];
 
@@ -51,8 +49,6 @@ export const config = {
   matcher: [
     "/login",
     "/register",
-    "/register/client",
-    "/register/engineer",
     "/forgot-password",
   ],
 };

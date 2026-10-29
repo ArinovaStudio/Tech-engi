@@ -343,10 +343,10 @@ const Start = () => {
               Tech-ENGI connects students, startups, and businesses with verified engineering experts for projects, prototyping, product development, and consulting.
             </p>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center font-inter gap-3 w-full sm:w-auto">
-              <Link href={'register/engineer'} className="px-6 py-4 text-[16px] font-bold text-gray-900 dark:text-white bg-[#F4F4F4] dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 whitespace-nowrap text-center">
+              <Link href={'register'} className="px-6 py-4 text-[16px] font-bold text-gray-900 dark:text-white bg-[#F4F4F4] dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 whitespace-nowrap text-center">
                 BECOME BUILDER
               </Link>
-              <Link href={'register/client'} className="px-6 py-4 text-[16px] font-bold bg-black dark:bg-white text-white dark:text-black flex items-center justify-center gap-2 hover:bg-gray-800 dark:hover:bg-gray-100 whitespace-nowrap">
+              <Link href={'register'} className="px-6 py-4 text-[16px] font-bold bg-black dark:bg-white text-white dark:text-black flex items-center justify-center gap-2 hover:bg-gray-800 dark:hover:bg-gray-100 whitespace-nowrap">
                 START MY PROJECT <span>↗</span>
               </Link>
             </div>

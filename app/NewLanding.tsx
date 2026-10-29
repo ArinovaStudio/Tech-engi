@@ -48,7 +48,7 @@ export default function TechEngiLanding() {
             description="No procurement queue. No agency retainer. Describe what's broken and let the network find the right person."
             steps={companySteps}
             button="Post your first task"
-            href="/register/client"
+            href="/register"
           />
           <PathCard
             id="how-eng"
@@ -57,7 +57,7 @@ export default function TechEngiLanding() {
             description="No cold outreach, no client hunting. Set your skills once — tasks that fit come to you."
             steps={engineerSteps}
             button="Join as an engineer"
-            href="/register/engineer"
+            href="/register"
           />
         </div>
       </Section>
@@ -126,7 +126,7 @@ function Nav() {
         </div>
         <div className="ml-auto flex gap-2.5">
           <a href="/login" className="rounded-[9px] border border-white/[0.16] px-4 py-2.5 text-sm font-semibold">Log in</a>
-          <a href="/register/client" className="rounded-[9px] bg-[#F0B31E] px-4 py-2.5 text-sm font-semibold text-[#1a1400]">Post a bug</a>
+          <a href="/register" className="rounded-[9px] bg-[#F0B31E] px-4 py-2.5 text-sm font-semibold text-[#1a1400]">Post a bug</a>
         </div>
       </div>
     </nav>
@@ -150,8 +150,8 @@ function Hero() {
             Post the exact thing that's broken. A verified engineer picks it up, fixes it in your environment, and you pay only when it works — from ₹500, with an NDA signed before they see a line of your code.
           </p>
           <div className="mb-8 flex flex-wrap gap-3.5">
-            <a href="/register/client" className="rounded-[9px] bg-[#F0B31E] px-6 py-3.5 text-[15px] font-semibold text-[#1a1400]">Post your first task</a>
-            <a href="/register/engineer" className="rounded-[9px] border border-white/[0.16] px-6 py-3.5 text-[15px] font-semibold">Join as an engineer</a>
+            <a href="/register" className="rounded-[9px] bg-[#F0B31E] px-6 py-3.5 text-[15px] font-semibold text-[#1a1400]">Post your first task</a>
+            <a href="/register" className="rounded-[9px] border border-white/[0.16] px-6 py-3.5 text-[15px] font-semibold">Join as an engineer</a>
           </div>
           <div className="flex flex-wrap gap-7">
             {[
@@ -359,8 +359,8 @@ function CTA() {
             Free to register on either side. Your first task is a click away.
           </p>
           <div className="flex flex-wrap justify-center gap-3.5">
-            <a href="/register/client" className="rounded-[9px] bg-[#F0B31E] px-6 py-3.5 text-[15px] font-semibold text-[#1a1400]">Post your first task</a>
-            <a href="/register/engineer" className="rounded-[9px] border border-white/[0.16] px-6 py-3.5 text-[15px] font-semibold">Join as an engineer</a>
+            <a href="/register" className="rounded-[9px] bg-[#F0B31E] px-6 py-3.5 text-[15px] font-semibold text-[#1a1400]">Post your first task</a>
+            <a href="/register" className="rounded-[9px] border border-white/[0.16] px-6 py-3.5 text-[15px] font-semibold">Join as an engineer</a>
           </div>
         </div>
       </div>

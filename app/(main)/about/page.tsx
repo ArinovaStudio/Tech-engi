@@ -262,14 +262,14 @@ export default function AboutPage() {
 
             <div className="te-in mt-10 flex flex-col gap-3.5 sm:flex-row" style={st(5)}>
               <Link
-                href="/register/client"
+                href="/register"
                 className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#050a30] px-7 py-3.5 text-[13.5px] font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#1257e8] hover:shadow-xl"
               >
                 Post a bug or project
                 <ArrowRight size={16} className="transition group-hover:translate-x-1" />
               </Link>
               <Link
-                href="/register/engineer"
+                href="/register"
                 className="inline-flex items-center justify-center rounded-full border border-slate-300 px-7 py-3.5 text-[13.5px] font-semibold transition hover:-translate-y-0.5 hover:border-[#1257e8] hover:text-[#1257e8]"
               >
                 Join as Builder
@@ -720,14 +720,14 @@ export default function AboutPage() {
           </p>
           <div className="mt-10 flex flex-col justify-center gap-3.5 sm:flex-row">
             <Link
-              href="/register/client"
+              href="/register"
               className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#050a30] px-7 py-3.5 text-[13.5px] font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#1257e8] hover:shadow-xl"
             >
               Post your bug or project
               <ArrowRight size={16} className="transition group-hover:translate-x-1" />
             </Link>
             <Link
-              href="/register/engineer"
+              href="/register"
               className="inline-flex items-center justify-center rounded-full border border-slate-300 px-7 py-3.5 text-[13.5px] font-semibold transition hover:-translate-y-0.5 hover:border-[#1257e8] hover:text-[#1257e8]"
             >
               Get verified and matched

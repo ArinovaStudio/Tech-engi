@@ -511,14 +511,14 @@ export default function CommonCodingBugsPage() {
                   </p>
                   <div className="mt-9 flex flex-col gap-3.5 sm:flex-row">
                     <Link
-                      href="/register/client"
+                      href="/register"
                       className="inline-flex items-center justify-center gap-2 rounded-full bg-amber-500 px-6 py-3 text-[13px] font-bold text-[#050a30] transition hover:-translate-y-0.5 hover:bg-amber-400 hover:shadow-xl"
                     >
                       Post Your Bug
                       <ArrowRight size={16} />
                     </Link>
                     <Link
-                      href="/register/engineer"
+                      href="/register"
                       className="inline-flex items-center justify-center gap-2 rounded-full border border-white/40 px-6 py-3 text-[13px] font-semibold text-white transition hover:bg-white/10"
                     >
                       Join as Builder

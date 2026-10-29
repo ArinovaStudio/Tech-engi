@@ -19,13 +19,13 @@ export default function CtaSection() {
 
             <div className="mt-6 flex flex-col gap-3 sm:mt-7 sm:flex-row">
               <Link
-                href="/register/client"
+                href="/register"
                 className="btn w-full justify-center text-center sm:w-auto"
               >
                 Post your first task
               </Link>
               <Link
-                href="/register/engineer"
+                href="/register"
                 className="btn-outline w-full justify-center text-center sm:w-auto"
               >
                 Register free

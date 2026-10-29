@@ -69,7 +69,7 @@ export default function LeadsSection() {
             </span>
             <h3>Post a project — 0% client fee</h3>
             <p>Tell us your bug, stack, or project scope. Get an AI-matched engineer in 2 to 24 hours.</p>
-            <Link href="/register/client" className="btn-outline mt-6 inline-flex">
+            <Link href="/register" className="btn-outline mt-6 inline-flex">
               Request a quote
             </Link>
           </div>
@@ -80,7 +80,7 @@ export default function LeadsSection() {
             </span>
             <h3>Engineers register free and get matched</h3>
             <p>Keep 97% on your first project (95% after). No bidding credits, no cut-rate contests.</p>
-            <Link href="/register/engineer" className="btn mt-6 inline-flex">
+            <Link href="/register" className="btn mt-6 inline-flex">
               Join as an engineer
             </Link>
           </div>

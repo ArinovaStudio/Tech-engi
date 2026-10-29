@@ -476,14 +476,14 @@ export default function IndianItBurnoutPage() {
                   </p>
                   <div className="mt-9 flex flex-col gap-3.5 sm:flex-row">
                     <Link
-                      href="/register/engineer"
+                      href="/register"
                       className={`inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-[13px] font-bold text-teal-950 transition hover:-translate-y-0.5 hover:shadow-xl ${CORAL}`}
                     >
                       Register on Tech Engi
                       <ArrowRight size={16} />
                     </Link>
                     <Link
-                      href="/register/client"
+                      href="/register"
                       className="inline-flex items-center justify-center gap-2 rounded-full border border-white/40 px-6 py-3 text-[13px] font-semibold text-white transition hover:bg-white/10"
                     >
                       Hire an Engineer

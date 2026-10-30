@@ -1,17 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Wrench, Loader2, X, Plus, Upload, FileText } from "lucide-react";
-import { useSession } from "next-auth/react";
-import Image from "next/image";
+import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
 import toast from "react-hot-toast";
-import { signOut } from "next-auth/react";
-
+import { useTheme } from "@/components/ThemeProvider";
+import AuthBrandSide from "@/components/auth/AuthBrandSide";
 
 const QUALIFICATIONS = [
-  { value: "UG", label: "Under Graduate (Student)" },
-  { value: "EMPLOYED", label: "Employed" },
+  { value: "UG", label: "Undergraduate (Student)" },
+  { value: "EMPLOYED", label: "Employed Professional" },
   { value: "AspiringEngineer", label: "Aspiring Engineer" },
 ];
 
@@ -36,32 +35,32 @@ const EXPERIENCE_LEVELS = [
   { value: "EIGHT_PLUS_YEARS", label: "8+ Years" },
 ];
 
-interface CertificateData {
-  name: string;
-  file: File;
-}
-
 export default function EngineerFormPage() {
   const router = useRouter();
   const { status } = useSession();
-  const [qualification, setQualification] = useState("");
-  const [idType, setIdType] = useState("");
-  const [idNumber, setIdNumber] = useState("");
-  const [idFile, setIdFile] = useState<File | null>(null);
-  const [yearsOfExperience, setYearsOfExperience] = useState("");
-  const [qualificationDetails, setqualificationDetails] = useState("");
+  const { theme, toggleTheme } = useTheme();
+
+  const [step, setStep] = useState<1 | 2>(1);
+
+  // Step 1: Background & Links
+  const [qualificationDetails, setQualificationDetails] = useState("");
   const [universityName, setUniversityName] = useState("");
-  const [skills, setSkills] = useState<string[]>([]);
-  const [skillInput, setSkillInput] = useState("");
+  const [yearsOfExperience, setYearsOfExperience] = useState("");
   const [github, setGithub] = useState("");
   const [linkedin, setLinkedin] = useState("");
   const [portfolio, setPortfolio] = useState("");
   const [achievements, setAchievements] = useState("");
-  const [certifications, setCertifications] = useState<CertificateData[]>([]);
-  const [certInput, setCertInput] = useState("");
-  const [certFile, setCertFile] = useState<File | null>(null);
-  const [saving, setSaving] = useState(false);
-  const [preferredMethod, setPreferredMethod] = useState("UPI");
+
+  // Step 2: Verification, Skills & Payout
+  const [qualification, setQualification] = useState("");
+  const [idType, setIdType] = useState("");
+  const [idNumber, setIdNumber] = useState("");
+  const [idFile, setIdFile] = useState<File | null>(null);
+
+  const [skills, setSkills] = useState<string[]>([]);
+  const [skillInput, setSkillInput] = useState("");
+
+  const [preferredMethod, setPreferredMethod] = useState<"UPI" | "BANK">("UPI");
   const [upiId, setUpiId] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [ifscCode, setIfscCode] = useState("");
@@ -69,40 +68,24 @@ export default function EngineerFormPage() {
   const [accountHolder, setAccountHolder] = useState("");
 
   const [error, setError] = useState("");
-  const [showErrors, setShowErrors] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [step, setStep] = useState<1 | 2>(1);
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/register");
+      router.push("/login");
     }
   }, [status, router]);
 
   const addSkill = () => {
     const val = skillInput.trim();
-    if (val && !skills.includes(val)) setSkills([...skills, val]);
+    if (val && !skills.includes(val)) {
+      setSkills([...skills, val]);
+    }
     setSkillInput("");
   };
 
-  const addCertificate = () => {
-    const val = certInput.trim();
-    if (!val) {
-      setError("Please enter the certificate name.");
-      return;
-    }
-    if (!certFile) {
-      setError("Please upload the proof document for the certificate.");
-      return;
-    }
-    setError("");
-    setCertifications([...certifications, { name: val, file: certFile }]);
-    setCertInput("");
-    setCertFile(null);
-  };
-
-  const removeCertificate = (indexToRemove: number) => {
-    setCertifications(certifications.filter((_, idx) => idx !== indexToRemove));
+  const removeSkill = (tag: string) => {
+    setSkills(skills.filter((s) => s !== tag));
   };
 
   const handleQualificationChange = (val: string) => {
@@ -111,19 +94,55 @@ export default function EngineerFormPage() {
     setIdNumber("");
   };
 
+  const handleNextStep = () => {
+    setError("");
+    if (!qualificationDetails.trim()) {
+      setError("Please enter your qualification degree / title.");
+      return;
+    }
+    if (!universityName.trim()) {
+      setError("Please enter your college / university name.");
+      return;
+    }
+    if (!yearsOfExperience) {
+      setError("Please select your years of experience.");
+      return;
+    }
+    setStep(2);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (!idFile) { setError("Please upload your ID document"); return; }
-    if (skills.length === 0) { setError("Please add at least one skill"); return; }
+    if (!qualification) {
+      setError("Please select your qualification category.");
+      return;
+    }
+    if (!idType) {
+      setError("Please select an ID document type.");
+      return;
+    }
+    if (!idNumber.trim()) {
+      setError("Please enter your ID number.");
+      return;
+    }
+    if (!idFile) {
+      setError("Please upload a scanned copy of your ID document.");
+      return;
+    }
+    if (skills.length === 0) {
+      setError("Please add at least one technical skill.");
+      return;
+    }
 
-    const cleanedId = idNumber.replace(/\s+/g, '').toUpperCase();
+    const cleanedId = idNumber.replace(/\s+/g, "").toUpperCase();
 
     if (idType === "PAN") {
       const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
       if (!panRegex.test(cleanedId)) {
-        setError("Invalid PAN format. It should be 5 letters, 4 numbers, and 1 letter (e.g., ABCDE1234F)");
+        setError("Invalid PAN format. Expected format: ABCDE1234F");
         return;
       }
     }
@@ -131,7 +150,19 @@ export default function EngineerFormPage() {
     if (idType === "AADHAAR") {
       const aadhaarRegex = /^[2-9]{1}[0-9]{11}$/;
       if (!aadhaarRegex.test(cleanedId)) {
-        setError("Invalid Aadhaar format. It must be exactly 12 digits and cannot start with 0 or 1.");
+        setError("Invalid Aadhaar format. It must be 12 digits and cannot start with 0 or 1.");
+        return;
+      }
+    }
+
+    if (preferredMethod === "UPI") {
+      if (!upiId.trim()) {
+        setError("Please enter your UPI ID.");
+        return;
+      }
+    } else {
+      if (!accountNumber.trim() || !ifscCode.trim() || !bankName.trim() || !accountHolder.trim()) {
+        setError("Please fill out all bank account details.");
         return;
       }
     }
@@ -145,31 +176,28 @@ export default function EngineerFormPage() {
       formData.append("idNumber", cleanedId);
       formData.append("file", idFile);
       formData.append("skills", JSON.stringify(skills));
+
       // Education
-      formData.append("qualificationDetails", qualificationDetails);
-      formData.append("universityName", universityName);
+      formData.append("qualificationDetails", qualificationDetails.trim());
+      formData.append("universityName", universityName.trim());
 
       // Professional Links
-      formData.append("github", github);
-      formData.append("linkedin", linkedin);
-      formData.append("portfolio", portfolio);
+      formData.append("github", github.trim());
+      formData.append("linkedin", linkedin.trim());
+      formData.append("portfolio", portfolio.trim());
 
       // Achievements
-      formData.append("achievements", achievements);
+      formData.append("achievements", achievements.trim());
 
       // Payout Details
       formData.append("preferredMethod", preferredMethod);
-      formData.append("upiId", upiId);
-      formData.append("accountNumber", accountNumber);
-      formData.append("ifscCode", ifscCode);
-      formData.append("bankName", bankName);
-      formData.append("accountHolder", accountHolder);
+      formData.append("upiId", preferredMethod === "UPI" ? upiId.trim() : "");
+      formData.append("accountNumber", preferredMethod === "BANK" ? accountNumber.trim() : "");
+      formData.append("ifscCode", preferredMethod === "BANK" ? ifscCode.trim().toUpperCase() : "");
+      formData.append("bankName", preferredMethod === "BANK" ? bankName.trim() : "");
+      formData.append("accountHolder", preferredMethod === "BANK" ? accountHolder.trim() : "");
+      formData.append("certifications", JSON.stringify([]));
 
-      const mappedCertifications = certifications.map((cert, index) => {
-        formData.append(`certFile_${index}`, cert.file);
-        return { name: cert.name, fileIndex: index };
-      });
-      formData.append("certifications", JSON.stringify(mappedCertifications));
       const res = await fetch("/api/engineer/profile", {
         method: "POST",
         body: formData,
@@ -177,25 +205,33 @@ export default function EngineerFormPage() {
 
       const data = await res.json();
 
-      if (!res.ok || !data.success) toast.error(data.message || "Failed to send OTP");
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to submit profile.");
+      }
 
-      await signOut({
-        callbackUrl: "/login",
-      });
-
-      router.push("/");
-    } catch (err: any) {
-      setError(err.message);
-
-    } finally {
+      toast.success("Profile submitted for verification! Please log in.");
+      await signOut({ callbackUrl: "/login" });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Submission failed.";
+      setError(msg);
       setIsLoading(false);
     }
   };
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-[#f8fafd] flex items-center justify-center">
-        <Loader2 className="animate-spin h-8 w-8 text-[#f0b31e]" />
+      <div className="min-h-screen bg-white dark:bg-[#070b14] flex items-center justify-center">
+        <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400">
+          <svg className="h-6 w-6 animate-spin text-[#f0b31e]" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+          <span className="font-mono text-sm">Loading session...</span>
+        </div>
       </div>
     );
   }
@@ -204,647 +240,643 @@ export default function EngineerFormPage() {
     return null;
   }
 
-  const missingFields: string[] = [];
-
-  if (!qualification) missingFields.push("Qualification");
-  if (!idType) missingFields.push("ID Type");
-
-  if (!preferredMethod) {
-    missingFields.push("Payment Method");
-  } else if (preferredMethod === "UPI") {
-    if (!upiId) missingFields.push("UPI ID");
-  } else if (preferredMethod === "BANK_TRANSFER") {
-    if (!accountNumber) missingFields.push("Account Number");
-    if (!ifscCode) missingFields.push("IFSC Code");
-    if (!bankName) missingFields.push("Bank Name");
-    if (!accountHolder) missingFields.push("Account Holder Name");
-  }
-
   return (
-    <div className="flex flex-col lg:flex-row w-full h-screen">
-      <div className="w-full lg:w-[50%] h-screen">
-        <div className="flex items-center justify-center px-4 py-8 font-sans w-full">
+    <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2 bg-white text-slate-900 dark:bg-[#070b14] dark:text-slate-100 transition-colors duration-200">
+      {/* ================= LEFT: FORM SIDE ================= */}
+      <div className="flex flex-col justify-between p-6 sm:p-10 lg:p-12 overflow-y-auto min-h-screen">
+        {/* Topbar */}
+        <div className="flex items-center justify-between gap-4 pb-6">
+          {step === 2 ? (
+            <button
+              type="button"
+              onClick={() => {
+                setError("");
+                setStep(1);
+              }}
+              className="group inline-flex items-center gap-2.5 text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors cursor-pointer"
+            >
+              <svg
+                width="16"
+                height="14"
+                viewBox="0 0 16 14"
+                aria-hidden="true"
+                className="transition-transform group-hover:-translate-x-0.5"
+              >
+                <path
+                  d="M15 7H1M7 1L1 7l6 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span>Back to Step 1</span>
+            </button>
+          ) : (
+            <Link
+              href="/"
+              className="group inline-flex items-center gap-2.5 text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
+            >
+              <svg
+                width="16"
+                height="14"
+                viewBox="0 0 16 14"
+                aria-hidden="true"
+                className="transition-transform group-hover:-translate-x-0.5"
+              >
+                <path
+                  d="M15 7H1M7 1L1 7l6 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span>Back to techengi.in</span>
+            </Link>
+          )}
 
-          {/* Increased around 30% from previous small version */}
-          <div className="w-160 scale-[0.95] origin-top">
+          <div className="flex items-center gap-3">
+            {/* Theme Toggle Button */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label="Toggle dark mode"
+              title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-white dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 transition-all cursor-pointer"
+            >
+              {theme === "light" ? (
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+                </svg>
+              ) : (
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="4" />
+                  <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+                </svg>
+              )}
+            </button>
 
-            {/* Header */}
-            <div className="mb-10 flex flex-col items-center justify-center">
-              <h1 className="text-[42px] leading-[1] font-black tracking-[-1.8px] text-[#0F172A] flex items-center gap-2">
-                Hey, Join us Today!
-                <span className="text-2xl">👀</span>
-              </h1>
+            {/* Mobile Brandmark */}
+            <div className="flex lg:hidden items-center gap-2 font-black text-slate-900 dark:text-white">
+              <span className="font-mono text-[#f0b31e]">{`{ }`}</span>
+              <span className="text-sm tracking-tight">Tech Engi</span>
+            </div>
+          </div>
+        </div>
 
-              <p className="text-[#7B6A42] text-[15px] leading-[1.5] mt-4 max-w-[360px] font-medium">
-                Today is a new day. It's your day. You shape it.
-                Sign in to start connection with other business.
-              </p>
+        {/* Form Container */}
+        <div className="w-full max-w-[460px] mx-auto my-auto py-6">
+          {/* Step Pill Header */}
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-block rounded-full bg-[#f0b31e]/15 px-3 py-1 font-mono text-[11px] font-bold text-[#b8850a] dark:text-[#f0b31e] tracking-wider uppercase">
+                ENGINEER ONBOARDING
+              </span>
+              <span className="font-mono text-xs text-slate-400 dark:text-slate-500">
+                &bull; Step {step} of 2
+              </span>
             </div>
 
-            {/* Progress */}
-            <div className="relative mb-10 px-1">
+            <h1 className="text-3xl sm:text-[34px] font-black tracking-[-0.035em] text-slate-900 dark:text-white">
+              {step === 1 ? "Your background." : "Verification & payout."}
+            </h1>
+            <p className="mt-2 text-[15px] text-slate-500 dark:text-slate-400">
+              {step === 1
+                ? "Tell us about your education, experience level, and verified engineering work."
+                : "Submit verification proof and payout preferences to be eligible for project matches."}
+            </p>
+          </div>
 
-              {/* Line */}
-              <div className="absolute top-3.5 left-0 right-0 h-[2px] bg-[#F0B31E]" />
+          {/* Stepper Bar */}
+          <div className="mb-6 flex gap-2">
+            <div
+              className={`h-1.5 flex-1 rounded-full transition-colors ${
+                step >= 1 ? "bg-[#f0b31e]" : "bg-slate-200 dark:bg-slate-800"
+              }`}
+            />
+            <div
+              className={`h-1.5 flex-1 rounded-full transition-colors ${
+                step === 2 ? "bg-[#f0b31e]" : "bg-slate-200 dark:bg-slate-800"
+              }`}
+            />
+          </div>
 
-              <div className="relative flex justify-between items-center">
+          {/* Error Callout */}
+          {error && (
+            <div
+              role="alert"
+              className="mb-6 rounded-xl border border-rose-200 bg-rose-50/80 p-3.5 text-[13.5px] leading-relaxed text-rose-600 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400"
+            >
+              {error}
+            </div>
+          )}
 
-                {/* Step 1 */}
-                <div className="flex flex-col items-start">
-                  <div className="w-7 h-7 rounded-full bg-[#F0B31E] text-white flex items-center justify-center text-[12px] font-semibold shadow-md shadow-yellow-500/30">
-                    1
-                  </div>
+          {/* STEP 1: Background & Links */}
+          {step === 1 && (
+            <div className="space-y-4">
+              {/* Qualification Details */}
+              <div>
+                <label
+                  htmlFor="qualificationDetails"
+                  className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase mb-2 block"
+                >
+                  Qualification / Degree *
+                </label>
+                <input
+                  id="qualificationDetails"
+                  type="text"
+                  value={qualificationDetails}
+                  onChange={(e) => setQualificationDetails(e.target.value)}
+                  placeholder="e.g. B.Tech in Computer Science"
+                  className="min-h-[50px] w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:outline-none hover:border-slate-300 focus:border-[#f0b31e] focus:ring-4 focus:ring-[#f0b31e]/15 dark:border-slate-800 dark:bg-slate-900/80 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-slate-700 dark:focus:border-[#f0b31e]"
+                />
+              </div>
 
-                  <p className="text-[10px] text-[#C98F00] mt-2 font-medium">
-                    Basic Credentials
-                  </p>
-                </div>
+              {/* College / University Name */}
+              <div>
+                <label
+                  htmlFor="universityName"
+                  className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase mb-2 block"
+                >
+                  College / University Name *
+                </label>
+                <input
+                  id="universityName"
+                  type="text"
+                  value={universityName}
+                  onChange={(e) => setUniversityName(e.target.value)}
+                  placeholder="e.g. Anna University, IIT Madras"
+                  className="min-h-[50px] w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:outline-none hover:border-slate-300 focus:border-[#f0b31e] focus:ring-4 focus:ring-[#f0b31e]/15 dark:border-slate-800 dark:bg-slate-900/80 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-slate-700 dark:focus:border-[#f0b31e]"
+                />
+              </div>
 
-                {/* Step 2 */}
-                <div className="flex flex-col items-end">
-                  <div className="w-7 h-7 rounded-full bg-[#F0B31E] text-white flex items-center justify-center text-[12px] font-semibold shadow-md shadow-yellow-500/30">
-                    2
-                  </div>
+              {/* Experience Level */}
+              <div>
+                <label
+                  htmlFor="yearsOfExperience"
+                  className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase mb-2 block"
+                >
+                  Years of Experience *
+                </label>
+                <select
+                  id="yearsOfExperience"
+                  value={yearsOfExperience}
+                  onChange={(e) => setYearsOfExperience(e.target.value)}
+                  className="min-h-[50px] w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 transition-all focus:outline-none hover:border-slate-300 focus:border-[#f0b31e] focus:ring-4 focus:ring-[#f0b31e]/15 dark:border-slate-800 dark:bg-slate-900/80 dark:text-white dark:hover:border-slate-700 dark:focus:border-[#f0b31e] cursor-pointer"
+                >
+                  <option value="" disabled>
+                    Select experience level
+                  </option>
+                  {EXPERIENCE_LEVELS.map((exp) => (
+                    <option key={exp.value} value={exp.value}>
+                      {exp.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-                  <p className="text-[10px] text-[#C98F00] mt-2 font-medium">
-                    Company Details
-                  </p>
+              {/* GitHub Link */}
+              <div>
+                <label
+                  htmlFor="github"
+                  className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase mb-2 block"
+                >
+                  GitHub Profile URL
+                </label>
+                <input
+                  id="github"
+                  type="url"
+                  value={github}
+                  onChange={(e) => setGithub(e.target.value)}
+                  placeholder="https://github.com/yourhandle"
+                  className="min-h-[50px] w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:outline-none hover:border-slate-300 focus:border-[#f0b31e] focus:ring-4 focus:ring-[#f0b31e]/15 dark:border-slate-800 dark:bg-slate-900/80 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-slate-700 dark:focus:border-[#f0b31e]"
+                />
+              </div>
+
+              {/* LinkedIn Link */}
+              <div>
+                <label
+                  htmlFor="linkedin"
+                  className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase mb-2 block"
+                >
+                  LinkedIn Profile URL
+                </label>
+                <input
+                  id="linkedin"
+                  type="url"
+                  value={linkedin}
+                  onChange={(e) => setLinkedin(e.target.value)}
+                  placeholder="https://linkedin.com/in/yourhandle"
+                  className="min-h-[50px] w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:outline-none hover:border-slate-300 focus:border-[#f0b31e] focus:ring-4 focus:ring-[#f0b31e]/15 dark:border-slate-800 dark:bg-slate-900/80 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-slate-700 dark:focus:border-[#f0b31e]"
+                />
+              </div>
+
+              {/* Portfolio Link */}
+              <div>
+                <label
+                  htmlFor="portfolio"
+                  className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase mb-2 block"
+                >
+                  Portfolio / Personal Website
+                </label>
+                <input
+                  id="portfolio"
+                  type="url"
+                  value={portfolio}
+                  onChange={(e) => setPortfolio(e.target.value)}
+                  placeholder="https://yourportfolio.dev"
+                  className="min-h-[50px] w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:outline-none hover:border-slate-300 focus:border-[#f0b31e] focus:ring-4 focus:ring-[#f0b31e]/15 dark:border-slate-800 dark:bg-slate-900/80 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-slate-700 dark:focus:border-[#f0b31e]"
+                />
+              </div>
+
+              {/* Achievements */}
+              <div>
+                <label
+                  htmlFor="achievements"
+                  className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase mb-2 block"
+                >
+                  Key Achievements
+                </label>
+                <input
+                  id="achievements"
+                  type="text"
+                  value={achievements}
+                  onChange={(e) => setAchievements(e.target.value)}
+                  placeholder="Hackathon Winner, AWS Certified, Contributor"
+                  className="min-h-[50px] w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:outline-none hover:border-slate-300 focus:border-[#f0b31e] focus:ring-4 focus:ring-[#f0b31e]/15 dark:border-slate-800 dark:bg-slate-900/80 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-slate-700 dark:focus:border-[#f0b31e]"
+                />
+                <p className="mt-1 font-mono text-[11px] text-slate-400 dark:text-slate-500">
+                  Separate multiple achievements with commas.
+                </p>
+              </div>
+
+              {/* Next Step Button */}
+              <button
+                type="button"
+                onClick={handleNextStep}
+                className="mt-6 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-[#f0b31e] font-bold text-slate-950 shadow-sm transition-all duration-150 hover:bg-[#ffc543] active:translate-y-[1px] cursor-pointer"
+              >
+                <span>Continue to Verification</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                  <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {/* STEP 2: Verification, Skills & Payout */}
+          {step === 2 && (
+            <form onSubmit={handleSubmit} noValidate className="space-y-5">
+              {/* Qualification Category Pills */}
+              <div>
+                <label className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase mb-2 block">
+                  Category *
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {QUALIFICATIONS.map((q) => {
+                    const isSelected = qualification === q.value;
+                    return (
+                      <button
+                        key={q.value}
+                        type="button"
+                        onClick={() => handleQualificationChange(q.value)}
+                        className={`min-h-[46px] rounded-xl border px-3 py-2 text-xs font-semibold transition-all cursor-pointer text-center ${
+                          isSelected
+                            ? "border-[#f0b31e] bg-[#f0b31e] text-slate-950 shadow-xs"
+                            : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:text-white"
+                        }`}
+                      >
+                        {q.label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
-            </div>
 
-            <div className="mb-8">
-              <h2 className="text-[24px] font-extrabold text-[#111827] tracking-tight">
-                {step === 1 ? "Tell us about you" : "Verify your identity"}
-              </h2>
-
-              <p className="text-[14px] text-[#7B6A42] mt-2 leading-relaxed">
-                {step === 1
-                  ? "We use this to personalize your experience"
-                  : "This helps us keep the platform secure and trusted"}
-              </p>
-            </div>
-
-            {showErrors && missingFields.length > 0 && (
-              <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3">
-                <p className="text-sm font-medium text-red-600">
-                  Please complete the following required fields:
-                </p>
-
-                <p className="mt-1 text-sm text-red-500">
-                  {missingFields.join(", ")}
-                </p>
-              </div>
-            )}
-
-            {step === 1 && (
-              <div className="space-y-6">
-
-                {/* Qualification */}
-                <div className="space-y-2">
-                  <label className="text-[15px] font-semibold text-[#111827]">
-                    Qualification*
+              {/* ID Document Type */}
+              {qualification && (
+                <div>
+                  <label className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase mb-2 block">
+                    Verification ID Type *
                   </label>
+                  <div className="flex flex-wrap gap-2">
+                    {ID_TYPES[qualification].map((type) => {
+                      const isSelected = idType === type;
+                      return (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => {
+                            setIdType(type);
+                            setIdNumber("");
+                          }}
+                          className={`rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer ${
+                            isSelected
+                              ? "border-[#f0b31e] bg-[#f0b31e] text-slate-950 shadow-xs"
+                              : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:text-white"
+                          }`}
+                        >
+                          {ID_LABELS[type]}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
-                  <div className="flex gap-3">
-                    <input type="text"
-                      value={qualificationDetails}
-                      onChange={(e) => setqualificationDetails(e.target.value)}
-                      placeholder="Enter your qualification e.g. B.Tech"
-                      className="flex-1 h-[56px] px-5 rounded-[16px] border text-[#8A7440] text-[14px] outline-none"
+              {/* ID Number Input */}
+              {idType && (
+                <div>
+                  <label
+                    htmlFor="idNumber"
+                    className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase mb-2 block"
+                  >
+                    {ID_LABELS[idType]} Number *
+                  </label>
+                  <input
+                    id="idNumber"
+                    type="text"
+                    value={idNumber}
+                    onChange={(e) => setIdNumber(e.target.value.toUpperCase())}
+                    placeholder={
+                      idType === "PAN"
+                        ? "e.g. ABCDE1234F"
+                        : idType === "AADHAAR"
+                        ? "12-digit Aadhaar number"
+                        : "Enter your ID number"
+                    }
+                    className="min-h-[50px] w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 uppercase transition-all placeholder:text-slate-400 focus:outline-none hover:border-slate-300 focus:border-[#f0b31e] focus:ring-4 focus:ring-[#f0b31e]/15 dark:border-slate-800 dark:bg-slate-900/80 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-slate-700 dark:focus:border-[#f0b31e]"
+                  />
+                </div>
+              )}
+
+              {/* ID Document Upload */}
+              <div>
+                <label className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase mb-2 block">
+                  Upload ID Proof Document *
+                </label>
+                <label className="flex min-h-[52px] w-full items-center justify-between rounded-xl border border-dashed border-slate-300 bg-slate-50/50 px-4 py-3 transition-colors hover:border-[#f0b31e] dark:border-slate-700 dark:bg-slate-900/40 cursor-pointer">
+                  <div className="flex items-center gap-3 truncate">
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="shrink-0 text-slate-400 dark:text-slate-500"
+                    >
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    <span className="truncate text-xs font-medium text-slate-700 dark:text-slate-300">
+                      {idFile ? idFile.name : "Choose file (JPG, PNG or PDF)"}
+                    </span>
+                  </div>
+                  <span className="shrink-0 rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 border border-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300">
+                    Browse
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*,.pdf"
+                    className="hidden"
+                    onChange={(e) => setIdFile(e.target.files?.[0] || null)}
+                  />
+                </label>
+              </div>
+
+              {/* Technical Skills */}
+              <div>
+                <label className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase mb-2 block">
+                  Technical Skills *
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={skillInput}
+                    onChange={(e) => setSkillInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addSkill();
+                      }
+                    }}
+                    placeholder="e.g. Next.js, Embedded C, Python..."
+                    className="min-h-[50px] flex-1 rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:outline-none hover:border-slate-300 focus:border-[#f0b31e] focus:ring-4 focus:ring-[#f0b31e]/15 dark:border-slate-800 dark:bg-slate-900/80 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-slate-700 dark:focus:border-[#f0b31e]"
+                  />
+                  <button
+                    type="button"
+                    onClick={addSkill}
+                    aria-label="Add skill"
+                    className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-xl bg-[#f0b31e] text-slate-950 font-bold transition-all hover:bg-[#ffc543] active:translate-y-[1px] cursor-pointer"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {skills.length > 0 && (
+                  <div className="flex flex-wrap gap-2 pt-3">
+                    {skills.map((skill) => (
+                      <span
+                        key={skill}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/60 bg-amber-50 px-3.5 py-1 text-xs font-semibold text-amber-900 dark:border-amber-400/30 dark:bg-amber-950/30 dark:text-amber-200"
+                      >
+                        <span>{skill}</span>
+                        <button
+                          type="button"
+                          aria-label={`Remove ${skill}`}
+                          onClick={() => removeSkill(skill)}
+                          className="text-amber-700 hover:text-amber-950 dark:text-amber-300 dark:hover:text-white cursor-pointer"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                          </svg>
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Payout Details Section */}
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-4 dark:border-slate-800 dark:bg-slate-900/50">
+                <label className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase mb-3 block">
+                  Payout Method Preference *
+                </label>
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                  <button
+                    type="button"
+                    onClick={() => setPreferredMethod("UPI")}
+                    className={`min-h-[42px] rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                      preferredMethod === "UPI"
+                        ? "border-[#f0b31e] bg-[#f0b31e] text-slate-950 shadow-xs"
+                        : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400"
+                    }`}
+                  >
+                    UPI Transfer
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreferredMethod("BANK")}
+                    className={`min-h-[42px] rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                      preferredMethod === "BANK"
+                        ? "border-[#f0b31e] bg-[#f0b31e] text-slate-950 shadow-xs"
+                        : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400"
+                    }`}
+                  >
+                    Bank Account
+                  </button>
+                </div>
+
+                {preferredMethod === "UPI" ? (
+                  <div>
+                    <label
+                      htmlFor="upiId"
+                      className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase mb-1.5 block"
+                    >
+                      UPI ID *
+                    </label>
+                    <input
+                      id="upiId"
+                      type="text"
+                      value={upiId}
+                      onChange={(e) => setUpiId(e.target.value.toLowerCase())}
+                      placeholder="e.g. yourname@okaxis"
+                      className="min-h-[46px] w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:outline-none focus:border-[#f0b31e] dark:border-slate-800 dark:bg-slate-900 dark:text-white"
                     />
                   </div>
-                </div>
-
-                {/* collage / School Name */}
-                {qualificationDetails && (
-                  <div>
-                    <div className="space-y-2">
-                      <label className="text-[15px] font-semibold text-[#111827]">
-                        University Name*
+                ) : (
+                  <div className="space-y-3">
+                    <div>
+                      <label
+                        htmlFor="accountHolder"
+                        className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase mb-1.5 block"
+                      >
+                        Account Holder Name *
                       </label>
-
-                      <div className="flex gap-3">
-                        <input type="text"
-                          value={universityName}
-                          onChange={(e) => setUniversityName(e.target.value)}
-                          placeholder="Enter your Collage Name"
-                          className="flex-1 h-14 px-5 rounded-[16px] border text-[#8A7440] text-[14px] outline-none"
+                      <input
+                        id="accountHolder"
+                        type="text"
+                        value={accountHolder}
+                        onChange={(e) => setAccountHolder(e.target.value)}
+                        placeholder="Full name as on passbook"
+                        className="min-h-[46px] w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:outline-none focus:border-[#f0b31e] dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label
+                          htmlFor="accountNumber"
+                          className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase mb-1.5 block"
+                        >
+                          Account Number *
+                        </label>
+                        <input
+                          id="accountNumber"
+                          type="text"
+                          value={accountNumber}
+                          onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ""))}
+                          placeholder="Account number"
+                          className="min-h-[46px] w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:outline-none focus:border-[#f0b31e] dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="ifscCode"
+                          className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase mb-1.5 block"
+                        >
+                          IFSC Code *
+                        </label>
+                        <input
+                          id="ifscCode"
+                          type="text"
+                          value={ifscCode}
+                          onChange={(e) => setIfscCode(e.target.value.toUpperCase())}
+                          placeholder="e.g. SBIN0001234"
+                          className="min-h-[46px] w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm text-slate-900 uppercase transition-all placeholder:text-slate-400 focus:outline-none focus:border-[#f0b31e] dark:border-slate-800 dark:bg-slate-900 dark:text-white"
                         />
                       </div>
                     </div>
+                    <div>
+                      <label
+                        htmlFor="bankName"
+                        className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase mb-1.5 block"
+                      >
+                        Bank Name *
+                      </label>
+                      <input
+                        id="bankName"
+                        type="text"
+                        value={bankName}
+                        onChange={(e) => setBankName(e.target.value)}
+                        placeholder="e.g. HDFC Bank, SBI"
+                        className="min-h-[46px] w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm text-slate-900 transition-all placeholder:text-slate-400 focus:outline-none focus:border-[#f0b31e] dark:border-slate-800 dark:bg-slate-900 dark:text-white"
+                      />
+                    </div>
                   </div>
                 )}
-
-                {/* Experience */}
-                <div className="space-y-2">
-                  <label className="text-[15px] font-semibold text-[#111827]">
-                    Years of Experience*
-                  </label>
-
-                  <select
-                    value={yearsOfExperience}
-                    onChange={(e) => setYearsOfExperience(e.target.value)}
-                    className="w-full h-[56px] px-5 rounded-[16px] border text-[#8A7440] text-[14px] outline-none focus:border-[#F0B31E]"
-                  >
-                    <option value="" disabled>
-                      Select experience level
-                    </option>
-
-                    {EXPERIENCE_LEVELS.map((exp) => (
-                      <option key={exp.value} value={exp.value}>
-                        {exp.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* GitHub */}
-                <div>
-                  <div className="space-y-2">
-                    <label className="text-[15px] font-semibold text-[#111827]">
-                      GitHub
-                    </label>
-
-                    <div className="flex gap-3">
-                      <input type="text"
-                        value={github}
-                        onChange={(e) => setGithub(e.target.value)}
-                        placeholder="Enter your Github link"
-                        className="flex-1 h-14 px-5 rounded-[16px] border text-[#8A7440] text-[14px] outline-none"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Linkedin */}
-                <div>
-                  <div className="space-y-2">
-                    <label className="text-[15px] font-semibold text-[#111827]">
-                      Linkedin
-                    </label>
-
-                    <div className="flex gap-3">
-                      <input type="text"
-                        value={linkedin}
-                        onChange={(e) => setLinkedin(e.target.value)}
-                        placeholder="Enter your linkedin link"
-                        className="flex-1 h-14 px-5 rounded-[16px] border text-[#8A7440] text-[14px] outline-none"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Portfolio */}
-                <div className="space-y-2">
-                  <label className="text-[15px] font-semibold text-[#111827]">
-                    Portfolio
-                  </label>
-
-                  <div className="flex gap-3">
-                    <input type="text"
-                      value={portfolio}
-                      onChange={(e) => setPortfolio(e.target.value)}
-                      placeholder="Enter your Portfolio link"
-                      className="flex-1 h-14 px-5 rounded-[16px] border text-[#8A7440] text-[14px] outline-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Achievements */}
-                <div className="space-y-2">
-                  <label className="text-[15px] font-semibold text-[#111827]">
-                    Achievements
-                  </label>
-
-                  <input
-                    type="text"
-                    value={achievements}
-                    onChange={(e) => setAchievements(e.target.value)}
-                    placeholder="Hackathon Winner, AWS Certified, Open Source Contributor"
-                    className="w-full h-14 px-5 rounded-[16px] border text-[#8A7440] text-[14px] outline-none"
-                  />
-
-                  <div className="flex items-center gap-2 pl-1">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#F0B31E]" />
-                    <p className="text-[12px] text-[#8A7440]">
-                      Separate multiple achievements using commas (,)
-                    </p>
-                  </div>
-                </div>
-
-                {/* NEXT BUTTON */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStep(2)
-                  }}
-                  disabled={!qualificationDetails || !yearsOfExperience || !universityName}
-                  className="w-full h-[62px] mt-7 rounded-[18px] bg-[#F0B31E] text-white text-[19px] font-semibold"
-                >
-                  Continue
-                </button>
               </div>
-            )}
 
-            {step === 2 && (
-              <div>
-                {/* Form */}
-                <form onSubmit={handleSubmit} className="space-y-6">
-
-                  {/* Qualification */}
-                  <div className="space-y-2">
-                    <label className="text-[15px] font-semibold text-[#111827]">
-                      Qualification
-                    </label>
-
-                    <div className="flex gap-3">
-                      {QUALIFICATIONS.map((q) => (
-                        <button
-                          key={q.value}
-                          type="button"
-                          onClick={() => handleQualificationChange(q.value)}
-                          className={`flex-1 h-[52px] rounded-[16px] border text-[13px] font-semibold transition-all ${qualification === q.value
-                            ? "bg-[#F0B31E] text-white border-[#F0B31E] shadow-lg shadow-yellow-500/20"
-                            : "text-[#8A7440]"
-                            }`}
-                        >
-                          {q.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Experience */}
-                  {/* <div className="space-y-2">
-                    <label className="text-[15px] font-semibold text-[#111827]">
-                      Years of Experience
-                    </label>
-
-                    <select
-                      value={yearsOfExperience}
-                      onChange={(e) => setYearsOfExperience(e.target.value)}
-                      className="w-full h-[56px] px-5 rounded-[16px] border text-[#8A7440] text-[14px] outline-none focus:border-[#F0B31E]"
-                    >
-                      <option value="" disabled>
-                        Select experience level
-                      </option>
-
-                      {EXPERIENCE_LEVELS.map((exp) => (
-                        <option key={exp.value} value={exp.value}>
-                          {exp.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div> */}
-
-                  {/* ID Type */}
-                  {qualification && (
-                    <div className="space-y-2">
-                      <label className="text-[15px] font-semibold text-[#111827]">
-                        ID Type
-                      </label>
-
-                      <div className="flex flex-wrap gap-3">
-                        {ID_TYPES[qualification].map((type) => (
-                          <button
-                            key={type}
-                            type="button"
-                            onClick={() => {
-                              setIdType(type);
-                              setIdNumber("");
-                              setError("");
-                            }}
-                            className={`px-5 h-[46px] rounded-[16px] border text-[12px] font-semibold transition-all ${idType === type
-                              ? "bg-[#F0B31E] text-white border-[#F0B31E] shadow-lg shadow-yellow-500/20"
-                              : " text-[#8A7440]"
-                              }`}
-                          >
-                            {ID_LABELS[type]}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* ID Number */}
-                  <div className="space-y-2">
-                    <label className="text-[15px] font-semibold text-[#111827]">
-                      ID Number
-                    </label>
-
-                    <input
-                      type="text"
-                      required
-                      value={idNumber}
-                      onChange={(e) => setIdNumber(e.target.value.toUpperCase())}
-                      placeholder={
-                        idType === "PAN"
-                          ? "ABCDE1234F"
-                          : idType === "AADHAAR"
-                            ? "12 Digit Number"
-                            : "Enter your ID number"
-                      }
-                      className="w-full h-[56px] px-5 rounded-[16px] border text-[#8A7440] text-[14px] outline-none"
-                    />
-                  </div>
-
-                  {/* Upload */}
-                  <div className="space-y-2">
-                    <label className="text-[15px] font-semibold text-[#111827]">
-                      Upload ID Document
-                    </label>
-
-                    <label className="w-full h-[56px] rounded-[16px] border flex items-center px-5 cursor-pointer">
-
-                      <Upload className="h-4 w-4 text-[#B08D32]" />
-
-                      <span className="ml-3 text-[#8A7440] text-[13px] truncate">
-                        {idFile ? idFile.name : "Click to upload (JPG, PNG, PDF)"}
-                      </span>
-
-                      <input
-                        type="file"
-                        accept="image/*,.pdf"
-                        className="hidden"
-                        onChange={(e) => setIdFile(e.target.files?.[0] || null)}
-                      />
-                    </label>
-                  </div>
-
-                  {/* Skills */}
-
-                  <div className="space-y-2">
-                    <label className="text-[15px] font-semibold text-[#111827]">
-                      Skills
-                    </label>
-
-                    <div className="flex gap-3">
-                      <input
-                        type="text"
-                        value={skillInput}
-                        onChange={(e) => setSkillInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            addSkill();
-                          }
-                        }}
-                        placeholder="e.g. Arduino, PCB Design"
-                        className="flex-1 h-[56px] px-5 rounded-[16px] border text-[#8A7440] text-[14px] outline-none"
-                      />
-
-                      <button
-                        type="button"
-                        onClick={addSkill}
-                        className="w-[56px] h-[56px] rounded-[16px] bg-[#F0B31E] text-white flex items-center justify-center shadow-lg shadow-yellow-500/25"
-                      >
-                        <Plus className="h-5 w-5" />
-                      </button>
-                    </div>
-
-                    {/* Skills Tags */}
-                    {skills.length > 0 && (
-                      <div className="flex flex-wrap gap-2 pt-2">
-                        {skills.map((skill, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center gap-2 px-3 py-2 rounded-full bg-[#FFF8E7] border border-[#F3D37A]"
-                          >
-                            <span className="text-[13px] font-medium text-[#8A7440]">
-                              {skill}
-                            </span>
-
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setSkills(skills.filter((_, i) => i !== index))
-                              }
-                              className="text-[#B08D32] hover:text-red-500 transition-colors"
-                            >
-                              <X className="h-3.5 w-3.5" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="p-4 border-2 border-[var(--primary)] bg-[#fff4e6]/30 rounded-xl">
-                    <label className="block text-sm font-bold text-[var(--text-primary)] mb-3">Which method do you prefer to use?</label>
-                    <div className="flex gap-4">
-                      <label className="flex items-center gap-2 font-semibold text-sm cursor-pointer">
-                        <input type="radio" name="preference" checked={preferredMethod === "UPI"} onChange={() => setPreferredMethod("UPI")} className="accent-[var(--primary)] w-4 h-4" /> UPI Transfer
-                      </label>
-                      <label className="flex items-center gap-2 font-semibold text-sm cursor-pointer">
-                        <input type="radio" name="preference" checked={preferredMethod === "BANK"} onChange={() => setPreferredMethod("BANK")} className="accent-[var(--primary)] w-4 h-4" /> Bank Account
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h5 className="font-bold border-b pb-2">UPI Details</h5>
-                    <input value={upiId} onChange={e => setUpiId(e.target.value)} required={preferredMethod === "UPI"} placeholder="yourname@bank" className="w-full border border-[var(--border)] rounded-lg p-2.5 outline-none focus:border-[var(--primary)] bg-gray-50/50" />
-                  </div>
-
-                  <div className="space-y-4">
-                    <h5 className="font-bold border-b pb-2">Bank Account Details</h5>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="col-span-2">
-                        <label className="text-xs font-semibold mb-1 block">Account Holder Name</label>
-                        <input value={accountHolder} onChange={e => setAccountHolder(e.target.value)} required={preferredMethod === "BANK"} className="w-full border rounded-lg p-2.5 outline-none focus:border-[var(--primary)] bg-gray-50/50" />
-                      </div>
-                      <div className="col-span-2 sm:col-span-1">
-                        <label className="text-xs font-semibold mb-1 block">Account Number</label>
-                        <input value={accountNumber} onChange={e => setAccountNumber(e.target.value)} required={preferredMethod === "BANK"} className="w-full border rounded-lg p-2.5 outline-none focus:border-[var(--primary)] bg-gray-50/50" />
-                      </div>
-                      <div className="col-span-2 sm:col-span-1">
-                        <label className="text-xs font-semibold mb-1 block">IFSC Code</label>
-                        <input value={ifscCode} onChange={e => setIfscCode(e.target.value)} required={preferredMethod === "BANK"} className="w-full border rounded-lg p-2.5 outline-none focus:border-[var(--primary)] bg-gray-50/50" />
-                      </div>
-                      <div className="col-span-2">
-                        <label className="text-xs font-semibold mb-1 block">Bank Name</label>
-                        <input value={bankName} onChange={e => setBankName(e.target.value)} required={preferredMethod === "BANK"} className="w-full border rounded-lg p-2.5 outline-none focus:border-[var(--primary)] bg-gray-50/50" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Submit */}
-                  <button
-                    type="submit"
-                    onClick={(e) => {
-                      if (
-                        !qualification ||
-                        !idType ||
-                        !preferredMethod ||
-                        (preferredMethod === "UPI" && !upiId) ||
-                        (preferredMethod === "BANK_TRANSFER" &&
-                          (!accountNumber || !ifscCode || !bankName || !accountHolder))
-                      ) {
-                        e.preventDefault();
-                        setShowErrors(true);
-
-                        return;
-                      }
-
-                      setShowErrors(false);
-                    }}
-                    className="w-full h-[62px] cursor-pointer mt-7 rounded-[18px] bg-[#F0B31E] hover:bg-[#DE9F08] text-white text-[19px] font-semibold transition-all shadow-[0_10px_30px_rgba(240,179,30,0.35)] disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    {isLoading ? (
-                      <Loader2 className="h-5 w-5 animate-spin mx-auto" />
-                    ) : (
-                      "Sign in"
-                    )}
-                  </button>
-                </form>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-      <div className="hidden lg:flex lg:w-[50%] rounded-[40px] relative overflow-hidden p-10 flex-col justify-between mt-6 mr-6">
-
-        {/* MAIN YELLOW GRADIENT LIKE REFERENCE IMAGE */}
-        <div className="absolute inset-0 bg-[linear-gradient(135deg,#FFF6D6_0%,#F8D978_18%,#F0B31E_45%,#E8A400_65%,#FFF1C2_100%)]" />
-
-        {/* Soft White Glow Top Left */}
-        <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-white/10 blur-[140px] rounded-full" />
-        <div className="absolute -top-32 -right-32 w-[600px] h-[600px] bg-white/50 blur-[140px] rounded-full" />
-
-        {/* Warm Golden Glow Center */}
-        <div className="absolute top-[20%] left-[20%] w-[500px] h-[500px] bg-[#FFD65C]/40 blur-[120px] rounded-full" />
-
-        {/* Light Cream Glow Right */}
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#FFF3CF]/60 blur-[140px] rounded-full" />
-
-        {/* Grain Texture */}
-        <div className="absolute inset-0 opacity-[0.12] mix-blend-soft-light bg-[url('https://www.transparenttextures.com/patterns/noise.png')]" />
-
-        {/* Overlay Fade */}
-        <div className="absolute inset-0 bg-white/[0.08]" />
-
-        {/* Content */}
-        <div className="relative z-10 flex flex-col h-full ">
-
-          <div className="mt-20">
-            {/* Logo */}
-            <div className="relative w-24 h-24 bg-white rounded-sm shadow-xl overflow-hidden dark:bg-card">
-              <Image
-                src="/logoImagediff2.PNG"
-                alt="Logo"
-                fill
-                className="object-cover rounded-sm"
-              />
-            </div>
-
-            {/* Hero */}
-            <div className="mt-12">
-              <h1 className="text-white text-7xl font-extrabold tracking-tight leading-none">
-                TECH ENGI
-              </h1>
-
-              <p className="text-white/85 text-lg max-w-xl mt-4 leading-relaxed">
-                Connect with skilled engineers and get your technical work done faster and more efficiently. From ideas to execution, collaborate with experts who help you build real, working solutions.
-              </p>
-            </div>
-          </div>
-
-          {/* Bottom */}
-          {/* Bottom Section */}
-          <div className="mt-auto pt-28">
-
-            {/* Testimonials */}
-            <div className="flex gap-6 overflow-hidden">
-
-              {/* Card 1 */}
-              <div
-                className="
-        min-w-[420px]
-        rounded-3xl
-        border
-        border-white/20
-        bg-white/[0.12]
-        backdrop-blur-2xl
-        p-6
-        shadow-[0_10px_40px_rgba(255,190,40,0.15)]
-      "
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="mt-6 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-[#f0b31e] font-bold text-slate-950 shadow-sm transition-all duration-150 hover:bg-[#ffc543] active:translate-y-[1px] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
               >
-                <p className="text-white/90 text-sm leading-relaxed font-medium">
-                  Dude, your stuff is the bomb! House rent is the real deal! I
-                  STRONGLY recommend house rent to EVERYONE interested in running a
-                  successful online business!
-                </p>
-
-                <div className="flex items-center gap-3 mt-6">
-                  <img
-                    src="https://i.pravatar.cc/100?img=32"
-                    alt=""
-                    className="w-10 h-10 rounded-full object-cover border border-white/30"
-                  />
-
-                  <div>
-                    <h4 className="text-white font-semibold text-sm">
-                      Lana Bernier
-                    </h4>
-
-                    <p className="text-white/70 text-xs">
-                      Senior Paradigm Strategist
-                    </p>
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <svg className="h-5 w-5 animate-spin text-slate-950" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    <span>Submitting profile...</span>
                   </div>
-                </div>
-              </div>
-
-              {/* Card 2 */}
-              <div
-                className="
-        min-w-[420px]
-        rounded-3xl
-        border
-        border-white/20
-        bg-white/[0.12]
-        backdrop-blur-2xl
-        p-6
-        shadow-[0_10px_40px_rgba(255,190,40,0.15)]
-      "
-              >
-                <p className="text-white/90 text-sm leading-relaxed font-medium">
-                  Dude, your stuff is the bomb! House rent is the real deal! I
-                  STRONGLY recommend house rent to EVERYONE interested in running a
-                  successful online business!
-                </p>
-
-                <div className="flex items-center gap-3 mt-6">
-                  <img
-                    src="https://i.pravatar.cc/100?img=12"
-                    alt=""
-                    className="w-10 h-10 rounded-full object-cover border border-white/30"
-                  />
-
-                  <div>
-                    <h4 className="text-white font-semibold text-sm">
-                      Lana Bernier
-                    </h4>
-
-                    <p className="text-white/70 text-xs">
-                      Senior Paradigm Strategist
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="flex items-center justify-end mt-16 gap-4 pr-2">
-              <div className="w-32 h-[2px] bg-white/70" />
-
-              <p className="text-white text-3xl font-light tracking-tight">
-                Build for connectivity
-              </p>
-            </div>
-          </div>
+                ) : (
+                  <span>Submit Profile for Verification</span>
+                )}
+              </button>
+            </form>
+          )}
         </div>
+
+        {/* Mini Footer */}
+        <p className="pt-6 font-mono text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed text-center sm:text-left">
+          TSquareY1 OPC Private Limited, Chennai, Tamil Nadu &middot; techengi.in
+        </p>
       </div>
+
+      {/* ================= RIGHT: BRAND + TRUST SIDE ================= */}
+      <AuthBrandSide role="ENGINEER" />
     </div>
   );
 }

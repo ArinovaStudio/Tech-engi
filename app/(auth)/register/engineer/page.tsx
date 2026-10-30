@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import EngineerRegisterClient from "./EngineerRegisterClient";
+import RegisterClient from "../RegisterClient";
 
 export const metadata: Metadata = {
-  title: "Register as Engineer",
+  title: "Register as Engineer · Tech Engi",
+  description: "Join Tech Engi as a verified engineer. Get AI-matched to clients in India based on what you have built — no bidding, no proposal flooding.",
   robots: {
     index: false,
     follow: true,
@@ -10,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function EngineerRegisterPage() {
-  return <EngineerRegisterClient />;
+  return <RegisterClient defaultRole="ENGINEER" />;
 }

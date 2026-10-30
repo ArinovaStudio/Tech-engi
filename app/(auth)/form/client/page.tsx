@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Briefcase, Loader2, X, Plus } from "lucide-react";
+import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { useEffect } from "react";
-import Image from "next/image";
+import { useTheme } from "@/components/ThemeProvider";
+import AuthBrandSide from "@/components/auth/AuthBrandSide";
 
 export default function ClientFormPage() {
   const router = useRouter();
   const { status } = useSession();
+  const { theme, toggleTheme } = useTheme();
+
   const [totalProjects, setTotalProjects] = useState("");
   const [totalBudget, setTotalBudget] = useState("");
   const [expertise, setExpertise] = useState<string[]>([]);
@@ -19,7 +21,7 @@ export default function ClientFormPage() {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/register");
+      router.push("/login");
     }
   }, [status, router]);
 
@@ -31,12 +33,16 @@ export default function ClientFormPage() {
     setExpertiseInput("");
   };
 
+  const removeExpertise = (tag: string) => {
+    setExpertise(expertise.filter((t) => t !== tag));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     if (expertise.length === 0) {
-      setError("Please add at least one area of expertise");
+      setError("Please add at least one area of expertise.");
       return;
     }
 
@@ -46,18 +52,21 @@ export default function ClientFormPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          totalProjects: parseInt(totalProjects) || 0,
+          totalProjects: parseInt(totalProjects, 10) || 0,
           totalBudget: parseFloat(totalBudget) || 0,
           expertise,
         }),
       });
 
       const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.message);
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to save profile.");
+      }
 
       router.push("/client");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to update profile.";
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -65,8 +74,18 @@ export default function ClientFormPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-[#f8fafd] flex items-center justify-center">
-        <Loader2 className="animate-spin h-8 w-8 text-[#f0b31e]" />
+      <div className="min-h-screen bg-white dark:bg-[#070b14] flex items-center justify-center">
+        <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400">
+          <svg className="h-6 w-6 animate-spin text-[#f0b31e]" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
+          </svg>
+          <span className="font-mono text-sm">Loading session...</span>
+        </div>
       </div>
     );
   }
@@ -76,237 +95,244 @@ export default function ClientFormPage() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row w-full h-screen">
-      <div className="w-full lg:w-[50%] h-screen">
-        <div className="min-h-screen flex flex-col justify-center items-center p-4 font-sans">
-          <div className="w-full max-w-[420px] rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8 sm:p-10 animate-in fade-in slide-in-from-bottom-4 duration-500 dark:border-slate-800">
-            <div className="text-center mb-8">
-              <div className="flex h-14 w-14 items-center justify-center rounded-[1rem] bg-[#f0b31e] shadow-lg shadow-yellow-500/30 mx-auto mb-4">
-                <Briefcase className="h-7 w-7 text-white" />
-              </div>
-              <h1 className="text-2xl font-bold text-[#0f172a] tracking-tight">Complete Your Profile</h1>
-              <p className="text-gray-500 mt-2 text-sm dark:text-slate-400">Tell us a bit about your project history</p>
-            </div>
+    <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2 bg-white text-slate-900 dark:bg-[#070b14] dark:text-slate-100 transition-colors duration-200">
+      {/* ================= LEFT: FORM SIDE ================= */}
+      <div className="flex flex-col justify-between p-6 sm:p-10 lg:p-12 overflow-y-auto min-h-screen">
+        {/* Topbar */}
+        <div className="flex items-center justify-between gap-4 pb-6">
+          <Link
+            href="/"
+            className="group inline-flex items-center gap-2.5 text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
+          >
+            <svg
+              width="16"
+              height="14"
+              viewBox="0 0 16 14"
+              aria-hidden="true"
+              className="transition-transform group-hover:-translate-x-0.5"
+            >
+              <path
+                d="M15 7H1M7 1L1 7l6 6"
+                stroke="currentColor"
+                strokeWidth="2"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span>Back to techengi.in</span>
+          </Link>
 
-            {error && (
-              <div className="mb-6 text-red-500 text-sm font-medium text-center bg-red-50 p-3 rounded-xl border border-red-100">
-                {error}
-              </div>
-            )}
+          <div className="flex items-center gap-3">
+            {/* Theme Toggle Button */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label="Toggle dark mode"
+              title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-white dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 transition-all cursor-pointer"
+            >
+              {theme === "light" ? (
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+                </svg>
+              ) : (
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="4" />
+                  <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+                </svg>
+              )}
+            </button>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700 ml-1 dark:text-slate-300">Total Projects Done</label>
-                <input
-                  type="number"
-                  min="0"
-                  value={totalProjects}
-                  onChange={(e) => setTotalProjects(e.target.value)}
-                  placeholder="e.g. 5"
-                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700 ml-1 dark:text-slate-300">Total Budget Spent (₹)</label>
-                <input
-                  type="number"
-                  min="0"
-                  value={totalBudget}
-                  onChange={(e) => setTotalBudget(e.target.value)}
-                  placeholder="e.g. 50000"
-                  className="w-full px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700 ml-1 dark:text-slate-300">Areas of Expertise</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={expertiseInput}
-                    onChange={(e) => setExpertiseInput(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addExpertise(); } }}
-                    placeholder="e.g. Embedded Systems"
-                    className="flex-1 px-4 h-12 rounded-xl border border-gray-200 bg-transparent focus:border-[#f0b31e] focus:ring-1 focus:ring-[#f0b31e] outline-none transition-all text-sm text-black dark:border-slate-800 dark:text-white"
-                  />
-                  <button
-                    type="button"
-                    onClick={addExpertise}
-                    className="h-12 w-12 flex items-center justify-center rounded-xl bg-[#f0b31e] text-white hover:bg-[#e0a61a] transition-colors"
-                  >
-                    <Plus className="h-5 w-5" />
-                  </button>
-                </div>
-                {expertise.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {expertise.map((tag) => (
-                      <span key={tag} className="flex items-center gap-1 px-3 py-1 bg-yellow-50 border border-yellow-200 text-yellow-800 text-xs font-medium rounded-full">
-                        {tag}
-                        <button type="button" onClick={() => setExpertise(expertise.filter(t => t !== tag))}>
-                          <X className="h-3 w-3" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full h-12 mt-2 bg-[#f0b31e] hover:bg-[#e0a61a] text-white rounded-xl text-base font-semibold shadow-md shadow-yellow-500/20 transition-all flex justify-center items-center disabled:opacity-70 disabled:cursor-not-allowed"
-              >
-                {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Save & Continue"}
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-      <div className="hidden lg:flex lg:w-[50%] rounded-[40px] relative overflow-hidden p-10 flex-col justify-between mt-3 mr-3 mb-3">
-
-        {/* MAIN YELLOW GRADIENT LIKE REFERENCE IMAGE */}
-        <div className="absolute inset-0 bg-[linear-gradient(135deg,#FFF6D6_0%,#F8D978_18%,#F0B31E_45%,#E8A400_65%,#FFF1C2_100%)]" />
-
-        {/* Soft White Glow Top Left */}
-        <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-white/10 blur-[140px] rounded-full" />
-        <div className="absolute -top-32 -right-32 w-[600px] h-[600px] bg-white/50 blur-[140px] rounded-full" />
-
-        {/* Warm Golden Glow Center */}
-        <div className="absolute top-[20%] left-[20%] w-[500px] h-[500px] bg-[#FFD65C]/40 blur-[120px] rounded-full" />
-
-        {/* Light Cream Glow Right */}
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#FFF3CF]/60 blur-[140px] rounded-full" />
-
-        {/* Grain Texture */}
-        <div className="absolute inset-0 opacity-[0.12] mix-blend-soft-light bg-[url('https://www.transparenttextures.com/patterns/noise.png')]" />
-
-        {/* Overlay Fade */}
-        <div className="absolute inset-0 bg-white/[0.08]" />
-
-        {/* Content */}
-        <div className="relative z-10 flex flex-col h-full ">
-
-          <div className="mt-20">
-            {/* Logo */}
-            <div className="w-24 h-24 bg-white rounded-sm flex items-center justify-center text-black font-bold text-sm shadow-xl dark:bg-card dark:text-white">
-              <div className="relative w-24 h-24 bg-white rounded-sm shadow-xl overflow-hidden dark:bg-card">
-                <Image
-                  src="/logoImagediff2.PNG"
-                  alt="Logo"
-                  fill
-                  className="object-cover rounded-sm"
-                />
-              </div>
-            </div>
-
-            {/* Hero */}
-            <div className="mt-12">
-              <h1 className="text-white text-7xl font-extrabold tracking-tight leading-none">
-                TECH ENGI
-              </h1>
-
-              <p className="text-white/85 text-lg max-w-xl mt-4 leading-relaxed">
-                Connect with skilled engineers and get your technical projects done faster. From prototypes to complex systems, we help turn ideas into real working solutions with the right expertise.
-              </p>
-            </div>
-          </div>
-
-          {/* Bottom */}
-          {/* Bottom Section */}
-          <div className="mt-auto pt-28">
-
-            {/* Testimonials */}
-            <div className="flex gap-6 overflow-hidden">
-
-              {/* Card 1 */}
-              <div
-                className="
-        min-w-[420px]
-        rounded-3xl
-        border
-        border-white/20
-        bg-white/[0.12]
-        backdrop-blur-2xl
-        p-6
-        shadow-[0_10px_40px_rgba(255,190,40,0.15)]
-      "
-              >
-                <p className="text-white/90 text-sm leading-relaxed font-medium">
-                  Dude, your stuff is the bomb! House rent is the real deal! I
-                  STRONGLY recommend house rent to EVERYONE interested in running a
-                  successful online business!
-                </p>
-
-                <div className="flex items-center gap-3 mt-6">
-                  <img
-                    src="https://i.pravatar.cc/100?img=32"
-                    alt=""
-                    className="w-10 h-10 rounded-full object-cover border border-white/30"
-                  />
-
-                  <div>
-                    <h4 className="text-white font-semibold text-sm">
-                      Lana Bernier
-                    </h4>
-
-                    <p className="text-white/70 text-xs">
-                      Senior Paradigm Strategist
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Card 2 */}
-              <div
-                className="
-        min-w-[420px]
-        rounded-3xl
-        border
-        border-white/20
-        bg-white/[0.12]
-        backdrop-blur-2xl
-        p-6
-        shadow-[0_10px_40px_rgba(255,190,40,0.15)]
-      "
-              >
-                <p className="text-white/90 text-sm leading-relaxed font-medium">
-                  Dude, your stuff is the bomb! House rent is the real deal! I
-                  STRONGLY recommend house rent to EVERYONE interested in running a
-                  successful online business!
-                </p>
-
-                <div className="flex items-center gap-3 mt-6">
-                  <img
-                    src="https://i.pravatar.cc/100?img=12"
-                    alt=""
-                    className="w-10 h-10 rounded-full object-cover border border-white/30"
-                  />
-
-                  <div>
-                    <h4 className="text-white font-semibold text-sm">
-                      Lana Bernier
-                    </h4>
-
-                    <p className="text-white/70 text-xs">
-                      Senior Paradigm Strategist
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="flex items-center justify-end mt-16 gap-4 pr-2">
-              <div className="w-32 h-[2px] bg-white/70" />
-
-              <p className="text-white text-3xl font-light tracking-tight">
-                Build for connectivity
-              </p>
+            {/* Mobile Brandmark */}
+            <div className="flex lg:hidden items-center gap-2 font-black text-slate-900 dark:text-white">
+              <span className="font-mono text-[#f0b31e]">{`{ }`}</span>
+              <span className="text-sm tracking-tight">Tech Engi</span>
             </div>
           </div>
         </div>
+
+        {/* Form Container */}
+        <div className="w-full max-w-[420px] mx-auto my-auto py-8">
+          <div>
+            <span className="inline-block rounded-full bg-[#f0b31e]/15 px-3 py-1 font-mono text-[11px] font-bold text-[#b8850a] dark:text-[#f0b31e] tracking-wider uppercase mb-3">
+              CLIENT ONBOARDING
+            </span>
+            <h1 className="text-3xl sm:text-[34px] font-black tracking-[-0.035em] text-slate-900 dark:text-white">
+              Complete your profile.
+            </h1>
+            <p className="mt-2 text-[15.5px] text-slate-500 dark:text-slate-400">
+              Tell us a bit about your past project history and technical requirements.
+            </p>
+          </div>
+
+          {error && (
+            <div
+              role="alert"
+              className="mt-6 rounded-xl border border-rose-200 bg-rose-50/80 p-3.5 text-[13.5px] leading-relaxed text-rose-600 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400"
+            >
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} noValidate className="mt-7 space-y-5">
+            {/* Total Projects Field */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label
+                  htmlFor="clProjects"
+                  className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase"
+                >
+                  Total Projects Done
+                </label>
+              </div>
+              <input
+                id="clProjects"
+                type="number"
+                min="0"
+                value={totalProjects}
+                onChange={(e) => setTotalProjects(e.target.value)}
+                placeholder="e.g. 5"
+                className="min-h-[52px] w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 transition-all placeholder:text-slate-400 focus:outline-none hover:border-slate-300 focus:border-[#f0b31e] focus:ring-4 focus:ring-[#f0b31e]/15 dark:border-slate-800 dark:bg-slate-900/80 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-slate-700 dark:focus:border-[#f0b31e]"
+              />
+            </div>
+
+            {/* Total Budget Spent Field */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label
+                  htmlFor="clBudget"
+                  className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase"
+                >
+                  Total Budget Spent (₹)
+                </label>
+              </div>
+              <input
+                id="clBudget"
+                type="number"
+                min="0"
+                value={totalBudget}
+                onChange={(e) => setTotalBudget(e.target.value)}
+                placeholder="e.g. 50000"
+                className="min-h-[52px] w-full rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 transition-all placeholder:text-slate-400 focus:outline-none hover:border-slate-300 focus:border-[#f0b31e] focus:ring-4 focus:ring-[#f0b31e]/15 dark:border-slate-800 dark:bg-slate-900/80 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-slate-700 dark:focus:border-[#f0b31e]"
+              />
+            </div>
+
+            {/* Areas of Expertise Tags */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label
+                  htmlFor="clExpertise"
+                  className="font-mono text-[11px] font-semibold tracking-[0.1em] text-slate-500 dark:text-slate-400 uppercase"
+                >
+                  Areas of Expertise
+                </label>
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  id="clExpertise"
+                  type="text"
+                  value={expertiseInput}
+                  onChange={(e) => setExpertiseInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addExpertise();
+                    }
+                  }}
+                  placeholder="e.g. Next.js, Embedded, AI..."
+                  className="min-h-[52px] flex-1 rounded-xl border border-slate-200 bg-white px-4 text-base text-slate-900 transition-all placeholder:text-slate-400 focus:outline-none hover:border-slate-300 focus:border-[#f0b31e] focus:ring-4 focus:ring-[#f0b31e]/15 dark:border-slate-800 dark:bg-slate-900/80 dark:text-white dark:placeholder:text-slate-500 dark:hover:border-slate-700 dark:focus:border-[#f0b31e]"
+                />
+                <button
+                  type="button"
+                  onClick={addExpertise}
+                  aria-label="Add expertise tag"
+                  className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl bg-[#f0b31e] text-slate-950 font-bold transition-all hover:bg-[#ffc543] active:translate-y-[1px] cursor-pointer"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                </button>
+              </div>
+
+              {expertise.length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-3">
+                  {expertise.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/60 bg-amber-50 px-3.5 py-1 text-xs font-semibold text-amber-900 dark:border-amber-400/30 dark:bg-amber-950/30 dark:text-amber-200"
+                    >
+                      <span>{tag}</span>
+                      <button
+                        type="button"
+                        aria-label={`Remove ${tag}`}
+                        onClick={() => removeExpertise(tag)}
+                        className="text-amber-700 hover:text-amber-950 dark:text-amber-300 dark:hover:text-white cursor-pointer"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <line x1="18" y1="6" x2="6" y2="18" />
+                          <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="mt-6 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-[#f0b31e] font-bold text-slate-950 shadow-sm transition-all duration-150 hover:bg-[#ffc543] active:translate-y-[1px] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <svg className="h-5 w-5 animate-spin text-slate-950" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  <span>Saving profile...</span>
+                </div>
+              ) : (
+                <span>Save & Continue</span>
+              )}
+            </button>
+          </form>
+        </div>
+
+        {/* Mini Footer */}
+        <p className="pt-6 font-mono text-[11px] text-slate-400 dark:text-slate-500 leading-relaxed text-center sm:text-left">
+          TSquareY1 OPC Private Limited, Chennai, Tamil Nadu &middot; techengi.in
+        </p>
       </div>
+
+      {/* ================= RIGHT: BRAND + TRUST SIDE ================= */}
+      <AuthBrandSide role="CLIENT" />
     </div>
   );
 }

@@ -564,7 +564,7 @@ export default function FreelanceEngineeringWithoutIssuesPage() {
                       href="/register"
                       className="inline-flex items-center justify-center gap-2 rounded-full bg-amber-500 px-6 py-3 text-[13px] font-bold text-[#050a30] transition hover:-translate-y-0.5 hover:bg-amber-400 hover:shadow-xl"
                     >
-                      Join as Builder
+                      Join as Freelancer
                       <ArrowRight size={16} />
                     </Link>
                     <Link

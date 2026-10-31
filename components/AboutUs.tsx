@@ -33,7 +33,7 @@ const testimonials = [
     name: "Ranjith Gowda",
     role: "Robotic Engineer",
     image: "/users/ranjith.jpg",
-    text: "The web interface is too good, easy and simple makes it attractive.Mainly the concept is too Good to create a network and connect clients with builders. It will be best flat form for people willing to do freelancing."
+    text: "The web interface is easy and simple to use. The concept creates a network connecting clients with freelancers and gives people a great platform to do freelance work."
   },
   {
     name: "Baisakhi",
@@ -150,7 +150,7 @@ const AboutUs = () => {
             {/* LEFT SIDE */}
             <div
               className=" relative flex flex-col items-center xl:items-start
-          "
+              "
             >
               <Image
                 src={current.image}
@@ -203,7 +203,7 @@ const AboutUs = () => {
                 className=" mt-4 xl:mt-6 mx-auto xl:ml-auto xl:mr-0 w-fit text-[70px] sm:text-[100px] leading-none font-black text-gray-100 dark:text-slate-800 select-none "
                 style={{ fontFamily: "Georgia, serif" }}
               >
-                "
+                &quot;
               </div>
 
               {/* ARROWS */}

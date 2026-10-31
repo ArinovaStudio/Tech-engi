@@ -372,7 +372,7 @@ const Start = () => {
           >
             <Image
               src="/two-guys.png"
-              alt="Student and builder shaking hands"
+              alt="Student and freelancer shaking hands"
               width={600}
               height={500}
               className="w-full h-auto object-contain "
@@ -384,7 +384,7 @@ const Start = () => {
           <div className="lg:hidden relative flex justify-center">
             <Image
               src="/two-guys.png"
-              alt="Student and builder shaking hands"
+              alt="Student and freelancer shaking hands"
               width={400}
               height={545}
               className="w-full max-w-[400px] h-[300px] md:max-w-[400px] md:h-[545px] scale-125 object-contain"

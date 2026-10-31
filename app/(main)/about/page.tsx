@@ -272,7 +272,7 @@ export default function AboutPage() {
                 href="/register"
                 className="inline-flex items-center justify-center rounded-full border border-slate-300 px-7 py-3.5 text-[13.5px] font-semibold transition hover:-translate-y-0.5 hover:border-[#1257e8] hover:text-[#1257e8]"
               >
-                Join as Builder
+                Join as Freelancer
               </Link>
             </div>
 

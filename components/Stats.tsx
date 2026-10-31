@@ -32,7 +32,7 @@ const Stats = () => {
       <div className="mx-auto">
         <ScrollReveal animation="fadeUp" className="text-center mb-18">
           <h2 className="text-[40px] lg:text-[50px] font-semibold leading-tight text-slate-950 dark:text-white">
-            Trusted by <span className="italic">builders,</span><br /> startups &amp; growing teams
+            Trusted by <span className="italic">freelancers,</span><br /> startups &amp; growing teams
           </h2>
         </ScrollReveal>
 

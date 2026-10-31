@@ -5,7 +5,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 
 const COMPANY = [
-  { label: "Join as Builder", href: "/register" },
+  { label: "Join as Freelancer", href: "/register" },
   { label: "Start a Project", href: "/register" },
   { label: "Read Blogs", href: "/blog" },
   { label: "Privacy Policy", href: "/privacy-policy" },
@@ -97,7 +97,7 @@ export default function Footer() {
                 Start a Project
               </Link>
               <Link href="/register" className={`${btn} border border-white/40 !text-white hover:bg-white/10 w-full`}>
-                Join as Builder
+                Join as Freelancer
               </Link>
             </div>
           </div>

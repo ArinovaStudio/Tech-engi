@@ -214,11 +214,11 @@ const TONE = {
     off: "border-white/50 bg-saas-accent",
     focus: "focus-visible:outline-white",
     tile: "bg-white",
-    iconColor: "#4F6BEA",
+    iconColor: "#DBA400",
     frame: "border-white/25 bg-white/10 text-white",
     dot: "rgba(255,255,255,.28)",
     outline: "rgba(255,255,255,.22)",
-    ill: "#4F6BEA",
+    ill: "#DBA400",
     pull: "border-white",
   },
 };

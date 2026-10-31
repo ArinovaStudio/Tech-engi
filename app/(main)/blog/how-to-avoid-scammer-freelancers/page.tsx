@@ -116,7 +116,7 @@ const patterns = [
   {
     n: "2",
     title: "The Portfolio That Isn't Theirs",
-    body: "Scammers often lift real developers' GitHub projects, Behance portfolios, or case studies and present them as their own. If a freelancer's portfolio looks too polished for their quoted price, verify it — ask specific questions about a project's implementation details that only the actual builder would know.",
+    body: "Scammers often lift real developers' GitHub projects, Behance portfolios, or case studies and present them as their own. If a freelancer's portfolio looks too polished for their quoted price, verify it — ask specific questions about a project's implementation details that only the person who did the work would know.",
   },
   {
     n: "3",
@@ -362,7 +362,7 @@ export default function AvoidScammerFreelancersPage() {
                     <Versus
                       badTitle="Lifted portfolio"
                       bad={["Looks too polished for the quoted price", "Vague about how it was actually built"]}
-                      goodTitle="Real builder"
+                      goodTitle="Real freelancer"
                       good={["Answers implementation questions in detail", "Can walk you through their own decisions"]}
                     />
                   )}
@@ -537,7 +537,7 @@ export default function AvoidScammerFreelancersPage() {
                       href="/register"
                       className="inline-flex items-center justify-center gap-2 rounded-full border border-white/40 px-6 py-3 text-[13px] font-semibold text-white transition hover:bg-white/10"
                     >
-                      Join as Builder
+                      Join as Freelancer
                     </Link>
                   </div>
                 </div>

@@ -37,7 +37,7 @@ export default function AgreementModal({
           </div>
           <div>
             <h2 className="text-base font-bold text-[var(--text-primary)]">
-              Builder Agreement & NDA Required
+              Freelancer Agreement & NDA Required
             </h2>
             <p className="text-xs text-[var(--text-muted)] mt-0.5">
               You must accept this agreement to view details for{" "}
@@ -63,11 +63,11 @@ export default function AgreementModal({
           className="mx-6 mt-4 h-72 overflow-y-auto text-xs leading-relaxed text-[var(--text-secondary)] border border-[var(--border)] rounded-lg p-4 bg-[var(--bg)] space-y-3"
         >
           <p className="font-semibold text-[var(--text-primary)]">
-            Builder Agreement, Confidentiality (NDA) & Platform Rules — v1.0
+            Freelancer Agreement, Confidentiality (NDA) & Platform Rules — v1.0
           </p>
           <p>
             This Agreement governs the relationship between Tech Engi, operated by TSquareY1
-            Private Limited, and every registered Builder. By accepting, you confirm you have
+            Private Limited, and every registered Freelancer. By accepting, you confirm you have
             read, understood, and agreed to this Agreement before accessing this project and any
             confidential client information tied to it.
           </p>
@@ -115,11 +115,11 @@ export default function AgreementModal({
           </p>
           <p>
             This Agreement is governed by the laws of the Republic of India. Disputes are first
-            handled through Tech Engi's internal review process, and if unresolved, referred to
+            handled through Tech Engi&apos;s internal review process, and if unresolved, referred to
             arbitration under the Arbitration and Conciliation Act, 1996.
           </p>
           <p className="text-[var(--text-muted)] italic">
-            This is a summary. The complete Builder Agreement, NDA, and Platform Rules apply in
+            This is a summary. The complete Freelancer Agreement, NDA, and Platform Rules apply in
             full and are binding upon acceptance.
           </p>
         </div>

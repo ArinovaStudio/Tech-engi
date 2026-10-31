@@ -108,7 +108,7 @@ export default function Header() {
               tabIndex={open ? 0 : -1}
               className="btn-outline mt-4 sm:hidden"
             >
-              Login
+              Join as Freelancer
             </Link>
           </nav>
         </div>

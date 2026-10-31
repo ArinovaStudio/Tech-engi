@@ -389,13 +389,13 @@ export default function RegisterClient({ defaultRole = "CLIENT" }: RegisterClien
                       : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                   }`}
                 >
-                  <span>I&apos;m building</span>
+                  <span>I&apos;m a freelancer</span>
                   <span
                     className={`font-mono text-[10px] font-semibold tracking-wider uppercase ${
                       role === "ENGINEER" ? "text-slate-900/80" : "text-slate-400 dark:text-slate-500"
                     }`}
                   >
-                    ENGINEER
+                    FREELANCER
                   </span>
                 </button>
               </div>

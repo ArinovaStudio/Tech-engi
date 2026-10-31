@@ -473,7 +473,7 @@ export default function HowToFixCodeWithoutAiPage() {
                       href="/register"
                       className="inline-flex items-center justify-center gap-2 rounded-full border border-white/40 px-6 py-3 text-[13px] font-semibold text-white transition hover:bg-white/10"
                     >
-                      Join as Builder
+                      Join as Freelancer
                     </Link>
                   </div>
                 </div>

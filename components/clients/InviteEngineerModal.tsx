@@ -93,14 +93,14 @@ function EngineerAvatar({
         src={image}
         alt={name || 'Engineer'}
         onError={() => setImgError(true)}
-        className={`${sizeClasses} rounded-full object-cover border border-emerald-500/30 shrink-0 shadow-xs`}
+        className={`${sizeClasses} rounded-full object-cover border border-amber-500/30 shrink-0 shadow-xs`}
       />
     );
   }
 
   return (
     <div
-      className={`${sizeClasses} rounded-full bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-bold flex items-center justify-center uppercase shrink-0 shadow-xs border border-emerald-400/30`}
+      className={`${sizeClasses} rounded-full bg-gradient-to-tr from-amber-600 to-teal-500 text-white font-bold flex items-center justify-center uppercase shrink-0 shadow-xs border border-amber-400/30`}
     >
       {getInitials(name, email)}
     </div>
@@ -384,7 +384,7 @@ export default function InviteEngineerModal({
         <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
           <div>
             <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
+              <span className="p-1.5 rounded-lg bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
                 <Share2 size={18} />
               </span>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">Invite Engineer</h2>
@@ -418,7 +418,7 @@ export default function InviteEngineerModal({
             onClick={() => setActiveTab('link')}
             className={`flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
               activeTab === 'link'
-                ? 'bg-emerald-600 text-white shadow-sm'
+                ? 'bg-amber-600 text-white shadow-sm'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
             }`}
           >
@@ -429,7 +429,7 @@ export default function InviteEngineerModal({
             onClick={() => setActiveTab('email')}
             className={`flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
               activeTab === 'email'
-                ? 'bg-emerald-600 text-white shadow-sm'
+                ? 'bg-amber-600 text-white shadow-sm'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
             }`}
           >
@@ -457,7 +457,7 @@ export default function InviteEngineerModal({
                   </div>
                   <button
                     onClick={handleCopyLink}
-                    className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm shrink-0"
+                    className="px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm shrink-0"
                   >
                     {copied ? (
                       <>
@@ -482,7 +482,7 @@ export default function InviteEngineerModal({
                 <div className="flex gap-2">
                   <button
                     onClick={handleShareWhatsApp}
-                    className="flex-1 py-2 px-3 border border-gray-200 dark:border-gray-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 hover:border-emerald-300 rounded-xl text-xs font-medium text-gray-700 dark:text-gray-300 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="flex-1 py-2 px-3 border border-gray-200 dark:border-gray-700 hover:bg-amber-50 dark:hover:bg-amber-950/30 hover:border-amber-300 rounded-xl text-xs font-medium text-gray-700 dark:text-gray-300 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <span>💬</span> WhatsApp
                   </button>
@@ -506,7 +506,7 @@ export default function InviteEngineerModal({
 
               {/* Info card */}
               <div className="p-3.5 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl flex items-start gap-3">
-                <ShieldCheck size={18} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                <ShieldCheck size={18} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                 <div className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
                   Engineers opening this link will see your project scope, requirements, and payout. Only approved engineers can officially accept the project.
                 </div>
@@ -520,7 +520,7 @@ export default function InviteEngineerModal({
                     Search Engineer by Email or Name <span className="text-red-500">*</span>
                   </label>
                   <span className="text-[11px] font-medium text-gray-500 dark:text-gray-400">
-                    Selected: <strong className="text-emerald-600 dark:text-emerald-400">{selectedEngineers.length}</strong> / 3 (Min 1, Max 3)
+                    Selected: <strong className="text-amber-600 dark:text-amber-400">{selectedEngineers.length}</strong> / 3 (Min 1, Max 3)
                   </span>
                 </div>
 
@@ -548,7 +548,7 @@ export default function InviteEngineerModal({
                         setShowDropdown(true);
                       }
                     }}
-                    className={`w-full pl-9 pr-9 py-2.5 bg-white dark:bg-gray-800 border rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all ${
+                    className={`w-full pl-9 pr-9 py-2.5 bg-white dark:bg-gray-800 border rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all ${
                       selectedEngineers.length >= 3
                         ? 'opacity-60 cursor-not-allowed border-gray-200 dark:border-gray-700'
                         : 'border-gray-300 dark:border-gray-700'
@@ -575,7 +575,7 @@ export default function InviteEngineerModal({
                   <div className="absolute top-full left-0 right-0 mt-1.5 z-50 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl overflow-hidden max-h-64 overflow-y-auto animate-in fade-in-50 zoom-in-95 duration-150">
                     {isSearchingEngineer ? (
                       <div className="p-4 flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                        <Loader2 size={15} className="animate-spin text-emerald-600 dark:text-emerald-400" />
+                        <Loader2 size={15} className="animate-spin text-amber-600 dark:text-amber-400" />
                         <span>Searching engineers...</span>
                       </div>
                     ) : engineersList.length === 0 ? (
@@ -601,10 +601,10 @@ export default function InviteEngineerModal({
                               onClick={() => handleSelectEngineer(eng)}
                               className={`w-full text-left px-3.5 py-2.5 flex items-center justify-between gap-3 transition-colors border-b border-gray-50 dark:border-gray-800/40 last:border-0 ${
                                 isAlreadySelected
-                                  ? 'bg-emerald-50/40 dark:bg-emerald-950/20 opacity-70 cursor-default'
+                                  ? 'bg-amber-50/40 dark:bg-amber-950/20 opacity-70 cursor-default'
                                   : eng.alreadyAssigned
                                   ? 'opacity-60 cursor-not-allowed'
-                                  : 'hover:bg-emerald-50 dark:hover:bg-gray-800/80 cursor-pointer group'
+                                  : 'hover:bg-amber-50 dark:hover:bg-gray-800/80 cursor-pointer group'
                               }`}
                             >
                               <div className="flex items-center gap-2.5 min-w-0">
@@ -615,7 +615,7 @@ export default function InviteEngineerModal({
                                   size="sm"
                                 />
                                 <div className="min-w-0">
-                                  <p className="font-semibold text-xs text-gray-900 dark:text-white truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                                  <p className="font-semibold text-xs text-gray-900 dark:text-white truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                                     {eng.name}
                                   </p>
                                   <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
@@ -626,7 +626,7 @@ export default function InviteEngineerModal({
 
                               <div className="shrink-0 flex items-center gap-1.5">
                                 {isAlreadySelected ? (
-                                  <span className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
+                                  <span className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
                                     <Check size={11} /> Added
                                   </span>
                                 ) : eng.alreadyAssigned ? (
@@ -638,7 +638,7 @@ export default function InviteEngineerModal({
                                     Invited
                                   </span>
                                 ) : (
-                                  <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 group-hover:underline">
+                                  <span className="text-[11px] font-medium text-amber-600 dark:text-amber-400 group-hover:underline">
                                     Select
                                   </span>
                                 )}
@@ -670,7 +670,7 @@ export default function InviteEngineerModal({
                     {selectedEngineers.map((eng) => (
                       <div
                         key={eng.id}
-                        className="p-3 bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-300 dark:border-emerald-800 rounded-xl flex items-center justify-between gap-3 animate-in fade-in duration-200 shadow-xs"
+                        className="p-3 bg-amber-50/70 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800 rounded-xl flex items-center justify-between gap-3 animate-in fade-in duration-200 shadow-xs"
                       >
                         {/* Profile: Small Profile Image / Circular Initial, Name, Email only (NO bio/description) */}
                         <div className="flex items-center gap-3 min-w-0">
@@ -729,14 +729,14 @@ export default function InviteEngineerModal({
                   placeholder="Hey, we'd love for you to engineer this hardware project! Let me know if you have questions."
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  className="w-full p-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  className="w-full p-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={isSending || selectedEngineers.length < 1 || selectedEngineers.length > 3}
-                className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-sm"
+                className="w-full py-3 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-sm"
               >
                 {isSending ? (
                   <>
@@ -787,7 +787,7 @@ export default function InviteEngineerModal({
                 {invitations.map((inv) => {
                   const statusColors: Record<string, string> = {
                     SENT: 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800',
-                    ACCEPTED: 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800',
+                    ACCEPTED: 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800',
                     REJECTED: 'bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800',
                     EXPIRED: 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
                     PENDING_ADMIN: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800',

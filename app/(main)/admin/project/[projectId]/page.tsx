@@ -4,8 +4,9 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import DashboardShell from "@/components/layout/DashboardShell";
 import TabContent from "@/components/project/TabContent";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, UserPlus } from "lucide-react";
 import Link from "next/link";
+import InviteEngineerModal from "@/components/clients/InviteEngineerModal";
 
 const ADMIN_TABS = ["Overview", "Tasks", "Milestones", "Credentials", "Assets", "Report Issue", "Chat", "Payout"];
 
@@ -13,9 +14,11 @@ function getTabsForRole() {
   return ADMIN_TABS;
 }
 
-function TabBar({ tabs, active, setActive }: { tabs: string[]; active: string; setActive: (t: string) => void }) {
+function TabBar({ tabs, active, setActive, onInvite }: { tabs: string[]; active: string; setActive: (t: string) => void, onInvite?: () => void }) {
   return (
-    <div className="flex items-center gap-1 border-b border-[var(--border)] bg-white overflow-x-auto dark:bg-card">
+    <div className="flex justify-between border-b border-[var(--border)] bg-white overflow-x-auto dark:bg-card">
+
+    <div className="flex items-center gap-1">
       <Link href="/admin/project" className="p-3 hover:bg-[var(--primary-light)] transition-colors shrink-0">
         <ArrowLeft size={18} className="text-[var(--text-muted)]" />
       </Link>
@@ -23,17 +26,27 @@ function TabBar({ tabs, active, setActive }: { tabs: string[]; active: string; s
         const isActive = active === tab;
         return (
           <button
-            key={tab}
-            onClick={() => setActive(tab)}
-            className={`relative px-4 py-4 text-sm whitespace-nowrap transition-all duration-150 shrink-0
-              ${isActive ? "text-[var(--primary)] font-semibold" : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"}`}
-          >
+          key={tab}
+          onClick={() => setActive(tab)}
+          className={`relative px-4 py-4 text-sm whitespace-nowrap transition-all duration-150 shrink-0
+            ${isActive ? "text-[var(--primary)] font-semibold" : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"}`}
+            >
             {tab}
             {isActive && <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--primary)] rounded-t-full" />}
           </button>
         );
       })}
     </div>
+
+            {onInvite && (
+        <button
+          onClick={onInvite}
+          className="my-2 ml-4 mr-2 px-3.5 py-2 hover:text-primary text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-colors cursor-pointer shadow-sm"
+        >
+          <UserPlus size={14} /> Invite Engineer
+        </button>
+      )}
+      </div>
   );
 }
 
@@ -52,6 +65,8 @@ export default function ProjectDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("");
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  
 
   useEffect(() => {
     if (!projectId) return;
@@ -104,7 +119,7 @@ export default function ProjectDetailPage() {
         {/* Project Header */}
         <h1 className="text-lg font-bold text-[var(--text-primary)] pb-4">{project.title}</h1>
 
-        <TabBar tabs={tabs} active={activeTab} setActive={setActiveTab} />
+        <TabBar tabs={tabs} active={activeTab} setActive={setActiveTab} onInvite={() => setShowInviteModal(true)} />
 
         <div className="mt-6  px-2">
           <RoleTabContent
@@ -112,6 +127,15 @@ export default function ProjectDetailPage() {
             project={project}
           />
         </div>
+
+              <InviteEngineerModal
+                isOpen={showInviteModal}
+                onClose={() => setShowInviteModal(false)}
+                projectId={projectId}
+                projectName={project?.title}
+                projectBudget={project?.budget}
+                assignedEngineer={project?.engineer?.user?.name}
+              />
       </div>
     </DashboardShell >
   );

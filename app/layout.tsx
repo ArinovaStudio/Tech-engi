@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Inter } from "next/font/google";
@@ -8,7 +9,9 @@ import Providers from "@/components/Providers";
 import SocketAnnouncer from "@/components/SocketAnnouncer";
 import FacebookPixel from "@/components/FacebookPixel";
 
-const GTM_ID = "AW-18541777566";
+// Google Tracking IDs
+const GOOGLE_ADS_ID = "AW-18541777566";
+const GA4_ID = "G-2SHZGJCHRR";
 
 const idGrotesk = localFont({
   src: [
@@ -132,50 +135,51 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Google Tag Manager - Head */}
+        {/* Google Tag - Initialize dataLayer */}
         <Script
-          id="google-tag-manager"
+          id="google-tag-init"
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
-              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-              })(window,document,'script','dataLayer','${GTM_ID}');
+              window.dataLayer = window.dataLayer || [];
+
+              function gtag() {
+                window.dataLayer.push(arguments);
+              }
+
+              window.gtag = gtag;
+
+              gtag('js', new Date());
+
+              // Google Ads Configuration
+              gtag('config', '${GOOGLE_ADS_ID}');
+
+              // Google Analytics 4 Configuration
+              gtag('config', '${GA4_ID}');
             `,
           }}
         />
 
+        {/* Load Google Tag Library - Only Once */}
+        <Script
+          id="google-tag-library"
+          src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`}
+          strategy="afterInteractive"
+        />
 
-{/* Google Analytics 4 */}
-<Script
-  src="https://www.googletagmanager.com/gtag/js?id=G-2SHZGJCHRR"
-  strategy="afterInteractive"
-/>
-<Script
-  id="google-analytics"
-  strategy="afterInteractive"
-  dangerouslySetInnerHTML={{
-    __html: `
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){window.dataLayer.push(arguments);}
-      window.gtag = gtag;
-      gtag('js', new Date());
-      gtag('config', 'G-2SHZGJCHRR');
-    `,
-  }}
-/>
-
-        {/* Existing theme initialization */}
+        {/* Theme Initialization */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
                 try {
                   var savedTheme = localStorage.getItem('theme');
-                  var systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                  var systemTheme = window.matchMedia(
+                    '(prefers-color-scheme: dark)'
+                  ).matches ? 'dark' : 'light';
+
                   var theme = savedTheme || systemTheme;
+
                   if (theme === 'dark') {
                     document.documentElement.classList.add('dark');
                     document.documentElement.style.colorScheme = 'dark';
@@ -189,7 +193,7 @@ export default function RootLayout({
           }}
         />
 
-        {/* Existing JSON-LD structured data */}
+        {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -201,21 +205,7 @@ export default function RootLayout({
       <body
         className={`min-h-full flex flex-col ${idGrotesk.variable} ${inter.variable}`}
       >
-        {/* Google Tag Manager - Body (noscript fallback) */}
-        <noscript>
-          <iframe
-            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
-            height="0"
-            width="0"
-            style={{
-              display: "none",
-              visibility: "hidden",
-            }}
-            title="Google Tag Manager"
-          />
-        </noscript>
-
-        {/* Facebook Meta Pixel — skips auth/admin/dashboard routes */}
+        {/* Facebook Meta Pixel */}
         <FacebookPixel />
 
         <Providers>

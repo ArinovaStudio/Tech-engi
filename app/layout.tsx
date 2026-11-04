@@ -8,7 +8,7 @@ import Providers from "@/components/Providers";
 import SocketAnnouncer from "@/components/SocketAnnouncer";
 import FacebookPixel from "@/components/FacebookPixel";
 
-const GTM_ID = "GTM-5HV8B6QX";
+const GTM_ID = "AW-18541777566";
 
 const idGrotesk = localFont({
   src: [

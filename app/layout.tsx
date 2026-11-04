@@ -10,6 +10,7 @@ import SocketAnnouncer from "@/components/SocketAnnouncer";
 import FacebookPixel from "@/components/FacebookPixel";
 
 // Google Tracking IDs
+const GTM_ID = "GTM-5HV8B6QX";
 const GOOGLE_ADS_ID = "AW-18541777566";
 const GA4_ID = "G-2SHZGJCHRR";
 
@@ -135,7 +136,27 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Google Tag - Initialize dataLayer */}
+        {/* Google Tag Manager */}
+        <Script
+          id="google-tag-manager"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start': new Date().getTime(), event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0],
+                j=d.createElement(s),
+                dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+              })(window,document,'script','dataLayer','${GTM_ID}');
+            `,
+          }}
+        />
+
+        {/* Direct Google Ads + GA4 Tag Initialization */}
         <Script
           id="google-tag-init"
           strategy="beforeInteractive"
@@ -143,27 +164,24 @@ export default function RootLayout({
             __html: `
               window.dataLayer = window.dataLayer || [];
 
-              function gtag() {
+              window.gtag = window.gtag || function() {
                 window.dataLayer.push(arguments);
-              }
-
-              window.gtag = gtag;
+              };
 
               gtag('js', new Date());
 
-              // Google Ads Configuration
               gtag('config', '${GOOGLE_ADS_ID}');
-
-              // Google Analytics 4 Configuration
               gtag('config', '${GA4_ID}');
             `,
           }}
         />
 
-        {/* Load Google Tag Library - Only Once */}
+        {/* Load Google Tag Library */}
         <Script
           id="google-tag-library"
-          src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`}
+          src={
+            `https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`
+          }
           strategy="afterInteractive"
         />
 
@@ -205,6 +223,20 @@ export default function RootLayout({
       <body
         className={`min-h-full flex flex-col ${idGrotesk.variable} ${inter.variable}`}
       >
+        {/* Google Tag Manager - NoScript Fallback */}
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+            height="0"
+            width="0"
+            style={{
+              display: "none",
+              visibility: "hidden",
+            }}
+            title="Google Tag Manager"
+          />
+        </noscript>
+
         {/* Facebook Meta Pixel */}
         <FacebookPixel />
 

@@ -1,6 +1,4 @@
-
 import type { Metadata } from "next";
-import Script from "next/script";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 
@@ -136,53 +134,32 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Google Tag Manager */}
-        <Script
-          id="google-tag-manager"
-          strategy="beforeInteractive"
+        {/* Google Tag Manager (plain script so it is in the server HTML) */}
+        <script
           dangerouslySetInnerHTML={{
-            __html: `
-              (function(w,d,s,l,i){
-                w[l]=w[l]||[];
-                w[l].push({'gtm.start': new Date().getTime(), event:'gtm.js'});
-                var f=d.getElementsByTagName(s)[0],
-                j=d.createElement(s),
-                dl=l!='dataLayer'?'&l='+l:'';
-                j.async=true;
-                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
-                f.parentNode.insertBefore(j,f);
-              })(window,document,'script','dataLayer','${GTM_ID}');
-            `,
+            __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','${GTM_ID}');`,
           }}
         />
 
-        {/* Direct Google Ads + GA4 Tag Initialization */}
-        <Script
-          id="google-tag-init"
-          strategy="beforeInteractive"
+        {/* Google tag (gtag.js) - Google Ads + GA4 */}
+        <script
+          async
+          src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`}
+        />
+        <script
           dangerouslySetInnerHTML={{
             __html: `
-              window.dataLayer = window.dataLayer || [];
-
-              window.gtag = window.gtag || function() {
-                window.dataLayer.push(arguments);
-              };
-
-              gtag('js', new Date());
-
-              gtag('config', '${GOOGLE_ADS_ID}');
-              gtag('config', '${GA4_ID}');
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${GOOGLE_ADS_ID}');
+gtag('config', '${GA4_ID}');
             `,
           }}
-        />
-
-        {/* Load Google Tag Library */}
-        <Script
-          id="google-tag-library"
-          src={
-            `https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`
-          }
-          strategy="afterInteractive"
         />
 
         {/* Theme Initialization */}

@@ -28,8 +28,8 @@ type View = {
 
 const VIEWS: Record<ViewKey, View> = {
   client: {
-    line1: "You imagine it.",
-    line2: "We ship it.",
+    line1: "We handle code smoothly.",
+    line2: "Where your AI fails easily.",
     sub: "Tech Engi brings clients, engineers and students into one workspace. Start a project from zero, or hand over one that stalled halfway.",
     placeholder: "Describe your project…",
     suggestions: [

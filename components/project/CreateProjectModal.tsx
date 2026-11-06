@@ -9,6 +9,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { usePayment } from "@/hooks/usePayment";
 
+const MIN_PROJECT_BUDGET = 2000;
+
 export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void; onCreated: () => void, user: User }) {
   const router = useRouter();
   const { processPayment, loading: isPaying } = usePayment();
@@ -45,7 +47,11 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
     try {
       if (form.title.length < 5) { setError("Title must be at least 5 characters"); setLoading(false); return; }
       if (form.description.length < 20) { setError("Description must be at least 20 characters"); setLoading(false); return; }
-      if (Number(form.budget) < 500) { setError("Budget must be at least ₹500"); setLoading(false); return; }
+      if (!Number.isFinite(Number(form.budget)) || Number(form.budget) < MIN_PROJECT_BUDGET) {
+        setError("Budget must be at least ₹2,000");
+        setLoading(false);
+        return;
+      }
 
       // Create the Project in the Database
       const res = await fetch("/api/client/projects", {
@@ -99,6 +105,9 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
 
   const inputCls = "w-full px-3 py-2 border border-[var(--border)] rounded-lg text-sm outline-none focus:ring-2 focus:ring-[var(--primary)] bg-[var(--input-bg)] text-[var(--text-primary)]";
   const budgetAmount = form.budget ? Number(form.budget) : 0;
+  const isBudgetBelowMinimum =
+    form.budget !== "" &&
+    (!Number.isFinite(budgetAmount) || budgetAmount < MIN_PROJECT_BUDGET);
   const advanceAmount = (budgetAmount * 0.25).toFixed(0);
 
   return (
@@ -127,7 +136,10 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
 
             <div>
               <label className="block text-xs font-medium  text-[var(--text-secondary)] mb-1">Budget (₹) *</label>
-              <input type="number" className={inputCls} placeholder="Min ₹500" value={form.budget} onChange={(e) => setForm({ ...form, budget: e.target.value })} min="500" disabled={loading || isPaying} required />
+              <input type="number" className={inputCls} placeholder="Min ₹2,000" value={form.budget} onChange={(e) => setForm({ ...form, budget: e.target.value })} min={MIN_PROJECT_BUDGET} disabled={loading || isPaying} required />
+              {isBudgetBelowMinimum && (
+                <p className="mt-1 text-xs text-red-600" role="alert">Budget must be at least ₹2,000.</p>
+              )}
               {budgetAmount > 0 && (
                 <p className="text-[10px] text-[var(--text-muted)] mt-1.5 p-2 bg-blue-50 rounded border border-blue-100">
                   💳 You&apos;ll pay <span className="font-bold text-[var(--primary)]">₹{advanceAmount}</span> (25% advance) after project creation
@@ -178,7 +190,7 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
 
             <div className="flex gap-3 pt-2">
               <button type="button" onClick={onClose} disabled={loading || isPaying} className="flex-1 px-4 py-2 border border-[var(--border)] rounded-lg text-sm  text-[var(--text-secondary)] hover:bg-[var(--bg)] disabled:opacity-50">Cancel</button>
-              <button type="submit" disabled={loading || isPaying || !form.title.trim() || !form.description.trim() || !form.budget} className="flex-1 px-4 py-2 text-white rounded-lg text-sm  font-semibold disabled:opacity-50 flex items-center justify-center gap-2" style={{ background: "var(--primary)" }}>
+              <button type="submit" disabled={loading || isPaying || !form.title.trim() || !form.description.trim() || !form.budget || isBudgetBelowMinimum} className="flex-1 px-4 py-2 text-white rounded-lg text-sm  font-semibold disabled:opacity-50 flex items-center justify-center gap-2" style={{ background: "var(--primary)" }}>
                 {(loading || isPaying) ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                 {isPaying ? "Processing..." : "Create & Pay"}
               </button>

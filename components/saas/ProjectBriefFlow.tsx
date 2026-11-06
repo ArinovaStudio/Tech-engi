@@ -21,6 +21,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+const MIN_PROJECT_BUDGET = 2000;
+
 type CategoryId = "software" | "cloud" | "ai" | "design" | "hardware" | "unsure";
 type ModeId = "fix" | "build" | "finish" | "review" | "cowork";
 type Step = 1 | 2 | 3 | 4;
@@ -240,6 +242,9 @@ export default function ProjectBriefFlow({
 
   const category = CATEGORIES.find((item) => item.id === categoryId) ?? null;
   const mode = MODES.find((item) => item.id === modeId) ?? null;
+  const hasInvalidBudget =
+    budget.trim() !== "" &&
+    (!Number.isFinite(Number(budget)) || Number(budget) < MIN_PROJECT_BUDGET);
   const totalBudget = modeId === "cowork" ? days * 3480 : Number(budget) || 0;
   const upfront = totalBudget ? Math.round(totalBudget * 0.25) : null;
   const remaining = totalBudget && upfront !== null ? totalBudget - upfront : null;
@@ -272,6 +277,10 @@ export default function ProjectBriefFlow({
 
   function continueToRegister() {
     if (!categoryId || !modeId) return;
+    if (hasInvalidBudget) {
+      setError("Budget must be at least ₹2,000, or leave it blank if you are not sure yet.");
+      return;
+    }
 
     const params = new URLSearchParams({ cat: categoryId, mode: modeId });
     if (services.length) params.set("svc", services.join("|"));
@@ -539,17 +548,22 @@ export default function ProjectBriefFlow({
                       <input
                         id="project-budget"
                         type="number"
-                        min="0"
+                        min={MIN_PROJECT_BUDGET}
                         step="500"
                         inputMode="numeric"
                         value={budget}
-                        onChange={(event) => setBudget(event.target.value)}
-                        placeholder="Not sure yet"
+                        onChange={(event) => {
+                          setBudget(event.target.value);
+                          setError("");
+                        }}
+                        placeholder="Min ₹2,000"
                         className="min-h-12 w-full border-0 bg-transparent px-2 text-base text-saas-ink outline-none placeholder:text-saas-mut"
                       />
                     </div>
-                    <p className="mt-2 text-sm text-saas-tx">
-                      A rough estimate is fine. You can leave this blank.
+                    <p className={`mt-2 text-sm ${hasInvalidBudget ? "text-red-700" : "text-saas-tx"}`}>
+                      {hasInvalidBudget
+                        ? "Enter at least ₹2,000 or clear the field to continue without a budget."
+                        : "A rough estimate is fine. You can leave this blank."}
                     </p>
                   </div>
                 )}

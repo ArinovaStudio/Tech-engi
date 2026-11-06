@@ -123,7 +123,7 @@ export const EXPLAINER_SLIDES: ExplainerSlide[] = [
     number: "06",
     stepNumber: 6,
     title: "Assigned. Now chat, track and pay as you go.",
-    desc: "Talk to your engineer and the Tech Engi admin in one thread. Live progress, email updates, and milestone payments after the 40% upfront.",
+    desc: "Talk to your engineer and the Tech Engi admin in one thread. Live progress, email updates, and milestone payments after the 25% upfront.",
     ambientGlow:
       "radial-gradient(ellipse 75% 65% at 70% 50%, rgba(14, 165, 233, 0.10) 0%, rgba(14, 165, 233, 0.03) 40%, rgba(248, 250, 253, 0) 70%)",
     checklist: [

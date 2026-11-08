@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 
 const COMPANY = [
   { label: "Join as Freelancer", href: "/register" },
-  { label: "Start a Project", href: "/register" },
+  { label: "Start a Project", href: "/start" },
   { label: "Read Blogs", href: "/blog" },
   { label: "Privacy Policy", href: "/privacy-policy" },
   { label: "Terms and conditions", href: "/terms-and-conditions" },

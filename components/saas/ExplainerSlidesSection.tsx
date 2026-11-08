@@ -168,15 +168,25 @@ export const EXPLAINER_SLIDES: ExplainerSlide[] = [
   },
 ];
 
+// ---- Tuning (desktop) ----
+const SLIDE_DURATION = 0.02; // seconds for one slide change
+const COOLDOWN = 0.01; // extra pause after a slide change
+const QUIET_MS = 160; // wheel events closer together than this count as the same gesture (trackpad momentum)
+const WHEEL_MIN = 4; // ignore tiny wheel jitter
+const SWIPE_MIN = 40; // px a finger must travel to count as a swipe
+const STEP_VH = 0.8; // scroll distance per slide, as a fraction of the screen height
+const SETTLE_MS = 140; // after scrolling stops by other means, settle on the nearest slide
+
 export default function ExplainerSlidesSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const mobileScrollRef = useRef<HTMLDivElement>(null);
   const progressFillRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const rangeRef = useRef<{ start: number; end: number } | null>(null);
+  // Set by the desktop effect: jumps to a slide (used by the dots and arrow buttons)
+  const gotoRef = useRef<((index: number) => void) | null>(null);
 
-  // Desktop horizontal scroll triggered by vertical scroll
+  // Desktop: the section is pinned, and each scroll gesture moves exactly one slide.
   useEffect(() => {
     const section = sectionRef.current;
     const track = trackRef.current;
@@ -195,47 +205,157 @@ export default function ExplainerSlidesSection() {
         };
         if (!desk) return;
 
-        // Total scrollable distance = (total slides - 1) * viewport width
-        const distance = () => track.scrollWidth - window.innerWidth;
+        const last = EXPLAINER_SLIDES.length - 1;
+        const slideDur = reduce ? 0.01 : SLIDE_DURATION;
 
+        let busy = false; // a slide animation (or its cooldown) is running
+        let lastWheelAt = 0;
+        let touchStartY = 0;
+        let settleTimer: ReturnType<typeof setTimeout> | undefined;
+        let scrollTween: gsap.core.Tween | undefined;
+
+        // --- helpers (they read the ScrollTrigger lazily, so order doesn't matter) ---
+        const trig = () => move.scrollTrigger!;
+        const span = () => trig().end - trig().start || 1;
+        const stepY = (i: number) => trig().start + span() * (i / last);
+        const currentIndex = () => {
+          const p = (window.scrollY - trig().start) / span();
+          return Math.min(last, Math.max(0, Math.round(p * last)));
+        };
+        const inRange = () =>
+          window.scrollY >= trig().start - 2 && window.scrollY <= trig().end + 2;
+
+        // "instant" so a site-wide `scroll-behavior: smooth` can't make this laggy
+        const jumpTo = (y: number) =>
+          window.scrollTo({ top: y, behavior: "instant" as ScrollBehavior });
+
+        // Glide the page scroll to the exact position of slide i. The track follows the scroll.
+        const scrollToIndex = (i: number) => {
+          busy = true;
+          const p = { y: window.scrollY };
+          scrollTween?.kill();
+          scrollTween = gsap.to(p, {
+            y: stepY(i),
+            duration: slideDur,
+            ease: "power3.inOut",
+            onUpdate: () => jumpTo(p.y),
+            onComplete: () => {
+              gsap.delayedCall(COOLDOWN, () => {
+                busy = false;
+              });
+            },
+          });
+        };
+
+        // If the page was scrolled by some other means, settle on the nearest slide
+        const settle = () => {
+          if (busy || !inRange()) return;
+          const target = currentIndex();
+          if (Math.abs(window.scrollY - stepY(target)) > 2) scrollToIndex(target);
+        };
+
+        // --- Pinned horizontal track, tied directly to scroll ---
         const move = gsap.to(track, {
-          x: () => -distance(),
+          x: () => -last * window.innerWidth,
           ease: "none",
           scrollTrigger: {
             trigger: section,
             start: "top top",
-            end: () => "+=" + distance(),
+            end: () => "+=" + Math.round(window.innerHeight * STEP_VH * last),
             pin: true,
-            scrub: reduce ? true : 0.8,
+            anticipatePin: 1,
+            scrub: true,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
-              const p = self.progress;
-              const idx = Math.min(
-                Math.floor(p * EXPLAINER_SLIDES.length + 0.05),
-                EXPLAINER_SLIDES.length - 1
-              );
-              setActiveIndex(idx);
+              setActiveIndex(Math.round(self.progress * last));
               if (progressFillRef.current) {
-                gsap.set(progressFillRef.current, { scaleX: p });
+                gsap.set(progressFillRef.current, { scaleX: self.progress });
               }
+              clearTimeout(settleTimer);
+              settleTimer = setTimeout(settle, SETTLE_MS);
             },
           },
         });
 
-        const st = move.scrollTrigger;
-        if (st) {
-          rangeRef.current = {
-            get start() {
-              return st.start;
-            },
-            get end() {
-              return st.end;
-            },
-          };
-        }
+        // --- Input: one gesture = one slide. At the very first/last slide the page is allowed to scroll on. ---
+        const onWheel = (e: WheelEvent) => {
+          if (!inRange()) return;
+
+          const now = performance.now();
+          const gap = now - lastWheelAt;
+          lastWheelAt = now;
+
+          // Same gesture still going (trackpad momentum), or an animation is running: swallow it
+          if (busy || gap < QUIET_MS) {
+            e.preventDefault();
+            return;
+          }
+
+          const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+          if (Math.abs(d) < WHEEL_MIN) {
+            e.preventDefault();
+            return;
+          }
+
+          const next = currentIndex() + (d > 0 ? 1 : -1);
+          if (next < 0 || next > last) return; // past either end: let the page scroll on
+          e.preventDefault();
+          scrollToIndex(next);
+        };
+
+        const onTouchStart = (e: TouchEvent) => {
+          if (inRange()) touchStartY = e.touches[0].clientY;
+        };
+        const onTouchMove = (e: TouchEvent) => {
+          if (!inRange()) return;
+          const dy = touchStartY - e.touches[0].clientY;
+          const next = currentIndex() + (dy > 0 ? 1 : -1);
+          if (next < 0 || next > last) return;
+          e.preventDefault();
+        };
+        const onTouchEnd = (e: TouchEvent) => {
+          if (!inRange() || busy) return;
+          const dy = touchStartY - e.changedTouches[0].clientY;
+          if (Math.abs(dy) < SWIPE_MIN) return;
+          const next = currentIndex() + (dy > 0 ? 1 : -1);
+          if (next >= 0 && next <= last) scrollToIndex(next);
+        };
+
+        const onKey = (e: KeyboardEvent) => {
+          if (!inRange()) return;
+          const tag = (e.target as HTMLElement | null)?.tagName;
+          if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+          let dir = 0;
+          if (["ArrowDown", "PageDown"].includes(e.key) || (e.key === " " && !e.shiftKey)) dir = 1;
+          else if (["ArrowUp", "PageUp"].includes(e.key) || (e.key === " " && e.shiftKey)) dir = -1;
+          if (!dir) return;
+          const next = currentIndex() + dir;
+          if (next < 0 || next > last) return; // past either end: let the page scroll on
+          e.preventDefault();
+          if (!busy) scrollToIndex(next);
+        };
+
+        window.addEventListener("wheel", onWheel, { passive: false });
+        window.addEventListener("touchstart", onTouchStart, { passive: true });
+        window.addEventListener("touchmove", onTouchMove, { passive: false });
+        window.addEventListener("touchend", onTouchEnd, { passive: true });
+        window.addEventListener("keydown", onKey);
+
+        // Dots and arrow buttons
+        gotoRef.current = (i: number) => {
+          if (busy || i < 0 || i > last || i === currentIndex()) return;
+          scrollToIndex(i);
+        };
 
         return () => {
-          rangeRef.current = null;
+          gotoRef.current = null;
+          clearTimeout(settleTimer);
+          scrollTween?.kill();
+          window.removeEventListener("wheel", onWheel);
+          window.removeEventListener("touchstart", onTouchStart);
+          window.removeEventListener("touchmove", onTouchMove);
+          window.removeEventListener("touchend", onTouchEnd);
+          window.removeEventListener("keydown", onKey);
         };
       }
     );
@@ -245,11 +365,8 @@ export default function ExplainerSlidesSection() {
 
   // Jump to specific slide
   const goToSlide = useCallback((index: number) => {
-    const r = rangeRef.current;
-    if (r && window.innerWidth >= 901) {
-      const targetScroll =
-        r.start + (r.end - r.start) * (index / (EXPLAINER_SLIDES.length - 1));
-      window.scrollTo({ top: targetScroll, behavior: "smooth" });
+    if (window.innerWidth >= 901) {
+      gotoRef.current?.(index);
     } else if (mobileScrollRef.current) {
       const container = mobileScrollRef.current;
       const card = container.children[index] as HTMLElement;
@@ -287,7 +404,7 @@ export default function ExplainerSlidesSection() {
       <div className="hidden min-[901px]:block absolute top-[76px] inset-x-0 h-1 bg-black/5 z-30">
         <div
           ref={progressFillRef}
-          className="h-full bg-gradient-to-r from-[#5B74F0] via-[#F0B31E] to-[#F2548A] origin-left transition-transform duration-75"
+          className="h-full bg-gradient-to-r from-[#5B74F0] via-[#F0B31E] to-[#F2548A] origin-left"
           style={{ transform: "scaleX(0)" }}
         />
       </div>

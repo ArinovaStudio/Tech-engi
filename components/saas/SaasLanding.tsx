@@ -42,11 +42,11 @@ export default function SaasLanding() {
           <EscrowSection />b
           {/*  */}
           <StudentsSection />
-          <BuildTypesSection />
-          <ProcessSection />
+          {/* <BuildTypesSection /> */}
+          {/* <ProcessSection /> */}
           <FeaturesTabs />
           <WorkspaceSection />
-          <TestimonialsSection />
+          {/* <TestimonialsSection /> */}
           <ResultsSection />
           <LeadsSection />
           <FaqSection />

@@ -1,44 +1,83 @@
 # Tech Engi
 
-> Tech Engi (techengi.in) is India's AI-matched freelance network for bug fixing and engineering work. Clients post a bug, feature or project; an AI (LLM) matches it to a verified engineer by project title, description, tech stack, skills and budget; and an experienced human engineer does the work. AI matches. Humans fix. Tech Engi is a platform of TSquareY1 OPC Private Limited, a DPIIT- and MSME-recognised startup based in Chennai, Tamil Nadu, India, founded by Tarun Patak K.
+> Tech Engi (techengi.in) is an AI-matched freelance engineering platform in India, operated by TSquareY1 OPC Private Limited (Chennai, Tamil Nadu). Founders, startups and companies post a bug, a stalled or half-built project, or a new build. Tech Engi's AI matches it to a verified Indian engineer (Aadhaar and PAN verified). There is no bidding. Clients pay 0% platform fee. The client funds 25% upfront into escrow, and the remaining 75% is released milestone by milestone after the client approves the work. Engineers keep 97% on their first completed project and 95% after that.
 
 Key facts:
 
-- Focus: bug fixing first, especially for corporate teams; also CRM, ERP, SaaS, AI development, embedded systems and IoT.
-- How it works for clients: post the requirement, pay 25% upfront to confirm, get matched by AI, track progress live, pay by milestone through escrow.
-- Co-worker for a day: a verified engineer works through your agreed task list for one working day for ₹3,480.
-- For engineers: no bidding, no tokens or credits, no profile ranking, no fee to close a deal. Engineers keep 97% of what the client pays on their first project and 95% on every project after.
-- Tech Engi Pro: optional ₹734 plan for engineers that sends client leads by email. Escrow protection applies only to work run through the Tech Engi dashboard.
-- Verification: engineers submit Aadhaar, PAN and proof of experience before taking work.
-- Who it's for: corporate teams and managers, QA testers, debuggers, junior/senior/full-stack/MERN developers, freshers, students (help with their own projects), startups and founders.
-- Tagline: "Tech Engi — where engineers build without overhead."
+- Website: https://techengi.in
+- Operator: TSquareY1 OPC Private Limited, Chennai, Tamil Nadu, India
+- Contact: support@techengi.in
+- Who it is for: founders, startups and companies that need a bug fixed, an unfinished project completed, a code takeover, or a new website or app built; and engineers, including engineering students, looking for paid project work
+- Domains covered: software and bug fixing, web and app development, cloud and DevOps, embedded systems and IoT
+- Matching: AI matching on stack, skills and track record, no bidding; typically 2 to 24 hours from posting to a matched engineer
+- Client fees: 0% platform fee, 0% posting fee, no subscription, no success fee; the client sets the budget
+- Payments: 25% upfront held in escrow, the remaining 75% released per approved milestone (example: a ₹50,000 budget is ₹12,500 upfront and ₹37,500 by milestone)
+- Engineer fees: 3% on the first completed project, 5% after (engineers keep 97%, then 95%)
+- Co-Worker for a Day: a verified engineer works alongside the client for one sprint day for a flat ₹3,480
+- After delivery: clients can report an issue from the dashboard to reopen the work with the same engineer
 
-## Start
+## Platform
 
-- [About Tech Engi](https://techengi.in/about): what Tech Engi is, how it works, pricing, verification and company details
-- [Post a bug or project](https://techengi.in/register/client): for clients, founders and companies
-- [Join as an engineer](https://techengi.in/register/engineer): for developers, QA testers and freelancers
+- [Home](https://techengi.in/): what Tech Engi does, how matching works, pricing, FAQ
+- [How it works](https://techengi.in/#how): post a project, get matched, pay 25% upfront, approve milestones
+- [Who it's for](https://techengi.in/#who): clients and engineers
+- [FAQ](https://techengi.in/#faq): common questions about fees, matching, escrow and verification
+- [Post a project or join as an engineer](https://techengi.in/register): free registration for clients and engineers
+- [Log in](https://techengi.in/login)
 
-## Blog
+## Hiring and costs
 
-- [The 14 bugs that break code every day](https://techengi.in/blog/common-coding-bugs-why-hard-to-fix): common bug types, difficulty, and why senior engineers get stuck too
-- [Who can fix my code, and how soon?](https://techengi.in/blog/who-can-fix-my-code-how-soon): what to try first, whether AI can fix it, who can, how fast, and sharing code safely
-- [₹3,480 co-worker for a day](https://techengi.in/blog/hire-coworker-for-a-day-3480): hire a verified engineer for one working day in India
-- [How to fix your code without AI](https://techengi.in/blog/how-to-fix-code-without-ai): a 9-step human debugging method and free tools by language
-- [My developer left and the project is unfinished](https://techengi.in/blog/developer-left-unfinished-project): what to secure, finish vs rebuild, and how to find someone to finish it
-- [Cost to hire a developer or fix a bug in India](https://techengi.in/blog/cost-to-hire-developer-fix-bug-india): 2026 freelance rates, per-day salary cost, platform fees and Tech Engi pricing
-- [Indian IT is breaking its own people](https://techengi.in/blog/indian-it-burnout-overtime-bugs-ai-layoffs-2026): burnout, overtime, bugs and AI layoffs in Indian IT
-- [How to avoid scammer freelancers](https://techengi.in/blog/how-to-avoid-scammer-freelancers): red flags and fixes when hiring freelancers
-- [Freelance engineering without the chaos](https://techengi.in/blog/freelance-engineering-without-issues): how Tech Engi helps freelance engineers finish work
+- [How Much Does It Cost to Hire a Developer or Fix a Bug in India? (2026)](https://techengi.in/blog/cost-to-hire-developer-fix-bug-india): freelance rates by experience, full-time cost, platform fees and what drives bug-fix cost
+- [₹3,480 for a Co-Worker Who Clears Your Task List: Hire a Verified Engineer for a Day](https://techengi.in/blog/hire-coworker-for-a-day-3480): the flat-fee day-pass and what it includes
+- [My Developer Left and the Project Is Unfinished: How to Get It Finished](https://techengi.in/blog/developer-left-unfinished-project): securing a project after a developer disappears, finish vs rebuild, finding a replacement in India
+- [Bidding vs Matching: Which Gets Freelancers Paid Faster?](https://techengi.in/blog/bidding-vs-matching-freelance-platforms): cost, speed and risk of bidding platforms compared with matching platforms
+- [India's First AI Matching Freelance Platform: Meet Nashedi AI](https://techengi.in/blog/india-first-ai-matching-freelance-platform-nashedi-ai): introduction to Tech Engi's no-bidding matching model and fees
 
-## Company
+## Bug fixing and debugging
 
-- [Tech Engi on LinkedIn](https://www.linkedin.com/company/tech-engi)
-- [TSquareY1 OPC Private Limited on LinkedIn](https://www.linkedin.com/company/tsquarey1)
-- [Founder: Tarun Patak K](https://www.linkedin.com/in/tarunpatak)
-- Contact: support@techengi.in · Chennai, Tamil Nadu, India
+- [My Code Is Not Working: How to Fix It, Who Can Fix It, and How Soon](https://techengi.in/blog/who-can-fix-my-code-how-soon): first steps, whether AI helps, typical fix times, sharing code safely
+- [The 14 Bugs That Break Code Every Day](https://techengi.in/blog/common-coding-bugs-why-hard-to-fix): common bugs from undefined errors to race conditions and legacy code
+- [How to Fix Your Code Without AI: A Human Debugging Method That Actually Works](https://techengi.in/blog/how-to-fix-code-without-ai): a nine-step manual debugging method
+- [25 Bug-Fixing Tips That Work When the AI's Answer Doesn't](https://techengi.in/blog/bug-fixing-tips-when-ai-fails): reproduction, bisecting, logging, race conditions, memory leaks, production-only failures
+- [API Slow? A 7-Step Optimisation Checklist](https://techengi.in/blog/slow-api-performance-optimisation-checklist): measure first, then fix queries, caching, async work and load testing
+- [A Beginner's Guide to Code Review in 15 Minutes](https://techengi.in/blog/how-to-review-code-beginners-guide): a five-step review method with a checklist, including AI-generated code
+
+## Vibe coding and AI-written code
+
+- [10 Signs Your Vibe-Coded App Will Break in Production](https://techengi.in/blog/vibe-coded-app-breaks-in-production-10-signs): warning signs for AI-built apps, each with a 5-minute test
+- [Can a Vibe Coder Fix a Single Real Bug? The Honest Test](https://techengi.in/blog/can-vibe-coders-fix-bugs): five real bugs of rising difficulty and where AI help stops
+- [Why Gen Z Loves Vibe Coding (and Who Fixes It After)](https://techengi.in/blog/why-gen-z-loves-vibe-coding): where AI-built apps fail and how to hire a human to repair them
+- [AI Wrote Your Code. Who Fixes It? What the 2026 Coding Data Really Says](https://techengi.in/blog/ai-generated-code-2026-bugs-review-skills): how much AI-written code reaches production, with corrected figures
+- [Using AI Without Losing the Ability to Code](https://techengi.in/blog/use-ai-without-losing-coding-skill): over-reliance on AI when coding and its blind spots
+
+## Freelancing for engineers
+
+- [How to Get Your First Freelance Project in India (Without Bidding Wars)](https://techengi.in/blog/how-to-get-first-freelance-project-india): niche, proof of work, rates, finding clients, getting paid safely
+- [How to Start Freelancing as an Engineering Student in India (A 30-Day Plan)](https://techengi.in/blog/freelancing-for-engineering-students-india): skills, portfolio, pricing, tax basics, scam warning signs
+- [Reading a Client Brief: 8 Questions to Ask Before Saying Yes](https://techengi.in/blog/freelance-client-brief-8-questions-before-saying-yes): scope, deadline, payment, access and approvals
+- [How Tech Engi Helps Freelance Engineers Finish Work Without the Usual Chaos](https://techengi.in/blog/freelance-engineering-without-issues): ghosting, scope creep and late payments, and how milestones address them
+
+## Freelance safety
+
+- [How to Avoid Scammer or Cheating Freelancers (Before They Cost You)](https://techengi.in/blog/how-to-avoid-scammer-freelancers): scam patterns, red flags and payment protections
+
+## Security
+
+- [The Dark Web Didn't Hack SBI: What Actually Happened](https://techengi.in/blog/sbi-data-breach-dark-web-explained): confirmed exposed records vs a hacker group's claim, and what customers should do
+- [php2shell and Cloudflare, Explained](https://techengi.in/blog/php2shell-cloudflare-explained): the php2shell exploit wave, Cloudflare's role and which patches to apply
+
+## IT careers and industry
+
+- [Indian IT Is Breaking Its Own People, Then Blaming AI for the Layoffs](https://techengi.in/blog/indian-it-burnout-overtime-bugs-ai-layoffs-2026): unpaid overtime, understaffing and costly bugs behind AI-blamed layoffs (opinion)
+- [Innodata Layoffs in India: ~550 Employees](https://techengi.in/blog/innodata-layoffs-india-550-employees-what-to-do): what happened, legal rights and a 48-hour checklist
+- ["I'm Not Coming Today": India's Weekend Work Problem](https://techengi.in/blog/weekend-work-india-saturday-overtime-rights): Saturday work, legal context and how to decline
+- [An AI Researcher Quit and Said AI Could Kill Us All: What Is Confirmed](https://techengi.in/blog/jacob-coxon-ai-warning-fact-check): fact-check of verified claims vs opinion
 
 ## Optional
 
-- [Privacy policy](https://techengi.in/privacy-policy)
-- [Terms and conditions](https://techengi.in/terms-and-conditions)
+- [Blog index](https://techengi.in/blog): all articles
+- [Privacy Policy](https://techengi.in/privacy-policy)
+- [Terms and Conditions](https://techengi.in/terms-and-conditions)
+- [LinkedIn](https://www.linkedin.com/company/tsquarey1)
+- [Instagram](https://www.instagram.com/tsy1_tech.engi)
+- [YouTube](https://youtu.be/7jniNW5R2R0)

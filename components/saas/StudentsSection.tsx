@@ -63,7 +63,7 @@ export default function StudentsSection() {
               width={bg.width}
               height={bg.height}
               alt="Engineering student"
-              sizes="(min-width: 1024px) 50vw, 100vw"
+              sizes="(min-width: 1024px) 50vw, 70vw"
               className="h-full w-auto max-w-full object-contain object-right-bottom"
             />
           </div>

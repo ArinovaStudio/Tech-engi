@@ -12,11 +12,13 @@ type Tile = {
 
 type GridConfig = { cols: number; rows: number };
 
-const STOPS = [
-  [110, 168, 255],
-  [185, 140, 246],
-  [233, 139, 100],
-  [295, 180, 0],
+// Colour stops by distance from the bottom centre (0 = right there, 1 = far away).
+// Blue only near the bottom centre, then purple, a wide orange stretch, yellow at the far sides/top.
+const STOPS: { at: number; rgb: number[] }[] = [
+  { at: 0.0, rgb: [110, 168, 255] }, // blue
+  { at: 0.22, rgb: [185, 140, 246] }, // purple
+  { at: 0.5, rgb: [240, 135, 85] }, // orange
+  { at: 1.0, rgb: [250, 195, 70] }, // yellow
 ];
 
 // Grid size per screen width. Fewer, larger tiles on small screens.
@@ -27,6 +29,16 @@ const TIERS: { minWidth: number; cfg: GridConfig }[] = [
   { minWidth: 0, cfg: { cols: 6, rows: 4 } },
 ];
 
+// Boxes per SIDE in each row, listed top to bottom (a row has twice this many boxes).
+// Keep each list as long as `rows`, and end it at half the columns so the bottom row is full.
+// A size that is not listed here falls back to the formula in buildGrid.
+const SIDE_BY_ROW: Record<string, number[]> = {
+  "14x6": [2, 3, 4, 5, 6, 7], // 4, 6, 8, 10, 12, 14 boxes in total
+  "10x5": [1, 2, 3, 4, 5],
+  "8x5": [1, 2, 2, 3, 4],
+  "6x4": [1, 2, 2, 3],
+};
+
 function configForWidth(w: number): GridConfig {
   return (TIERS.find((t) => w >= t.minWidth) ?? TIERS[TIERS.length - 1]).cfg;
 }
@@ -36,37 +48,45 @@ function hash(a: number, b: number) {
   return s - Math.floor(s);
 }
 
-// x is 0..1 across the grid; interpolates through all four color stops
-function colorAt(x: number) {
-  const p = x * (STOPS.length - 1);
-  const i = Math.min(STOPS.length - 2, Math.floor(p));
-  const f = p - i;
-  return STOPS[i].map((v, j) => Math.round(v + (STOPS[i + 1][j] - v) * f));
+// t is 0..1; walks through the stops and blends between the two around it
+function colorAt(t: number): number[] {
+  let i = 0;
+  while (i < STOPS.length - 2 && t > STOPS[i + 1].at) i++;
+  const a = STOPS[i];
+  const b = STOPS[i + 1];
+  const f = Math.min(1, Math.max(0, (t - a.at) / (b.at - a.at)));
+  return a.rgb.map((v, j) => Math.round(v + (b.rgb[j] - v) * f));
 }
 
-// Row 0 is the TOP row. The number of lit tiles grows from ~43% of the
-// columns at the top to all columns at the second-to-last row, for any
-// grid size. (For 14 cols x 6 rows this gives 6, 8, 10, 12, 14, 14,
-// the same as the original.)
-function visibleCountForRow(r: number, cols: number, rows: number): number {
-  const start = Math.round(cols * 0.43);
-  const span = Math.max(1, rows - 2);
-  return Math.min(cols, Math.round(start + ((cols - start) * r) / span));
-}
-
+// Valley shape: every row is lit from both outer edges inwards. The top row has a short
+// run on each side with a gap in the middle, each row below gets wider, and the bottom
+// row is full. Left and right are always equal.
 function buildGrid({ cols, rows }: GridConfig): Tile[] {
   const tiles: Tile[] = [];
+  const half = Math.ceil(cols / 2); // tiles per side in the bottom row
+  const top = Math.max(1, Math.round(half * 0.4)); // fallback: tiles per side in the top row
+  const mid = (cols - 1) / 2;
+
   for (let r = 0; r < rows; r++) {
-    const count = visibleCountForRow(r, cols, rows);
-    const cutoff = cols - count; // columns before this index are hidden
+    // Your list wins; otherwise grow evenly from `top` to `half`
+    const side =
+      SIDE_BY_ROW[`${cols}x${rows}`]?.[r] ??
+      Math.round(top + ((half - top) * r) / Math.max(1, rows - 1));
+    const depth = rows > 1 ? r / (rows - 1) : 1; // 0 at top, 1 at bottom
 
     for (let c = 0; c < cols; c++) {
-      const k = colorAt(c / (cols - 1));
-      const hidden = c < cutoff;
+      const hidden = !(c < side || c >= cols - side);
+
+      // Distance from the bottom centre: dx sideways (0..1), dy upwards (0..1).
+      // Every tile gets its own value, so the colour fades box by box.
+      const dx = mid === 0 ? 0 : Math.abs(c - mid) / mid;
+      const dy = 1 - depth;
+      const t = Math.min(1, Math.hypot(dx, dy * 0.9) / 1.2);
+      const k = colorAt(t);
 
       let alpha = 0;
       if (!hidden) {
-        const depth = rows > 1 ? r / (rows - 1) : 1; // 0 at top, 1 at bottom
+        // same fade as the original version
         alpha = (0.12 + 0.75 * Math.pow(depth, 1.2)) * (0.55 + 0.45 * hash(c, r));
       }
 

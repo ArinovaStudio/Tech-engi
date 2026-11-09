@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
   Check,
-  Clock3,
   Code2,
   Cloud,
   Cpu,
@@ -22,10 +21,24 @@ import {
 } from "lucide-react";
 
 const MIN_PROJECT_BUDGET = 2000;
+const BRIEF_DRAFT_KEY = "te_project_brief_draft";
 
 type CategoryId = "software" | "cloud" | "ai" | "design" | "hardware" | "unsure";
 type ModeId = "fix" | "build" | "finish" | "review" | "cowork";
 type Step = 1 | 2 | 3 | 4;
+
+interface ProjectBriefDraft {
+  step: Step;
+  categoryId: CategoryId | null;
+  services: string[];
+  otherDetails: Record<string, string>;
+  modeId: ModeId | null;
+  days: number;
+  description: string;
+  budget: string;
+  email: string;
+  phone: string;
+}
 
 interface ServiceGroup {
   title: string;
@@ -51,53 +64,53 @@ interface WorkMode {
 const CATEGORIES: Category[] = [
   {
     id: "software",
-    name: "Software engineering",
+    name: "Website / Apps development",
     description: "Web and mobile apps, custom software, bugs and integrations.",
     icon: Code2,
     groups: [
       {
-        title: "Debugging & maintenance",
-        options: ["Production bug fixing", "Performance issues", "Legacy code takeover", "Refactoring"],
+        title: "Web development",
+        options: ["Business Website", "SAAS Application", "Full-stack development", "Web app deployment", "Frontend development", "Backend development", "Apps Development", "something else"],
       },
       {
-        title: "Web development",
-        options: ["Frontend development", "Backend development", "REST / GraphQL APIs"],
+        title: "Debugging & maintenance",
+        options: ["Production bug fixing", "Performance issues", "Legacy code takeover", "Refactoring", "Something else"],
       },
       {
         title: "Mobile development",
-        options: ["Flutter", "React Native", "Native Android / iOS", "App store release"],
+        options: ["Flutter", "React Native", "Native Android / iOS", "App store release", "Cross platform App", "Mobile app deployment", "SAAS App", "something else"],
       },
       {
         title: "Custom business software",
-        options: ["ERP / CRM", "Billing & inventory", "Internal tools", "Admin dashboards"],
+        options: ["ERP / CRM", "Billing & inventory", "Internal tools", "Admin dashboards", "something else"],
       },
       {
         title: "Integrations & testing",
-        options: ["Payment gateways", "Third-party APIs", "Test automation", "Load testing"],
+        options: ["Payment gateways", "Third-party APIs", "Test automation", "Load testing", "something else"],
       },
     ],
   },
   {
     id: "cloud",
-    name: "Cloud, DevOps & security",
+    name: "Deployment, Security & Fixes",
     description: "Deployments, reliability, cloud costs and security reviews.",
     icon: Cloud,
     groups: [
       {
         title: "Deployment & hosting",
-        options: ["AWS", "GCP", "Azure", "VPS setup", "Domains & SSL"],
+        options: ["AWS", "GCP", "Azure", "VPS setup", "Domains & SSL", "something else"],
       },
       {
         title: "CI/CD & containers",
-        options: ["GitHub Actions", "Docker", "Kubernetes"],
+        options: ["GitHub Actions", "Docker", "Kubernetes", "something else"],
       },
       {
         title: "Reliability",
-        options: ["Monitoring & logging", "Uptime & alerting", "Incident fixes"],
+        options: ["Monitoring & logging", "Uptime & alerting", "Incident fixes", "something else"],
       },
       {
         title: "Optimisation & security",
-        options: ["Cloud cost reduction", "Server migration", "Security audit", "Website hardening"],
+        options: ["Cloud cost reduction", "Server migration", "Security audit", "Website hardening", "something else"],
       },
     ],
   },
@@ -109,15 +122,15 @@ const CATEGORIES: Category[] = [
     groups: [
       {
         title: "AI & machine learning",
-        options: ["LLM chatbot", "AI features in an existing app", "Model training", "Computer vision"],
+        options: ["LLM chatbot", "AI features in an existing app", "Model training", "Computer vision", "something else"],
       },
       {
         title: "Data",
-        options: ["ETL pipelines", "Database design", "Data cleaning", "Custom dashboards"],
+        options: ["ETL pipelines", "Database design", "Data cleaning", "Custom dashboards", "something else"],
       },
       {
         title: "Automation",
-        options: ["Python scripting", "n8n / Zapier workflows", "Excel / Sheets automation"],
+        options: ["Python scripting", "n8n / Zapier workflows", "Excel / Sheets automation", "something else"],
       },
     ],
   },
@@ -129,15 +142,15 @@ const CATEGORIES: Category[] = [
     groups: [
       {
         title: "UI/UX design",
-        options: ["Mobile app UI", "Web app UI", "Wireframes & prototypes", "Design systems"],
+        options: ["Mobile app UI", "Web app UI", "Wireframes & prototypes", "Design systems", "something else"],
       },
       {
         title: "Product & industrial design",
-        options: ["Concept sketches", "Form design", "Ergonomics"],
+        options: ["Concept sketches", "Form design", "Ergonomics", "something else"],
       },
       {
         title: "3D design",
-        options: ["3D modelling", "Product rendering", "Product demo animation"],
+        options: ["3D modelling", "Product rendering", "Product demo animation", "something else"],
       },
     ],
   },
@@ -149,15 +162,15 @@ const CATEGORIES: Category[] = [
     groups: [
       {
         title: "Mechanical CAD",
-        options: ["SolidWorks", "Fusion 360", "CATIA", "2D drawings & GD&T"],
+        options: ["SolidWorks", "Fusion 360", "CATIA", "2D drawings & GD&T", "something else"],
       },
       {
         title: "Manufacturing & prototyping",
-        options: ["DFM / DFA review", "Sheet metal", "Enclosures", "3D printing"],
+        options: ["DFM / DFA review", "Sheet metal", "Enclosures", "3D printing", "something else"],
       },
       {
         title: "Electronics",
-        options: ["PCB design", "Embedded firmware", "IoT", "Robotics"],
+        options: ["PCB design", "Embedded firmware", "IoT", "Robotics", "something else"],
       },
     ],
   },
@@ -172,18 +185,18 @@ const CATEGORIES: Category[] = [
 
 const MODES: WorkMode[] = [
   {
-    id: "fix",
-    name: "Fix",
-    description: "Something is broken and needs to work again.",
-    example: "A crash, error, wrong output or slow page",
-    icon: Wrench,
-  },
-  {
     id: "build",
     name: "Build",
     description: "Start from an idea and create something new.",
     example: "A new app, tool or product design",
     icon: Cpu,
+  },
+  {
+    id: "fix",
+    name: "Fix",
+    description: "Something is broken and needs to work again.",
+    example: "A crash, error, wrong output or slow page",
+    icon: Wrench,
   },
   {
     id: "finish",
@@ -199,13 +212,13 @@ const MODES: WorkMode[] = [
     example: "Student projects, capstones, hackathons or code review",
     icon: Users,
   },
-  {
-    id: "cowork",
-    name: "Co-worker for a day",
-    description: "Work alongside a verified freelancer for a full working day.",
-    example: "Pairing, debugging, reviews or an overloaded sprint",
-    icon: Clock3,
-  },
+  // {
+  //   id: "cowork",
+  //   name: "Co-worker for a day",
+  //   description: "Work alongside a verified freelancer for a full working day.",
+  //   example: "Pairing, debugging, reviews or an overloaded sprint",
+  //   icon: Clock3,
+  // },
 ];
 
 const STEP_NAMES = ["What", "Service", "Approach", "Brief"];
@@ -222,6 +235,23 @@ function isModeId(value: string | undefined): value is ModeId {
   return MODES.some((mode) => mode.id === value);
 }
 
+function isStep(value: unknown): value is Step {
+  return value === 1 || value === 2 || value === 3 || value === 4;
+}
+
+function serviceSelectionKey(group: string, service: string): string {
+  return `${group}::${service}`;
+}
+
+function isEmail(value: string): boolean {
+  return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/.test(value.trim());
+}
+
+function isPhone(value: string): boolean {
+  const digits = value.replace(/\D/g, "");
+  return /^[+\d()\s.-]+$/.test(value) && digits.length >= 7 && digits.length <= 15;
+}
+
 export default function ProjectBriefFlow({
   initialCategory,
   initialMode,
@@ -234,20 +264,123 @@ export default function ProjectBriefFlow({
   const [step, setStep] = useState<Step>(startCategory ? (startCategory === "unsure" ? 3 : 2) : 1);
   const [categoryId, setCategoryId] = useState<CategoryId | null>(startCategory);
   const [services, setServices] = useState<string[]>([]);
+  const [otherDetails, setOtherDetails] = useState<Record<string, string>>({});
   const [modeId, setModeId] = useState<ModeId | null>(isModeId(initialMode) ? initialMode : null);
   const [days, setDays] = useState(1);
   const [description, setDescription] = useState("");
   const [budget, setBudget] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [draftLoaded, setDraftLoaded] = useState(false);
+  const lastSentSnapshot = useRef<string | null>(null);
 
   const category = CATEGORIES.find((item) => item.id === categoryId) ?? null;
   const mode = MODES.find((item) => item.id === modeId) ?? null;
+  const selectedServices = category?.groups.flatMap((group) =>
+    group.options
+      .filter((option) => services.includes(serviceSelectionKey(group.title, option)))
+      .map((option) => ({ group: group.title, option })),
+  ) ?? [];
+  const serviceLabels = selectedServices.map(({ group, option }) => `${group}: ${option}`);
+  const customServices = Object.entries(otherDetails)
+    .filter(([, detail]) => detail.trim())
+    .map(([group, detail]) => `${group}: ${detail.trim()}`);
   const hasInvalidBudget =
     budget.trim() !== "" &&
     (!Number.isFinite(Number(budget)) || Number(budget) < MIN_PROJECT_BUDGET);
   const totalBudget = modeId === "cowork" ? days * 3480 : Number(budget) || 0;
   const upfront = totalBudget ? Math.round(totalBudget * 0.25) : null;
   const remaining = totalBudget && upfront !== null ? totalBudget - upfront : null;
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(BRIEF_DRAFT_KEY);
+      if (saved) {
+        const draft = JSON.parse(saved) as Partial<ProjectBriefDraft>;
+        if (draft && typeof draft === "object") {
+          const savedCategory =
+            typeof draft.categoryId === "string" ? draft.categoryId : undefined;
+          if (!startCategory && isCategoryId(savedCategory)) {
+            setCategoryId(savedCategory);
+          }
+          const canRestoreSelections = !startCategory || draft.categoryId === startCategory;
+          if (canRestoreSelections && Array.isArray(draft.services)) {
+            setServices(draft.services.filter((service): service is string => typeof service === "string"));
+          }
+          if (
+            canRestoreSelections &&
+            draft.otherDetails &&
+            typeof draft.otherDetails === "object" &&
+            !Array.isArray(draft.otherDetails)
+          ) {
+            setOtherDetails(
+              Object.fromEntries(
+                Object.entries(draft.otherDetails).filter(
+                  (entry): entry is [string, string] => typeof entry[1] === "string",
+                ),
+              ),
+            );
+          }
+          const savedMode = typeof draft.modeId === "string" ? draft.modeId : undefined;
+          if (!initialMode && isModeId(savedMode)) setModeId(savedMode);
+          if (typeof draft.days === "number" && Number.isInteger(draft.days)) {
+            setDays(Math.min(30, Math.max(1, draft.days)));
+          }
+          if (typeof draft.description === "string") setDescription(draft.description);
+          if (typeof draft.budget === "string") setBudget(draft.budget);
+          if (typeof draft.email === "string") setEmail(draft.email);
+          if (typeof draft.phone === "string") setPhone(draft.phone);
+          if (!startCategory && isStep(draft.step)) setStep(draft.step);
+        }
+      }
+
+      const heroDescription = localStorage.getItem("req")?.trim();
+      if (heroDescription) {
+        setDescription(heroDescription);
+        localStorage.removeItem("req");
+      }
+    } catch (storageError) {
+      console.error("Could not restore the project brief draft:", storageError);
+    } finally {
+      setDraftLoaded(true);
+    }
+  }, [initialMode, startCategory]);
+
+  useEffect(() => {
+    if (!draftLoaded) return;
+    const draft: ProjectBriefDraft = {
+      step,
+      categoryId,
+      services,
+      otherDetails,
+      modeId,
+      days,
+      description,
+      budget,
+      email,
+      phone,
+    };
+    try {
+      localStorage.setItem(BRIEF_DRAFT_KEY, JSON.stringify(draft));
+    } catch (storageError) {
+      console.error("Could not save the project brief draft:", storageError);
+    }
+  }, [
+    budget,
+    categoryId,
+    days,
+    description,
+    draftLoaded,
+    email,
+    modeId,
+    otherDetails,
+    phone,
+    services,
+    step,
+  ]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -257,44 +390,142 @@ export default function ProjectBriefFlow({
   function chooseCategory(id: CategoryId) {
     if (categoryId !== id) {
       setServices([]);
+      setOtherDetails({});
     }
     setCategoryId(id);
     setStep(id === "unsure" ? 3 : 2);
   }
 
-  function toggleService(service: string) {
+  function toggleService(service: string, groupTitle: string) {
+    const selectionKey = serviceSelectionKey(groupTitle, service);
+    const isSelected = services.includes(selectionKey);
     setServices((selected) =>
-      selected.includes(service)
-        ? selected.filter((item) => item !== service)
-        : [...selected, service],
+      isSelected
+        ? selected.filter((item) => item !== selectionKey)
+        : [...selected, selectionKey],
     );
+    if (service.toLowerCase() === "something else") {
+      setOtherDetails((details) => {
+        if (isSelected) {
+          const next = { ...details };
+          delete next[groupTitle];
+          return next;
+        }
+        return details;
+      });
+    }
+  }
+
+  function buildLeadSnapshot() {
+    return JSON.stringify({
+      categoryId,
+      services,
+      otherDetails,
+      modeId,
+      days,
+      description: description.trim(),
+      budget: totalBudget || null,
+      email: email.trim(),
+      phone: phone.trim(),
+    });
+  }
+
+  async function sendLead(allowPartialContact = false): Promise<boolean> {
+    const snapshot = buildLeadSnapshot();
+    if (lastSentSnapshot.current === snapshot) return true;
+
+    setIsSubmitting(true);
+    setError("");
+    setSuccess("");
+    try {
+      const response = await fetch("/api/project-lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          category: category?.name ?? "",
+          services: serviceLabels,
+          otherDetails,
+          mode: mode?.name ?? "",
+          days: modeId === "cowork" ? days : undefined,
+          budget: totalBudget || undefined,
+          description: description.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
+          allowPartialContact,
+        }),
+      });
+      const result = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        setError(result.error ?? "We couldn't send your brief. Please try again.");
+        return false;
+      }
+      lastSentSnapshot.current = snapshot;
+      return true;
+    } catch (sendError) {
+      console.error("Could not send the project brief:", sendError);
+      setError("We couldn't send your brief right now. Please try again.");
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleBriefBack() {
+    if (email.trim() || phone.trim()) {
+      const sent = await sendLead(true);
+      if (!sent) return;
+      setSuccess("We've received your project details and will be in touch.");
+    }
+    setStep(3);
+  }
+
+  async function submitBrief(createAccount: boolean) {
+    if (!isEmail(email)) {
+      setError("Enter a valid email address to send your project brief.");
+      return;
+    }
+    if (!isPhone(phone)) {
+      setError("Enter a valid phone number to send your project brief.");
+      return;
+    }
+    if (!categoryId || !modeId) {
+      setError("Choose a category and approach before sending your brief.");
+      return;
+    }
+    if (hasInvalidBudget) {
+      setError("Budget must be at least ₹2,000, or leave it blank if you are not sure yet.");
+      return;
+    }
+    if (!(await sendLead())) return;
+
+    if (createAccount) {
+      const params = new URLSearchParams({ cat: categoryId, mode: modeId });
+      if (selectedServices.length) {
+        params.set("svc", selectedServices.map(({ option }) => option).join("|"));
+      }
+      if (modeId === "cowork") params.set("days", String(days));
+      if (totalBudget) params.set("budget", String(totalBudget));
+
+      try {
+        const accountDescription = [
+          description.trim(),
+          ...(customServices.length ? [`Other service details:\n${customServices.join("\n")}`] : []),
+        ]
+          .filter(Boolean)
+          .join("\n\n");
+        sessionStorage.setItem("te_brief", accountDescription);
+      } catch (storageError) {
+        console.error("Could not save the project description for registration:", storageError);
+      }
+      router.push(`/register/client?${params.toString()}`);
+      return;
+    }
+    setSuccess("Your brief is on its way. Our team will contact you shortly.");
   }
 
   function continueToMode() {
     if (categoryId && categoryId !== "unsure" && services.length === 0) return;
     setStep(3);
-  }
-
-  function continueToRegister() {
-    if (!categoryId || !modeId) return;
-    if (hasInvalidBudget) {
-      setError("Budget must be at least ₹2,000, or leave it blank if you are not sure yet.");
-      return;
-    }
-
-    const params = new URLSearchParams({ cat: categoryId, mode: modeId });
-    if (services.length) params.set("svc", services.join("|"));
-    if (modeId === "cowork") params.set("days", String(days));
-    if (totalBudget) params.set("budget", String(totalBudget));
-
-    try {
-      sessionStorage.setItem("te_brief", description.trim());
-    } catch {
-      setError("Your browser could not save this brief. Please allow session storage and try again.");
-      return;
-    }
-
-    router.push(`/register/client?${params.toString()}`);
   }
 
   return (
@@ -330,7 +561,7 @@ export default function ProjectBriefFlow({
               <StepHeading
                 step={step}
                 title="What do you need help with?"
-                description="Choose the closest fit. You can change your selections before creating an account."
+                description="Choose the closest fit. You can change your selections before sending your brief."
               />
               <div className="grid gap-4 sm:grid-cols-2">
                 {CATEGORIES.map((item) => {
@@ -366,20 +597,27 @@ export default function ProjectBriefFlow({
                 description="Select one or more. If you are not sure, you can skip this and explain in your own words."
               />
               <div className="space-y-4">
-                {category.groups.map((group) => (
-                  <div
-                    key={group.title}
-                    className="rounded-3xl bg-slate-50 p-5 sm:p-6"
-                  >
+                {category.groups.map((group) => {
+                  const otherOption = group.options.find(
+                    (option) => option.toLowerCase() === "something else",
+                  );
+                  const otherSelected =
+                    otherOption !== undefined &&
+                    services.includes(serviceSelectionKey(group.title, otherOption));
+                  return (
+                    <div
+                      key={group.title}
+                      className="rounded-3xl bg-slate-50 p-5 sm:p-6"
+                    >
                     <h3 className="text-base font-semibold text-saas-ink">{group.title}</h3>
                     <div className="mt-4 grid gap-2 sm:grid-cols-2">
                       {group.options.map((option) => {
-                        const selected = services.includes(option);
+                        const selected = services.includes(serviceSelectionKey(group.title, option));
                         return (
                           <button
                             key={option}
                             type="button"
-                            onClick={() => toggleService(option)}
+                            onClick={() => toggleService(option, group.title)}
                             aria-pressed={selected}
                             className="flex min-h-11 items-center gap-3 rounded-xl bg-white px-3.5 py-2 text-left text-sm text-saas-tx transition-colors hover:bg-[#FFDE21]/15 aria-pressed:bg-[#FFDE21]/30 aria-pressed:text-saas-ink"
                           >
@@ -397,8 +635,33 @@ export default function ProjectBriefFlow({
                         );
                       })}
                     </div>
-                  </div>
-                ))}
+                    {otherSelected && (
+                      <div className="mt-4">
+                        <label
+                          htmlFor={`other-service-${category.id}-${group.title}`}
+                          className="block text-sm font-medium text-saas-tx"
+                        >
+                          What else do you need for {group.title.toLowerCase()}?
+                        </label>
+                        <input
+                          id={`other-service-${category.id}-${group.title}`}
+                          type="text"
+                          value={otherDetails[group.title] ?? ""}
+                          onChange={(event) =>
+                            setOtherDetails((details) => ({
+                              ...details,
+                              [group.title]: event.target.value,
+                            }))
+                          }
+                          maxLength={500}
+                          placeholder="Tell us what you have in mind"
+                          className="mt-2 min-h-11 w-full rounded-xl border border-saas-line bg-white px-3.5 py-2 text-sm text-saas-ink outline-none focus:border-[#FFDE21] focus:ring-2 focus:ring-[#FFDE21]/40"
+                        />
+                      </div>
+                    )}
+                    </div>
+                  );
+                })}
               </div>
               <div className="mt-6 flex flex-wrap gap-3">
                 <button
@@ -414,6 +677,7 @@ export default function ProjectBriefFlow({
                   type="button"
                   onClick={() => {
                     setServices([]);
+                    setOtherDetails({});
                     setStep(3);
                   }}
                   className="inline-flex min-h-12 items-center justify-center rounded-full bg-white px-6 font-medium text-saas-ink transition-colors hover:bg-[#FFDE21]/35"
@@ -477,11 +741,15 @@ export default function ProjectBriefFlow({
 
           {step === 4 && mode && (
             <section aria-labelledby="brief-step-4">
-              <BackButton onClick={() => setStep(3)} label="Back" />
+              <BackButton
+                onClick={handleBriefBack}
+                label={isSubmitting ? "Sending before going back…" : "Back"}
+                disabled={isSubmitting}
+              />
               <StepHeading
                 step={step}
                 title="Tell us a little more."
-                description="A few plain-language details help us understand what you need. You can add more after creating your account."
+                description="A few plain-language details help us understand what you need. Send your brief with or without creating an account."
               />
               <div className="rounded-3xl bg-slate-50 p-5 sm:p-7">
                 <label htmlFor="project-description" className="block text-sm font-semibold text-saas-ink">
@@ -507,7 +775,51 @@ export default function ProjectBriefFlow({
                   className="mt-2 w-full resize-y rounded-2xl border border-saas-line bg-white px-4 py-3 text-base text-saas-ink outline-none transition-colors placeholder:text-saas-mut focus:border-[#FFDE21] focus:ring-2 focus:ring-[#FFDE21]/40"
                 />
                 <p className="mt-2 text-sm text-saas-tx">
-                  Optional. Keep sensitive information out of this description.
+                  Keep sensitive information out of this description.
+                </p>
+
+                <div className="mt-7 grid gap-4 border-t border-saas-line pt-6 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="project-email" className="block text-sm font-semibold text-saas-ink">
+                      Email address <span aria-hidden="true">*</span>
+                    </label>
+                    <input
+                      id="project-email"
+                      type="email"
+                      required
+                      autoComplete="email"
+                      value={email}
+                      onChange={(event) => {
+                        setEmail(event.target.value);
+                        setError("");
+                      }}
+                      maxLength={254}
+                      placeholder="you@example.com"
+                      className="mt-2 min-h-12 w-full rounded-2xl border border-saas-line bg-white px-4 text-base text-saas-ink outline-none focus:border-[#FFDE21] focus:ring-2 focus:ring-[#FFDE21]/40"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="project-phone" className="block text-sm font-semibold text-saas-ink">
+                      Phone number <span aria-hidden="true">*</span>
+                    </label>
+                    <input
+                      id="project-phone"
+                      type="tel"
+                      required
+                      autoComplete="tel"
+                      value={phone}
+                      onChange={(event) => {
+                        setPhone(event.target.value);
+                        setError("");
+                      }}
+                      maxLength={24}
+                      placeholder="Include country code if outside India"
+                      className="mt-2 min-h-12 w-full rounded-2xl border border-saas-line bg-white px-4 text-base text-saas-ink outline-none focus:border-[#FFDE21] focus:ring-2 focus:ring-[#FFDE21]/40"
+                    />
+                  </div>
+                </div>
+                <p className="mt-2 text-sm text-saas-tx">
+                  We need both details to send your brief and follow up.
                 </p>
 
                 {modeId === "cowork" ? (
@@ -597,18 +909,33 @@ export default function ProjectBriefFlow({
                   {error}
                 </p>
               )}
+              {success && (
+                <p role="status" className="mt-4 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+                  {success}
+                </p>
+              )}
               <div className="mt-6">
                 <button
                   type="button"
-                  onClick={continueToRegister}
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#FFDE21] px-6 font-semibold text-slate-950 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#f2d01e]"
+                  onClick={() => void submitBrief(true)}
+                  disabled={isSubmitting}
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#FFDE21] px-6 font-semibold text-slate-950 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#f2d01e] disabled:cursor-wait disabled:opacity-60"
                 >
-                  Create account &amp; get matched
+                  {isSubmitting ? "Sending your brief…" : "Get my project started"}
                   <ArrowRight aria-hidden="true" className="h-4 w-4" />
                 </button>
-                <p className="mt-3 text-sm text-saas-tx">
-                  Free to create an account. Nothing is charged until you confirm a project.
-                </p>
+                <br />
+                {/* <p className="mt-3 text-sm text-saas-tx">
+                  We’ll email your brief to our team, then you can create an account to manage your project.
+                </p> */}
+                <button
+                  type="button"
+                  onClick={() => void submitBrief(false)}
+                  disabled={isSubmitting}
+                  className="mt-3 inline-flex min-h-10 items-center rounded-full px-3 text-sm font-medium text-saas-tx underline underline-offset-4 transition-colors hover:text-saas-ink disabled:cursor-wait disabled:opacity-60"
+                >
+                  Send my brief without creating an account
+                </button>
               </div>
             </section>
           )}
@@ -620,8 +947,11 @@ export default function ProjectBriefFlow({
             <SummaryItem label="Category" value={category?.name ?? "Choose a category"} />
             <SummaryItem
               label="Services"
-              value={services.length ? services.join(", ") : categoryId ? "Not selected" : "—"}
+              value={serviceLabels.length ? serviceLabels.join(", ") : categoryId ? "Not selected" : "—"}
             />
+            {customServices.map((service) => (
+              <SummaryItem key={service} label="Something else" value={service} />
+            ))}
             <SummaryItem label="Approach" value={mode?.name ?? "—"} />
             <SummaryItem
               label="Budget"
@@ -666,12 +996,21 @@ function StepHeading({
   );
 }
 
-function BackButton({ onClick, label }: { onClick: () => void; label: string }) {
+function BackButton({
+  onClick,
+  label,
+  disabled = false,
+}: {
+  onClick: () => void;
+  label: string;
+  disabled?: boolean;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="mb-4 inline-flex min-h-10 items-center gap-2 rounded-full px-3 text-sm font-medium text-saas-tx transition-colors hover:bg-slate-100 hover:text-saas-ink"
+      disabled={disabled}
+      className="mb-4 inline-flex min-h-10 items-center gap-2 rounded-full px-3 text-sm font-medium text-saas-tx transition-colors hover:bg-slate-100 hover:text-saas-ink disabled:cursor-wait disabled:opacity-60"
     >
       <ArrowLeft aria-hidden="true" className="h-4 w-4" />
       {label}

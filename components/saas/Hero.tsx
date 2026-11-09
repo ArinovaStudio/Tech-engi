@@ -229,7 +229,7 @@ export default function Hero() {
     } catch {
       // storage can be blocked (private mode); still continue to /start
     }
-    router.push("/start");
+    router.push(`/start?draft=${Date.now()}`);
   };
 
   return (

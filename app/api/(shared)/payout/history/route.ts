@@ -116,20 +116,44 @@ export async function GET() {
 
       const pendingProjects = projects.filter((p) =>["DRAFT", "AWAITING_FINAL_PAYMENT"].includes(p.status));
 
-      let pendingAmount = 0;
-      for (const p of pendingProjects) {
-        if (p.status === "DRAFT") {
-          pendingAmount += (p.budget || 0) * 0.25;
-        } else if (p.status === "AWAITING_FINAL_PAYMENT") {
-          pendingAmount += (p.budget || 0) * 0.75;
-        }
-      }
+      const pendingPromoTransactions = pendingProjects.length
+        ? await prisma.transaction.findMany({
+            where: {
+              userId: user.id,
+              projectId: { in: pendingProjects.map((project) => project.id) },
+              type: "ADVANCE_PAYMENT",
+              status: "PENDING",
+              promoCodeId: { not: null },
+            },
+            include: { promoCode: { select: { code: true } } },
+            orderBy: { createdAt: "desc" },
+          })
+        : [];
+      const pendingPromoByProject = new Map(
+        pendingPromoTransactions.map((transaction) => [transaction.projectId, transaction]),
+      );
+      const pendingProjectsWithPayment = pendingProjects.map((project) => {
+        const pendingPromo = pendingPromoByProject.get(project.id);
+        const normalAmount = project.status === "DRAFT"
+          ? (project.budget || 0) * 0.25
+          : (project.budget || 0) * 0.75;
+        return {
+          ...project,
+          pendingAmount: pendingPromo?.amount ?? normalAmount,
+          pendingPromoCode: pendingPromo?.promoCode?.code ?? null,
+          promoDiscount: pendingPromo?.promoDiscount ?? 0,
+        };
+      });
+      const pendingAmount = pendingProjectsWithPayment.reduce(
+        (total, project) => total + project.pendingAmount,
+        0,
+      );
 
       return NextResponse.json({
         success: true,
         transactions,
         stats: { totalSpent, totalRefunded, pendingRefunds, totalBudget, totalProjects, pendingAmount },
-        pendingProjects
+        pendingProjects: pendingProjectsWithPayment
       }, { status: 200 });
     }
 

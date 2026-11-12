@@ -8,6 +8,7 @@ interface PaymentOptions {
   redirectPath: string;
   user?: { name?: string | null; email?: string | null };
   description?: string;
+  promoCode?: string;
   onSuccess?: () => void;
   onError?: (error: string) => void;
   onDismiss?: () => void;
@@ -24,13 +25,14 @@ export function usePayment() {
 
     if (gateway === "PAYU") {
       const fullRedirectUrl = `${window.location.origin}${options.redirectPath}`;
-      await payPayu(options.projectId, fullRedirectUrl);
+      await payPayu(options.projectId, fullRedirectUrl, options.promoCode);
     } 
     else {
       await payRazorpay({
         projectId: options.projectId,
         user: options.user,
         description: options.description,
+        promoCode: options.promoCode,
         onSuccess: options.onSuccess,
         onError: options.onError,
         onDismiss: options.onDismiss,

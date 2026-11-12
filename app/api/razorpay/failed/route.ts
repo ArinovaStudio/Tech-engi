@@ -15,13 +15,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Order ID required" }, { status: 400 });
     }
 
-    await prisma.transaction.updateMany({
-      where: { 
+    const transaction = await prisma.transaction.findFirst({
+        where: {
         razorpayOrderId: razorpay_order_id,
         userId: user.id,
         status: "PENDING"
-      },
-      data: { status: "FAILED" }
+        },
+        select: { id: true, promoCodeId: true },
+      });
+    if (!transaction || transaction.promoCodeId) {
+      return NextResponse.json(
+        { success: true, message: "Discounted advance payment can be retried." },
+        { status: 200 },
+      );
+    }
+
+    await prisma.transaction.update({
+      where: { id: transaction.id },
+      data: { status: "FAILED" },
     });
 
     return NextResponse.json({ success: true, message: "Transaction marked as failed" }, { status: 200 });

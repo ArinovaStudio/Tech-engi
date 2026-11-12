@@ -6,7 +6,7 @@ import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, CreditCard, Users, MessageSquare, LogOut, ChevronLeft, ChevronRight,
   User, UserKeyIcon, FolderKanban, Presentation, Lightbulb, FileUp, Handshake, Bug, Paperclip, Send,
-  Headset
+  Headset, Tag
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { dashboardTourSteps } from "@/config/dashboardTourSteps";
@@ -29,6 +29,7 @@ const ADMIN_NAV: NavItem[] = [
   { label: "Engineer Management", icon: <UserKeyIcon size={20} />, href: "/admin/engineer-management" },
   { label: "Invitations Management", icon: <Send size={20} />, href: "/admin/invitations-management" },
   { label: "Leads", icon: <Headset size={20} />, href: "/admin/leads" },
+  { label: "Promo Codes", icon: <Tag size={20} />, href: "/admin/promo-codes" },
   { label: "Message", icon: <MessageSquare size={20} />, href: "/admin/message" },
 ];
 
@@ -60,6 +61,7 @@ function getSidebarDescription(label: string): string {
     "Projects": "View and manage all projects assigned to you.",
     "Client Management": "View and manage all client accounts on the platform.",
     "Engineer Management": "View and manage all engineer accounts and assignments.",
+    "Promo Codes": "Create and manage percentage discounts for client advance payments.",
     "Invitations Management": "Send and track invitations for new clients or engineers joining the platform.",
   };
   return descriptions[label] || `Navigate to the ${label} section.`;

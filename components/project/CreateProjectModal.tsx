@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Plus, AlertCircle, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -8,6 +8,7 @@ import { User } from "./ProjectUI";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { usePayment } from "@/hooks/usePayment";
+import { PromoCodeField, PromoQuoteView } from "./PromoCodeField";
 
 const MIN_PROJECT_BUDGET = 2000;
 
@@ -20,6 +21,11 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
   const [instrInput, setInstrInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<PromoQuoteView | null>(null);
+
+  const handlePromoChange = useCallback((promo: PromoQuoteView | null) => {
+    setAppliedPromo(promo);
+  }, []);
 
   const addInstrument = () => {
     const v = instrInput.trim();
@@ -79,6 +85,7 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
         redirectPath: `/client`,
         user: { name: user?.name, email: user?.email },
         description: "Advance Payment (25%)",
+        promoCode: appliedPromo?.code,
         
         onSuccess: () => {
           handleStartMatching(projectId);
@@ -142,10 +149,18 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
               )}
               {budgetAmount > 0 && (
                 <p className="text-[10px] text-[var(--text-muted)] mt-1.5 p-2 bg-blue-50 rounded border border-blue-100">
-                  💳 You&apos;ll pay <span className="font-bold text-[var(--primary)]">₹{advanceAmount}</span> (25% advance) after project creation
+                  You&apos;ll pay <span className="font-bold text-[var(--primary)]">₹{appliedPromo ? appliedPromo.amountDue.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : advanceAmount}</span> (25% advance) after project creation
                 </p>
               )}
             </div>
+
+            {budgetAmount >= MIN_PROJECT_BUDGET && (
+              <PromoCodeField
+                budget={budgetAmount}
+                disabled={loading || isPaying}
+                onPromoChange={handlePromoChange}
+              />
+            )}
 
             <div className="grid grid-cols-2 gap-3">
               <div>

@@ -39,6 +39,8 @@ model User {
   projectTasks         ProjectTask[]
   raisedTickets        Ticket[]
   transactions         Transaction[]
+  promoCodesCreated    PromoCode[]                  @relation("PromoCodeCreator")
+  promoCodeRedemptions PromoCodeRedemption[]
 }
 
 model ClientProfile {
@@ -147,8 +149,7 @@ model Project {
   projectTasks         ProjectTask[]
   tickets              Ticket[]
   transactions         Transaction[]
-
-  projectAgreements ProjectAgreement[]
+  projectAgreements    ProjectAgreement[]
 }
 
 model DesignSystem {
@@ -302,26 +303,59 @@ model Ticket {
 }
 
 model Transaction {
-  id                String            @id @default(uuid())
-  projectId         String
-  userId            String
-  amount            Float
-  type              TransactionType
-  status            TransactionStatus @default(PENDING)
-  razorpayOrderId   String?           @unique
-  razorpayPaymentId String?           @unique
-  razorpaySignature String?
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-  proof             String?
-  completedAt       DateTime?
-  razorpayPayoutId  String?           @unique
-  razorpayRefundId  String?           @unique
-  payuHash          String?
-  payuPaymentId     String?           @unique
-  payuTransactionId String?           @unique
-  project           Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                  String               @id @default(uuid())
+  projectId           String
+  userId              String
+  amount              Float
+  promoCodeId         String?
+  promoPercentage     Int?
+  promoDiscount       Float                @default(0)
+  type                TransactionType
+  status              TransactionStatus    @default(PENDING)
+  razorpayOrderId     String?              @unique
+  razorpayPaymentId   String?              @unique
+  razorpaySignature   String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  proof               String?
+  completedAt         DateTime?
+  razorpayPayoutId    String?              @unique
+  razorpayRefundId    String?              @unique
+  payuHash            String?
+  payuFirstName       String?
+  payuPaymentId       String?              @unique
+  payuTransactionId   String?              @unique
+  promoCode           PromoCode?           @relation(fields: [promoCodeId], references: [id], onDelete: SetNull)
+  promoCodeRedemption PromoCodeRedemption?
+  project             Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PromoCode {
+  id           String                @id @default(uuid())
+  code         String                @unique
+  percentage   Int
+  isActive     Boolean               @default(true)
+  createdById  String
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  createdBy    User                  @relation("PromoCodeCreator", fields: [createdById], references: [id])
+  redemptions  PromoCodeRedemption[]
+  transactions Transaction[]
+}
+
+model PromoCodeRedemption {
+  id            String            @id @default(uuid())
+  promoCodeId   String
+  userId        String
+  transactionId String            @unique
+  status        TransactionStatus @default(PENDING)
+  createdAt     DateTime          @default(now())
+  promoCode     PromoCode         @relation(fields: [promoCodeId], references: [id], onDelete: Restrict)
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transaction   Transaction       @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@unique([promoCodeId, userId])
 }
 
 model Otp {
@@ -558,16 +592,17 @@ enum KanbanTaskStatus {
   IN_PROGRESS
   COMPLETED
 }
+
 model ProjectAgreement {
-  id          String           @id @default(uuid())
+  id          String          @id @default(uuid())
   projectId   String
   engineerId  String
-  status      AgreementStatus  @default(PENDING)
+  status      AgreementStatus @default(PENDING)
   respondedAt DateTime?
-  createdAt   DateTime         @default(now())
+  createdAt   DateTime        @default(now())
 
-  project     Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  engineer    EngineerProfile  @relation(fields: [engineerId], references: [id], onDelete: Cascade)
+  project  Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  engineer EngineerProfile @relation(fields: [engineerId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, engineerId])
 }

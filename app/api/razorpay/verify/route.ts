@@ -39,13 +39,16 @@ export async function POST(req: NextRequest) {
     if (!transaction) {
       return NextResponse.json({ success: false, message: "Transaction not found" }, { status: 404 });
     }
+    if (transaction.userId !== user.id) {
+      return NextResponse.json({ success: false, message: "Transaction not found" }, { status: 404 });
+    }
 
     if (transaction.status !== "PENDING") {
       return NextResponse.json({ success: false, message: "Transaction already processed" }, { status: 400 });
     }
 
     const project = transaction.project;
-    let adminsToNotify: { email: string }[] = [];
+    const adminsToNotify: { email: string }[] = [];
     let engineerEmailHtml = "";
 
     await prisma.$transaction(async (tx) => {
@@ -62,6 +65,16 @@ export async function POST(req: NextRequest) {
       });
 
       if (transaction.type === "ADVANCE_PAYMENT") {
+        if (transaction.promoCodeId) {
+          await tx.promoCodeRedemption.create({
+            data: {
+              promoCodeId: transaction.promoCodeId,
+              userId: transaction.userId,
+              transactionId: transaction.id,
+              status: "SUCCESS",
+            },
+          });
+        }
         await tx.project.update({
           where: { id: project.id },
           data: {
@@ -152,7 +165,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true, message: "Payment verified successfully" }, { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
+    console.error("Failed to verify Razorpay payment:", error);
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }

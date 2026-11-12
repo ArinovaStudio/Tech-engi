@@ -12,6 +12,7 @@ interface RazorpayOptions {
   projectId: string;
   user?: RazorpayUser;
   description?: string;
+  promoCode?: string;
   onSuccess?: () => void;
   onError?: (error: string) => void;
   onDismiss?: () => void;
@@ -35,7 +36,7 @@ export const useRazorpay = () => {
   const [error, setError] = useState<string | null>(null);
 
   const initiatePayment = async (options: RazorpayOptions) => {
-    const { projectId, user, description, onSuccess, onError, onDismiss } = options;
+    const { projectId, user, description, promoCode, onSuccess, onError, onDismiss } = options;
 
     try {
       setLoading(true);
@@ -56,7 +57,7 @@ export const useRazorpay = () => {
       const orderRes = await fetch("/api/razorpay/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId }),
+        body: JSON.stringify({ projectId, promoCode }),
       });
       const orderData = await orderRes.json();
 

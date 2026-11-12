@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     const calculatedHash = crypto.createHash('sha512').update(reverseHashString).digest('hex');
 
-    if (calculatedHash === payuHash && status === "success") {
+    if (calculatedHash === payuHash && Number(amount).toFixed(2) === transaction.amount.toFixed(2) && status === "success") {
       
       if (transaction.status === "PENDING") {
         await prisma.$transaction(async (tx) => {
@@ -54,6 +54,16 @@ export async function POST(request: NextRequest) {
         });
 
         if (transaction.type === "ADVANCE_PAYMENT") {
+            if (transaction.promoCodeId) {
+              await tx.promoCodeRedemption.create({
+                data: {
+                  promoCodeId: transaction.promoCodeId,
+                  userId: transaction.userId,
+                  transactionId: transaction.id,
+                  status: "SUCCESS",
+                },
+              });
+            }
             await tx.project.update({
                 where: { id: project.id },
                 data: {
@@ -117,10 +127,12 @@ export async function POST(request: NextRequest) {
     else {
 
       // Failed payment
-      if (transaction.status === "PENDING") {
-        await prisma.transaction.update({
-          where: { id: transaction.id },
-          data: { status: "FAILED" }
+      if (calculatedHash === payuHash && transaction.status === "PENDING") {
+        await prisma.$transaction(async (tx) => {
+          await tx.transaction.update({
+            where: { id: transaction.id },
+            data: { status: "FAILED" }
+          });
         });
       }
       const failedUrl = new URL(targetBaseUrl, baseUrl);
@@ -128,7 +140,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.redirect(failedUrl);
     }
 
-  } catch {
+  } catch (error) {
+    console.error("Failed to verify PayU payment:", error);
     return NextResponse.redirect(new URL('/client?error=payment_error', process.env.NEXTAUTH_URL));
   }
 }

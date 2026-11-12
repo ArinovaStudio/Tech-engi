@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { usePayment } from "@/hooks/usePayment";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
+import { PromoCodeField, PromoQuoteView } from "@/components/project/PromoCodeField";
 
 interface Transaction {
   id: string;
@@ -30,6 +31,9 @@ interface PendingProject {
   budget: number;
   status: string;
   endDate?: string;
+  pendingAmount?: number;
+  pendingPromoCode?: string | null;
+  promoDiscount?: number;
 }
 
 export default function ClientAccountPage() {
@@ -39,6 +43,7 @@ export default function ClientAccountPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [pendingProjects, setPendingProjects] = useState<PendingProject[]>([]);
   const [paying, setPaying] = useState<string | null>(null);
+  const [promoQuotes, setPromoQuotes] = useState<Record<string, PromoQuoteView | null>>({});
   const [loading, setLoading] = useState(true);
 
 
@@ -137,7 +142,7 @@ export default function ClientAccountPage() {
     const timer = setTimeout(startTour, isHandoff ? 0 : 1000);
     return () => clearTimeout(timer);
   }, [user?.id, loading]);
-  async function handlePay(project: PendingProject) {
+  async function handlePay(project: PendingProject, promoCode?: string) {
     setPaying(project.id);
 
     const isAdvance = project.status === "DRAFT";
@@ -148,6 +153,7 @@ export default function ClientAccountPage() {
       redirectPath: `/client/account`,
       user: { name: user?.name, email: user?.email },
       description,
+      promoCode: isAdvance ? promoCode : undefined,
       onSuccess: () => {
         fetchData();
         setPaying(null);
@@ -338,7 +344,11 @@ export default function ClientAccountPage() {
             <div className="flex-1 overflow-y-auto divide-y divide-[var(--border)]">
               {pendingProjects.map((p) => {
                 const isAdvance = p.status === "DRAFT";
-                const amount = isAdvance ? p.budget * 0.25 : p.budget * 0.75;
+                const baseAmount = isAdvance
+                  ? Math.round(p.budget * 0.25 * 100) / 100
+                  : p.budget * 0.75;
+                const amount = p.pendingAmount ??
+                  (isAdvance ? promoQuotes[p.id]?.amountDue ?? baseAmount : baseAmount);
                 return (
                   <div key={p.id} className="p-4 hover:bg-[var(--bg)] transition-colors">
                     <div className="flex items-start gap-3 mb-3">
@@ -355,8 +365,29 @@ export default function ClientAccountPage() {
                         </p>
                       </div>
                     </div>
+                    {isAdvance && p.pendingPromoCode ? (
+                      <p className="mb-3 rounded-lg bg-green-50 px-3 py-2 text-xs text-green-800">
+                        Promo code <strong>{p.pendingPromoCode}</strong> applied
+                        {p.promoDiscount ? ` · ₹${p.promoDiscount.toLocaleString()} off` : ""}.
+                      </p>
+                    ) : isAdvance && (
+                      <div className="mb-3">
+                        <PromoCodeField
+                          budget={p.budget}
+                          disabled={paying === p.id || isPaying}
+                          onPromoChange={(promo) =>
+                            setPromoQuotes((current) => ({
+                              ...current,
+                              [p.id]: promo,
+                            }))
+                          }
+                        />
+                      </div>
+                    )}
                     <button
-                      onClick={() => handlePay(p)}
+                      onClick={() =>
+                        handlePay(p, p.pendingPromoCode || promoQuotes[p.id]?.code)
+                      }
                       disabled={paying === p.id || isPaying}
                       className="w-full py-2 text-white rounded-lg text-xs  font-semibold flex items-center justify-center gap-1.5 disabled:opacity-50"
                       style={{ background: "var(--primary)" }}

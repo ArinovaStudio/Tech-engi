@@ -14,14 +14,14 @@ export function usePayu() {
     return () => window.removeEventListener("pageshow", handlePageShow);
   }, []);
 
-  const initiatePayuPayment = async (projectId: string, redirectUrl: string) => {
+  const initiatePayuPayment = async (projectId: string, redirectUrl: string, promoCode?: string) => {
     setLoading(true);
 
     try {
       const res = await fetch("/api/payu/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId, redirectUrl }),
+        body: JSON.stringify({ projectId, redirectUrl, promoCode }),
       });
 
       const orderData = await res.json();

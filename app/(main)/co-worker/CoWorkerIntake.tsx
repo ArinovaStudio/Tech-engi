@@ -416,10 +416,10 @@ export default function CoWorkerIntake() {
         aria-labelledby="booking-title"
       >
         <div className={styles.bookingIntro}>
-          <p className={styles.eyebrow}>ONE DAY, TWO WAYS TO BOOK</p>
-          <h2 id="booking-title">Pick how you want to book</h2>
+          <p className={styles.eyebrow}>BOOK IN UNDER A MINUTE</p>
+          <h2 id="booking-title">One engineer. 12 hours. ₹3,480.</h2>
           <p>
-            Both options are for the same ₹3,480 day. Only the timing differs.
+            Pay ₹870 today to book. Pay the remaining ₹2,610 only after you approve the work.
           </p>
           <div className={styles.bookingAssurance}>
             <span aria-hidden="true">✓</span>
@@ -448,15 +448,15 @@ export default function CoWorkerIntake() {
                 }}
               />
               <span className={styles.radioDot} aria-hidden="true" />
-              <span className={styles.choiceTag}>OPTION 1</span>
-              <span className={styles.choiceTitle}>Book now</span>
+              <span className={styles.choiceTag}>12 HOURS</span>
+              <span className={styles.choiceTitle}>Start now</span>
               <span className={styles.choicePrice}>
-                ₹3,480 <small>pay in full</small>
+                ₹870 <small>today to book</small>
               </span>
               <ul>
-                <li>Start as soon as an engineer is available</li>
-                <li>One full working day</li>
-                <li>Slot details shared after booking</li>
+                <li>Your 12 hours run from booking</li>
+                <li>Most engineers matched within 2 hours</li>
+                <li>Pay ₹2,610 only after you approve</li>
               </ul>
             </label>
             <label
@@ -475,7 +475,7 @@ export default function CoWorkerIntake() {
               />
               <span className={styles.radioDot} aria-hidden="true" />
               <span className={styles.choiceTag}>OPTION 2</span>
-              <span className={styles.choiceTitle}>Book ahead</span>
+              <span className={styles.choiceTitle}>Reserve ahead</span>
               <span className={styles.choicePrice}>
                 ₹870 <small>25% upfront</small>
               </span>

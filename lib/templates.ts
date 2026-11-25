@@ -86,7 +86,7 @@ export const projectInvitationTemplate = (
       <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 35px 0 20px;" />
       
       <p style="color: #9ca3af; font-size: 12px; text-align: center;">
-        Arinova Studio © 2026 • Connecting Clients with Top Hardware Engineers
+        Tech Engi © 2026 • Connecting Clients with Top Hardware Engineers
       </p>
     </div>
   `;

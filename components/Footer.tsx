@@ -260,7 +260,7 @@ const Footer = () => {
           </p>
 
           {/* <p className="text-[14px] sm:text-[15px]">
-            Designed by Arinova Studio
+            Designed by Anonymous
           </p> */}
         </div>
       </div>

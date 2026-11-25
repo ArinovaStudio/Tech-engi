@@ -9,7 +9,7 @@ interface AppConfig {
 }
 
 export const appConfig: AppConfig = {
-  name: process.env.APP_NAME ?? "Arinova Studio",
+  name: process.env.APP_NAME ?? "Anonymous",
   supportEmail: process.env.APP_SUPPORT_EMAIL ?? "support@arinova.studio",
   managementEmail: process.env.APP_MANAGEMENT_EMAIL ?? "management@arinova.studio",
   portalUrl: process.env.APP_PORTAL_URL ?? "https://management.arinova.studio",

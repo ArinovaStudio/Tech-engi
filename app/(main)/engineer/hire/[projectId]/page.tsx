@@ -1,0 +1,382 @@
+"use client";
+
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import toast from "react-hot-toast";
+import {
+  ArrowLeft,
+  Loader2,
+  Lock,
+  Users,
+  ShieldCheck,
+  Briefcase,
+  Award,
+  Sparkles,
+} from "lucide-react";
+import DashboardShell from "@/components/layout/DashboardShell";
+import { useAuth } from "@/hooks/useAuth";
+import { usePayment } from "@/hooks/usePayment";
+
+interface PreviewCard {
+  id: string;
+  initials: string;
+  skills: string[];
+  experience: string;
+  completedProjects: number;
+}
+
+interface HiredEngineer {
+  invitationId: string;
+  status: string;
+  skills: string[];
+  completedProjects: number;
+  yearsOfExperience?: string | null;
+  qualification?: string;
+  user: { name: string | null; image: string | null };
+}
+
+interface HireData {
+  unlocked: boolean;
+  project: {
+    id: string;
+    title: string;
+    description: string;
+    budget: number;
+    instruments: string[];
+    status: string;
+  };
+  preview?: {
+    profileCount: number;
+    cards: PreviewCard[];
+    advanceAmount: number;
+  };
+  engineers?: HiredEngineer[];
+}
+
+const inr = (n: number) =>
+  `₹${n.toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
+
+export default function HireEngineerPage() {
+  const { projectId } = useParams<{ projectId: string }>();
+  const router = useRouter();
+  const { user } = useAuth();
+  const { processPayment, loading: paying } = usePayment();
+  const [data, setData] = useState<HireData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const matchStarted = useRef(false);
+
+  const load = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/engineer/hire/${projectId}`);
+      const json = await res.json();
+      if (!json.success) {
+        toast.error(json.message || "Could not load project");
+        router.push("/engineer/project");
+        return;
+      }
+      setData(json);
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId, router]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const startMatching = async () => {
+    if (matchStarted.current) return;
+    matchStarted.current = true;
+    try {
+      const res = await fetch("/api/match", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId }),
+      });
+      const json = await res.json();
+      if (json.success)
+        toast.success("Matching started! Finding best engineers...");
+      else toast.error(json.message || "Matching could not start");
+    } catch {
+      toast.error("Something went wrong with matching.");
+    }
+  };
+
+  const handlePay = () => {
+    if (!data?.preview) return;
+    processPayment({
+      projectId,
+      redirectPath: `/engineer/hire/${projectId}`,
+      user: { name: user?.name, email: user?.email },
+      description: "Advance Payment (25%)",
+      onSuccess: async () => {
+        await startMatching();
+        await load();
+      },
+      onError: () => {},
+      onDismiss: () =>
+        toast("Project saved. You can pay the advance later from this page."),
+    });
+  };
+
+  if (loading || !data) {
+    return (
+      <DashboardShell>
+        <div className="flex items-center justify-center py-24">
+          <Loader2 className="animate-spin text-[var(--primary)]" size={36} />
+        </div>
+      </DashboardShell>
+    );
+  }
+
+  const remainingCount = data.preview
+    ? Math.max(0, data.preview.profileCount - data.preview.cards.length)
+    : 0;
+
+  return (
+    <DashboardShell>
+      <div className="space-y-6 pb-12 max-w-5xl mx-auto">
+        {/* Top Project Summary Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-card border border-[var(--border)] rounded-xl p-4 sm:p-5">
+          <div className="flex items-start sm:items-center gap-3">
+            <Link
+              href="/engineer/project"
+              className="p-2 rounded-lg border border-[var(--border)] hover:bg-[var(--primary-light)] transition-colors shrink-0"
+            >
+              <ArrowLeft size={16} className="text-[var(--text-muted)]" />
+            </Link>
+            <div>
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <h1 className="text-lg font-semibold text-[var(--text-primary)]">
+                  {data.project.title}
+                </h1>
+                <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-[var(--primary-light)] text-[var(--primary)]">
+                  Budget: {inr(data.project.budget)}
+                </span>
+              </div>
+              {data.project.instruments?.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-1.5">
+                  {data.project.instruments.slice(0, 4).map((inst) => (
+                    <span
+                      key={inst}
+                      className="text-[11px] text-[var(--text-muted)] bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded"
+                    >
+                      {inst}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {data.unlocked ? (
+          <UnlockedProfiles engineers={data.engineers ?? []} />
+        ) : (
+          data.preview && (
+            <div className="bg-white dark:bg-card border border-[var(--border)] rounded-xl overflow-hidden shadow-sm">
+              {/* Banner Header */}
+              <div className="p-6 border-b border-[var(--border)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-11 h-11 rounded-xl bg-[var(--primary-light)] text-[var(--primary)] flex items-center justify-center shrink-0">
+                    <Users size={22} />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-lg font-bold text-[var(--text-primary)]">
+                        {data.preview.profileCount} matching engineers found
+                      </h2>
+                      <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500">
+                        <Sparkles size={11} /> Verified Pool
+                      </span>
+                    </div>
+                    <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                      Review matched skills &amp; experience below. Unlock full
+                      profiles and send invites with a 25% advance.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Preview Cards Grid with Soft Full-Card Blur */}
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {data.preview.cards.map((c) => (
+                    <div
+                      key={c.id}
+                      className="relative overflow-hidden border border-[var(--border)] bg-black/[0.02] dark:bg-white/[0.02] rounded-xl p-4 hover:border-[var(--primary)]/40 transition-colors"
+                    >
+                      {/* Soft-blurred card content */}
+                      <div
+                        aria-hidden
+                        className="flex flex-col justify-between h-full blur-[3px] opacity-80 select-none pointer-events-none"
+                      >
+                        <div>
+                          {/* Header Row */}
+                          <div className="flex items-center gap-2.5 pb-3 mb-3 border-b border-[var(--border)]/60">
+                            <div className="w-9 h-9 rounded-full bg-[var(--primary-light)] text-[var(--primary)] flex items-center justify-center text-xs font-bold shrink-0">
+                              {c.initials}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium text-[var(--text-primary)] truncate">
+                                Matched Engineer
+                              </p>
+                              <p className="text-[11px] text-[var(--text-muted)]">
+                                Verified Specialist
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Skills */}
+                          <div className="flex flex-wrap gap-1.5 mb-4">
+                            {c.skills.slice(0, 4).map((s) => (
+                              <span
+                                key={s}
+                                className="text-[11px] font-medium px-2 py-0.5 bg-[var(--primary-light)] text-[var(--primary)] rounded-md"
+                              >
+                                {s}
+                              </span>
+                            ))}
+                            {c.skills.length > 4 && (
+                              <span className="text-[11px] px-1.5 py-0.5 text-[var(--text-muted)]">
+                                +{c.skills.length - 4}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Credibility Stats */}
+                        <div className="pt-2.5 border-t border-[var(--border)]/60 flex items-center justify-between text-xs text-[var(--text-muted)]">
+                          <span className="flex items-center gap-1.5">
+                            <Briefcase
+                              size={13}
+                              className="text-[var(--primary)]"
+                            />
+                            {c.experience}
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <Award
+                              size={13}
+                              className="text-[var(--primary)]"
+                            />
+                            {c.completedProjects} completed
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Subtle Center Lock Badge Overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center bg-white/10 dark:bg-black/15">
+                        <div className="p-2.5 rounded-full bg-white/90 dark:bg-zinc-900/90 border border-[var(--border)] text-[var(--text-primary)] shadow-sm">
+                          <Lock size={15} />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {remainingCount > 0 && (
+                  <p className="text-center text-xs text-[var(--text-muted)] mt-4">
+                    +{" "}
+                    <span className="font-semibold text-[var(--text-primary)]">
+                      {remainingCount} more
+                    </span>{" "}
+                    matched engineer profiles will be unlocked upon payment
+                  </p>
+                )}
+              </div>
+
+              {/* Balanced Payment Footer */}
+              <div className="px-6 py-4 bg-black/[0.03] dark:bg-white/[0.02] border-t border-[var(--border)] flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-center sm:text-left">
+                  <p className="text-xs text-[var(--text-muted)]">
+                    Advance Deposit (25% of {inr(data.project.budget)})
+                  </p>
+                  <div className="flex items-baseline justify-center sm:justify-start gap-2 mt-0.5">
+                    <span className="text-xl font-bold text-[var(--text-primary)]">
+                      {inr(data.preview.advanceAmount)}
+                    </span>
+                    <span className="text-[11px] text-[var(--text-muted)] flex items-center gap-1">
+                      <ShieldCheck size={13} className="text-emerald-500" />
+                      Escrow protected
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handlePay}
+                  disabled={paying}
+                  className="w-full sm:w-auto px-6 py-3 bg-[var(--primary)] text-zinc-950 rounded-lg text-sm font-semibold hover:opacity-90 disabled:opacity-60 transition-opacity flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {paying && <Loader2 size={16} className="animate-spin" />}
+                  Unlock Profiles &amp; Pay {inr(data.preview.advanceAmount)}
+                </button>
+              </div>
+            </div>
+          )
+        )}
+      </div>
+    </DashboardShell>
+  );
+}
+
+function UnlockedProfiles({ engineers }: { engineers: HiredEngineer[] }) {
+  if (engineers.length === 0) {
+    return (
+      <div className="bg-white border border-[var(--border)] rounded-xl p-8 text-center dark:bg-card">
+        <p className="text-sm font-semibold text-[var(--text-primary)]">
+          Payment received. Matching is in progress.
+        </p>
+        <p className="text-xs text-[var(--text-muted)] mt-1">
+          Matched engineer profiles will appear here shortly.
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {engineers.map((e) => (
+        <div
+          key={e.invitationId}
+          className="bg-white border border-[var(--border)] rounded-xl p-4 dark:bg-card"
+        >
+          <div className="flex items-center gap-3 mb-3">
+            {e.user.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={e.user.image}
+                alt=""
+                className="w-10 h-10 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-[var(--primary-light)] text-[var(--primary)] flex items-center justify-center font-bold">
+                {(e.user.name ?? "E")[0]}
+              </div>
+            )}
+            <div>
+              <p className="text-sm font-semibold text-[var(--text-primary)]">
+                {e.user.name ?? "Engineer"}
+              </p>
+              <p className="text-[11px] text-[var(--text-muted)] capitalize">
+                {e.status.replace(/_/g, " ").toLowerCase()}
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {e.skills.slice(0, 5).map((s) => (
+              <span
+                key={s}
+                className="text-[11px] px-2 py-0.5 bg-[var(--primary-light)] text-[var(--primary)] rounded-md"
+              >
+                {s}
+              </span>
+            ))}
+          </div>
+          <p className="text-xs text-[var(--text-muted)] pt-2 border-t border-[var(--border)]/60">
+            {e.completedProjects} projects completed
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}

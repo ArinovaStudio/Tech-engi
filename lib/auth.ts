@@ -91,3 +91,37 @@ export async function getEngineer(requireApproval = true) {
 
   return { user, error: null };
 }
+
+/**
+ * Resolves the user who owns a project being hired for: a CLIENT, or an
+ * approved ENGINEER using "Hire Engineer". Engineers get a hiring-side
+ * ClientProfile created on first use so the existing Project/payment/matching
+ * code (which keys off project.clientId) works unchanged.
+ */
+export async function getProjectOwner() {
+  const { user, error } = await getUser();
+
+  if (!user || error) {
+    return { user: null, error };
+  }
+
+  if (user.role === "CLIENT") {
+    return { user, error: null };
+  }
+
+  if (user.role === "ENGINEER") {
+    if (user.engineerProfile?.status !== "APPROVED") {
+      return { user: null, error: "Only approved engineers can hire engineers" };
+    }
+    const clientProfile =
+      user.clientProfile ??
+      (await prisma.clientProfile.upsert({
+        where: { userId: user.id },
+        update: {},
+        create: { userId: user.id },
+      }));
+    return { user: { ...user, clientProfile }, error: null };
+  }
+
+  return { user: null, error: "Client or engineer access required" };
+}

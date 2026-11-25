@@ -1,7 +1,8 @@
 "use client";
 
 import DashboardShell from "@/components/layout/DashboardShell";
-import { Search, Filter, Briefcase, Calendar, Clock, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Filter, Briefcase, Calendar, Clock, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight, UserPlus } from "lucide-react";
+import { HireEngineerModal } from "@/components/engineer/hire/HireEngineerModal";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { driver } from "driver.js";
@@ -19,6 +20,17 @@ interface Project {
   endDate?: string;
   createdAt: string;
 }
+
+interface HiringProject {
+  id: string;
+  title: string;
+  budget: number;
+  advancePaid: boolean;
+  status: string;
+  createdAt: string;
+}
+
+type Tab = "assigned" | "created";
 
 const STATUS_META: Record<string, { label: string; color: string }> = {
   IN_PROGRESS: { label: "In Progress", color: "bg-green-100 text-green-700" },
@@ -94,6 +106,43 @@ function ProjectCard({ project }: { project: Project }) {
   );
 }
 
+function HiringCard({ project }: { project: HiringProject }) {
+  return (
+    <Link href={`/engineer/hire/${project.id}`}>
+      <div className="bg-white border border-[var(--border)] rounded-xl p-5 hover:shadow-md hover:border-[var(--primary)] transition-all cursor-pointer group dark:bg-card">
+        <div className="flex items-start justify-between gap-2 mb-3">
+          <h3 className="text-sm font-bold text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--primary)] transition-colors">
+            {project.title}
+          </h3>
+          <span
+            className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+              project.advancePaid ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"
+            }`}
+          >
+            {project.advancePaid ? "Profiles unlocked" : "Payment pending"}
+          </span>
+        </div>
+
+        <p className="text-xs text-[var(--text-muted)] mb-4">
+          {project.advancePaid
+            ? "Advance paid. View the engineers matched to this project."
+            : "Pay the 25% advance to unlock matched engineer profiles."}
+        </p>
+
+        <div className="flex items-center justify-between pt-3 border-t border-[var(--border)]">
+          <div className="flex items-center gap-1 text-[10px] text-[var(--text-muted)]">
+            <Calendar size={11} />
+            {new Date(project.createdAt).toLocaleDateString()}
+          </div>
+          <span className="text-xs font-bold text-[var(--text-primary)]">
+            Budget: ₹{project.budget.toLocaleString("en-IN")}
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 export default function EngineerProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
@@ -106,6 +155,18 @@ export default function EngineerProjectsPage() {
   const [totalItems, setTotalItems] = useState(0);
 
   const [stats, setStats] = useState({ total: 0, active: 0, completed: 0 });
+  const [showHire, setShowHire] = useState(false);
+  const [tab, setTab] = useState<Tab>("assigned");
+  const [hiring, setHiring] = useState<HiringProject[]>([]);
+  const [hiringLoading, setHiringLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/engineer/hire")
+      .then((r) => r.json())
+      .then((d) => d.success && setHiring(d.projects))
+      .catch(() => {})
+      .finally(() => setHiringLoading(false));
+  }, []);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -151,7 +212,7 @@ export default function EngineerProjectsPage() {
   useEffect(() => {
     const isHandoff = sessionStorage.getItem("start_engineer_projects_tour") === "true";
     if (!isHandoff) return;
-    if (loading || projects.length === 0) return;
+    if (tab !== "assigned" || loading || projects.length === 0) return;
 
     const timer = setTimeout(() => {
       const driverObj = driver({
@@ -201,7 +262,7 @@ export default function EngineerProjectsPage() {
     }, 800);
 
     return () => clearTimeout(timer);
-  }, [loading, projects]);
+  }, [loading, projects, tab]);
 
   return (
     <DashboardShell>
@@ -211,37 +272,72 @@ export default function EngineerProjectsPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-semibold text-[var(--text-primary)]">
-                My Assigned Projects
+                {tab === "assigned" ? "My Assigned Projects" : "Projects Created by Me"}
               </h1>
               <p className="text-xs  text-[var(--text-muted)] mt-0.5">
-                Overview of all your active and completed work
+                {tab === "assigned"
+                  ? "Overview of all your active and completed work"
+                  : "Projects you created to hire engineers"}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-4 mt-4 flex-col md:flex-row">
-            <div className="relative w-full md:w-64 shrink-0">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
-              <input
-                placeholder="Search projects..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 border border-[var(--border)] rounded-lg text-sm bg-gray-50 text-[var(--text-primary)] outline-none focus:ring-1 focus:ring-[var(--primary)] dark:bg-background"
-              />
-            </div>
-            <div className="relative w-full md:w-auto shrink-0">
-              <Filter size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full md:w-auto pl-8 pr-8 py-2 border border-[var(--border)] rounded-lg text-sm bg-gray-50 text-[var(--text-primary)] outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[var(--primary)] dark:bg-background"
-              >
-                <option value="ALL">All Status</option>
-                {Object.entries(STATUS_META).map(([k, v]) => (
-                  <option key={k} value={k}>{v.label}</option>
-                ))}
-              </select>
-            </div>
+            <button
+              onClick={() => setShowHire(true)}
+              className="w-full md:w-auto shrink-0 flex items-center justify-center gap-2 px-4 py-2 bg-[var(--primary)] text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity"
+            >
+              <UserPlus size={15} /> Hire Engineer
+            </button>
+            {tab === "assigned" && (
+              <>
+                <div className="relative w-full md:w-64 shrink-0">
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+                  <input
+                    placeholder="Search projects..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 border border-[var(--border)] rounded-lg text-sm bg-gray-50 text-[var(--text-primary)] outline-none focus:ring-1 focus:ring-[var(--primary)] dark:bg-background"
+                  />
+                </div>
+                <div className="relative w-full md:w-auto shrink-0">
+                  <Filter size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="w-full md:w-auto pl-8 pr-8 py-2 border border-[var(--border)] rounded-lg text-sm bg-gray-50 text-[var(--text-primary)] outline-none appearance-none cursor-pointer focus:ring-1 focus:ring-[var(--primary)] dark:bg-background"
+                  >
+                    <option value="ALL">All Status</option>
+                    {Object.entries(STATUS_META).map(([k, v]) => (
+                      <option key={k} value={k}>{v.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            )}
           </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-1 border-b border-[var(--border)]">
+          {([
+            { key: "assigned", label: "My Assigned Projects", count: totalItems },
+            { key: "created", label: "Created by Me", count: hiring.length },
+          ] as { key: Tab; label: string; count: number }[]).map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors ${
+                tab === t.key
+                  ? "border-[var(--primary)] text-[var(--primary)]"
+                  : "border-transparent text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+              }`}
+            >
+              {t.label}
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--bg)] text-[var(--text-muted)]">
+                {t.count}
+              </span>
+            </button>
+          ))}
         </div>
 
         {/* Global Stats */}
@@ -290,16 +386,41 @@ export default function EngineerProjectsPage() {
           </span>
         </div> */}
 
-        {/* Content */}
-        {loading ? (
+        {/* Created by me */}
+        {tab === "created" && (
+          hiringLoading ? (
+            <div className="flex items-center justify-center py-24">
+              <Loader2 className="animate-spin text-[var(--primary)]" size={36} />
+            </div>
+          ) : hiring.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-xl border border-[var(--border)] dark:bg-card">
+              <UserPlus size={40} className="text-[var(--border)] mb-3" />
+              <p className="text-sm font-semibold text-[var(--text-primary)]">No hiring projects yet</p>
+              <p className="text-xs text-[var(--text-muted)] mt-1">Use &quot;Hire Engineer&quot; to create your first one</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {hiring.map((h) => <HiringCard key={h.id} project={h} />)}
+            </div>
+          )
+        )}
+
+        {/* Assigned to me */}
+        {tab === "assigned" && (loading ? (
           <div className="flex items-center justify-center py-24">
             <Loader2 className="animate-spin text-[var(--primary)]" size={36} />
           </div>
         ) : projects.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center bg-white rounded-xl border border-[var(--border)] dark:bg-card">
             <XCircle size={40} className="text-[var(--border)] mb-3" />
-            <p className="text-sm  font-semibold text-[var(--text-primary)]">No projects found</p>
-            <p className="text-xs  text-[var(--text-muted)] mt-1">Try adjusting your filters</p>
+            <p className="text-sm  font-semibold text-[var(--text-primary)]">
+              {debouncedSearch || statusFilter !== "ALL" ? "No projects found" : "No assigned projects yet"}
+            </p>
+            <p className="text-xs  text-[var(--text-muted)] mt-1">
+              {debouncedSearch || statusFilter !== "ALL"
+                ? "Try adjusting your filters"
+                : "Projects assigned to you will appear here"}
+            </p>
           </div>
         ) : (
           <>
@@ -333,8 +454,9 @@ export default function EngineerProjectsPage() {
               </div>
             )}
           </>
-        )}
+        ))}
       </div>
+      {showHire && <HireEngineerModal onClose={() => setShowHire(false)} />}
     </DashboardShell>
   );
 }

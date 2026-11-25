@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Project not found" }, { status: 404 });
     }
 
-    const isParticipant = user.role === "ADMIN" || (user.role === "CLIENT" && project.client?.userId === user.id);
+    const isParticipant = user.role === "ADMIN" || ((user.role === "CLIENT" || user.role === "ENGINEER") && project.client?.userId === user.id);
 
     if (!isParticipant){
         return NextResponse.json({ success: false, message: "Project matching not allowed" }, { status: 403 });

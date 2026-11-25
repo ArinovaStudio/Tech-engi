@@ -5,7 +5,7 @@ import { generateEmbedding } from "@/lib/embeddings";
 const ollama = new Ollama();
 
 export async function getTopMatches(projectId: string) {
-  const project = await prisma.project.findUnique({ where: { id: projectId } });
+  const project = await prisma.project.findUnique({ where: { id: projectId }, include: { client: true } });
   if (!project) return [];
 
   const projectRequirementText = `Required Skills: ${project.instruments.join(", ")}`;
@@ -17,6 +17,7 @@ export async function getTopMatches(projectId: string) {
     FROM "EngineerProfile" e
     JOIN "User" u ON e."userId" = u.id
     WHERE e.status = 'APPROVED'
+    AND e."userId" <> ${project.client.userId}
     
     AND u."lastActiveAt" >= NOW() - INTERVAL '180 days'
   

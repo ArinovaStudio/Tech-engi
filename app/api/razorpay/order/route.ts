@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getClient } from "@/lib/auth";
+import { getProjectOwner } from "@/lib/auth";
 import { razorpay } from "@/lib/razorpay";
 import {
   getAdvanceAmount,
@@ -10,7 +10,7 @@ import {
 
 export async function POST(req: NextRequest) {
   try {
-    const { user, error } = await getClient();
+    const { user, error } = await getProjectOwner();
     if (error || !user?.clientProfile) {
       return NextResponse.json({ success: false, message: error || "Unauthorized" }, { status: 401 });
     }

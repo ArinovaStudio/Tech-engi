@@ -10,7 +10,7 @@ export interface VisitStat {
 }
 
 interface VisitStatsProps {
-  stats: VisitStat[];
+  stats?: VisitStat[];
   loading?: boolean;
   onDeleted?: (ref: string) => void;
 }
@@ -62,17 +62,22 @@ function SwipeRow({
   };
 
   const handleMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (dragX === null) return;
+    if (dragX === null || !e.currentTarget.hasPointerCapture(e.pointerId)) {
+      return;
+    }
     const dx = e.clientX - startX.current;
     if (Math.abs(dx) > 4) moved.current = true;
     setDragX(Math.min(0, Math.max(-REVEAL, startBase.current + dx)));
   };
 
-  const handleUp = () => {
+  const handleUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
     if (dragX === null) return;
 
     if (!moved.current) {
-      if (isOpen) onClose(); // tap on an open row closes it
+      if (isOpen) onClose();
     } else if (dragX < -REVEAL / 2) {
       onOpen();
     } else {
@@ -110,7 +115,7 @@ function SwipeRow({
         style={{
           transform: `translateX(${x}px)`,
           transition: dragX === null ? "transform 200ms ease" : "none",
-          touchAction: "pan-y", // keep vertical scroll working
+          touchAction: "pan-y",
         }}
         className="relative select-none"
       >
@@ -121,14 +126,15 @@ function SwipeRow({
 }
 
 export default function VisitStats({
-  stats,
+  stats = [],
   loading = false,
   onDeleted,
 }: VisitStatsProps) {
   const [openRef, setOpenRef] = useState<string | null>(null);
   const [deletingRef, setDeletingRef] = useState<string | null>(null);
 
-  const total = stats.reduce((sum, s) => sum + s.visits, 0);
+  const safeStats = Array.isArray(stats) ? stats : [];
+  const total = safeStats.reduce((sum, s) => sum + (s.visits ?? 0), 0);
 
   const handleDelete = async (ref: string) => {
     setDeletingRef(ref);
@@ -177,12 +183,12 @@ export default function VisitStats({
               className="h-[68px] animate-pulse rounded-xl bg-[#F4F4F5] dark:bg-slate-800"
             />
           ))
-        ) : stats.length === 0 ? (
+        ) : safeStats.length === 0 ? (
           <p className="py-6 text-center text-[13px] text-[#8B8B8B] dark:text-slate-400">
             No visits yet
           </p>
         ) : (
-          stats.map((s) => (
+          safeStats.map((s) => (
             <SwipeRow
               key={s.ref}
               isOpen={openRef === s.ref}
@@ -195,18 +201,18 @@ export default function VisitStats({
                 className="relative overflow-hidden rounded-xl border border-white/10 px-4 py-3 flex items-center justify-between"
                 style={{
                   background: `
-      radial-gradient(
-        circle at top right,
-        rgba(255,255,255,0.18),
-        transparent 30%
-      ),
-      linear-gradient(
-        135deg,
-        #FF7A00 0%,
-        #FFAE58 50%,
-        #ffd195 100%
-      )
-    `,
+                    radial-gradient(
+                      circle at top right,
+                      rgba(255,255,255,0.18),
+                      transparent 30%
+                    ),
+                    linear-gradient(
+                      135deg,
+                      #FF7A00 0%,
+                      #FFAE58 50%,
+                      #ffd195 100%
+                    )
+                  `,
                 }}
               >
                 {/* PLACE + LATEST */}

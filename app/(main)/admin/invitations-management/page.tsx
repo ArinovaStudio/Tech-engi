@@ -30,39 +30,55 @@ export default function InvitationsManagementPage() {
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchInvitations = async () => {
       try {
-        const res = await fetch("/api/admin/invitations"); // adjust route
-        const data = await res.json();
+        // Projects come from the projects API so that projects with no
+        // invitations yet still show up; invitations only supply the counts.
+        const projectsRes = await fetch("/api/admin/project?limit=200");
+        const projectsData = await projectsRes.json();
 
-        if (!data.success) return;
+        if (!projectsRes.ok || !projectsData.success) {
+          console.error("Failed to load projects:", projectsData);
+          setError(projectsData?.message || "Failed to load projects");
+          return;
+        }
 
-        // 🔥 GROUP BY PROJECT
-        const grouped: Record<string, any> = {};
+        const counts: Record<string, number> = {};
+        const engineersByProject: Record<string, any[]> = {};
 
-        data.invitations.forEach((inv: Invitation) => {
-          const projectId = inv.project.id;
+        // Invitation counts are optional: don't let a failure here hide projects.
+        try {
+          const invitationsRes = await fetch("/api/admin/invitations");
+          const invitationsData = await invitationsRes.json();
 
-          if (!grouped[projectId]) {
-            grouped[projectId] = {
-              id: projectId,
-              title: inv.project.title,
-              budget: inv.project.budget,
-              status: inv.project.status,
-              invitationsCount: 0,
-              engineers: [],
-            };
+          if (invitationsData.success) {
+            invitationsData.invitations.forEach((inv: Invitation) => {
+              const projectId = inv.project?.id;
+              if (!projectId) return;
+              counts[projectId] = (counts[projectId] || 0) + 1;
+              (engineersByProject[projectId] ||= []).push(inv.engineer);
+            });
           }
+        } catch (err) {
+          console.error("Failed to load invitation counts:", err);
+        }
 
-          grouped[projectId].invitationsCount += 1;
-          grouped[projectId].engineers.push(inv.engineer);
-        });
-
-        setProjects(Object.values(grouped));
+        setProjects(
+          projectsData.projects.map((project: any) => ({
+            id: project.id,
+            title: project.title,
+            budget: project.budget,
+            status: project.status,
+            invitationsCount: counts[project.id] || 0,
+            engineers: engineersByProject[project.id] || [],
+          }))
+        );
       } catch (err) {
         console.error(err);
+        setError("Could not load projects");
       } finally {
         setLoading(false);
       }
@@ -161,6 +177,14 @@ export default function InvitationsManagementPage() {
               className=" h-11 w-full md:w-80 px-4 rounded-xl border border-[var(--border)] bg-white text-sm outline-none focus:ring-2 focus:ring-orange-400  dark:bg-card" />
           </div>
         </div>
+
+        {error && (
+          <p className="text-sm text-red-500">{error}</p>
+        )}
+
+        {!error && filteredProjects.length === 0 && (
+          <p className="text-sm text-[var(--text-muted)]">No projects found.</p>
+        )}
 
         {/* GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">

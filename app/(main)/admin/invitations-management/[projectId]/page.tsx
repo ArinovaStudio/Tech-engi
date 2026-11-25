@@ -20,6 +20,8 @@ export default function ProjectDetailsPage() {
   const [sendingLoader, setSendingLoader] = useState<string | null>(null);
   const [aiSuggestions, setAiSuggestions] = useState<any>([]);
   const [aiLoading, setAiLoading] = useState(true);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [engineersLoaded, setEngineersLoaded] = useState(false);
   const [dots, setDots] = useState("");
   const [search, setSearch] = useState("");
   const [showFilters, setShowFilters] = useState(false);
@@ -151,6 +153,8 @@ export default function ProjectDetailsPage() {
       setEngineers(json.engineers || []);
     } catch (err) {
       console.error(err);
+    } finally {
+      setEngineersLoaded(true);
     }
   };
 
@@ -562,14 +566,14 @@ export default function ProjectDetailsPage() {
   useEffect(() => {
     if (!projectId) return;
 
-    if (engineers.length === 0) return;
+    if (!engineersLoaded) return;
 
     if (hasRunAi.current) return;
 
     hasRunAi.current = true;
 
     automation();
-  }, [projectId, engineers]);
+  }, [projectId, engineersLoaded]);
 
   useEffect(() => {
     if (!aiLoading) return;
@@ -785,32 +789,45 @@ const remainingEngineers = engineers
   const automation = async () => {
     try {
       setAiLoading(true);
-      const filteredEngineers = engineers.filter((engineer) =>engineer.engineerProfile !== null &&engineer?.isSuspended === false);
-      if (filteredEngineers.length < 0) {
+      setAiError(null);
+
+      const eligibleEngineers = engineers.filter(
+        (engineer) =>
+          engineer.engineerProfile !== null &&
+          engineer?.isSuspended === false
+      );
+
+      if (eligibleEngineers.length === 0) {
+        setAiSuggestions([]);
+        setAiError("No active engineers with a profile are available to match.");
         return;
       }
-      
+
       const res = await fetch(`/api/admin/project-matcher`, {
         method: "POST",
         headers: {
-          "Content-Type":
-            "application/json",
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           projectId,
-          engineers: filteredEngineers,
+          engineers: eligibleEngineers,
         }),
       });
       const json = await res.json();
 
-      const lead = setAiSuggestions(json.aiSuggestions || []);
+      setAiSuggestions(json.aiSuggestions || []);
+
+      if (!res.ok || json.success === false) {
+        setAiError(json.message || "Unknown error");
+      }
     } catch (error) {
       console.error(error);
+      setAiSuggestions([]);
+      setAiError("Could not reach the matching service.");
     } finally {
-
       setAiLoading(false);
     }
-  }
+  };
 
   const clearFilters = () => {
     setFilters({
@@ -1047,7 +1064,7 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
     // </DashboardShell>
 
     <div className="p-6 h-full overflow-hidden">
-      <div className=" relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-[#f7f5f5] rounded-2xl p-4 md:p-5">
+      <div className=" relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-[#f7f5f5] dark:bg-card rounded-2xl p-4 md:p-5">
 
         {/* PAGE TITLE */}
         <div className="flex flex-col min-w-0">
@@ -1110,7 +1127,7 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
 
               <button
                 onClick={() => setShowFilters(true)}
-                className=" h-11 px-4 rounded-xl border bg-white flex items-center gap-2 dark:bg-card">
+                className=" h-11 px-4 rounded-xl border bg-white flex items-center gap-2 dark:bg-card dark:border-slate-700">
                 <SlidersHorizontal size={16} />
                 Filters
 
@@ -1148,11 +1165,11 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-4 gap-6 h-screen mt-2 p-4 bg-[#f8f6f6] rounded-2xl">
+      <div className="grid grid-cols-4 gap-6 h-screen mt-2 p-4 bg-[#f8f6f6] dark:bg-[var(--bg)] rounded-2xl">
         {columns.map((column) => (
           <div
             key={column.id}
-            className="flex flex-col h-full overflow-hidden"
+            className="flex flex-col h-full min-w-0 overflow-hidden"
           >
             {/* HEADER */}
             <div className="sticky top-0 z-10 flex items-center justify-between rounded-xl mb-4 p-3 bg-white border-b border-[var(--border)] dark:bg-card">
@@ -1162,12 +1179,12 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
                 p-2
                 rounded-lg
                 ${column.color === "blue"
-                      ? "bg-blue-50 text-blue-600"
+                      ? "bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400"
                       : column.color === "green"
-                        ? "bg-green-50 text-green-600"
+                        ? "bg-green-50 text-green-600 dark:bg-green-950/50 dark:text-green-400"
                         : column.color === "red"
-                          ? "bg-red-50 text-red-600"
-                          : "bg-yellow-50 text-yellow-600"
+                          ? "bg-red-50 text-red-600 dark:bg-red-950/50 dark:text-red-400"
+                          : "bg-yellow-50 text-yellow-600 dark:bg-yellow-950/50 dark:text-yellow-400"
                     }
               `}
                 >
@@ -1214,7 +1231,7 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
               onDrop={() => handleDrop(column.id)}
               className={`flex-1 h-full min-h-0 rounded-2xl border-2 border-dashed border-[var(--border)] bg-[var(--bg)] p-2 transition-colors overflow-y-auto
                 ${draggedItem
-                  ? "bg-white"
+                  ? "bg-white/60 dark:bg-slate-900/40"
                   : ""
                 }
             `}
@@ -1222,13 +1239,21 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
               {column.id === "ALL_USERS" && (
                 <>
                   {aiLoading && (
-                    <div className="mb-4 rounded-2xl border border-cyan-200 bg-cyan-50 p-4">
+                    <div className="mb-4 rounded-2xl border border-cyan-200 bg-cyan-50 p-4 dark:border-cyan-800/60 dark:bg-cyan-950/40">
                       <div className="flex items-center gap-2">
                         <div className="h-3 w-3 rounded-full bg-cyan-500 animate-pulse" />
-                        <h3 className="font-semibold text-cyan-700">
+                        <h3 className="font-semibold text-cyan-700 dark:text-cyan-300">
                           AI is finding the best engineers{dots}
                         </h3>
                       </div>
+                    </div>
+                  )}
+
+                  {!aiLoading && aiError && (
+                    <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800/60 dark:bg-amber-950/40">
+                      <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">
+                        AI matching unavailable: {aiError}
+                      </p>
                     </div>
                   )}
 
@@ -1285,19 +1310,20 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
                               "ALL_USERS"
                             )
                           }
+                          onDragEnd={() => setDraggedItem(null)}
                           className="bg-white border border-[var(--border)] rounded-2xl p-4 mb-3 cursor-grab active:cursor-grabbing transition-all hover:shadow-sm dark:bg-card"
                         >
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-start gap-3">
 
                             {engineer.image ? (
                               <img
                                 src={engineer.image}
                                 alt={engineer.name}
-                                className="w-12 h-12 rounded-full object-cover"
+                                className="w-12 h-12 shrink-0 rounded-full object-cover"
                               />
                             ) : (
                               <div
-                                className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-sm"
+                                className="w-12 h-12 shrink-0 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                                 style={{
                                   background: "var(--primary)",
                                 }}
@@ -1308,63 +1334,59 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
 
                             <div className="min-w-0 flex-1">
 
-                              <div className="flex items-center justify-between">
+                              <div className="flex items-start justify-between gap-2">
 
-                                <div className="flex items-center gap-2">
+                                <div className="min-w-0 flex-1">
+                                  <h3
+                                    className="font-semibold text-[16px] truncate leading-tight tracking-[-0.02em]"
+                                    title={engineer.name}
+                                    style={{
+                                      color: "var(--text-primary)",
+                                    }}
+                                  >
+                                    {engineer.name}
+                                  </h3>
 
-                                  <div>
-                                    <h3
-                                      className="font-semibold text-[18px] truncate leading-tight tracking-[-0.02em]"
-                                      style={{
-                                        color:
-                                          "var(--text-primary)",
-                                      }}
-                                    >
-                                      {engineer.name}
-                                    </h3>
+                                  <p
+                                    className="text-[11px] font-medium truncate"
+                                    title={engineer?.email}
+                                    style={{
+                                      color: "var(--text-muted)",
+                                    }}
+                                  >
+                                    {engineer?.email}
+                                  </p>
+                                </div>
 
-                                    <p
-                                      className="text-[11px] font-medium"
-                                      style={{
-                                        color:
-                                          "var(--text-muted)",
-                                      }}
-                                    >
-                                      {
-                                        engineer?.email
-                                      }
-                                    </p>
-                                  </div>
-
+                                <div className="shrink-0 flex flex-col items-end gap-1.5">
                                   {isAiRecommended && (
-                                    <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-cyan-100 text-cyan-700 border border-cyan-200">
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap bg-cyan-100 text-cyan-700 border border-cyan-200 dark:bg-cyan-950/60 dark:text-cyan-300 dark:border-cyan-800/60">
                                       AI PICK
                                     </span>
                                   )}
 
-                                </div>
-
-                                <button
-                                  disabled={
-                                    sendingLoader ===
-                                    engineer?.engineerProfile?.id
-                                  }
-                                  onClick={() =>
-                                    handleSendInvitation(
+                                  <button
+                                    disabled={
+                                      sendingLoader ===
                                       engineer?.engineerProfile?.id
-                                    )
-                                  }
-                                  className={`cursor-pointer shrink-0 h-8 sm:h-9 px-3 sm:px-4 rounded-xl text-white text-[11px] sm:text-[12px] font-semibold shadow-sm ${sendingLoader ===
-                                    engineer?.engineerProfile?.id
-                                    ? "bg-[#FFC98F] cursor-not-allowed opacity-70"
-                                    : "bg-[#FFAE58]"
-                                    }`}
-                                >
-                                  {sendingLoader ===
-                                    engineer?.engineerProfile?.id
-                                    ? "Inviting..."
-                                    : "Invite"}
-                                </button>
+                                    }
+                                    onClick={() =>
+                                      handleSendInvitation(
+                                        engineer?.engineerProfile?.id
+                                      )
+                                    }
+                                    className={`cursor-pointer h-8 sm:h-9 px-3 sm:px-4 rounded-xl text-white text-[11px] sm:text-[12px] font-semibold shadow-sm whitespace-nowrap ${sendingLoader ===
+                                      engineer?.engineerProfile?.id
+                                      ? "bg-[#FFC98F] cursor-not-allowed opacity-70"
+                                      : "bg-[#FFAE58]"
+                                      }`}
+                                  >
+                                    {sendingLoader ===
+                                      engineer?.engineerProfile?.id
+                                      ? "Inviting..."
+                                      : "Invite"}
+                                  </button>
+                                </div>
                               </div>
 
                               {(engineer?.engineerProfile?.skills || engineer?.skills)?.length > 0 && (
@@ -1374,10 +1396,7 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
                                     (skill: string, index: number) => (
                                       <span
                                         key={index}
-                                        className="px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-medium bg-[#FFF7ED] border border-[#FED7AA] whitespace-nowrap"
-                                        style={{
-                                          color: "#C2410C",
-                                        }}
+                                        className="px-2.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-medium bg-[#FFF7ED] border border-[#FED7AA] text-[#C2410C] dark:bg-orange-950/40 dark:border-orange-800/60 dark:text-orange-300 whitespace-nowrap"
                                       >
                                         {skill}
                                       </span>
@@ -1388,10 +1407,7 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
                               )}
 
                               <span
-                                className="px-2.5 py-1 rounded-full text-[12px] font-semibold bg-[#F8FAFC] border border-[#E2E8F0]"
-                                style={{
-                                  color: "#475569",
-                                }}
+                                className="px-2.5 py-1 rounded-full text-[12px] font-semibold bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569] dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300"
                               >
                                 {experience}{" "}
                                 years
@@ -1422,6 +1438,8 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
                         column.id
                       )
                     }
+
+                    onDragEnd={() => setDraggedItem(null)}
 
                     className="bg-white border border-[var(--border)] rounded-2xl p-4 mb-3 transition-all dark:bg-card">
 
@@ -1487,10 +1505,7 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
 
                                 <span
                                   key={index}
-                                  className="px-2.5 mr-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-medium bg-[#FFF7ED] border border-[#FED7AA] whitespace-nowrap"
-                                  style={{
-                                    color: "#C2410C",
-                                  }}
+                                  className="px-2.5 mr-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-medium bg-[#FFF7ED] border border-[#FED7AA] text-[#C2410C] dark:bg-orange-950/40 dark:border-orange-800/60 dark:text-orange-300 whitespace-nowrap"
                                 >
                                   {skill}
                                 </span>
@@ -1499,10 +1514,7 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
                           </div>
 
                           <span
-                            className="px-2.5 py-1 rounded-full text-[12px] font-semibold bg-[#F8FAFC] border border-[#E2E8F0]"
-                            style={{
-                              color: "#475569",
-                            }}
+                            className="px-2.5 py-1 rounded-full text-[12px] font-semibold bg-[#F8FAFC] border border-[#E2E8F0] text-[#475569] dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300"
                           >
                             {invitation.engineer?.yearsOfExperienceNumber || 0} years
                           </span>
@@ -1528,6 +1540,7 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
 
               <button
                 onClick={() => setShowFilters(false)}
+                className="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
               >
                 ✕
               </button>
@@ -1559,10 +1572,10 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
                         }))
                       }
                       className={`
-                  px-3 py-2 rounded-lg border
+                  px-3 py-2 rounded-lg border transition-colors
                   ${filters.experiences.includes(exp)
-                          ? "bg-cyan-500 text-white"
-                          : "bg-white"
+                          ? "bg-cyan-500 text-white border-cyan-500"
+                          : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 dark:hover:bg-slate-700"
                         }
                 `}
                     >
@@ -1594,7 +1607,7 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
             <div className="flex justify-end gap-3">
               <button
                 onClick={clearFilters}
-                className=" px-4 py-2 border rounded-lg">
+                className=" px-4 py-2 border border-slate-200 rounded-lg bg-white text-slate-700 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-700">
                 Clear
               </button>
 

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { Ollama } from "ollama";
 
 const ollama = new Ollama();
+const MATCHER_MODEL = process.env.OLLAMA_MODEL || "llama3.2";
 
 export async function POST(req: NextRequest) {
     try {
@@ -91,6 +92,18 @@ export async function POST(req: NextRequest) {
             );
 
         const topCandidates = relevantEngineers.slice(0, 20);
+
+        if (topCandidates.length === 0) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message:
+                        "No active engineers with a matching skill were found for this project",
+                    aiSuggestions: [],
+                },
+                { status: 200 }
+            );
+        }
         const prompt = `
 You are a senior engineering recruiter.
 
@@ -177,8 +190,10 @@ Rules:
 - No text outside JSON.
 `;
 
-        const response = await ollama.chat({
-            model: "llama3",
+        let response;
+        try {
+            response = await ollama.chat({
+            model: MATCHER_MODEL,
             messages: [
                 {
                     role: "user",
@@ -187,6 +202,24 @@ Rules:
             ],
             format: "json",
         });
+        } catch (error: any) {
+            console.error("OLLAMA CHAT ERROR:", error);
+
+            const detail = error?.message ?? String(error);
+            const modelMissing =
+                error?.status_code === 404 || /not found/i.test(detail);
+
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: modelMissing
+                        ? `Ollama model "${MATCHER_MODEL}" is not installed (run: ollama pull ${MATCHER_MODEL})`
+                        : `Ollama is not reachable (${detail})`,
+                    aiSuggestions: [],
+                },
+                { status: 503 }
+            );
+        }
 
         let recommendedIds: string[] = [];
 
@@ -201,13 +234,26 @@ Rules:
             );
         }
 
-        const aiSuggestions =
-            relevantEngineers.filter((engineer) =>
-                recommendedIds.includes(
-                    engineer.id
-                )
+        const candidateMap = new Map(
+            topCandidates.map((engineer) => [engineer.id, engineer])
+        );
+
+        const aiSuggestions = recommendedIds
+            .filter((id, index) => recommendedIds.indexOf(id) === index)
+            .map((id) => candidateMap.get(id))
+            .filter(Boolean);
+
+        if (aiSuggestions.length === 0) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "AI returned no usable recommendations",
+                    aiSuggestions: [],
+                },
+                { status: 200 }
             );
-            
+        }
+
         return NextResponse.json(
             {
                 success: true,

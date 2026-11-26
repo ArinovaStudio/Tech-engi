@@ -37,6 +37,14 @@ export async function POST(req: NextRequest) {
     if (project.engineerId) {
       return NextResponse.json({ success: false, message: "Project already assigned" }, { status: 400 });
     }
+    // Idempotent: don't match twice for the same project
+    const existing = await prisma.projectInvitation.count({
+      where: { projectId, engineerId: { not: null } },
+    });
+    if (existing > 0) {
+      return NextResponse.json({ success: true, message: "Matching already completed" });
+    }
+
     await prisma.project.update({
       where: { id: projectId },
       data: { status: "SEARCHING" }
@@ -56,7 +64,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, message: "Matching completed successfully" });
 
-  } catch {
+  } catch (error) {
+    console.error("Error in POST /api/match:", error);
     return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 });
   }
 }

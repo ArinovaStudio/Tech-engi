@@ -21,10 +21,11 @@ export async function getTopMatches(projectId: string) {
     
     AND u."lastActiveAt" >= NOW() - INTERVAL '180 days'
   
-    AND e.id NOT IN (
-      SELECT "engineerId" 
-      FROM "ProjectInvitation" 
-      WHERE "projectId" = ${projectId}
+    AND NOT EXISTS (
+      SELECT 1
+      FROM "ProjectInvitation" pi
+      WHERE pi."projectId" = ${projectId}
+      AND pi."engineerId" = e.id
     )
     
     AND e.id NOT IN (
@@ -75,7 +76,7 @@ export async function getTopMatches(projectId: string) {
 
   try {
     const response = await ollama.chat({
-      model: 'llama3',
+      model: 'llama3.2',
       messages: [{ role: 'user', content: prompt }],
       format: 'json'
     });

@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import { Users, CheckCircle2, XCircle, Clock3, ArrowLeft, FolderSearch, ArrowRight, SlidersHorizontal, } from "lucide-react";
 
 export default function ProjectDetailsPage() {
@@ -129,6 +130,8 @@ export default function ProjectDetailsPage() {
     return [];
   };
 
+  const prevStatuses = useRef<Record<string, string> | null>(null);
+
   const fetchData = async () => {
     try {
       const res = await fetch(`/api/admin/project/${projectId}/invitations`);
@@ -136,7 +139,25 @@ export default function ProjectDetailsPage() {
 
       setProject(json.project);
 
-      setInvitations(json.invitations || []);
+      const next: any[] = json.invitations || [];
+
+      // Notify the admin when an engineer responds to an invitation
+      if (prevStatuses.current) {
+        for (const inv of next) {
+          const before = prevStatuses.current[inv.id];
+          const name = inv.engineer?.user?.name || "The engineer";
+          if (before === "SENT" && inv.status === "ACCEPTED") {
+            toast.success(`${name} accepted the invitation. The project is now assigned.`);
+          } else if (before === "SENT" && inv.status === "REJECTED") {
+            toast.error(`${name} rejected the invitation.`);
+          } else if (before === "SENT" && inv.status === "EXPIRED") {
+            toast(`${name}'s invitation expired.`);
+          }
+        }
+      }
+      prevStatuses.current = Object.fromEntries(next.map((i) => [i.id, i.status]));
+
+      setInvitations(next);
     } catch (err) {
       console.error(err);
     } finally {
@@ -561,6 +582,10 @@ export default function ProjectDetailsPage() {
   useEffect(() => {
     fetchData();
     fetchEngineers();
+
+    // poll so the admin sees engineer responses without reloading
+    const interval = setInterval(fetchData, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {

@@ -333,6 +333,18 @@ export const invitationDeclinedAdminTemplate = (
   `;
 };
 
+export const invitationAcceptedAdminTemplate = (
+  engineerName: string,
+  projectName: string
+) => `
+  <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; max-width: 600px; line-height: 1.5;">
+    <h3 style="color: #28a745; border-bottom: 1px solid #eee; padding-bottom: 10px;">Invitation Accepted</h3>
+    <p>Hello Admin,</p>
+    <p>The engineer <b>${engineerName}</b> has accepted the invitation for the project <b>${projectName}</b>.</p>
+    <p>The project is now assigned and in progress. All other pending invitations for this project have been closed.</p>
+  </div>
+`;
+
 export const userSuspendedTemplate = (name: string, customMessage: string) => `
 <div style="font-family: sans-serif; max-w: 600px; margin: 0 auto; border: 1px solid #e5e5e5; border-radius: 8px; overflow: hidden;">
   <div style="background-color: #ef4444; padding: 20px; text-align: center;">

@@ -64,7 +64,7 @@ export default function EngineerDashboardPage() {
   const [cache, setCache] = useState<Record<string, AnalyticsData>>({});
 
   const { data: projectsData, isLoading: projectsLoading, mutate } = useSWR("/api/engineer/perengineer-projects", fetcher);
-  const { data: invitationsData } = useSWR("/api/engineer/invitation-engineer", fetcher);
+  const { data: invitationsData, mutate: mutateInvitations } = useSWR("/api/engineer/invitation-engineer", fetcher);
 
   useEffect(() => {
     const fetchEngineerProfile = async () => {
@@ -403,7 +403,10 @@ export default function EngineerDashboardPage() {
             <ModernCalendar projects={projectsData?.projects} />
           </div>
           <div id="engineer-invitations" className="w-full">
-            <InvitationCard invitationsData={invitationsData} />
+            <InvitationCard
+              invitationsData={invitationsData}
+              onUpdated={() => { mutateInvitations(); mutate(); }}
+            />
           </div>
         </div>
       </div>

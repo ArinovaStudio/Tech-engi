@@ -66,25 +66,6 @@ export default function HireEngineerPage() {
   const [loading, setLoading] = useState(true);
   const matchStarted = useRef(false);
 
-  const load = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/engineer/hire/${projectId}`);
-      const json = await res.json();
-      if (!json.success) {
-        toast.error(json.message || "Could not load project");
-        router.push("/engineer/project");
-        return;
-      }
-      setData(json);
-    } finally {
-      setLoading(false);
-    }
-  }, [projectId, router]);
-
-  useEffect(() => {
-    load();
-  }, [load]);
-
   const startMatching = async () => {
     if (matchStarted.current) return;
     matchStarted.current = true;
@@ -102,6 +83,38 @@ export default function HireEngineerPage() {
       toast.error("Something went wrong with matching.");
     }
   };
+
+  const load = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/engineer/hire/${projectId}`);
+      const json = await res.json();
+      if (!json.success) {
+        toast.error(json.message || "Could not load project");
+        router.push("/engineer/project");
+        return;
+      }
+      setData(json);
+
+      // Paid but no engineers yet (e.g. matching never started because the
+      // payment redirected away, or it failed earlier): start it now.
+      if (
+        json.unlocked &&
+        (json.engineers?.length ?? 0) === 0 &&
+        !matchStarted.current
+      ) {
+        await startMatching();
+        const retry = await fetch(`/api/engineer/hire/${projectId}`);
+        const retryJson = await retry.json();
+        if (retryJson.success) setData(retryJson);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId, router]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const handlePay = () => {
     if (!data?.preview) return;

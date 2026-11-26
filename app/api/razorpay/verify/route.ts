@@ -84,12 +84,6 @@ export async function POST(req: NextRequest) {
         });
         // const payoutAmount = project.budget * 0.25;
 
-        await tx.projectInvitation.create({
-          data: {
-            projectId: project.id,
-          }
-        })
-
         const admins = await tx.user.findMany({
           where: {
             role: "ADMIN",

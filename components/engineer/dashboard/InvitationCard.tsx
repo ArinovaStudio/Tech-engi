@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 interface InvitationProject {
     title: string;
@@ -22,32 +22,36 @@ interface InvitationCardProps {
 
     onAccept?: (id: string) => void;
     onReject?: (id: string) => void;
+    onUpdated?: () => void;
 }
 
-export default function InvitationCard({ invitationsData, onAccept, onReject, }: InvitationCardProps) {
-    const router = useRouter();
+export default function InvitationCard({ invitationsData, onAccept, onReject, onUpdated, }: InvitationCardProps) {
     const [loadingId, setLoadingId] = useState<string | null>(null);
-    const handleUpdate = async (invitationId: string, status: string) => {
+    const handleUpdate = async (invitationId: string, action: "ACCEPT" | "REJECT") => {
         try {
             setLoadingId(invitationId);
-            const res = await fetch("/api/admin/invitations",
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        id: invitationId,
-                        status,
-                    }),
-                });
+            const res = await fetch(`/api/engineer/invitation/${invitationId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action }),
+            });
 
             const data = await res.json();
             if (data.success) {
-                router.refresh();
+                toast.success(
+                    action === "ACCEPT"
+                        ? "You accepted the invitation. The project is now yours!"
+                        : "You declined the invitation."
+                );
+                if (action === "ACCEPT") onAccept?.(invitationId);
+                else onReject?.(invitationId);
+                onUpdated?.();
+            } else {
+                toast.error(data.message || "Could not update the invitation");
             }
         } catch (error) {
             console.error(error);
+            toast.error("Something went wrong. Please try again.");
         } finally {
             setLoadingId(null);
         }
@@ -155,7 +159,7 @@ export default function InvitationCard({ invitationsData, onAccept, onReject, }:
                                         <button
                                             disabled={loadingId === invitation.id}
                                             onClick={() =>
-                                                handleUpdate(invitation.id, "ACCEPTED")
+                                                handleUpdate(invitation.id, "ACCEPT")
                                             }
                                             className="flex-1 cursor-pointer rounded-2xl bg-[#D7F266] px-5 py-3 text-[15px] font-semibold text-[#111111] dark:text-slate-900 transition-all hover:bg-[#CBEF4E] disabled:cursor-not-allowed disabled:opacity-50"
                                         >
@@ -168,7 +172,7 @@ export default function InvitationCard({ invitationsData, onAccept, onReject, }:
                                         <button
                                             disabled={loadingId === invitation.id}
                                             onClick={() =>
-                                                handleUpdate(invitation.id, "REJECTED")
+                                                handleUpdate(invitation.id, "REJECT")
                                             }
                                             className="flex-1 cursor-pointer rounded-2xl bg-[#F3F3F3] dark:bg-slate-700 px-5 py-3 text-[15px] font-semibold text-[#555555] dark:text-slate-300 transition-all hover:bg-[#EBEBEB] dark:hover:bg-slate-600 disabled:cursor-not-allowed disabled:opacity-50"
                                         >

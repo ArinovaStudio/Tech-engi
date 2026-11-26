@@ -24,6 +24,15 @@ export async function GET(req: NextRequest) {``
       whereClause.status = { notIn: ["DRAFT",] };
     }
 
+    // Optional filters (used by Invitations Management):
+    // only projects created by CLIENT users, and only ones with no engineer yet.
+    if (searchParams.get("clientOnly") === "true") {
+      whereClause.client = { user: { role: "CLIENT" } };
+    }
+    if (searchParams.get("unassigned") === "true") {
+      whereClause.engineerId = null;
+    }
+
     if (search.trim() !== "") {
       whereClause.OR = [
         { title: { contains: search.trim(), mode: "insensitive" } },

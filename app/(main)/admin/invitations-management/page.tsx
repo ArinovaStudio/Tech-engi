@@ -37,7 +37,7 @@ export default function InvitationsManagementPage() {
       try {
         // Projects come from the projects API so that projects with no
         // invitations yet still show up; invitations only supply the counts.
-        const projectsRes = await fetch("/api/admin/project?limit=200");
+        const projectsRes = await fetch("/api/admin/project?limit=200&clientOnly=true&unassigned=true");
         const projectsData = await projectsRes.json();
 
         if (!projectsRes.ok || !projectsData.success) {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getEngineer } from "@/lib/auth";
 import { z } from "zod";
-import { invitationDeclinedAdminTemplate } from "@/lib/templates";
+import { invitationDeclinedAdminTemplate, invitationAcceptedAdminTemplate } from "@/lib/templates";
 import sendEmail from "@/lib/email";
 
 export async function GET( req: NextRequest, { params }: { params: Promise<{ invitationId: string }> } ) {
@@ -157,6 +157,20 @@ export async function PATCH( req: NextRequest, { params }: { params: Promise<{ i
         },
         data: { status: "EXPIRED" }
     });
+
+    // let admins know the engineer accepted
+    try {
+      const admins = await prisma.user.findMany({ where: { role: "ADMIN" }, select: { email: true } });
+      const adminEmails = admins.map(admin => admin.email).filter(Boolean);
+      if (adminEmails.length > 0) {
+        const emailHtml = invitationAcceptedAdminTemplate(user.name || "An Engineer", invitation.project.title);
+        await Promise.allSettled(
+          adminEmails.map(email => sendEmail(email, `Invitation Accepted for ${invitation.project.title}`, emailHtml))
+        );
+      }
+    } catch (e) {
+      console.error("Failed to notify admins of acceptance:", e);
+    }
 
     return NextResponse.json({ success: true, message: "Project accepted successfully" }, { status: 200 });
 

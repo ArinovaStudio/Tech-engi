@@ -90,6 +90,7 @@ export async function GET(req: NextRequest) {
       endDate: project.endDate?.toISOString() || "",
       createdAt: project.createdAt.toISOString(),
       status: project.status,
+      isCoWorker: project.isCoWorker,
       engineer: project.engineer?.user?.name || null,
       resources: project.resources
     }));
@@ -132,6 +133,7 @@ const projectSchema = z.object({
   instruments: z.array(z.string()).default([]),
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
+  isCoWorker: z.boolean().optional().default(false),
 });
 
 export async function POST(req: NextRequest) {
@@ -157,7 +159,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { title, description, budget, instruments, startDate, endDate } =
+    const { title, description, budget, instruments, startDate, endDate, isCoWorker } =
       validation.data;
 
     if (startDate && endDate && startDate > endDate) {
@@ -176,6 +178,7 @@ export async function POST(req: NextRequest) {
         instruments,
         startDate,
         endDate,
+        isCoWorker,
         status: "DRAFT",
       },
     });

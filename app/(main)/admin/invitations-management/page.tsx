@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import DashboardShell from "@/components/layout/DashboardShell";
-import { StatusBadge } from "@/components/project/ProjectUI";
+import { StatusBadge, CoWorkerBadge } from "@/components/project/ProjectUI";
 
 type Invitation = {
   id: string;
@@ -72,6 +72,7 @@ export default function InvitationsManagementPage() {
             title: project.title,
             budget: project.budget,
             status: project.status,
+            isCoWorker: project.isCoWorker,
             invitationsCount: counts[project.id] || 0,
             engineers: engineersByProject[project.id] || [],
           }))
@@ -204,7 +205,10 @@ export default function InvitationsManagementPage() {
                 {/* <Badge variant="secondary">
                   {project.status.replaceAll("_", " ")}
                 </Badge> */}
-                <StatusBadge status={project.status} />
+                <div className="flex flex-col items-end gap-1">
+                  <StatusBadge status={project.status} />
+                  <CoWorkerBadge show={project.isCoWorker} />
+                </div>
               </CardHeader>
 
               <CardContent className="space-y-4">

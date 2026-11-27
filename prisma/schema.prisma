@@ -134,6 +134,7 @@ model Project {
   repository           String?
   currentPhase         String[]
   technology           Json?
+  isCoWorker           Boolean                      @default(false)
   extensionRequests    DeadlineExtensionRequest[]
   designSystem         DesignSystem?
   featureRequests      FeatureRequest[]

@@ -4,13 +4,20 @@ import React, { useState, useEffect } from "react";
 import { Plus, Search, Filter, Users, Clock, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Project, User, STATUS_META, ProjectCard } from "@/components/project/ProjectUI"; 
+import { takeCoWorkerDraft, type CoWorkerDraft } from "@/lib/coworkerDraft";
 import { CreateProjectModal } from "@/components/project/CreateProjectModal"; 
 
 export default function ClientProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
+  const [coworkerDraft, setCoworkerDraft] = useState<CoWorkerDraft | null>(null);
   const { user } = useAuth() as { user: User };
+  useEffect(() => {
+    if (!user?.email) return;
+    const d = takeCoWorkerDraft(user.email);
+    if (d) { setCoworkerDraft(d); setShowCreate(true); }
+  }, [user?.email]);
 
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -174,7 +181,7 @@ export default function ClientProjectsPage() {
         )}
       </div>
 
-      {showCreate && <CreateProjectModal onClose={() => setShowCreate(false)} onCreated={fetchProjects} user={user} />}
+      {showCreate && <CreateProjectModal onClose={() => setShowCreate(false)} onCreated={fetchProjects} user={user} initial={coworkerDraft ?? undefined} />}
     </>
   );
 }

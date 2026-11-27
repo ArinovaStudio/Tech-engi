@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
+import { saveCoWorkerDraft } from "@/lib/coworkerDraft";
 import { useRef, useState, type ChangeEvent, type DragEvent, type FormEvent } from "react";
 import styles from "./CoWorkerPage.module.css";
 
@@ -88,6 +91,9 @@ export default function CoWorkerIntake() {
   const [email, setEmail] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [bookingReady, setBookingReady] = useState(false);
+  const [nextStep, setNextStep] = useState<"" | "redirect" | "login">("");
+  const router = useRouter();
+  const { user, isAuthenticated, isClient, isEngineer } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const today = new Date();
@@ -175,6 +181,38 @@ export default function CoWorkerIntake() {
         return;
       }
       setBookingReady(true);
+
+      // Hand the booking over to the normal project-creation + payment flow.
+      saveCoWorkerDraft({
+        title: "Co-worker for a day",
+        description: [
+          "Co-worker for a day booking.",
+          mode === "later" && date
+            ? `Requested date: ${date}.`
+            : "Start: as soon as an engineer is available.",
+          brief.trim(),
+          repo.trim() ? `Repo / drive link: ${repo.trim()}` : "",
+        ]
+          .filter(Boolean)
+          .join("\n\n"),
+        budget: TOTAL_PRICE,
+        email: email.trim(),
+      });
+      // Only continue straight into the dashboard when the logged-in account IS the
+      // email entered in the form. Otherwise send them to log in with that email.
+      const emailMatches =
+        isAuthenticated &&
+        !!user?.email &&
+        user.email.trim().toLowerCase() === email.trim().toLowerCase();
+      if (emailMatches && isClient) {
+        setNextStep("redirect");
+        router.push("/client/project");
+      } else if (emailMatches && isEngineer) {
+        setNextStep("redirect");
+        router.push("/engineer/project");
+      } else {
+        setNextStep("login");
+      }
     } catch {
       setSubmitError("We could not send your request. Please check your connection and try again.");
     } finally {
@@ -612,6 +650,28 @@ export default function CoWorkerIntake() {
             <p className={styles.bookingStatus} role="status">
               Your request has been emailed to our team, and a receipt has been
               sent to {email}. Nothing has been booked, charged, or uploaded.
+            </p>
+          )}
+          {bookingReady && nextStep === "redirect" && (
+            <p className={styles.bookingStatus} role="status">
+              Taking you to your dashboard to confirm the project details and pay the advance...
+            </p>
+          )}
+          {bookingReady && nextStep === "login" && (
+            <p className={styles.bookingStatus} role="status">
+              {isAuthenticated ? (
+                <>
+                  You are signed in with a different account. Please{" "}
+                  <Link href="/login">log in with {email}</Link> to confirm the project and pay.
+                </>
+              ) : (
+                <>
+                  To confirm the project and pay, <Link href="/login">log in</Link> or{" "}
+                  <Link href="/register">create an account</Link> using {email}.
+                </>
+              )}{" "}
+              Your details are saved in this browser tab and will be prefilled when you start the
+              project.
             </p>
           )}
           {submitError && (

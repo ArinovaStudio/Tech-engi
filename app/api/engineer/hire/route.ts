@@ -12,6 +12,7 @@ const hireSchema = z.object({
   instruments: z.array(z.string()).default([]),
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
+  isCoWorker: z.boolean().optional().default(false),
 });
 
 // Projects this engineer is hiring for
@@ -31,6 +32,7 @@ export async function GET() {
         budget: true,
         status: true,
         advancePaid: true,
+        isCoWorker: true,
         createdAt: true,
       },
     });
@@ -55,7 +57,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, message: parsed.error.issues[0].message }, { status: 400 });
     }
 
-    const { title, description, budget, instruments, startDate, endDate } = parsed.data;
+    const { title, description, budget, instruments, startDate, endDate, isCoWorker } = parsed.data;
     if (startDate && endDate && startDate > endDate) {
       return NextResponse.json({ success: false, message: "Start date must be before end date" }, { status: 400 });
     }
@@ -69,6 +71,7 @@ export async function POST(req: NextRequest) {
         instruments,
         startDate,
         endDate,
+        isCoWorker,
         status: "DRAFT",
       },
     });

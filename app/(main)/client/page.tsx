@@ -8,7 +8,9 @@ import LatestUpdates from '@/components/clients/analytics/LatestUpdates';
 import RiskBlockage from '@/components/clients/analytics/RiskBlockage';
 import Milestones from '@/components/clients/analytics/Milestones';
 import BudgetAndDocs from '@/components/clients/analytics/BudgetAndDocs';
+import { takeCoWorkerDraft, type CoWorkerDraft } from "@/lib/coworkerDraft";
 import { CreateProjectModal } from '@/components/project/CreateProjectModal';
+import { CoWorkerBadge } from '@/components/project/ProjectUI';
 import InviteEngineerModal from '@/components/clients/InviteEngineerModal';
 import { useTour } from '@/hooks/useTour';
 
@@ -23,6 +25,7 @@ interface Project {
   status: string;
   endDate: string;
   advancePaid: boolean;
+  isCoWorker?: boolean;
 }
 
 interface User {
@@ -101,6 +104,12 @@ const ClientAnalyticsDashboard = () => {
   const [priorityFilter, setPriorityFilter] = useState('ALL');
   const [showProjects, setShowProjects] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
+  const [coworkerDraft, setCoworkerDraft] = useState<CoWorkerDraft | null>(null);
+  useEffect(() => {
+    if (!user?.email) return;
+    const d = takeCoWorkerDraft(user.email);
+    if (d) { setCoworkerDraft(d); setShowCreate(true); }
+  }, [user?.email]);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(searchTerm), 500);
@@ -245,7 +254,10 @@ const ClientAnalyticsDashboard = () => {
                 )}
                 <div className="flex items-start justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2 flex-1">{project.title}</h3>
-                  <span className={`ml-2 px-2 py-1 text-xs font-medium rounded-full border whitespace-nowrap ${statusColor}`}>{displayStatus}</span>
+                  <div className="ml-2 flex flex-col items-end gap-1">
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full border whitespace-nowrap ${statusColor}`}>{displayStatus}</span>
+                    <CoWorkerBadge show={project.isCoWorker} />
+                  </div>
                 </div>
                 <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">{project.description || 'No summary available'}</p>
                 <div className="flex items-center gap-1 text-sm text-gray-500 mb-3 dark:text-slate-400">
@@ -267,7 +279,7 @@ const ClientAnalyticsDashboard = () => {
           })}
         </div>
       )}
-      {showCreate && <CreateProjectModal onClose={() => setShowCreate(false)} onCreated={() => setShowProjects(false)} user={user} />}
+      {showCreate && <CreateProjectModal onClose={() => setShowCreate(false)} onCreated={() => setShowProjects(false)} user={user} initial={coworkerDraft ?? undefined} />}
     </div>
   );
 

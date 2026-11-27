@@ -169,7 +169,7 @@ export async function GET(req: NextRequest) {
       where: whereClause,
       include: {
         project: {
-          select: { id: true, title: true, budget: true, status: true }
+          select: { id: true, title: true, budget: true, status: true, isCoWorker: true }
         },
         engineer: {
           include: { user: { select: { name: true, email: true, image: true } } }

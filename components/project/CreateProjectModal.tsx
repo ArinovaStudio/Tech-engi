@@ -12,11 +12,11 @@ import { PromoCodeField, PromoQuoteView } from "./PromoCodeField";
 
 const MIN_PROJECT_BUDGET = 2000;
 
-export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () => void; onCreated: () => void, user: User }) {
+export function CreateProjectModal({ onClose, onCreated, user, initial }: { onClose: () => void; onCreated: () => void, user: User, initial?: { title: string; description: string; budget: number } }) {
   const router = useRouter();
   const { processPayment, loading: isPaying } = usePayment();
   
-  const [form, setForm] = useState({ title: "", description: "", budget: "", startDate: "", endDate: "" });
+  const [form, setForm] = useState({ title: initial?.title ?? "", description: initial?.description ?? "", budget: initial ? String(initial.budget) : "", startDate: "", endDate: "" });
   const [instruments, setInstruments] = useState<string[]>([]);
   const [instrInput, setInstrInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -66,6 +66,7 @@ export function CreateProjectModal({ onClose, onCreated, user }: { onClose: () =
         body: JSON.stringify({
           title: form.title, description: form.description, budget: Number(form.budget),
           instruments, startDate: form.startDate || undefined, endDate: form.endDate || undefined,
+          isCoWorker: !!initial,
         }),
       });
 

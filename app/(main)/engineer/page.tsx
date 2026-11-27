@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import toast from "react-hot-toast";
+import { hasCoWorkerDraft } from "@/lib/coworkerDraft";
 
 interface AnalyticsData {
   overview: { totalAssigned: number; completedProjects: number; newInvitations: number };
@@ -99,6 +100,9 @@ export default function EngineerDashboardPage() {
 
   // console.log(invitationsData, "invitationsData");
   const { user } = useAuth();
+  useEffect(() => {
+    if (user?.email && hasCoWorkerDraft(user.email)) router.replace("/engineer/project");
+  }, [router, user?.email]);
   // Handoff: Engineer Dashboard → Engineer Projects page
   const goToProjectsTour = () => {
     sessionStorage.setItem("tour_in_progress", "true");

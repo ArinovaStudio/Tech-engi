@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { CoWorkerBadge } from "@/components/project/ProjectUI";
 import { Users, CheckCircle2, XCircle, Clock3, ArrowLeft, FolderSearch, ArrowRight, SlidersHorizontal, } from "lucide-react";
 
 export default function ProjectDetailsPage() {
@@ -1094,14 +1095,17 @@ const sortedUsers = [...filteredUsers].sort((a, b) => {
         {/* PAGE TITLE */}
         <div className="flex flex-col min-w-0">
 
-          <h1
-            className="text-xl sm:text-2xl font-semibold tracking-tight break-words"
-            style={{
-              color: "var(--text-primary)",
-            }}
-          >
-            {project.title}
-          </h1>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1
+              className="text-xl sm:text-2xl font-semibold tracking-tight break-words"
+              style={{
+                color: "var(--text-primary)",
+              }}
+            >
+              {project.title}
+            </h1>
+            <CoWorkerBadge show={project.isCoWorker} />
+          </div>
 
           <p
             className="text-sm mt-1 leading-relaxed"

@@ -3,6 +3,7 @@
 import DashboardShell from "@/components/layout/DashboardShell";
 import { Search, Filter, Users, Calendar, Clock, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { CoWorkerBadge } from "@/components/project/ProjectUI";
 import { useState, useEffect } from "react";
 
 interface Project {
@@ -64,7 +65,10 @@ function ProjectCard({ project }: { project: Project }) {
           <h3 className="text-sm font-bold text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--primary)] transition-colors">
             {project.title}
           </h3>
-          <StatusBadge status={project.status} />
+          <div className="flex flex-col items-end gap-1">
+            <StatusBadge status={project.status} />
+            <CoWorkerBadge show={project.isCoWorker} />
+          </div>
         </div>
 
         <p className="text-xs text-[var(--text-muted)] line-clamp-2 mb-4 leading-relaxed">

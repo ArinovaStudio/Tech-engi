@@ -6,6 +6,7 @@ import DashboardShell from "@/components/layout/DashboardShell";
 import TabContent from "@/components/project/TabContent";
 import { Loader2, ArrowLeft, UserPlus } from "lucide-react";
 import Link from "next/link";
+import { CoWorkerBadge } from "@/components/project/ProjectUI";
 import InviteEngineerModal from "@/components/clients/InviteEngineerModal";
 
 const ADMIN_TABS = ["Overview", "Tasks", "Milestones", "Credentials", "Assets", "Report Issue", "Chat", "Payout"];
@@ -117,7 +118,10 @@ export default function ProjectDetailPage() {
     <DashboardShell>
       <div>
         {/* Project Header */}
-        <h1 className="text-lg font-bold text-[var(--text-primary)] pb-4">{project.title}</h1>
+        <div className="flex items-center gap-2 flex-wrap pb-4">
+          <h1 className="text-lg font-bold text-[var(--text-primary)]">{project.title}</h1>
+          <CoWorkerBadge show={project.isCoWorker} />
+        </div>
 
         <TabBar tabs={tabs} active={activeTab} setActive={setActiveTab} onInvite={() => setShowInviteModal(true)} />
 

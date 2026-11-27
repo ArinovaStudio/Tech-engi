@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 
 const MIN_BUDGET = 2000;
 
-export function HireEngineerModal({ onClose }: { onClose: () => void }) {
+export function HireEngineerModal({ onClose, initial }: { onClose: () => void; initial?: { title: string; description: string; budget: number } }) {
   const router = useRouter();
-  const [form, setForm] = useState({ title: "", description: "", budget: "", startDate: "", endDate: "" });
+  const [form, setForm] = useState({ title: initial?.title ?? "", description: initial?.description ?? "", budget: initial ? String(initial.budget) : "", startDate: "", endDate: "" });
   const [instruments, setInstruments] = useState<string[]>([]);
   const [instrInput, setInstrInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -43,6 +43,7 @@ export function HireEngineerModal({ onClose }: { onClose: () => void }) {
           instruments,
           startDate: form.startDate || undefined,
           endDate: form.endDate || undefined,
+          isCoWorker: !!initial,
         }),
       });
       const data = await res.json();

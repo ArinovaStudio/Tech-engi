@@ -15,6 +15,7 @@ export interface Project {
   createdAt: string;
   advancePaid?: boolean;
   isFinalPaymentMade?: boolean;
+  isCoWorker?: boolean;
 }
 
 export interface User {
@@ -43,6 +44,15 @@ export function StatusBadge({ status }: { status: string }) {
   );
 }
 
+export function CoWorkerBadge({ show }: { show?: boolean }) {
+  if (!show) return null;
+  return (
+    <span className="shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200">
+      Co-worker for a day
+    </span>
+  );
+}
+
 export function ProjectCard({ project }: { project: Project }) {
   const amount = project.budget;
 
@@ -54,7 +64,10 @@ export function ProjectCard({ project }: { project: Project }) {
             <h3 className="text-sm font-bold  text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--primary)] transition-colors">
               {project.title}
             </h3>
-            <StatusBadge status={project.status} />
+            <div className="flex flex-col items-end gap-1">
+              <StatusBadge status={project.status} />
+              <CoWorkerBadge show={project.isCoWorker} />
+            </div>
           </div>
 
           <p className="text-xs  text-[var(--text-muted)] line-clamp-2 mb-4 leading-relaxed">

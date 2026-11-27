@@ -2,6 +2,9 @@
 
 import DashboardShell from "@/components/layout/DashboardShell";
 import { Search, Filter, Briefcase, Calendar, Clock, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight, UserPlus } from "lucide-react";
+import { takeCoWorkerDraft, type CoWorkerDraft } from "@/lib/coworkerDraft";
+import { useAuth } from "@/hooks/useAuth";
+import { CoWorkerBadge } from "@/components/project/ProjectUI";
 import { HireEngineerModal } from "@/components/engineer/hire/HireEngineerModal";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
@@ -19,6 +22,7 @@ interface Project {
   startDate?: string;
   endDate?: string;
   createdAt: string;
+  isCoWorker?: boolean;
 }
 
 interface HiringProject {
@@ -28,6 +32,7 @@ interface HiringProject {
   advancePaid: boolean;
   status: string;
   createdAt: string;
+  isCoWorker?: boolean;
 }
 
 type Tab = "assigned" | "created";
@@ -57,7 +62,10 @@ function ProjectCard({ project }: { project: Project }) {
           <h3 className="text-sm font-bold  text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--primary)] transition-colors">
             {project.title}
           </h3>
-          <StatusBadge status={project.status} />
+          <div className="flex flex-col items-end gap-1">
+            <StatusBadge status={project.status} />
+            <CoWorkerBadge show={project.isCoWorker} />
+          </div>
         </div>
 
         <p className="text-xs  text-[var(--text-muted)] line-clamp-2 mb-4 leading-relaxed">
@@ -114,13 +122,16 @@ function HiringCard({ project }: { project: HiringProject }) {
           <h3 className="text-sm font-bold text-[var(--text-primary)] line-clamp-2 group-hover:text-[var(--primary)] transition-colors">
             {project.title}
           </h3>
-          <span
-            className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-              project.advancePaid ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"
-            }`}
-          >
-            {project.advancePaid ? "Profiles unlocked" : "Payment pending"}
-          </span>
+          <div className="flex flex-col items-end gap-1">
+            <span
+              className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                project.advancePaid ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"
+              }`}
+            >
+              {project.advancePaid ? "Profiles unlocked" : "Payment pending"}
+            </span>
+            <CoWorkerBadge show={project.isCoWorker} />
+          </div>
         </div>
 
         <p className="text-xs text-[var(--text-muted)] mb-4">
@@ -156,6 +167,13 @@ export default function EngineerProjectsPage() {
 
   const [stats, setStats] = useState({ total: 0, active: 0, completed: 0 });
   const [showHire, setShowHire] = useState(false);
+  const [coworkerDraft, setCoworkerDraft] = useState<CoWorkerDraft | null>(null);
+  const { user } = useAuth();
+  useEffect(() => {
+    if (!user?.email) return;
+    const d = takeCoWorkerDraft(user.email);
+    if (d) { setCoworkerDraft(d); setShowHire(true); }
+  }, [user?.email]);
   const [tab, setTab] = useState<Tab>("assigned");
   const [hiring, setHiring] = useState<HiringProject[]>([]);
   const [hiringLoading, setHiringLoading] = useState(true);
@@ -456,7 +474,7 @@ export default function EngineerProjectsPage() {
           </>
         ))}
       </div>
-      {showHire && <HireEngineerModal onClose={() => setShowHire(false)} />}
+      {showHire && <HireEngineerModal onClose={() => setShowHire(false)} initial={coworkerDraft ?? undefined} />}
     </DashboardShell>
   );
 }

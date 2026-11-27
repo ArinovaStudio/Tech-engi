@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { User } from "./ProjectUI";
 import DatePicker from "react-datepicker";
+import { parseLocalDate, toLocalDateString } from "@/lib/projectDates";
 import "react-datepicker/dist/react-datepicker.css";
 import { usePayment } from "@/hooks/usePayment";
 import { PromoCodeField, PromoQuoteView } from "./PromoCodeField";
@@ -167,9 +168,14 @@ export function CreateProjectModal({ onClose, onCreated, user, initial }: { onCl
               <div>
                 <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Start Date</label>
                 <DatePicker
-                  selected={form.startDate ? new Date(form.startDate) : null}
-                  onChange={(date: any) => setForm({ ...form, startDate: date ? date.toISOString().split('T')[0] : "" })}
+                  selected={form.startDate ? parseLocalDate(form.startDate) : null}
+                  onChange={(date: Date | null) => {
+                    const start = date ? toLocalDateString(date) : "";
+                    // drop an end date that would now fall before the new start
+                    setForm({ ...form, startDate: start, endDate: start && form.endDate && form.endDate < start ? "" : form.endDate });
+                  }}
                   dateFormat="dd/MM/yy"
+                  minDate={new Date()}
                   className={inputCls}
                   placeholderText="dd/mm/yy"
                   disabled={loading || isPaying}
@@ -178,10 +184,10 @@ export function CreateProjectModal({ onClose, onCreated, user, initial }: { onCl
               <div>
                 <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">End Date</label>
                 <DatePicker
-                  selected={form.endDate ? new Date(form.endDate) : null}
-                  onChange={(date: any) => setForm({ ...form, endDate: date ? date.toISOString().split('T')[0] : "" })}
+                  selected={form.endDate ? parseLocalDate(form.endDate) : null}
+                  onChange={(date: Date | null) => setForm({ ...form, endDate: date ? toLocalDateString(date) : "" })}
                   dateFormat="dd/MM/yy"
-                  minDate={form.startDate ? new Date(form.startDate) : new Date()}
+                  minDate={form.startDate ? parseLocalDate(form.startDate) : new Date()}
                   className={inputCls}
                   placeholderText="dd/mm/yy"
                   disabled={loading || isPaying}

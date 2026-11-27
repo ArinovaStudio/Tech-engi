@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { todayLocalString } from "@/lib/projectDates";
 
 const MIN_BUDGET = 2000;
 
@@ -102,12 +103,12 @@ export function HireEngineerModal({ onClose, initial }: { onClose: () => void; i
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">Start Date</label>
-                <input type="date" className={inputCls} value={form.startDate}
+                <input type="date" className={inputCls} value={form.startDate} min={todayLocalString()}
                   onChange={(e) => setForm({ ...form, startDate: e.target.value })} disabled={loading} />
               </div>
               <div>
                 <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">End Date</label>
-                <input type="date" className={inputCls} value={form.endDate} min={form.startDate || undefined}
+                <input type="date" className={inputCls} value={form.endDate} min={form.startDate || todayLocalString()}
                   onChange={(e) => setForm({ ...form, endDate: e.target.value })} disabled={loading} />
               </div>
             </div>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { AFFILIATE_COOKIE } from "@/lib/affiliate";
 
 const registerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -29,12 +30,21 @@ export async function POST(req: NextRequest) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const refCode = req.cookies.get(AFFILIATE_COOKIE)?.value?.trim().toUpperCase();
+    const refLink = refCode
+      ? await prisma.affiliateLink.findFirst({
+          where: { code: refCode, isActive: true },
+          select: { id: true },
+        })
+      : null;
+
     await prisma.user.create({
       data: { 
         name, 
         email, 
         password: hashedPassword,
-        role 
+        role,
+        ...(refLink ? { referredByLinkId: refLink.id } : {}),
       }
     });
 

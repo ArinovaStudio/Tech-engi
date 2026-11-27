@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
+import { creditAffiliateCommission } from "@/lib/affiliate";
 import sendEmail from "@/lib/email";
 import { projectCompletedEngineerTemplate } from "@/lib/templates";
 
@@ -52,6 +53,8 @@ export async function POST(request: NextRequest) {
             where: { id: transaction.id },
             data: { status: "SUCCESS", payuPaymentId: mihpayid, completedAt: new Date() },
         });
+
+        await creditAffiliateCommission(tx, transaction);
 
         if (transaction.type === "ADVANCE_PAYMENT") {
             if (transaction.promoCodeId) {

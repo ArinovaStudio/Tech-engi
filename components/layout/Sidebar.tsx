@@ -6,7 +6,7 @@ import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, CreditCard, Users, MessageSquare, LogOut, ChevronLeft, ChevronRight,
   User, UserKeyIcon, FolderKanban, Presentation, Lightbulb, FileUp, Handshake, Bug, Paperclip, Send,
-  Headset, Tag
+  Headset, Tag, Link2
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { dashboardTourSteps } from "@/config/dashboardTourSteps";
@@ -30,6 +30,7 @@ const ADMIN_NAV: NavItem[] = [
   { label: "Invitations Management", icon: <Send size={20} />, href: "/admin/invitations-management" },
   { label: "Leads", icon: <Headset size={20} />, href: "/admin/leads" },
   { label: "Promo Codes", icon: <Tag size={20} />, href: "/admin/promo-codes" },
+  { label: "Affiliate Links", icon: <Link2 size={20} />, href: "/admin/affiliate-links" },
   { label: "Message", icon: <MessageSquare size={20} />, href: "/admin/message" },
 ];
 
@@ -39,6 +40,7 @@ const CLIENT_NAV: NavItem[] = [
   { label: "Report Issue", icon: <Bug size={20} />, href: "/client/reportissue" },
   { label: "Assets", icon: <Paperclip size={20} />, href: "/client/assets" },
   { label: "Payout", icon: <CreditCard size={20} />, href: "/client/account" },
+  { label: "Affiliate", icon: <Link2 size={20} />, href: "/client/affiliate" },
   { label: "Profile", icon: <User size={20} />, href: "/client/profile" },
 ];
 
@@ -47,6 +49,7 @@ const ENGINEER_NAV: NavItem[] = [
   { label: "Projects", icon: <FolderKanban size={20} />, href: "/engineer/project" },
   { label: "Message", icon: <MessageSquare size={20} />, href: "/engineer/message" },
   { label: "Payout", icon: <CreditCard size={20} />, href: "/engineer/payout" },
+  { label: "Affiliate", icon: <Link2 size={20} />, href: "/engineer/affiliate" },
   { label: "Profile", icon: <User size={20} />, href: "/engineer/profile" },
 ];
 
@@ -61,6 +64,8 @@ function getSidebarDescription(label: string): string {
     "Projects": "View and manage all projects assigned to you.",
     "Client Management": "View and manage all client accounts on the platform.",
     "Engineer Management": "View and manage all engineer accounts and assignments.",
+    "Affiliate Links": "Generate referral links for clients or engineers and set their commission.",
+    "Affiliate": "Share your referral link, track earnings and withdraw your balance.",
     "Promo Codes": "Create and manage percentage discounts for client advance payments.",
     "Invitations Management": "Send and track invitations for new clients or engineers joining the platform.",
   };

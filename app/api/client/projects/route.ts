@@ -1,3 +1,4 @@
+import { validateNewProjectDates } from "@/lib/projectDates";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getClient } from "@/lib/auth";
@@ -162,11 +163,9 @@ export async function POST(req: NextRequest) {
     const { title, description, budget, instruments, startDate, endDate, isCoWorker } =
       validation.data;
 
-    if (startDate && endDate && startDate > endDate) {
-      return NextResponse.json(
-        { success: false, message: "Start date must be before end date" },
-        { status: 400 }
-      );
+    const dateError = validateNewProjectDates(startDate, endDate);
+    if (dateError) {
+      return NextResponse.json({ success: false, message: dateError }, { status: 400 });
     }
 
     const newProject = await prisma.project.create({

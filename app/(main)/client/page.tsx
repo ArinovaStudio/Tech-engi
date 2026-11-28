@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { Loader, AlertCircle, Filter, Search, Calendar, Plus, UserPlus } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import ClientOverview from '@/components/clients/analytics/ClientOverview';
@@ -8,6 +8,7 @@ import LatestUpdates from '@/components/clients/analytics/LatestUpdates';
 import RiskBlockage from '@/components/clients/analytics/RiskBlockage';
 import Milestones from '@/components/clients/analytics/Milestones';
 import BudgetAndDocs from '@/components/clients/analytics/BudgetAndDocs';
+import PaymentStatus from '@/components/clients/analytics/PaymentStatus';
 import { takeCoWorkerDraft, type CoWorkerDraft } from "@/lib/coworkerDraft";
 import { CreateProjectModal } from '@/components/project/CreateProjectModal';
 import { CoWorkerBadge } from '@/components/project/ProjectUI';
@@ -78,6 +79,7 @@ const ProjectAnalyticsView = ({ projectAnalytics, projectId, setShowProjects, us
           <Milestones milestones={projectAnalytics?.milestones} />
         </div>
       </div>
+      <PaymentStatus data={projectAnalytics?.paymentStatus} />
       <BudgetAndDocs data={projectAnalytics?.budget} tasks={projectAnalytics?.projects} projects={projectAnalytics?.projects} />
 
       <InviteEngineerModal
@@ -146,6 +148,43 @@ const ClientAnalyticsDashboard = () => {
       })
       .finally(() => setLoading(false));
   }, [debouncedSearch, projectId, showProjects, user?.id]);
+
+  // Silent background refresh (no spinner, no navigation changes) so payment
+  // status, milestones and amounts update by themselves.
+  const refreshQuietly = useCallback(async () => {
+    if (!user?.id) return;
+    const url = projectId && !showProjects
+      ? `/api/client/analytics?projectId=${projectId}`
+      : `/api/client/analytics?search=${debouncedSearch}`;
+    try {
+      const res = await fetch(url, { cache: 'no-store' }).then(r => r.json());
+      if (!res.success) return;
+      if (projectId && !showProjects) setProjectAnalytics(res.data);
+      else setProjectsList(res.projects || []);
+    } catch {
+      // keep showing the last known data
+    }
+  }, [user?.id, projectId, showProjects, debouncedSearch]);
+
+  // Poll quickly while a payment is expected to land, slowly otherwise.
+  const expectingPayment = projectId && !showProjects
+    ? !!projectAnalytics?.paymentStatus?.awaitingPayment
+    : projectsList.some(p => p.status === 'AWAITING_FINAL_PAYMENT' || !p.advancePaid);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const run = () => { if (document.visibilityState === 'visible') void refreshQuietly(); };
+    const interval = setInterval(run, expectingPayment ? 4000 : 30000);
+    window.addEventListener('focus', run);
+    window.addEventListener('payment-completed', run);
+    document.addEventListener('visibilitychange', run);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', run);
+      window.removeEventListener('payment-completed', run);
+      document.removeEventListener('visibilitychange', run);
+    };
+  }, [user?.id, refreshQuietly, expectingPayment]);
 
   const filteredProjects = projectsList.filter(p => {
     const matchSearch = p.title?.toLowerCase().includes(searchTerm.toLowerCase()) || p.description?.toLowerCase().includes(searchTerm.toLowerCase());

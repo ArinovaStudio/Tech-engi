@@ -344,6 +344,8 @@ model PromoCode {
   code         String                @unique
   percentage   Int
   isActive     Boolean               @default(true)
+  expiresAt    DateTime?
+  usageLimit   Int?
   createdById  String
   createdAt    DateTime              @default(now())
   updatedAt    DateTime              @updatedAt

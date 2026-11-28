@@ -5,7 +5,7 @@ import { Download, FileText, Receipt, Wallet, ArrowDownCircle } from 'lucide-rea
 const BudgetAndDocs = ({ data, tasks, projects, }: { data: any; tasks: any[]; projects: any[]; }) => {
   if (!data) return null;
 
-  const { paidAmount = 0, remainingAmount = 0, totalBudget = 0, docs = [] } = data;
+  const { paidAmount = 0, promoDiscount = 0, remainingAmount = 0, totalBudget = 0, docs = [] } = data;
 
   const findDoc = (pattern: string) => docs.find((d: any) => d.title.toLowerCase().includes(pattern.toLowerCase()));
   const scopeDoc = findDoc('scope');
@@ -15,7 +15,7 @@ const BudgetAndDocs = ({ data, tasks, projects, }: { data: any; tasks: any[]; pr
   const openDoc = (url: string) => window.open(url, '_blank');
   const circumference = +(2 * Math.PI * 80).toFixed(1);
 
-  const paidPercentage = totalBudget > 0 ? Math.round((paidAmount / totalBudget) * 100) : 0;
+  const paidPercentage = totalBudget > 0 ? Math.round(((paidAmount + promoDiscount) / totalBudget) * 100) : 0;
   const remainingPercentage = 100 - paidPercentage;
   const project = projects?.[0]; // Assuming we're looking at the first project for transactions
   const latestTransaction =
@@ -97,73 +97,72 @@ const BudgetAndDocs = ({ data, tasks, projects, }: { data: any; tasks: any[]; pr
 
         {/* Payment History */}
         <div id="payment-history" className="h-[450px] flex flex-col">
-  <h3 className="font-semibold text-gray-900 dark:text-white shrink-0">
-    Payment History
-  </h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white shrink-0">
+            Payment History
+          </h3>
 
-  {project?.transactions?.length ? (
-    <div className="mt-3 flex-1 overflow-y-auto pr-2 space-y-3">
-      {project.transactions.map((transaction: any) => (
-        <div
-          key={transaction.id}
-          className="group flex items-center justify-between rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-4 transition-all duration-200 hover:shadow-md hover:border-[#FFAE58]/40"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-[#FFAE58]/15 flex items-center justify-center">
-              <Receipt className="w-5 h-5 text-[#FFAE58]" />
+          {project?.transactions?.length ? (
+            <div className="mt-3 flex-1 overflow-y-auto pr-2 space-y-3">
+              {project.transactions.map((transaction: any) => (
+                <div
+                  key={transaction.id}
+                  className="group flex items-center justify-between rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-4 transition-all duration-200 hover:shadow-md hover:border-[#FFAE58]/40"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-xl bg-[#FFAE58]/15 flex items-center justify-center">
+                      <Receipt className="w-5 h-5 text-[#FFAE58]" />
+                    </div>
+
+                    <div>
+                      <p className="font-semibold text-gray-900 dark:text-white">
+                        ₹{transaction.amount.toLocaleString()}
+                      </p>
+
+                      <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        {transaction.type.replaceAll("_", " ")}
+                      </p>
+
+                      <p className="text-xs text-gray-400 mt-1 dark:text-slate-500">
+                        #{transaction.id.slice(0, 8)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <span
+                      className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${transaction.status === "SUCCESS"
+                          ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                          : transaction.status === "FAILED"
+                            ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                            : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+                        }`}
+                    >
+                      {transaction.status}
+                    </span>
+
+                    <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                      {new Date(transaction.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center">
+              <div className="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                <Receipt className="w-6 h-6 text-gray-400 dark:text-slate-500" />
+              </div>
 
-            <div>
-              <p className="font-semibold text-gray-900 dark:text-white">
-                ₹{transaction.amount.toLocaleString()}
+              <p className="mt-3 font-medium text-gray-900 dark:text-white">
+                No transactions yet
               </p>
 
-              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                {transaction.type.replaceAll("_", " ")}
-              </p>
-
-              <p className="text-xs text-gray-400 mt-1 dark:text-slate-500">
-                #{transaction.id.slice(0, 8)}
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Payment history will appear here
               </p>
             </div>
-          </div>
-
-          <div className="text-right">
-            <span
-              className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
-                transaction.status === "SUCCESS"
-                  ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                  : transaction.status === "FAILED"
-                  ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                  : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
-              }`}
-            >
-              {transaction.status}
-            </span>
-
-            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-              {new Date(transaction.createdAt).toLocaleDateString()}
-            </p>
-          </div>
+          )}
         </div>
-      ))}
-    </div>
-  ) : (
-    <div className="flex-1 flex flex-col items-center justify-center">
-      <div className="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-        <Receipt className="w-6 h-6 text-gray-400 dark:text-slate-500" />
-      </div>
-
-      <p className="mt-3 font-medium text-gray-900 dark:text-white">
-        No transactions yet
-      </p>
-
-      <p className="text-sm text-gray-500 dark:text-gray-400">
-        Payment history will appear here
-      </p>
-    </div>
-  )}
-</div>
 
         {/* Latest Invoice */}
         {/* <div className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 flex justify-between items-center flex-1">
@@ -192,6 +191,9 @@ const BudgetAndDocs = ({ data, tasks, projects, }: { data: any; tasks: any[]; pr
               <div>
                 <p className="text-sm">Paid amount</p>
                 <h3 className="text-xl font-bold">₹{paidAmount.toLocaleString()}</h3>
+                {promoDiscount > 0 && (
+                  <p className="text-xs opacity-90">+ ₹{promoDiscount.toLocaleString()} promo discount applied</p>
+                )}
               </div>
               <span className="bg-white rounded-full bg-opacity-80 p-1 dark:bg-card">
                 <Receipt className="w-6 h-6 text-purple-600" />

@@ -10,6 +10,11 @@ const createSchema = z.object({
     "Use 3–32 letters, numbers, hyphens, or underscores.",
   ),
   percentage: z.number().int().min(1).max(99),
+  expiresAt: z.coerce
+    .date()
+    .refine((d) => d.getTime() > Date.now(), "Expiry date must be in the future.")
+    .nullish(),
+  usageLimit: z.number().int().min(1).max(1_000_000).nullish(),
 });
 
 export async function GET() {
@@ -28,6 +33,8 @@ export async function GET() {
         code: true,
         percentage: true,
         isActive: true,
+        expiresAt: true,
+        usageLimit: true,
         createdAt: true,
         createdBy: { select: { name: true, email: true } },
         _count: { select: { redemptions: true } },
@@ -74,7 +81,10 @@ export async function POST(request: NextRequest) {
   try {
     const promoCode = await prisma.promoCode.create({
       data: {
-        ...validation.data,
+        code: validation.data.code,
+        percentage: validation.data.percentage,
+        expiresAt: validation.data.expiresAt ?? null,
+        usageLimit: validation.data.usageLimit ?? null,
         createdById: user.id,
       },
       select: {
@@ -82,6 +92,8 @@ export async function POST(request: NextRequest) {
         code: true,
         percentage: true,
         isActive: true,
+        expiresAt: true,
+        usageLimit: true,
         createdAt: true,
       },
     });
@@ -110,9 +122,15 @@ const updateSchema = z.object({
   id: z.string().uuid(),
   percentage: z.number().int().min(1).max(99).optional(),
   isActive: z.boolean().optional(),
+  expiresAt: z.coerce.date().nullable().optional(),
+  usageLimit: z.number().int().min(1).max(1_000_000).nullable().optional(),
 }).refine(
-  (value) => value.percentage !== undefined || value.isActive !== undefined,
-  "Provide a percentage or active state to update.",
+  (value) =>
+    value.percentage !== undefined ||
+    value.isActive !== undefined ||
+    value.expiresAt !== undefined ||
+    value.usageLimit !== undefined,
+  "Provide at least one field to update.",
 );
 
 export async function PATCH(request: NextRequest) {
@@ -152,6 +170,8 @@ export async function PATCH(request: NextRequest) {
         code: true,
         percentage: true,
         isActive: true,
+        expiresAt: true,
+        usageLimit: true,
       },
     });
     return NextResponse.json({ success: true, promoCode });

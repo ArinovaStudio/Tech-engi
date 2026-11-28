@@ -9,6 +9,8 @@ interface PromoCode {
   code: string;
   percentage: number;
   isActive: boolean;
+  expiresAt: string | null;
+  usageLimit: number | null;
   createdAt: string;
   createdBy: { name: string | null; email: string };
   _count: { redemptions: number };
@@ -18,6 +20,8 @@ export default function PromoCodesPage() {
   const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
   const [code, setCode] = useState("");
   const [percentage, setPercentage] = useState("10");
+  const [expiryDate, setExpiryDate] = useState("");
+  const [usageLimit, setUsageLimit] = useState("");
   const [editingPercentage, setEditingPercentage] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -61,7 +65,13 @@ export default function PromoCodesPage() {
       const response = await fetch("/api/admin/promo-codes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code, percentage: Number(percentage) }),
+        body: JSON.stringify({
+          code,
+          percentage: Number(percentage),
+          // End of the chosen day in the admin's local time
+          expiresAt: expiryDate ? new Date(`${expiryDate}T23:59:59.999`).toISOString() : null,
+          usageLimit: usageLimit ? Number(usageLimit) : null,
+        }),
       });
       const data = await response.json();
       if (!response.ok || !data.success) {
@@ -69,6 +79,8 @@ export default function PromoCodesPage() {
         return;
       }
       setCode("");
+      setExpiryDate("");
+      setUsageLimit("");
       setNotice(`${data.promoCode.code} created.`);
       await loadPromoCodes();
     } catch {
@@ -130,7 +142,7 @@ export default function PromoCodesPage() {
 
         <form
           onSubmit={createPromoCode}
-          className="grid gap-4 rounded-xl border border-[var(--border)] bg-white p-5 dark:bg-card sm:grid-cols-[1fr_180px_auto]"
+          className="grid gap-4 rounded-xl border border-[var(--border)] bg-white p-5 dark:bg-card sm:grid-cols-2 lg:grid-cols-[1fr_150px_170px_150px_auto]"
         >
           <label className="text-sm font-medium text-[var(--text-secondary)]">
             Code
@@ -163,6 +175,28 @@ export default function PromoCodesPage() {
               <span className="text-xs text-[var(--text-muted)]">%</span>
             </span>
           </label>
+          <label className="text-sm font-medium text-[var(--text-secondary)]">
+            Expiry date <span className="text-xs font-normal text-[var(--text-muted)]">(optional)</span>
+            <input
+              type="date"
+              value={expiryDate}
+              min={new Date().toISOString().slice(0, 10)}
+              onChange={(event) => setExpiryDate(event.target.value)}
+              className="mt-1.5 w-full rounded-lg border border-[var(--border)] bg-transparent px-3 py-2 text-sm text-[var(--text-primary)] outline-none focus:ring-2 focus:ring-orange-200"
+            />
+          </label>
+          <label className="text-sm font-medium text-[var(--text-secondary)]">
+            Usage limit <span className="text-xs font-normal text-[var(--text-muted)]">(optional)</span>
+            <input
+              type="number"
+              min={1}
+              step={1}
+              value={usageLimit}
+              onChange={(event) => setUsageLimit(event.target.value)}
+              placeholder="Unlimited"
+              className="mt-1.5 w-full rounded-lg border border-[var(--border)] bg-transparent px-3 py-2 text-sm text-[var(--text-primary)] outline-none focus:ring-2 focus:ring-orange-200"
+            />
+          </label>
           <button
             type="submit"
             disabled={saving || !code.trim()}
@@ -171,8 +205,9 @@ export default function PromoCodesPage() {
             {saving ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />}
             Create code
           </button>
-          <p className="text-xs text-[var(--text-muted)] sm:col-span-3">
+          <p className="text-xs text-[var(--text-muted)] sm:col-span-2 lg:col-span-5">
             Use 3–32 letters, numbers, hyphens, or underscores. Discounts must be between 1% and 99%.
+            The code stops working at the end of the expiry date or once the usage limit is reached; each client can still use a code only once.
           </p>
         </form>
 
@@ -203,7 +238,7 @@ export default function PromoCodesPage() {
               {promoCodes.map((promo) => (
                 <div
                   key={promo.id}
-                  className="grid gap-4 px-5 py-4 md:grid-cols-[minmax(0,1fr)_150px_120px_auto] md:items-center"
+                  className="grid gap-4 px-5 py-4 md:grid-cols-[minmax(0,1fr)_150px_170px_auto] md:items-center"
                 >
                   <div className="min-w-0">
                     <p className="truncate font-mono font-bold text-[var(--text-primary)]">{promo.code}</p>
@@ -244,8 +279,21 @@ export default function PromoCodesPage() {
                       </button>
                     )}
                   </label>
-                  <div className="text-xs text-[var(--text-muted)]">
-                    {promo._count.redemptions} redemption{promo._count.redemptions === 1 ? "" : "s"}
+                  <div className="space-y-0.5 text-xs text-[var(--text-muted)]">
+                    <p>
+                      {promo._count.redemptions}
+                      {promo.usageLimit !== null ? ` / ${promo.usageLimit}` : ""} used
+                      {promo.usageLimit !== null && promo._count.redemptions >= promo.usageLimit && (
+                        <span className="ml-1.5 font-semibold text-red-600">Full</span>
+                      )}
+                    </p>
+                    <p>
+                      {promo.expiresAt
+                        ? new Date(promo.expiresAt).getTime() < Date.now()
+                          ? <span className="font-semibold text-red-600">Expired {new Date(promo.expiresAt).toLocaleDateString()}</span>
+                          : `Expires ${new Date(promo.expiresAt).toLocaleDateString()}`
+                        : "No expiry"}
+                    </p>
                   </div>
                   <button
                     type="button"

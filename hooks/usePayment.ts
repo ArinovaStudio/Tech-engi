@@ -33,7 +33,11 @@ export function usePayment() {
         user: options.user,
         description: options.description,
         promoCode: options.promoCode,
-        onSuccess: options.onSuccess,
+        onSuccess: () => {
+          // Lets any mounted dashboard refresh immediately.
+          window.dispatchEvent(new Event("payment-completed"));
+          options.onSuccess?.();
+        },
         onError: options.onError,
         onDismiss: options.onDismiss,
       });

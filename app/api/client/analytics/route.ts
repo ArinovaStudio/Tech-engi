@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getClient } from "@/lib/auth";
+import { getPaymentStatus } from "@/lib/paymentStatus";
 
 export async function GET(req: NextRequest) {
   try {
@@ -25,7 +26,7 @@ export async function GET(req: NextRequest) {
           tickets: { orderBy: { createdAt: "desc" } },
           transactions: { where: { status: "SUCCESS" } },
           resources: { where: { type: "FILE" } },
-          projectTasks : true,
+          projectTasks: true,
           kanbanTasks: true,
         }
       });
@@ -33,13 +34,17 @@ export async function GET(req: NextRequest) {
       if (!project) return NextResponse.json({ success: false, message: "Project not found" }, { status: 404 });
 
       let paidAmount = 0;
+      let promoDiscount = 0;
       project.transactions.forEach(t => {
-        if (t.type === "ADVANCE_PAYMENT" || t.type === "FINAL_PAYMENT") paidAmount += t.amount;
+        if (t.type === "ADVANCE_PAYMENT" || t.type === "FINAL_PAYMENT") {
+          paidAmount += t.amount;
+          promoDiscount += t.promoDiscount ?? 0;
+        }
       });
-
       return NextResponse.json({
         success: true,
         data: {
+          paymentStatus: await getPaymentStatus(project),
           overview: {
             status: project.status,
             name: project.title,
@@ -60,7 +65,8 @@ export async function GET(req: NextRequest) {
           budget: {
             totalBudget: project.budget,
             paidAmount,
-            remainingAmount: project.budget - paidAmount,
+            promoDiscount,
+            remainingAmount: Math.max(0, project.budget - paidAmount - promoDiscount),
             docs: project.resources
           },
           preview: {
@@ -72,7 +78,7 @@ export async function GET(req: NextRequest) {
     }
 
     const projects = await prisma.project.findMany({
-      where: { 
+      where: {
         clientId,
         title: { contains: search, mode: "insensitive" }
       },

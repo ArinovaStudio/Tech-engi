@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getClient } from "@/lib/auth";
+import { getProjectOwner } from "@/lib/auth";
 import {
   getPromoQuote,
   PromoCodeValidationError,
 } from "@/lib/promoCodes";
 
 export async function POST(request: NextRequest) {
-  const { user, error } = await getClient();
+  const { user, error } = await getProjectOwner();
   if (error || !user) {
     return NextResponse.json(
       { success: false, message: error || "Unauthorized" },

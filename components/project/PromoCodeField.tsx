@@ -89,6 +89,12 @@ export function PromoCodeField({
                 maximumFractionDigits: 2,
               })}
               )
+              <span className="block text-xs">
+                New advance to pay: <strong>₹{promo.amountDue.toLocaleString("en-IN", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}</strong>
+              </span>
             </span>
           </span>
           <button

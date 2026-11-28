@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
-import { creditAffiliateCommission } from "@/lib/affiliate";
-import sendEmail from "@/lib/email";
-import { projectCompletedEngineerTemplate } from "@/lib/templates";
+import { fulfillPayment } from "@/lib/paymentFulfillment";
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,7 +22,7 @@ export async function POST(request: NextRequest) {
 
     const transaction = await prisma.transaction.findUnique({
       where: { payuTransactionId: txnid },
-      include: { project: { include: { engineer: { include: { user: true } } } } }
+      select: { id: true, projectId: true, amount: true, status: true }
     });
 
     if (!transaction){
@@ -32,7 +30,6 @@ export async function POST(request: NextRequest) {
     }
 
     const projectId = transaction.projectId;
-    const project = transaction.project;
 
     const targetBaseUrl = redirectParam || `/client/project/${projectId}`;
 
@@ -45,83 +42,8 @@ export async function POST(request: NextRequest) {
 
     if (calculatedHash === payuHash && Number(amount).toFixed(2) === transaction.amount.toFixed(2) && status === "success") {
       
-      if (transaction.status === "PENDING") {
-        await prisma.$transaction(async (tx) => {
-
-        // Mark transaction as successful
-        await tx.transaction.update({
-            where: { id: transaction.id },
-            data: { status: "SUCCESS", payuPaymentId: mihpayid, completedAt: new Date() },
-        });
-
-        await creditAffiliateCommission(tx, transaction);
-
-        if (transaction.type === "ADVANCE_PAYMENT") {
-            if (transaction.promoCodeId) {
-              await tx.promoCodeRedemption.create({
-                data: {
-                  promoCodeId: transaction.promoCodeId,
-                  userId: transaction.userId,
-                  transactionId: transaction.id,
-                  status: "SUCCESS",
-                },
-              });
-            }
-            await tx.project.update({
-                where: { id: project.id },
-                data: {
-                    advancePaid: true,
-                    status: "SEARCHING",
-                },
-            });
-
-        } else if (transaction.type === "FINAL_PAYMENT") {
-            await tx.project.update({
-                where: { id: project.id },
-                data: {
-                    isFinalPaymentMade: true,
-                    status: "COMPLETED",
-                },
-            });
-
-            // Unlock resources
-            await tx.projectResource.updateMany({
-                where: { projectId: project.id, isLocked: true },
-                data: { isLocked: false },
-            });
-
-            // Create or update payout for engineer
-            if (project.engineerId) {
-            const payoutAmount = project.budget * 0.7;
-            
-            const existingPayout = await tx.transaction.findFirst({
-                where: {
-                projectId: project.id,
-                type: "PAYOUT_ENGINEER",
-                userId: project.engineer!.userId
-                }
-            });
-
-            if (!existingPayout) {
-                await tx.transaction.create({
-                data: {
-                    projectId: project.id,
-                    userId: project.engineer!.userId,
-                    amount: payoutAmount,
-                    type: "PAYOUT_ENGINEER",
-                    status: "PENDING",
-                },
-                });
-            }
-            }
-        }
-        });
-
-        if (transaction.type === "FINAL_PAYMENT" && project.engineer?.user.email) {
-          const html = projectCompletedEngineerTemplate(project.title, project.budget * 0.7);
-          sendEmail(project.engineer.user.email, `Project Completed: ${project.title}`, html);
-        }
-      }
+      // Idempotent: the PayU webhook may already have confirmed this payment.
+      await fulfillPayment(transaction.id, { payuPaymentId: mihpayid });
 
       const successUrl = new URL(targetBaseUrl, baseUrl);
       successUrl.searchParams.set("payment", "success");

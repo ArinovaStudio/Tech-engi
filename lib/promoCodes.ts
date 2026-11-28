@@ -32,10 +32,29 @@ export async function getPromoQuote(
 
   const promoCode = await prisma.promoCode.findUnique({
     where: { code },
-    select: { id: true, code: true, percentage: true, isActive: true },
+    select: {
+      id: true,
+      code: true,
+      percentage: true,
+      isActive: true,
+      expiresAt: true,
+      usageLimit: true,
+      _count: { select: { redemptions: true } },
+    },
   });
   if (!promoCode || !promoCode.isActive) {
     throw new PromoCodeValidationError("This promo code is invalid or inactive.");
+  }
+  if (promoCode.expiresAt && promoCode.expiresAt.getTime() < Date.now()) {
+    throw new PromoCodeValidationError("This promo code has expired.");
+  }
+  if (
+    promoCode.usageLimit !== null &&
+    promoCode._count.redemptions >= promoCode.usageLimit
+  ) {
+    throw new PromoCodeValidationError(
+      "This promo code has reached its usage limit.",
+    );
   }
 
   const pendingAdvance = await prisma.transaction.findFirst({

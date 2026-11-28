@@ -51,9 +51,24 @@ export default function ClientAccountPage() {
     if (user) fetchData();
   }, [user]);
 
-  async function fetchData() {
+  // Keep payments, pending amounts and history current without a manual refresh.
+  useEffect(() => {
+    if (!user) return;
+    const run = () => { if (document.visibilityState === "visible") void fetchData(true); };
+    const interval = setInterval(run, pendingProjects.length > 0 ? 5000 : 30000);
+    window.addEventListener("focus", run);
+    window.addEventListener("payment-completed", run);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", run);
+      window.removeEventListener("payment-completed", run);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, pendingProjects.length]);
+
+  async function fetchData(silent = false) {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const historyRes = await fetch("/api/payout/history");
 
       if (historyRes.ok) {

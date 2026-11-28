@@ -22,6 +22,7 @@ import {
 import DashboardShell from "@/components/layout/DashboardShell";
 import { useAuth } from "@/hooks/useAuth";
 import { usePayment } from "@/hooks/usePayment";
+import { PromoCodeField, PromoQuoteView } from "@/components/project/PromoCodeField";
 
 interface PreviewCard {
   id: string;
@@ -72,6 +73,7 @@ export default function HireEngineerPage() {
   const { processPayment, loading: paying } = usePayment();
   const [data, setData] = useState<HireData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [promo, setPromo] = useState<PromoQuoteView | null>(null);
   const matchStarted = useRef(false);
 
   const startMatching = async () => {
@@ -131,6 +133,7 @@ export default function HireEngineerPage() {
       redirectPath: `/engineer/hire/${projectId}`,
       user: { name: user?.name, email: user?.email },
       description: "Advance Payment (25%)",
+      promoCode: promo?.code,
       onSuccess: async () => {
         await startMatching();
         await load();
@@ -150,6 +153,10 @@ export default function HireEngineerPage() {
       </DashboardShell>
     );
   }
+
+  const payableAmount = data.preview
+    ? promo?.amountDue ?? data.preview.advanceAmount
+    : 0;
 
   const remainingCount = data.preview
     ? Math.max(0, data.preview.profileCount - data.preview.cards.length)
@@ -307,15 +314,29 @@ export default function HireEngineerPage() {
                 )}
               </div>
 
+              {/* Promo code */}
+              <div className="px-6 pt-4 bg-black/[0.03] dark:bg-white/[0.02] border-t border-[var(--border)]">
+                <PromoCodeField
+                  budget={data.project.budget}
+                  disabled={paying}
+                  onPromoChange={setPromo}
+                />
+              </div>
+
               {/* Balanced Payment Footer */}
-              <div className="px-6 py-4 bg-black/[0.03] dark:bg-white/[0.02] border-t border-[var(--border)] flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="px-6 py-4 bg-black/[0.03] dark:bg-white/[0.02] flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="text-center sm:text-left">
                   <p className="text-xs text-[var(--text-muted)]">
                     Advance Deposit (25% of {inr(data.project.budget)})
                   </p>
                   <div className="flex items-baseline justify-center sm:justify-start gap-2 mt-0.5">
+                    {promo && (
+                      <span className="text-sm text-[var(--text-muted)] line-through">
+                        {inr(data.preview.advanceAmount)}
+                      </span>
+                    )}
                     <span className="text-xl font-bold text-[var(--text-primary)]">
-                      {inr(data.preview.advanceAmount)}
+                      {inr(payableAmount)}
                     </span>
                     <span className="text-[11px] text-[var(--text-muted)] flex items-center gap-1">
                       <ShieldCheck size={13} className="text-emerald-500" />
@@ -330,7 +351,7 @@ export default function HireEngineerPage() {
                   className="w-full sm:w-auto px-6 py-3 bg-[var(--primary)] text-zinc-950 rounded-lg text-sm font-semibold hover:opacity-90 disabled:opacity-60 transition-opacity flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {paying && <Loader2 size={16} className="animate-spin" />}
-                  Unlock Profiles &amp; Pay {inr(data.preview.advanceAmount)}
+                  Unlock Profiles &amp; Pay {inr(payableAmount)}
                 </button>
               </div>
             </div>

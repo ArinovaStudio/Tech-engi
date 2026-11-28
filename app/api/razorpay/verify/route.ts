@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getProjectOwner } from "@/lib/auth";
 import crypto from "crypto";
-import { creditAffiliateCommission } from "@/lib/affiliate";
-import sendEmail from "@/lib/email";
-import { advancePaymentSuccessTemplate, projectCompletedEngineerTemplate } from "@/lib/templates";
+import { fulfillPayment } from "@/lib/paymentFulfillment";
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,137 +26,21 @@ export async function POST(req: NextRequest) {
 
     const transaction = await prisma.transaction.findUnique({
       where: { razorpayOrderId: razorpay_order_id },
-      include: {
-        project: {
-          include: {
-            engineer: { include: { user: true } }, client: { include: { user: true } }
-          },
-        },
-      },
+      select: { id: true, userId: true },
     });
 
-    if (!transaction) {
-      return NextResponse.json({ success: false, message: "Transaction not found" }, { status: 404 });
-    }
-    if (transaction.userId !== user.id) {
+    if (!transaction || transaction.userId !== user.id) {
       return NextResponse.json({ success: false, message: "Transaction not found" }, { status: 404 });
     }
 
-    if (transaction.status !== "PENDING") {
-      return NextResponse.json({ success: false, message: "Transaction already processed" }, { status: 400 });
-    }
-
-    const project = transaction.project;
-    const adminsToNotify: { email: string }[] = [];
-    let engineerEmailHtml = "";
-
-    await prisma.$transaction(async (tx) => {
-
-      // Mark transaction as successful
-      await tx.transaction.update({
-        where: { id: transaction.id },
-        data: {
-          status: "SUCCESS",
-          razorpayPaymentId: razorpay_payment_id,
-          razorpaySignature: razorpay_signature,
-          completedAt: new Date(),
-        },
-      });
-
-      await creditAffiliateCommission(tx, transaction);
-
-      if (transaction.type === "ADVANCE_PAYMENT") {
-        if (transaction.promoCodeId) {
-          await tx.promoCodeRedemption.create({
-            data: {
-              promoCodeId: transaction.promoCodeId,
-              userId: transaction.userId,
-              transactionId: transaction.id,
-              status: "SUCCESS",
-            },
-          });
-        }
-        await tx.project.update({
-          where: { id: project.id },
-          data: {
-            advancePaid: true,
-            status: "SEARCHING",
-          },
-        });
-        // const payoutAmount = project.budget * 0.25;
-
-        const admins = await tx.user.findMany({
-          where: {
-            role: "ADMIN",
-          },
-        });
-
-        engineerEmailHtml = advancePaymentSuccessTemplate(
-          project.title,
-          project.budget * 0.25
-        );
-
-      } else if (transaction.type === "FINAL_PAYMENT") {
-        await tx.project.update({
-          where: { id: project.id },
-          data: {
-            isFinalPaymentMade: true,
-            status: "COMPLETED",
-          },
-        });
-
-        // Unlock resources
-        await tx.projectResource.updateMany({
-          where: { projectId: project.id, isLocked: true },
-          data: { isLocked: false },
-        });
-
-        // Create or update payout for engineer
-        if (project.engineerId) {
-          const payoutAmount = project.budget * 0.7;
-
-          const existingPayout = await tx.transaction.findFirst({
-            where: {
-              projectId: project.id,
-              type: "PAYOUT_ENGINEER",
-              userId: project.engineer!.userId
-            }
-          });
-
-          if (!existingPayout) {
-            await tx.transaction.create({
-              data: {
-                projectId: project.id,
-                userId: project.engineer!.userId,
-                amount: payoutAmount,
-                type: "PAYOUT_ENGINEER",
-                status: "PENDING",
-              },
-            });
-          }
-        }
-      }
+    // Idempotent: if the Razorpay webhook already confirmed this payment, this
+    // is still a success for the customer.
+    const result = await fulfillPayment(transaction.id, {
+      razorpayPaymentId: razorpay_payment_id,
+      razorpaySignature: razorpay_signature,
     });
-
-    await Promise.all(
-      adminsToNotify.map((admin) =>
-        sendEmail(
-          admin.email,
-          "Advance Payment Received",
-          engineerEmailHtml
-        )
-      )
-    );
-
-    // Send email to engineer if final payment
-    if (transaction.type === "FINAL_PAYMENT" && project.engineer?.user.email) {
-      const payoutAmount = project.budget * 0.7;
-      const engineerEmailHtml = projectCompletedEngineerTemplate(
-        project.title,
-        payoutAmount
-      );
-
-      sendEmail(project.engineer.user.email, `Project Completed: ${project.title}`, engineerEmailHtml);
+    if (result.outcome === "not_found") {
+      return NextResponse.json({ success: false, message: "Transaction not found" }, { status: 404 });
     }
 
     return NextResponse.json({ success: true, message: "Payment verified successfully" }, { status: 200 });

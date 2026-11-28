@@ -27,9 +27,15 @@ app.prepare().then(() => {
     cors: { origin: "*", methods: ["GET", "POST"] }
   });
 
+  io.engine.on("connection_error", (err: { code?: number; message?: string; context?: unknown }) => {
+    console.warn(`[socket] connection_error code=${err.code} message=${err.message}`);
+  });
+
   io.on("connection", (socket) => {
+    console.log(`[socket] connected ${socket.id} (${io.engine.clientsCount} clients)`);
 
     socket.on("user_connected", (userId: string) => {
+      socket.join(`user_${userId}`);
       if (!onlineUsers.has(userId)) {
         onlineUsers.set(userId, new Set());
       }
@@ -61,7 +67,8 @@ app.prepare().then(() => {
     registerDirectChatHandlers(io, socket);
     registerProjectChatHandlers(io, socket);
 
-    socket.on("disconnect", () => {
+    socket.on("disconnect", (reason) => {
+      console.log(`[socket] disconnected ${socket.id}: ${reason}`);
       for (const [userId, socketIds] of onlineUsers.entries()) {
         if (socketIds.has(socket.id)) {
           socketIds.delete(socket.id);

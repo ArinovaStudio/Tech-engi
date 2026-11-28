@@ -3,6 +3,8 @@ import { Send, MessageSquare, Loader2, User as UserIcon, X, CheckSquare, Trash2 
 import Image from "next/image";
 import { globalSocket } from "@/components/SocketAnnouncer";
 import MessageItem from "./MessageItem";
+import { chatFetch, chatErrorMessage, mergeMessages, SEND_FAILED, SEND_OFFLINE } from "@/lib/chat-fetch";
+import { useSocketConnected } from "@/components/useSocketConnected";
 
 export default function ChatArea({ currentUser, selectedContact, isOnline, mutateContacts }: any) {
   const [messages, setMessages] = useState<any[]>([]);
@@ -16,37 +18,82 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [historyError, setHistoryError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
+  const connected = useSocketConnected();
+  const contactId: string | undefined = selectedContact?.id;
+  const currentUserId: string | undefined = currentUser?.id;
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Fetch Initial History when contact changes
+  // Fetch Initial History when contact changes (or on Retry)
   useEffect(() => {
-    if (!selectedContact || !currentUser) return;
-    
+    if (!contactId || !currentUserId) return;
+    let cancelled = false;
+
     const fetchInitialHistory = async () => {
-      const res = await fetch(`/api/chat/direct/history/${selectedContact.id}`);
-      const data = await res.json();
-      if (data.success) {
+      setLoadingHistory(true);
+      setHistoryError(null);
+      try {
+        const data = await chatFetch(`/api/chat/direct/history/${contactId}`);
+        if (cancelled) return;
         setMessages(data.messages);
         setCursor(data.nextCursor);
         setHasMore(!!data.nextCursor);
         scrollToBottom();
 
         data.messages.forEach((msg: any) => {
-          if (msg.senderId !== currentUser.id && !msg.isRead) {
-            globalSocket.emit("mark_dm_read", { messageId: msg.id, readerId: currentUser.id });
+          if (msg.senderId !== currentUserId && !msg.isRead) {
+            globalSocket.emit("mark_dm_read", { messageId: msg.id, readerId: currentUserId });
           }
         });
+      } catch (err) {
+        if (!cancelled) setHistoryError(chatErrorMessage(err));
+      } finally {
+        if (!cancelled) setLoadingHistory(false);
       }
     };
     fetchInitialHistory();
-    globalSocket.emit("join_dm", { currentUserId: currentUser?.id, targetUserId: selectedContact.id });
-    
+    globalSocket.emit("join_dm", { currentUserId, targetUserId: contactId });
+
+    // Rooms are lost whenever the connection drops: rejoin and catch up on what we missed.
+    const handleReconnect = async () => {
+      globalSocket.emit("join_dm", { currentUserId, targetUserId: contactId });
+      try {
+        const data = await chatFetch(`/api/chat/direct/history/${contactId}`);
+        if (!cancelled) setMessages((prev) => mergeMessages(prev, data.messages));
+      } catch {
+        /* silent */
+      }
+    };
+    globalSocket.on("connect", handleReconnect);
+
     setIsSelectMode(false);
     setSelectedMessageIds([]);
     setError(null);
-  }, [selectedContact, currentUser]);
+
+    return () => {
+      cancelled = true;
+      globalSocket.off("connect", handleReconnect);
+    };
+  }, [contactId, currentUserId, reloadKey]);
+
+  // No websocket => poll so new messages still show up.
+  useEffect(() => {
+    if (connected || !contactId || !currentUserId || historyError) return;
+    const t = setInterval(async () => {
+      if (document.visibilityState !== "visible") return;
+      try {
+        const data = await chatFetch(`/api/chat/direct/history/${contactId}`);
+        setMessages((prev) => mergeMessages(prev, data.messages));
+      } catch {
+        /* silent */
+      }
+    }, 8000);
+    return () => clearInterval(t);
+  }, [connected, contactId, currentUserId, historyError]);
 
   // Load More History (Pagination)
   const handleScroll = async () => {
@@ -191,9 +238,27 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
         isPending: true
       };
       
+      const text = inputMessage.trim();
+      if (!connected) {
+        setError(SEND_OFFLINE);
+        setTimeout(() => setError(null), 6000);
+        return; // keep the text in the box
+      }
+
       setMessages(prev => [...prev, tempMessage]);
-      globalSocket.emit("send_dm", { senderId: currentUser.id, receiverId: selectedContact.id, content: inputMessage.trim() });
       scrollToBottom();
+      // The server acknowledges every send; a rejection or a timeout puts the text back instead of leaving a stuck bubble.
+      globalSocket.timeout(10000).emit(
+        "send_dm",
+        { senderId: currentUser.id, receiverId: selectedContact.id, content: text },
+        (err: Error | null, res?: { ok: boolean; message?: string }) => {
+          if (!err && res?.ok) return;
+          setMessages(prev => prev.filter(m => m.id !== tempMessage.id));
+          setInputMessage(cur => cur || text);
+          setError(res?.message || SEND_FAILED);
+          setTimeout(() => setError(null), 6000);
+        }
+      );
     }
     
     setInputMessage("");
@@ -310,6 +375,24 @@ export default function ChatArea({ currentUser, selectedContact, isOnline, mutat
         flex flex-col gap-2 sm:gap-3
       "
     >
+      {loadingHistory && (
+        <div className="flex flex-1 items-center justify-center">
+          <Loader2 className="animate-spin text-[#FFAE58]" size={22} />
+        </div>
+      )}
+
+      {historyError && !loadingHistory && (
+        <div role="alert" className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
+          <p className="text-sm text-gray-500 dark:text-slate-400">{historyError}</p>
+          <button
+            onClick={() => setReloadKey((k) => k + 1)}
+            className="rounded-lg bg-[#FFAE58] px-4 py-2 text-sm font-semibold text-slate-950 hover:opacity-90"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
       {isLoadingMore && (
         <div className="flex justify-center py-2">
           <Loader2 className="animate-spin text-gray-400 dark:text-slate-500" size={18} />

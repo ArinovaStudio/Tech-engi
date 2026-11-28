@@ -6,12 +6,18 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
+import { AUTH_ERROR } from "@/lib/auth-errors";
 
 export const authOptions: NextAuthOptions = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   adapter: PrismaAdapter(prisma) as any,
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
+  },
+  pages: {
+    signIn: "/login",
+    error: "/login",
   },
   providers: [
     GoogleProvider({
@@ -31,29 +37,25 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error("Missing email or password");
+        const email = credentials?.email?.trim().toLowerCase();
+        const password = credentials?.password;
+        if (!email || !password) {
+          throw new Error(AUTH_ERROR.MISSING);
         }
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
-          },
-          include: {
-            engineerProfile: true,
-          },
+
+        // Case-insensitive so "Name@Mail.com" finds the account registered as "name@mail.com".
+        const user = await prisma.user.findFirst({
+          where: { email: { equals: email, mode: "insensitive" } },
         });
 
-        if (!user) throw new Error("Invalid password or email");
-        if (user.isSuspended) throw new Error("Your account has been suspended.");
-        if (user.password === null) throw new Error("Password is not set, please login with Google or GitHub");
-        const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
-        if (!isPasswordValid) throw new Error("Invalid password or email");
-        // if (user.role === "ENGINEER" &&
-        //   user.engineerProfile &&
-        //   user.engineerProfile.status !== "APPROVED") {
-        //   throw new Error("Only approved engineers can login with email and password");
-        // }
-        return user;
+        if (!user) throw new Error(AUTH_ERROR.EMAIL_NOT_FOUND);
+        if (user.isSuspended) throw new Error(AUTH_ERROR.SUSPENDED);
+        if (user.password === null) throw new Error(AUTH_ERROR.NO_PASSWORD);
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) throw new Error(AUTH_ERROR.WRONG_PASSWORD);
+
+        // Only the fields the JWT needs. Never hand the password hash to NextAuth.
+        return { id: user.id, email: user.email, name: user.name, image: user.image, role: user.role };
       }
     })
   ],
@@ -75,6 +77,10 @@ export const authOptions: NextAuthOptions = {
         }
         else {
           const cookieStore = await cookies();
+          // Came from the LOGIN screen: don't silently create a (client) account.
+          if (cookieStore.get("oauth_mode")?.value === "login") {
+            return "/register?error=NoAccount";
+          }
           const intendedRole = cookieStore.get("oauth_role")?.value;
 
           const finalRole = intendedRole === "ENGINEER" ? "ENGINEER" : "CLIENT";
@@ -94,36 +100,32 @@ export const authOptions: NextAuthOptions = {
     },
 
     async jwt({ token, user }) {
-      try {
-        if (user) {
-          token.id = user.id;
-        }
-
-        if (token.id) {
-          const dbUser = await prisma.user.findUnique({
-            where: {
-              id: String(token.id),
-            },
-          });
-
-          if (dbUser) {
-            token.role = dbUser.role;
-          }
-        }
-
-        return token;
-      } catch (error) {
-        console.error(
-          "JWT CALLBACK ERROR:",
-          JSON.stringify(error, null, 2)
-        );
-
-        throw error;
+      if (user?.id) {
+        token.id = user.id;
       }
+      if (!token.id && token.sub) {
+        token.id = token.sub;
+      }
+
+      if (token.id) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: String(token.id) },
+            select: { role: true },
+          });
+          if (dbUser) token.role = dbUser.role;
+        } catch (error) {
+          // A DB hiccup (e.g. Neon cold start) must not invalidate a good session:
+          // throwing here made getServerSession() return null => "Unauthorized".
+          console.error("JWT CALLBACK ERROR:", error);
+        }
+      }
+
+      return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string;
+        session.user.id = (token.id ?? token.sub) as string;
         session.user.role = token.role as string;
       }
       return session;

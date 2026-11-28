@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import useSWRInfinite from "swr/infinite";
-import { fetcher } from "@/lib/fetcher";
+import { chatFetch, chatErrorMessage } from "@/lib/chat-fetch";
 import { useAuth } from "@/hooks/useAuth";
 import { globalSocket } from "@/components/SocketAnnouncer";
 import ChatSidebar from "./direct/ChatSidebar";
@@ -33,13 +33,56 @@ export default function DirectMessageUI() {
     return `/api/chat/direct/contacts?search=${debouncedSearch}&role=${activeTab}&page=${pageIndex + 1}&limit=20`;
   };
 
-  const { data, size, setSize, isValidating, mutate } = useSWRInfinite(
+  const { data, error, size, setSize, isValidating, mutate } = useSWRInfinite(
     getKey,
-    fetcher
+    (url: string) => chatFetch(url),
+    {
+      // Re-fetching page 1 on every "load more" is what kept the list spinning forever.
+      revalidateFirstPage: false,
+      errorRetryCount: 2,
+    }
   );
 
-  const contacts = data ? data.flatMap(p => p.contacts || []) : [];
-  const isLoadingInitialData = !data && isValidating;
+  // A message for someone whose chat with the sender isn't open: refresh the list (last message, order).
+  useEffect(() => {
+    const onNotify = () => { mutate(); };
+    globalSocket.on("new_dm_notification", onNotify);
+    return () => { globalSocket.off("new_dm_notification", onNotify); };
+  }, [mutate]);
+
+  const contacts = data ? data.flatMap((p: any) => p.contacts || []) : [];
+  const isLoadingInitialData = !data && !error;
+  // The API tells us when the last page was reached; without this the sidebar's
+  // scroll sentinel kept asking for page N+1 in an endless loop.
+  const isReachingEnd = !!data && !data[data.length - 1]?.hasMore;
+  const contactIdsKey = contacts.map((c: any) => c.id).join(",");
+
+  // Online dots: ask the server who is connected, then follow live changes.
+  // (liveUsers was declared but never filled, so everyone always showed offline.)
+  useEffect(() => {
+    const ids = contactIdsKey ? contactIdsKey.split(",") : [];
+    const ask = () => {
+      if (ids.length) globalSocket.emit("check_multiple_users_status", ids);
+    };
+    const onBulk = (statuses: Record<string, boolean>) => setLiveUsers((prev) => ({ ...prev, ...statuses }));
+    const onChange = ({ userId, isOnline }: { userId: string; isOnline: boolean }) =>
+      setLiveUsers((prev) => ({ ...prev, [userId]: isOnline }));
+
+    globalSocket.on("multiple_users_status_result", onBulk);
+    globalSocket.on("user_status_change", onChange);
+    globalSocket.on("connect", ask); // statuses are stale after a reconnect
+    ask();
+    const t = setInterval(ask, 30000); // safety net for any missed event
+
+    return () => {
+      globalSocket.off("multiple_users_status_result", onBulk);
+      globalSocket.off("user_status_change", onChange);
+      globalSocket.off("connect", ask);
+      clearInterval(t);
+    };
+  }, [contactIdsKey]);
+
+  const loadError = error && contacts.length === 0 ? chatErrorMessage(error) : null;
 
   return (
     <div className="flex h-[90vh] w-full bg-white dark:bg-background overflow-hidden relative">
@@ -70,7 +113,9 @@ export default function DirectMessageUI() {
         setSearch={setSearch}
         isLoading={isLoadingInitialData}
         isValidating={isValidating}
-        isReachingEnd={false}
+        isReachingEnd={isReachingEnd}
+        loadError={loadError}
+        onRetry={() => mutate()}
         loadMore={() => setSize(size + 1)}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}

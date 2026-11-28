@@ -20,9 +20,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json( { success: false, message: validation.error.issues[0].message }, { status: 400 } );
     }
 
-    const { name, email, password, role } = validation.data;
+    const { name, password, role } = validation.data;
+    const email = validation.data.email.trim().toLowerCase();
 
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const existingUser = await prisma.user.findFirst({
+      where: { email: { equals: email, mode: "insensitive" } },
+      select: { id: true },
+    });
 
     if (existingUser) {
       return NextResponse.json( { success: false, message: "User with this email already exists" }, { status: 409 } );

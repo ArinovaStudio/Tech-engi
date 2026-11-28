@@ -4,14 +4,23 @@ import { prisma } from "@/lib/prisma";
 
 export async function getUser() {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.email){
+  const sessionId = session?.user?.id;
+  const sessionEmail = session?.user?.email;
+  if (!sessionId && !sessionEmail){
     return { user: null, error: "Unauthorized" };
   }
 
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    include: { clientProfile: true, engineerProfile: true }
-  });
+  const include = { clientProfile: true, engineerProfile: true } as const;
+  // Prefer the stable id from the token; fall back to email (case-insensitive).
+  let user = sessionId
+    ? await prisma.user.findUnique({ where: { id: sessionId }, include })
+    : null;
+  if (!user && sessionEmail) {
+    user = await prisma.user.findFirst({
+      where: { email: { equals: sessionEmail, mode: "insensitive" } },
+      include,
+    });
+  }
   
   if (!user){
     return { user: null, error: "User not found" };
@@ -31,7 +40,7 @@ export async function getUser() {
     prisma.user.update({
       where: { id: user.id },
       data: { lastActiveAt: new Date() }
-    });
+    }).catch(() => {});
   }
 
   return { user, error: null };

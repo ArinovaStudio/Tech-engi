@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import RegisterClient from "./RegisterClient";
+import RoleChooser from "./RoleChooser";
+import { safeCallbackPath } from "@/lib/safe-redirect";
 
 export const metadata: Metadata = {
   title: "Create account · Tech Engi",
@@ -11,6 +12,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RegisterPage() {
-  return <RegisterClient />;
+type SP = Promise<Record<string, string | string[] | undefined>>;
+const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
+
+export default async function RegisterPage({ searchParams }: { searchParams: SP }) {
+  const sp = await searchParams;
+  return <RoleChooser callbackUrl={safeCallbackPath(one(sp.callbackUrl))} initialError={one(sp.error) ?? null} />;
 }

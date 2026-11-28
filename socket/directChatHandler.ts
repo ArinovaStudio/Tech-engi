@@ -13,10 +13,15 @@ export default function registerDirectChatHandlers(io: Server, socket: Socket) {
     socket.join(roomName);
   });
 
-  socket.on("send_dm", async (data: { senderId: string; receiverId: string; content: string }) => {
+  type Ack = (res: { ok: boolean; message?: string }) => void;
+
+  socket.on("send_dm", async (data: { senderId: string; receiverId: string; content: string }, ack?: Ack) => {
     try {
       const validation = validateChatMessage(data.content);
-      if (!validation.isValid) return socket.emit("dm_error", { message: validation.reason });
+      if (!validation.isValid) {
+        socket.emit("dm_error", { message: validation.reason });
+        return ack?.({ ok: false, message: validation.reason });
+      }
 
       const [user1Id, user2Id] = [data.senderId, data.receiverId].sort();
 
@@ -37,10 +42,13 @@ export default function registerDirectChatHandlers(io: Server, socket: Socket) {
 
       const roomName = `dm_${getRoomId(data.senderId, data.receiverId)}`;
       io.to(roomName).emit("receive_dm", savedMessage);
-      io.emit("new_dm_notification", { receiverId: data.receiverId, senderId: data.senderId, message: savedMessage });
+      // Only the receiver gets the notification (it used to be broadcast to every connected user).
+      io.to(`user_${data.receiverId}`).emit("new_dm_notification", { receiverId: data.receiverId, senderId: data.senderId, message: savedMessage });
+      ack?.({ ok: true });
 
     } catch {
       socket.emit("dm_error", { message: "Failed to send message" });
+      ack?.({ ok: false, message: "Your message couldn't be sent. Please try again." });
     }
   });
 

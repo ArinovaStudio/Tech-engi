@@ -1,12 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useTheme } from "@/components/ThemeProvider";
 import AuthBrandSide from "@/components/auth/AuthBrandSide";
+import { humanizeAuthError } from "@/lib/auth-errors";
 
-export default function LoginClient() {
+interface LoginClientProps {
+  initialRole?: "CLIENT" | "ENGINEER";
+  callbackUrl?: string | null;
+  initialError?: string | null;
+}
+
+export default function LoginClient({ initialRole = "CLIENT", callbackUrl = null, initialError = null }: LoginClientProps) {
   const { theme, toggleTheme } = useTheme();
 
   const [email, setEmail] = useState("");
@@ -15,8 +22,19 @@ export default function LoginClient() {
 
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
-  const [generalError, setGeneralError] = useState("");
+  const [generalError, setGeneralError] = useState(initialError ? humanizeAuthError(initialError) : "");
   const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState<"CLIENT" | "ENGINEER">(initialRole);
+
+  // Drop ?error= from the address bar once it has been shown (no state change).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("error")) {
+      params.delete("error");
+      const rest = params.toString();
+      window.history.replaceState(null, "", window.location.pathname + (rest ? `?${rest}` : ""));
+    }
+  }, []);
 
   const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -53,6 +71,13 @@ export default function LoginClient() {
     return isValid;
   };
 
+  const redirectTarget = callbackUrl
+    ? `/api/auth/role-redirect?callbackUrl=${encodeURIComponent(callbackUrl)}`
+    : "/api/auth/role-redirect";
+  const signupHref = `/register/${role === "CLIENT" ? "client" : "engineer"}${
+    callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : ""
+  }`;
+
   const handleCredentialsLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setGeneralError("");
@@ -63,27 +88,30 @@ export default function LoginClient() {
 
     try {
       const res = await signIn("credentials", {
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         password,
         redirect: false,
       });
 
-      if (res?.error) {
-        setGeneralError(res.error);
+      if (!res || res.error) {
+        setGeneralError(humanizeAuthError(res?.error));
         setLoading(false);
         return;
       }
 
-      window.location.href = "/api/auth/role-redirect";
-    } catch {
-      setGeneralError("An unexpected error occurred. Please try again.");
+      window.location.href = redirectTarget;
+    } catch (err) {
+      setGeneralError(humanizeAuthError(err));
       setLoading(false);
     }
   };
 
   const handleOAuthLogin = (provider: "google" | "github") => {
     setGeneralError("");
-    signIn(provider, { callbackUrl: "/api/auth/role-redirect" });
+    // Tell the server this is a LOGIN, so an unknown Google/GitHub email is sent to sign-up
+    // instead of silently becoming a client account.
+    document.cookie = "oauth_mode=login; path=/; max-age=120";
+    signIn(provider, { callbackUrl: redirectTarget });
   };
 
   return (
@@ -173,6 +201,29 @@ export default function LoginClient() {
             <p className="mt-2 text-[15.5px] text-slate-500 dark:text-slate-400">
               Log in to your Tech Engi account.
             </p>
+          </div>
+
+          {/* Role switch: same login, but sends new users down the right sign-up path */}
+          <div
+            role="group"
+            aria-label="Account type"
+            className="mt-6 grid grid-cols-2 gap-1 rounded-2xl border border-slate-200 bg-slate-100/80 p-1.5 dark:border-slate-800 dark:bg-slate-900/90"
+          >
+            {([["CLIENT", "I\u2019m hiring"], ["ENGINEER", "I\u2019m an engineer"]] as const).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={role === value}
+                onClick={() => setRole(value)}
+                className={`min-h-[44px] rounded-xl px-3 text-[14.5px] font-semibold transition-all cursor-pointer ${
+                  role === value
+                    ? "bg-[#f0b31e] text-slate-950 shadow-xs"
+                    : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
 
           {/* OAuth Buttons */}
@@ -387,10 +438,10 @@ export default function LoginClient() {
           <div className="mt-7 border-t border-slate-200 pt-5 text-center sm:text-left text-[15px] text-slate-500 dark:border-slate-800 dark:text-slate-400">
             Don&apos;t have an account?{" "}
             <Link
-              href="/register"
+              href={signupHref}
               className="font-semibold text-[#c48d08] hover:text-[#a07204] dark:text-[#f0b31e] dark:hover:text-[#ffc543] underline-offset-2 hover:underline transition-colors"
             >
-              Create one free
+              {role === "CLIENT" ? "Sign up to hire" : "Sign up as an engineer"}
             </Link>
           </div>
         </div>
@@ -402,7 +453,7 @@ export default function LoginClient() {
       </div>
 
       {/* ================= RIGHT: BRAND + TRUST SIDE ================= */}
-      <AuthBrandSide role="CLIENT" />
+      <AuthBrandSide role={role} />
     </div>
     
   );

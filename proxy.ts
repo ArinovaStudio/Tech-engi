@@ -6,6 +6,9 @@ export async function proxy(req: NextRequest) {
   const token = await getToken({
     req,
     secret: process.env.NEXTAUTH_SECRET,
+    // Behind a TLS-terminating proxy req.url is http://, so getToken would look
+    // for the non-secure cookie name and miss a valid session.
+    secureCookie: process.env.NEXTAUTH_URL?.startsWith("https://"),
   });
 
   const pathname = req.nextUrl.pathname;
@@ -13,6 +16,8 @@ export async function proxy(req: NextRequest) {
   const authPages = [
     "/login",
     "/register",
+    "/register/client",
+    "/register/engineer",
     "/forgot-password",
   ];
 
@@ -49,6 +54,8 @@ export const config = {
   matcher: [
     "/login",
     "/register",
+    "/register/client",
+    "/register/engineer",
     "/forgot-password",
   ],
 };

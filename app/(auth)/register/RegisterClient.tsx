@@ -6,18 +6,22 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useTheme } from "@/components/ThemeProvider";
 import AuthBrandSide from "@/components/auth/AuthBrandSide";
+import { rememberCallbackFromLocation } from "@/lib/safe-redirect";
+import { humanizeAuthError, readJsonSafe, AUTH_MESSAGES } from "@/lib/auth-errors";
 
 export type AccountRole = "CLIENT" | "ENGINEER";
 
 interface RegisterClientProps {
   defaultRole?: AccountRole;
+  callbackUrl?: string | null;
 }
 
-export default function RegisterClient({ defaultRole = "CLIENT" }: RegisterClientProps) {
+export default function RegisterClient({ defaultRole = "CLIENT", callbackUrl = null }: RegisterClientProps) {
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
 
   const [step, setStep] = useState<1 | 2>(1);
+  const switchQs = callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : "";
   const [role, setRole] = useState<AccountRole>(defaultRole);
 
   const [name, setName] = useState("");
@@ -124,6 +128,7 @@ export default function RegisterClient({ defaultRole = "CLIENT" }: RegisterClien
     setLoading(true);
 
     try {
+      rememberCallbackFromLocation();
       // 1. Create account
       const registerRes = await fetch("/api/auth/register", {
         method: "POST",
@@ -136,10 +141,11 @@ export default function RegisterClient({ defaultRole = "CLIENT" }: RegisterClien
         }),
       });
 
-      const registerData = await registerRes.json();
+      const registerData = await readJsonSafe<{ success?: boolean; message?: string }>(registerRes);
 
-      if (!registerRes.ok || !registerData.success) {
-        throw new Error(registerData.message || "Registration failed");
+      if (!registerRes.ok || !registerData?.success) {
+        // 4xx carries a friendly message from our API; anything else (5xx, HTML error page) does not.
+        throw new Error(registerRes.status < 500 && registerData?.message ? registerData.message : AUTH_MESSAGES.generic);
       }
 
       // 2. Try sending verification OTP
@@ -169,7 +175,7 @@ export default function RegisterClient({ defaultRole = "CLIENT" }: RegisterClien
         redirect: false,
       });
 
-      if (signInRes?.error) {
+      if (!signInRes || signInRes.error) {
         // Redirect to login if signin failed
         router.push("/login");
         return;
@@ -178,8 +184,7 @@ export default function RegisterClient({ defaultRole = "CLIENT" }: RegisterClien
       const callbackUrl = role === "ENGINEER" ? "/form/engineer" : "/form/client";
       window.location.href = callbackUrl;
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "An error occurred during registration. Please try again.";
-      setGeneralError(msg);
+      setGeneralError(humanizeAuthError(err));
       setLoading(false);
     }
   };
@@ -206,10 +211,10 @@ export default function RegisterClient({ defaultRole = "CLIENT" }: RegisterClien
         }),
       });
 
-      const verifyData = await verifyRes.json();
+      const verifyData = await readJsonSafe<{ success?: boolean; message?: string }>(verifyRes);
 
-      if (!verifyRes.ok || !verifyData.success) {
-        throw new Error(verifyData.message || "Invalid verification code.");
+      if (!verifyRes.ok || !verifyData?.success) {
+        throw new Error(verifyRes.status < 500 && verifyData?.message ? verifyData.message : AUTH_MESSAGES.generic);
       }
 
       const signInRes = await signIn("credentials", {
@@ -218,7 +223,7 @@ export default function RegisterClient({ defaultRole = "CLIENT" }: RegisterClien
         redirect: false,
       });
 
-      if (signInRes?.error) {
+      if (!signInRes || signInRes.error) {
         router.push("/login");
         return;
       }
@@ -226,8 +231,7 @@ export default function RegisterClient({ defaultRole = "CLIENT" }: RegisterClien
       const callbackUrl = role === "ENGINEER" ? "/form/engineer" : "/form/client";
       window.location.href = callbackUrl;
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Verification failed. Please check the code and try again.";
-      setGeneralError(msg);
+      setGeneralError(humanizeAuthError(err, "We couldn't verify that code. Please check it and try again."));
       setLoading(false);
     }
   };
@@ -241,14 +245,13 @@ export default function RegisterClient({ defaultRole = "CLIENT" }: RegisterClien
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim().toLowerCase(), type: "VERIFY_EMAIL" }),
       });
-      const otpData = await otpRes.json();
-      if (!otpRes.ok || !otpData.success) {
-        throw new Error(otpData.message || "Failed to resend code.");
+      const otpData = await readJsonSafe<{ success?: boolean; message?: string }>(otpRes);
+      if (!otpRes.ok || !otpData?.success) {
+        throw new Error(otpRes.status < 500 && otpData?.message ? otpData.message : "We couldn't resend the code. Please try again.");
       }
       setOtpSentMsg("A fresh 6-digit verification code has been sent.");
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to resend code.";
-      setGeneralError(msg);
+      setGeneralError(humanizeAuthError(err, "We couldn't resend the code. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -258,6 +261,8 @@ export default function RegisterClient({ defaultRole = "CLIENT" }: RegisterClien
     setGeneralError("");
     // Store selected role in cookie so the OAuth callback knows which role to assign
     document.cookie = `oauth_role=${role}; path=/; max-age=120`;
+    document.cookie = "oauth_mode=; path=/; max-age=0"; // clear a stale "login" intent
+    rememberCallbackFromLocation();
     const callbackUrl = role === "ENGINEER" ? "/form/engineer" : "/form/client";
     signIn(provider, { callbackUrl });
   };
@@ -353,51 +358,22 @@ export default function RegisterClient({ defaultRole = "CLIENT" }: RegisterClien
                 </p>
               </div>
 
-              {/* Segmented Role Control */}
-              <div
-                role="group"
-                aria-label="Account type"
-                className="mt-6 grid grid-cols-2 gap-1 rounded-2xl border border-slate-200 bg-slate-100/80 p-1.5 dark:border-slate-800 dark:bg-slate-900/90"
-              >
-                <button
-                  type="button"
-                  aria-pressed={role === "CLIENT"}
-                  onClick={() => setRole("CLIENT")}
-                  className={`flex min-h-[46px] flex-col items-center justify-center gap-0.5 rounded-xl py-2 px-3 text-[14.5px] font-semibold transition-all cursor-pointer ${
-                    role === "CLIENT"
-                      ? "bg-[#f0b31e] text-slate-950 shadow-xs"
-                      : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-                  }`}
+              {/* Fixed role (chosen on /register). Switch link keeps the callback. */}
+              <div className="mt-6 flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-100/80 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/90">
+                <div>
+                  <p className="font-mono text-[10px] font-semibold tracking-wider text-slate-400 uppercase dark:text-slate-500">
+                    Signing up as
+                  </p>
+                  <p className="text-[15px] font-bold text-slate-900 dark:text-white">
+                    {role === "CLIENT" ? "I\u2019m hiring" : "I\u2019m an engineer"}
+                  </p>
+                </div>
+                <Link
+                  href={`/register/${role === "CLIENT" ? "engineer" : "client"}${switchQs}`}
+                  className="shrink-0 text-[13.5px] font-semibold text-[#c48d08] underline-offset-2 hover:underline dark:text-[#f0b31e]"
                 >
-                  <span>I&apos;m hiring</span>
-                  <span
-                    className={`font-mono text-[10px] font-semibold tracking-wider uppercase ${
-                      role === "CLIENT" ? "text-slate-900/80" : "text-slate-400 dark:text-slate-500"
-                    }`}
-                  >
-                    CLIENT
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  aria-pressed={role === "ENGINEER"}
-                  onClick={() => setRole("ENGINEER")}
-                  className={`flex min-h-[46px] flex-col items-center justify-center gap-0.5 rounded-xl py-2 px-3 text-[14.5px] font-semibold transition-all cursor-pointer ${
-                    role === "ENGINEER"
-                      ? "bg-[#f0b31e] text-slate-950 shadow-xs"
-                      : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-                  }`}
-                >
-                  <span>I&apos;m a freelancer</span>
-                  <span
-                    className={`font-mono text-[10px] font-semibold tracking-wider uppercase ${
-                      role === "ENGINEER" ? "text-slate-900/80" : "text-slate-400 dark:text-slate-500"
-                    }`}
-                  >
-                    FREELANCER
-                  </span>
-                </button>
+                  {role === "CLIENT" ? "I\u2019m an engineer instead" : "I\u2019m hiring instead"}
+                </Link>
               </div>
 
               {/* OAuth Buttons */}
@@ -661,8 +637,7 @@ export default function RegisterClient({ defaultRole = "CLIENT" }: RegisterClien
                     <span>
                       <strong className="font-semibold text-slate-900 dark:text-white">
                         Verification comes later, not now.
-                      </strong>{" "}
-                      Aadhaar, PAN and proof of experience are collected from your dashboard before your first match. They&apos;re never shown to clients.
+                      </strong>
                     </span>
                   </div>
                 )}

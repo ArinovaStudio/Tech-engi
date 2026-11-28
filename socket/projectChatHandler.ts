@@ -8,10 +8,15 @@ export default function registerProjectChatHandlers(io: Server, socket: Socket) 
     socket.join(`project_${data.projectId}`);
   });
 
-  socket.on("send_project_message", async (data: { senderId: string; projectId: string; content: string }) => {
+  type Ack = (res: { ok: boolean; message?: string }) => void;
+
+  socket.on("send_project_message", async (data: { senderId: string; projectId: string; content: string }, ack?: Ack) => {
     try {
       const validation = validateChatMessage(data.content);
-      if (!validation.isValid) return socket.emit("project_error", { message: validation.reason });
+      if (!validation.isValid) {
+        socket.emit("project_error", { message: validation.reason });
+        return ack?.({ ok: false, message: validation.reason });
+      }
 
       const savedMessage = await prisma.projectMessage.create({
         data: {
@@ -25,8 +30,10 @@ export default function registerProjectChatHandlers(io: Server, socket: Socket) 
       });
 
       io.to(`project_${data.projectId}`).emit("receive_project_message", savedMessage);
+      ack?.({ ok: true });
     } catch {
       socket.emit("project_error", { message: "Failed to send project message" });
+      ack?.({ ok: false, message: "Your message couldn't be sent. Please try again." });
     }
   });
 

@@ -15,6 +15,8 @@ export default function ChatSidebar({
   search,
   setSearch,
   isLoading,
+  loadError,
+  onRetry,
   isValidating,
   isReachingEnd,
   loadMore,
@@ -131,6 +133,16 @@ export default function ChatSidebar({
           {isLoading ? (
             <div className="flex justify-center p-6">
               <Loader2 className="animate-spin text-[#FFAE58]" />
+            </div>
+          ) : loadError ? (
+            <div role="alert" className="flex flex-col items-center gap-3 p-6 text-center">
+              <p className="text-sm text-gray-500 dark:text-slate-400">{loadError}</p>
+              <button
+                onClick={onRetry}
+                className="rounded-lg bg-[#FFAE58] px-4 py-2 text-sm font-semibold text-slate-950 hover:opacity-90"
+              >
+                Retry
+              </button>
             </div>
           ) : (
             contacts.map((contact: any) => {

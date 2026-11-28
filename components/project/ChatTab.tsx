@@ -5,9 +5,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { Send, X, CheckSquare, Trash2, Loader2, ChevronUp } from "lucide-react";
 import { globalSocket } from "@/components/SocketAnnouncer";
 import MessageItem from "../chat/direct/MessageItem";
+import { chatFetch, chatErrorMessage, mergeMessages, CHAT_MESSAGES, SEND_FAILED, SEND_OFFLINE } from "@/lib/chat-fetch";
+import { useSocketConnected } from "@/components/useSocketConnected";
 
 export default function ChatTab({ projectId }: { projectId: string }) {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
+  const userId = user?.id;
+  const connected = useSocketConnected();
   const isAdmin = user?.role === "ADMIN"; 
 
   const [messages, setMessages] = useState<any[]>([]);
@@ -21,49 +25,82 @@ export default function ChatTab({ projectId }: { projectId: string }) {
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [loadingInitial, setLoadingInitial] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const loadMessages = useCallback(async (cursor?: string) => {
     try {
       const url = `/api/chat/${projectId}${cursor ? `?cursor=${cursor}` : ""}`;
-      const res = await fetch(url);
-      const data = await res.json();
-      
-      if (data.success) {
-        if (cursor) {
-          setMessages((prev) => [...data.messages, ...prev]);
-        } else {
-          setMessages(data.messages);
-          setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
-        }
-        setNextCursor(data.nextCursor);
+      const data = await chatFetch(url);
 
-        // Mark unread messages as read
-        if (user) {
-          data.messages.forEach((msg: any) => {
-            if (msg.senderId !== user.id && !msg.isRead) {
-              globalSocket.emit("mark_project_message_read", { messageId: msg.id, readerId: user.id, projectId });
-            }
-          });
-        }
+      if (cursor) {
+        setMessages((prev) => [...data.messages, ...prev]);
+      } else {
+        setMessages(data.messages);
+        setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+      }
+      setNextCursor(data.nextCursor);
+      setLoadError(null);
+
+      // Mark unread messages as read
+      if (userId) {
+        data.messages.forEach((msg: any) => {
+          if (msg.senderId !== userId && !msg.isRead) {
+            globalSocket.emit("mark_project_message_read", { messageId: msg.id, readerId: userId, projectId });
+          }
+        });
       }
     } catch (err) {
       console.error("Failed to load project chat", err);
+      // Only the first page blocks the screen; "load older" failures keep the chat usable.
+      if (!cursor) setLoadError(chatErrorMessage(err));
     } finally {
       setLoadingInitial(false);
       setLoadingMore(false);
     }
-  }, [projectId, user]);
+  }, [projectId, userId]);
+
+  // Quietly pull the newest page and merge it (polling fallback + catch-up after a reconnect).
+  const refreshLatest = useCallback(async () => {
+    try {
+      const data = await chatFetch(`/api/chat/${projectId}`);
+      setMessages((prev) => mergeMessages(prev, data.messages));
+    } catch {
+      /* silent: the visible state is whatever we already have */
+    }
+  }, [projectId]);
+
+  const retryLoad = () => {
+    setLoadError(null);
+    setLoadingInitial(true);
+    loadMessages();
+  };
 
   useEffect(() => {
-    if (user && projectId) loadMessages();
-  }, [user, projectId, loadMessages]);
+    if (authLoading || !userId || !projectId) return;
+    loadMessages();
+  }, [authLoading, userId, projectId, loadMessages]);
+
+  // No websocket => poll every few seconds so new messages still show up.
+  useEffect(() => {
+    if (connected || !userId || loadError) return;
+    const t = setInterval(() => {
+      if (document.visibilityState === "visible") refreshLatest();
+    }, 8000);
+    return () => clearInterval(t);
+  }, [connected, userId, loadError, refreshLatest]);
 
   useEffect(() => {
     if (!user || !projectId) return;
 
     globalSocket.emit("join_project_chat", { projectId });
+    // Rooms are lost whenever the connection drops: rejoin and catch up on what we missed.
+    const handleReconnect = () => {
+      globalSocket.emit("join_project_chat", { projectId });
+      refreshLatest();
+    };
+    globalSocket.on("connect", handleReconnect);
 
     const handleReceiveMessage = (msg: any) => {
       setMessages((prev) => {
@@ -106,6 +143,7 @@ export default function ChatTab({ projectId }: { projectId: string }) {
     globalSocket.on("project_error", handleError);
 
     return () => {
+      globalSocket.off("connect", handleReconnect);
       globalSocket.off("receive_project_message", handleReceiveMessage);
       globalSocket.off("project_message_edited", handleMessageEdited);
       globalSocket.off("project_message_deleted", handleMessageDeleted);
@@ -113,7 +151,7 @@ export default function ChatTab({ projectId }: { projectId: string }) {
       globalSocket.off("project_read_receipt", handleReadReceipt);
       globalSocket.off("project_error", handleError);
     };
-  }, [projectId, user]);
+  }, [projectId, user, refreshLatest]);
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -125,14 +163,26 @@ export default function ChatTab({ projectId }: { projectId: string }) {
       setMessages(prev => prev.map(m => m.id === editingMessage.id ? { ...m, content: inputMessage.trim(), isEdited: true } : m));
       setEditingMessage(null);
     } else {
-      const tempMessage = { id: `temp_${Date.now()}`, senderId: user.id, content: inputMessage.trim(), createdAt: new Date().toISOString(), isPending: true };
+      const text = inputMessage.trim();
+      if (!connected) {
+        setError(SEND_OFFLINE);
+        setTimeout(() => setError(null), 6000);
+        return; // keep the text in the box
+      }
+      const tempMessage = { id: `temp_${Date.now()}`, senderId: user.id, content: text, createdAt: new Date().toISOString(), isPending: true };
       setMessages(prev => [...prev, tempMessage]);
-      
-      globalSocket.emit("send_project_message", { 
-        senderId: user.id, 
-        projectId: projectId,
-        content: inputMessage.trim() 
-      });
+
+      globalSocket.timeout(10000).emit(
+        "send_project_message",
+        { senderId: user.id, projectId: projectId, content: text },
+        (err: Error | null, res?: { ok: boolean; message?: string }) => {
+          if (!err && res?.ok) return;
+          setMessages(prev => prev.filter(m => m.id !== tempMessage.id));
+          setInputMessage(cur => cur || text);
+          setError(res?.message || SEND_FAILED);
+          setTimeout(() => setError(null), 6000);
+        }
+      );
     }
     setInputMessage("");
     setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
@@ -150,7 +200,23 @@ export default function ChatTab({ projectId }: { projectId: string }) {
 
   const toggleSelectMessage = (id: string) => setSelectedMessageIds(prev => prev.includes(id) ? prev.filter(msgId => msgId !== id) : [...prev, id]);
 
-  if (loadingInitial) {
+  const sessionExpired = !authLoading && !isAuthenticated;
+  const blockingError = sessionExpired ? CHAT_MESSAGES.session : loadError;
+
+  if (blockingError) {
+    return (
+      <div role="alert" className="flex flex-col items-center justify-center gap-3 h-[500px] bg-white border border-[var(--border)] px-6 text-center dark:bg-card">
+        <p className="text-sm text-[var(--text-muted)]">{blockingError}</p>
+        {sessionExpired ? (
+          <a href="/login" className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white">Log in</a>
+        ) : (
+          <button onClick={retryLoad} className="rounded-lg bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white">Retry</button>
+        )}
+      </div>
+    );
+  }
+
+  if (loadingInitial || authLoading) {
     return <div className="flex items-center justify-center h-[500px] bg-white border border-[var(--border)] dark:bg-card"><Loader2 className="animate-spin text-[var(--primary)]" /></div>;
   }
 
